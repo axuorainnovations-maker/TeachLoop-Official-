@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axoura</title>
+  <script>
+    // First-time visitors go through onboarding; returning users go straight
+    // to the dashboard. The onboarding sets TEACHLOOP_ONBOARDED on completion.
+    (function () {
+      var onboarded = false;
+      try { onboarded = localStorage.getItem('TEACHLOOP_ONBOARDED') === '1'; } catch (e) {}
+      window.location.replace(onboarded ? 'dashboard.html' : 'onboarding.html');
+    })();
+  </script>
+  <style>html,body{margin:0;height:100%;background:#0c0c0e;}</style>
+</head>
+<body>
+  <a href="onboarding.html" style="color:#9a9aa2;font-family:sans-serif;padding:20px;display:block">Continue to Axoura →</a>
+</body>
+</html>

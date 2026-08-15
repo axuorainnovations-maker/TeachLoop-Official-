@@ -1,0 +1,12 @@
+.env.local
+config.js
+node_modules/
+scratch/
+
+.DS_Store
+
+.claude/
+
+# local dev server temp files
+.serve_3006.py
+.serve_3006.log

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create New Subject — Axoura</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background:#000000; color:#fff;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow-x:hidden; overflow-y:auto;
+  }
+  .wrap { width:100%; max-width:720px; display:flex; flex-direction:column; align-items:center; padding:0 24px; }
+  h1 { font-size:30px; font-weight:550; letter-spacing:-0.02em; line-height:1; text-align:center; }
+  .subtitle { margin-top:12px; font-size:15px; font-weight:400; letter-spacing:-0.01em; color:#9a9a9a; text-align:center; }
+
+  /* Single static folder */
+  .stage { position:relative; width:100%; height:240px; margin-top:36px; display:flex; align-items:center; justify-content:center; }
+  .folder { position:relative; transform-origin:center bottom; transition:transform 0.2s ease; }
+  .folder:hover { transform:translateY(-4px); }
+  .folder-shape { position:relative; width:220px; height:166px; }
+  .folder-shape svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .folder-content { position:absolute; inset:0; padding:30px 16px 14px; display:flex; flex-direction:column; justify-content:flex-end; }
+  .folder-name {
+    color:#fff; font-weight:700; letter-spacing:0.01em; line-height:1; opacity:0.85;
+    max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  .composer { margin-top:18px; width:100%; display:flex; justify-content:center; }
+  .composer-inner {
+    display:flex; align-items:center; gap:8px;
+    width:min(460px, 92vw); height:48px;
+    background:#1c1c1e; border:1px solid #232323; border-radius:999px;
+    padding-left:20px; padding-right:6px;
+    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset;
+  }
+  .composer-inner input {
+    flex:1; background:transparent; border:none; outline:none;
+    font-size:15px; font-weight:450; color:#fff; height:100%; font-family:inherit;
+  }
+  .composer-inner input::placeholder { color:#6a6a6a; }
+  .create-btn {
+    height:36px; padding:0 18px; border-radius:999px; border:none;
+    background:#fff; color:#000; font-size:14px; font-weight:600; letter-spacing:-0.01em;
+    cursor:pointer; white-space:nowrap; font-family:inherit; transition:background 0.15s, transform 0.15s;
+  }
+  .create-btn:hover { background:#efefef; }
+  .create-btn:active { transform:scale(0.98); }
+
+  .glow { pointer-events:none; position:absolute; inset:0; opacity:0.6;
+    background:radial-gradient(600px at 50% 45%, rgba(255,255,255,0.04), transparent 70%); }
+
+  .back-btn {
+    position:absolute; top:22px; left:22px; z-index:5;
+    display:flex; align-items:center; gap:7px;
+    background:transparent; border:none; color:#9a9a9a; cursor:pointer;
+    font-family:inherit; font-size:14px; font-weight:500; padding:8px 10px; border-radius:8px;
+    transition:color 0.15s, background 0.15s;
+  }
+  .back-btn:hover { color:#fff; background:#141414; }
+  .back-btn svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* Add-files modal */
+  .file-overlay {
+    position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none; transition:opacity 0.18s ease;
+  }
+  .file-overlay.open { opacity:1; pointer-events:auto; }
+  .file-box {
+    width:min(92vw, 440px); background:#161618; border:1px solid #2a2a2e; border-radius:18px;
+    padding:24px; box-shadow:0 24px 60px rgba(0,0,0,0.5);
+    transform:scale(0.94); transition:transform 0.18s ease;
+  }
+  .file-overlay.open .file-box { transform:scale(1); }
+  .file-title { font-size:18px; font-weight:600; color:#f4f4f5; }
+  .file-title span { color:#fff; }
+  .file-sub { font-size:13px; line-height:1.5; color:#9a9a9a; margin-top:6px; }
+  .dropzone {
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    margin-top:18px; padding:26px 16px; border:1.5px dashed #3a3a3f; border-radius:14px;
+    color:#9a9a9a; font-size:13.5px; cursor:pointer; text-align:center;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  .dropzone:hover, .dropzone.drag { border-color:#a866ee; background:rgba(168,102,238,0.06); color:#c7c7cc; }
+  .dropzone svg { width:26px; height:26px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .file-list { margin-top:14px; display:flex; flex-direction:column; gap:6px; max-height:130px; overflow-y:auto; }
+  .file-chip {
+    display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:9px;
+    background:#212124; font-size:13px; color:#e4e4e5;
+  }
+  .file-chip svg { width:15px; height:15px; stroke:#8a8a93; fill:none; stroke-width:1.7; flex-shrink:0; }
+  .file-chip .fname { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .file-chip .fdel { color:#8a8a93; cursor:pointer; font-size:16px; line-height:1; padding:0 2px; }
+  .file-chip .fdel:hover { color:#f87171; }
+  .file-actions { display:flex; gap:10px; margin-top:20px; }
+  .file-actions button {
+    flex:1; height:42px; border-radius:11px; font-size:14px; font-weight:600; cursor:pointer;
+    font-family:inherit; border:1px solid transparent; transition:background 0.15s, border-color 0.15s;
+  }
+  .file-skip { background:transparent; border-color:#3a3a3f; color:#e4e4e7; }
+  .file-skip:hover { background:#26262b; }
+  .file-create { background:#fff; color:#000; }
+  .file-create:hover { background:#efefef; }
+
+  @media (max-width:640px) {
+    .stage { height:220px; margin-top:32px; }
+    .folder-shape { width:196px; height:148px; }
+  }
+</style>
+</head>
+<body>
+  <button class="back-btn" id="backBtn" type="button" aria-label="Back">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    Back
+  </button>
+
+  <div class="wrap">
+    <h1>Create New Subject</h1>
+    <p class="subtitle">Keep one topic in one place</p>
+
+    <div class="stage">
+      <div class="folder">
+        <div class="folder-shape">
+          <svg viewBox="0 0 200 150" aria-hidden="true">
+            <path id="folderPath" d="M 12 0 H 56 L 68 18 H 188 C 194 18 200 22 200 30 V 138 C 200 145 194 150 186 150 H 12 C 4 150 0 145 0 137 V 8 C 0 2 5 0 12 0 Z"
+                  fill="#202020" stroke="#333333" stroke-width="1.1" shape-rendering="geometricPrecision"/>
+          </svg>
+          <div class="folder-content">
+            <span class="folder-name" id="folderName">New Subject</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <input id="nameInput" type="text" placeholder="Name your subject" spellcheck="false" autocomplete="off">
+        <button class="create-btn" id="createBtn" type="button">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="glow"></div>
+
+  <!-- Add-files pop-up -->
+  <div class="file-overlay" id="fileOverlay">
+    <div class="file-box" role="dialog" aria-modal="true">
+      <div class="file-title">Add files to “<span id="fileSubjName">New Subject</span>”</div>
+      <div class="file-sub">Attach documents, notes, or slides now — or skip and add them later.</div>
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" multiple hidden>
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <span>Click to choose files or drag them here</span>
+      </label>
+      <div class="file-list" id="fileList"></div>
+      <div class="file-actions">
+        <button class="file-skip" id="fileSkip" type="button">Skip</button>
+        <button class="file-create" id="fileCreate" type="button">Create folder</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var KEY = 'TEACHLOOP_SUBJECTS';
+  var FILES_KEY = 'TEACHLOOP_SUBJECT_FILES';
+
+  var nameInput = document.getElementById('nameInput');
+  var createBtn = document.getElementById('createBtn');
+  var backBtn = document.getElementById('backBtn');
+  var folderName = document.getElementById('folderName');
+
+  var fileOverlay = document.getElementById('fileOverlay');
+  var fileSubjName = document.getElementById('fileSubjName');
+  var fileInput = document.getElementById('fileInput');
+  var dropzone = document.getElementById('dropzone');
+  var fileList = document.getElementById('fileList');
+  var fileSkip = document.getElementById('fileSkip');
+  var fileCreate = document.getElementById('fileCreate');
+
+  function loadSubjects() {
+    try { var a = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(a) ? a.filter(Boolean).map(String) : []; }
+    catch (e) { return []; }
+  }
+  function saveSubjects(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {} }
+
+  function cap(s) {
+    if (!s) return '';
+    return s.split(' ').map(function (w) {
+      if (!w) return '';
+      var c = w.charAt(0);
+      if (c.toLowerCase() === c.toUpperCase()) return c + w.slice(1).toLowerCase();
+      return c.toUpperCase() + w.slice(1).toLowerCase();
+    }).join(' ');
+  }
+
+  // Live-update the single folder's name from the input.
+  nameInput.addEventListener('input', function () {
+    folderName.textContent = cap(nameInput.value.trim() || 'New Subject');
+  });
+
+  // ---- Add-files pop-up ----
+  var pickedFiles = [];
+
+  function renderFileList() {
+    fileList.innerHTML = '';
+    pickedFiles.forEach(function (name, i) {
+      var chip = document.createElement('div');
+      chip.className = 'file-chip';
+      chip.innerHTML =
+        '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
+        '<span class="fname"></span><span class="fdel" title="Remove">×</span>';
+      chip.querySelector('.fname').textContent = name;
+      chip.querySelector('.fdel').addEventListener('click', function () {
+        pickedFiles.splice(i, 1); renderFileList();
+      });
+      fileList.appendChild(chip);
+    });
+    fileCreate.textContent = pickedFiles.length ? ('Create folder (' + pickedFiles.length + ')') : 'Create folder';
+  }
+
+  function addFiles(fileArr) {
+    for (var i = 0; i < fileArr.length; i++) {
+      if (fileArr[i] && fileArr[i].name) pickedFiles.push(fileArr[i].name);
+    }
+    renderFileList();
+  }
+
+  fileInput.addEventListener('change', function () { addFiles(fileInput.files); fileInput.value = ''; });
+  dropzone.addEventListener('dragover', function (e) { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', function () { dropzone.classList.remove('drag'); });
+  dropzone.addEventListener('drop', function (e) {
+    e.preventDefault(); dropzone.classList.remove('drag');
+    if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+  });
+
+  function openFileModal() {
+    var name = (nameInput.value || '').trim();
+    if (!name) { nameInput.focus(); return; }
+    fileSubjName.textContent = cap(name);
+    pickedFiles = []; renderFileList();
+    fileOverlay.classList.add('open');
+  }
+  function closeFileModal() { fileOverlay.classList.remove('open'); }
+
+  function finalize() {
+    var name = (nameInput.value || '').trim();
+    if (!name) return;
+    var list = loadSubjects();
+    list.push(name);
+    saveSubjects(list);
+    // Mark it as most-recently opened so it shows in History.
+    try {
+      var rec = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]');
+      if (!Array.isArray(rec)) rec = [];
+      rec = rec.filter(function (n) { return n !== name; });
+      rec.unshift(name);
+      localStorage.setItem('TEACHLOOP_RECENTS', JSON.stringify(rec.slice(0, 8)));
+    } catch (e) {}
+    if (pickedFiles.length) {
+      try {
+        var map = JSON.parse(localStorage.getItem(FILES_KEY) || '{}');
+        map[name] = pickedFiles.slice();
+        localStorage.setItem(FILES_KEY, JSON.stringify(map));
+      } catch (e) {}
+    }
+    document.body.style.transition = 'opacity 0.3s ease';
+    document.body.style.opacity = '0';
+    setTimeout(function () { window.location.href = 'chatbot.html'; }, 300);
+  }
+
+  createBtn.addEventListener('click', openFileModal);
+  nameInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') openFileModal(); });
+  fileSkip.addEventListener('click', function () { pickedFiles = []; finalize(); });
+  fileCreate.addEventListener('click', finalize);
+  fileOverlay.addEventListener('click', function (e) { if (e.target === fileOverlay) closeFileModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeFileModal(); });
+
+  function goBack() {
+    document.body.style.transition = 'opacity 0.3s ease';
+    document.body.style.opacity = '0';
+    setTimeout(function () { window.location.href = 'chatbot.html'; }, 300);
+  }
+  backBtn.addEventListener('click', goBack);
+
+  nameInput.focus();
+})();
+</script>
+</body>
+</html>

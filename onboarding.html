@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Axoura — Onboarding</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.65);
+      --card: rgba(255, 255, 255, 0.06);
+      --card-hover: rgba(255, 255, 255, 0.11);
+      --border: rgba(255, 255, 255, 0.16);
+      --sel: rgba(139, 92, 246, 0.18);
+      --sel-border: #8b5cf6;
+      --green: #8b5cf6;
+      --green-2: #a78bfa;
+      --btn: #ffffff;
+      --btn-text: #111114;
+      --btn-disabled: rgba(255, 255, 255, 0.12);
+      --btn-disabled-text: rgba(255, 255, 255, 0.42);
+    }
+
+    html,
+    body {
+      height: 100%;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    /* Gradient lives on <html> only, so the body stays transparent and the
+     fixed z-index:-1 aurora layer (#usbg) shows through behind the content. */
+    html {
+      background:
+        radial-gradient(1100px 620px at 50% -10%, rgba(139, 92, 246, 0.45), transparent 60%),
+        radial-gradient(900px 600px at 85% 110%, rgba(124, 58, 237, 0.35), transparent 60%),
+        linear-gradient(180deg, #0c0a13 0%, #140f22 45%, #0b0a12 100%);
+      background-attachment: fixed;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: transparent;
+    }
+
+    /* Top bar: back + segmented progress + speaker */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 22px 26px 6px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .back {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      opacity: .9;
+    }
+
+    .back:hover {
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .back svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .back.hidden {
+      visibility: hidden;
+    }
+
+    .segs {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+    }
+
+    .seg {
+      flex: 1;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      overflow: hidden;
+    }
+
+    .seg>i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      border-radius: 999px;
+      transition: width .35s cubic-bezier(.2, 0, 0, 1);
+    }
+
+    .segs.hidden {
+      visibility: hidden;
+    }
+
+    .speaker {
+      width: 22px;
+      height: 22px;
+      color: var(--text);
+      opacity: .85;
+      flex-shrink: 0;
+    }
+
+    .speaker.hidden {
+      visibility: hidden;
+    }
+
+    /* Stage */
+    .stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 20px 26px 100px;
+      text-align: center;
+    }
+
+    .screen {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fade .35s ease;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* Heading with mascot */
+    .headrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 26px;
+    }
+
+    .headrow .m {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+    }
+
+    .sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    /* Mascot */
+    .mascot {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 26px rgba(168, 102, 238, .30));
+    }
+
+    .mascot.big {
+      width: 118px;
+      height: 118px;
+    }
+
+    .mascot-center .mascot {
+      width: 100%;
+      height: 100%;
+    }
+
+    .float {
+      animation: floaty 3.4s ease-in-out infinite;
+    }
+
+    @keyframes floaty {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0);
+      }
+
+      50% {
+        transform: translateY(-10px) rotate(-2deg);
+      }
+    }
+
+    /* Intro screen */
+    .intro {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 64vh;
+    }
+
+    .intro h1 {
+      margin-top: 26px;
+    }
+
+    /* Card grids */
+    .cards {
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+      width: 100%;
+    }
+
+    .cards.c4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      max-width: 900px;
+    }
+
+    .cards.c3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-width: 780px;
+    }
+
+    .cards.c2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 520px;
+    }
+
+    @media (max-width:820px) {
+      .cards.c4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .cards.c3 {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 26px 18px;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: background .15s, border-color .15s, transform .12s;
+      min-height: 150px;
+      justify-content: center;
+    }
+
+    .card:hover {
+      background: var(--card-hover);
+    }
+
+    .card.sel {
+      background: var(--sel);
+      border-color: var(--sel-border);
+      box-shadow: 0 0 0 1px var(--sel-border), 0 6px 26px rgba(139, 92, 246, 0.28);
+    }
+
+    .card:focus,
+    .goal:focus {
+      outline: none;
+    }
+
+    .card:focus-visible,
+    .goal:focus-visible {
+      outline: 2px solid var(--sel-border);
+      outline-offset: 2px;
+    }
+
+    .card .emoji {
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    .card .ic {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+
+    .card .ic svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Loading skeleton for the subject-adapted level cards */
+    .card.skel {
+      cursor: default;
+      gap: 10px;
+    }
+
+    .skel-line {
+      height: 11px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+      background-size: 200% 100%;
+      animation: shimmer 1.2s ease-in-out infinite;
+    }
+
+    .skel-line.w50 {
+      width: 50%;
+    }
+
+    .skel-line.w70 {
+      width: 70%;
+    }
+
+    .skel-line.w90 {
+      width: 90%;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    .card .t {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card .d {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    /* Sound screen */
+    .sound {
+      display: flex;
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .sound .tile {
+      width: 170px;
+      height: 210px;
+      border-radius: 20px;
+      background: var(--card);
+      border: 2px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+
+    .sound .tile:hover {
+      background: var(--card-hover);
+    }
+
+    .sound .tile.sel {
+      background: rgba(58, 213, 127, 0.15);
+      border-color: var(--sel-border);
+    }
+
+    .sound .tile .m {
+      width: 74px;
+      height: 74px;
+    }
+
+    .sound .tile .t {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .sound .tile.off .t {
+      color: var(--muted);
+    }
+
+    .voicerow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 26px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .toggle {
+      width: 52px;
+      height: 30px;
+      border-radius: 999px;
+      background: #cfe9d8;
+      position: relative;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .toggle.on {
+      background: #8fe0ad;
+    }
+
+    .toggle i {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+      transition: left .2s;
+    }
+
+    .toggle.on i {
+      left: 25px;
+    }
+
+    /* Age input */
+    .agebox {
+      margin-top: 120px;
+      width: min(92vw, 380px);
+      position: relative;
+    }
+
+    .agebox input {
+      width: 100%;
+      height: 64px;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 18px;
+      font-family: inherit;
+      outline: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .agebox input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .agebox input:focus {
+      border-color: #ffffff;
+    }
+
+    /* hide the native square spinner, use rounded custom steppers */
+    .agebox input::-webkit-inner-spin-button,
+    .agebox input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .stepper {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .stepper button {
+      width: 32px;
+      height: 18px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #ffffff;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      transition: opacity .15s, transform .08s;
+      opacity: .85;
+    }
+
+    .stepper button:hover {
+      opacity: 1;
+    }
+
+    .stepper button:active {
+      transform: scale(0.9);
+    }
+
+    .stepper button svg {
+      width: 15px;
+      height: 15px;
+      display: block;
+    }
+
+    /* Subject folder + free-type input */
+    .folderpick {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: min(92vw, 420px);
+    }
+
+    .folder-img {
+      width: 168px;
+      height: auto;
+      filter: drop-shadow(0 10px 26px rgba(124, 58, 237, 0.65)) drop-shadow(0 3px 8px rgba(0, 0, 0, 0.45));
+    }
+
+    .subject-input {
+      width: 100%;
+      height: 60px;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 17px;
+      font-family: inherit;
+      outline: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      text-align: center;
+    }
+
+    .subject-input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .subject-input:focus {
+      border-color: #ffffff;
+    }
+
+    /* Info screens */
+    .info-media {
+      margin-top: 34px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .experts {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .founder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 180px;
+    }
+
+    .founder .photo {
+      width: 100%;
+      height: 210px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #2a2140, #17121f);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    .founder .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .founder.center {
+      width: 214px;
+    }
+
+    .founder.center .photo {
+      height: 256px;
+    }
+
+    .founder .name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: 12px;
+      color: var(--text);
+    }
+
+    .founder .accolade {
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: var(--muted);
+      margin-top: 5px;
+      text-align: center;
+      max-width: 190px;
+    }
+
+    @media (max-width:720px) {
+      .experts {
+        flex-wrap: wrap;
+      }
+
+      .founder,
+      .founder.center {
+        width: 44%;
+      }
+    }
+
+    .unis {
+      margin-top: 34px;
+    }
+
+    .unis .lbl {
+      font-size: 11px;
+      letter-spacing: .12em;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 700;
+    }
+
+    .unis .row {
+      display: flex;
+      gap: 34px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 14px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 18px;
+      flex-wrap: wrap;
+    }
+
+    /* Topic map / constellation (approximate) */
+    .map {
+      position: relative;
+      width: min(92vw, 720px);
+      height: 320px;
+      margin-top: 20px;
+    }
+
+    .map .node {
+      position: absolute;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .map .node.dim {
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 600;
+    }
+
+    .map .node .bar {
+      display: block;
+      width: 56px;
+      height: 6px;
+      border-radius: 999px;
+      margin: 0 auto 6px;
+      background: linear-gradient(90deg, #c4b5fd, #a78bfa);
+    }
+
+    .map .dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      opacity: .5;
+    }
+
+    .map .mascot-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 88px;
+      height: 88px;
+    }
+
+    .constell .dot {
+      opacity: .55;
+    }
+
+    .constell .node {
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    /* Full-bleed animated background (UnicornStudio) for the "starting point" screen */
+    #usbg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .7s ease;
+    }
+
+    #usbg canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    /* Legibility scrim over the aurora so headings, cards and inputs stay readable */
+    #usbg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(120% 90% at 50% 0%, rgba(12, 10, 19, 0.30), rgba(12, 10, 19, 0.55));
+    }
+
+    body.show-usbg #usbg {
+      opacity: 1;
+    }
+
+    .startpoint {
+      min-height: 66vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .startpoint .mascot {
+      width: 132px;
+      height: 132px;
+      filter: drop-shadow(0 14px 40px rgba(168, 102, 238, .55));
+    }
+
+    .startpoint .sp-caption {
+      margin-top: 30px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    /* Goal timers */
+    .goals {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    @media (max-width:820px) {
+      .goals {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .goal {
+      background: var(--card);
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 30px 12px;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transition: background .15s, border-color .15s;
+    }
+
+    .goal:hover {
+      background: var(--card-hover);
+    }
+
+    .goal.sel {
+      background: var(--sel);
+      border-color: var(--sel-border);
+      box-shadow: 0 0 0 1px var(--sel-border), 0 6px 26px rgba(139, 92, 246, 0.28);
+    }
+
+    .goal .clock {
+      font-size: 40px;
+    }
+
+    .goal .t {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .goal .d {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.3;
+      text-align: center;
+      margin-top: -4px;
+    }
+
+    /* Signup */
+    .signup {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-top: 40px;
+      max-width: 420px;
+    }
+
+    .signup .signup-buddy {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 22px;
+      filter: drop-shadow(0 10px 26px rgba(168, 102, 238, 0.45));
+    }
+
+    .signup h1 {
+      font-size: 26px;
+    }
+
+    .oauth {
+      width: 100%;
+      height: 56px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 26px;
+    }
+
+    .oauth:hover {
+      background: #fafafa;
+    }
+
+    .oauth svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      font-weight: 700;
+      margin: 18px 0;
+    }
+
+    .or::before,
+    .or::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .email {
+      width: 100%;
+      height: 56px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0 16px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .email::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .email:focus {
+      border-color: #ffffff;
+    }
+
+    .signup-btn {
+      width: 100%;
+      height: 56px;
+      border-radius: 999px;
+      background: var(--btn);
+      color: var(--btn-text);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 16px;
+    }
+
+    .signup-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .legal {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    .legal a {
+      color: var(--muted);
+    }
+
+    .existing {
+      font-size: 14px;
+      margin-top: 22px;
+    }
+
+    .existing a {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* Continue */
+    .foot {
+      padding: 10px 26px 34px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .continue {
+      width: min(92vw, 360px);
+      height: 58px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+      background: var(--btn);
+      color: var(--btn-text);
+      transition: filter .15s;
+    }
+
+    .continue:hover {
+      filter: brightness(1.1);
+    }
+
+    .continue:disabled {
+      background: var(--btn-disabled);
+      color: var(--btn-disabled-text);
+      cursor: not-allowed;
+    }
+
+    .foot.hidden {
+      display: none;
+    }
+
+    /* ── Liquid-glass buttons: clear, glossy, light-catching over the aurora ── */
+    .continue,
+    .signup-btn,
+    .oauth {
+      background:
+        radial-gradient(130% 90% at 50% -25%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 62%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.05) 55%, rgba(255, 255, 255, 0.12) 100%);
+      -webkit-backdrop-filter: blur(20px) saturate(190%) brightness(1.12);
+      backdrop-filter: blur(20px) saturate(190%) brightness(1.12);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      color: #ffffff;
+      box-shadow: inset 0 1.5px 0.5px rgba(255, 255, 255, 0.9), inset 0 -10px 20px rgba(0, 0, 0, 0.08),
+        inset 0 0 22px rgba(255, 255, 255, 0.10), 0 16px 40px rgba(0, 0, 0, 0.42);
+      transition: background .18s, box-shadow .18s, transform .08s;
+    }
+
+    .continue:hover:not(:disabled),
+    .signup-btn:hover,
+    .oauth:hover {
+      filter: none;
+      background:
+        radial-gradient(130% 90% at 50% -25%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 62%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 55%, rgba(255, 255, 255, 0.16) 100%);
+      box-shadow: inset 0 1.5px 0.5px rgba(255, 255, 255, 1), inset 0 0 26px rgba(255, 255, 255, 0.16), 0 18px 46px rgba(0, 0, 0, 0.48);
+    }
+
+    .continue:active:not(:disabled),
+    .signup-btn:active,
+    .oauth:active {
+      transform: translateY(1px);
+    }
+
+    .continue:disabled {
+      background: rgba(255, 255, 255, 0.06);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.42);
+      box-shadow: none;
+    }
+
+    /* Frost the selectable cards/tiles so the aurora blurs gently behind them */
+    .card,
+    .goal {
+      -webkit-backdrop-filter: blur(9px) saturate(130%);
+      backdrop-filter: blur(9px) saturate(130%);
+    }
+
+    .back:hover {
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <button class="back hidden" id="backBtn" aria-label="Back"><svg viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6" />
+      </svg></button>
+    <div class="segs hidden" id="segs">
+      <div class="seg"><i></i></div>
+      <div class="seg"><i></i></div>
+      <div class="seg"><i></i></div>
+    </div>
+    <svg class="speaker hidden" id="speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5 6 9H2v6h4l5 4V5z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" />
+    </svg>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="foot" id="foot">
+    <button class="continue" id="continue">Continue</button>
+  </div>
+
+  <script>
+    // Axoura logo (the orbit/planet mark).
+    function mascotHTML(cls) { return `<img class="mascot ${cls || ''}" src="logo.png?v=3" alt="Axoura">`; }
+
+    const store = {};
+    function set(k, v) { store[k] = v; try { localStorage.setItem('TEACHLOOP_ONBOARD_' + k, JSON.stringify(v)); } catch (e) { } }
+
+    // Founders (center card = Mathieu). Save jayden.jpg / mathieu.jpg / daniel.jpg
+    // into the project folder; a gradient placeholder shows until they exist.
+    const FOUNDERS = [
+      { name: "Jayden Liew", img: "jayden.jpg", pos: "50% 18%", accolade: "Featured in Malaysia's The Star for mastery in Computer Science & Design Technology. Founder of 2 startups." },
+      { name: "Mathieu Marchis", img: "mathieu.jpg", center: true, pos: "43% 50%", accolade: "3 startups by 17. Placed 1st (solo & team) at MIT's entrepreneurship internship. Built the full backend for all 3." },
+      { name: "Daniel Liu", img: "daniel.jpg", pos: "38% 50%", accolade: "Built 2 startups at 15. Won international design competitions across France & China." },
+    ];
+
+    // Generic fallback levels used only if the subject-specific AI call fails.
+    const LEVEL_LADDER = [
+      { v: 'new', t: 'Just starting', d: 'I’m brand new to this.' },
+      { v: 'basics', t: 'Some basics', d: 'I know a few fundamentals.' },
+      { v: 'comfortable', t: 'Comfortable', d: 'I understand the core ideas.' },
+      { v: 'advanced', t: 'Advanced', d: 'I want to go deep.' },
+    ];
+
+    // Screen definitions — Brilliant copy verbatim, our mascot.
+    const screens = [
+      { type: 'intro' },
+      {
+        type: 'select', key: 'motivation', title: 'What motivates you to learn?', cols: 4, options: [
+          { v: 'school', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.27103 2.11151C5.46135 2.21816 5.03258 2.41324 4.72718 2.71244C4.42179 3.01165 4.22268 3.43172 4.11382 4.225C4.00176 5.04159 4 6.12387 4 7.67568V16.2442C4.38867 15.9781 4.82674 15.7756 5.29899 15.6517C5.82716 15.513 6.44305 15.5132 7.34563 15.5135L20 15.5135V7.67568C20 6.12387 19.9982 5.04159 19.8862 4.22499C19.7773 3.43172 19.5782 3.01165 19.2728 2.71244C18.9674 2.41324 18.5387 2.21816 17.729 2.11151C16.8955 2.00172 15.7908 2 14.2069 2H9.7931C8.2092 2 7.10452 2.00172 6.27103 2.11151ZM6.75862 6.59459C6.75862 6.1468 7.12914 5.78378 7.58621 5.78378H16.4138C16.8709 5.78378 17.2414 6.1468 17.2414 6.59459C17.2414 7.04239 16.8709 7.40541 16.4138 7.40541H7.58621C7.12914 7.40541 6.75862 7.04239 6.75862 6.59459ZM7.58621 9.56757C7.12914 9.56757 6.75862 9.93058 6.75862 10.3784C6.75862 10.8262 7.12914 11.1892 7.58621 11.1892H13.1034C13.5605 11.1892 13.931 10.8262 13.931 10.3784C13.931 9.93058 13.5605 9.56757 13.1034 9.56757H7.58621Z" fill="currentColor"></path><path d="M8.68965 17.1351H7.47341C6.39395 17.1351 6.01657 17.1421 5.72738 17.218C4.93365 17.4264 4.30088 18.0044 4.02952 18.7558C4.0463 19.1382 4.07259 19.4746 4.11382 19.775C4.22268 20.5683 4.42179 20.9884 4.72718 21.2876C5.03258 21.5868 5.46135 21.7818 6.27103 21.8885C7.10452 21.9983 8.2092 22 9.7931 22H14.2069C15.7908 22 16.8955 21.9983 17.729 21.8885C18.5387 21.7818 18.9674 21.5868 19.2728 21.2876C19.5782 20.9884 19.7773 20.5683 19.8862 19.775C19.9776 19.1088 19.9956 18.2657 19.9991 17.1351H13.1034V20.1417C13.1034 20.4397 13.1034 20.5886 12.9988 20.6488C12.8941 20.709 12.751 20.6424 12.4647 20.5092L11.0939 19.8713C10.9971 19.8262 10.9486 19.8037 10.8966 19.8037C10.8445 19.8037 10.796 19.8262 10.6992 19.8713L9.32842 20.5092C9.04213 20.6424 8.89899 20.709 8.79432 20.6488C8.68965 20.5886 8.68965 20.4397 8.68965 20.1417V17.1351Z" fill="currentColor"></path></svg>`, t: 'Excelling in school' },
+          { v: 'career', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M2 1C2.55228 1 3 1.44772 3 2V18.5C3 19.8807 4.11929 21 5.5 21H22C22.5523 21 23 21.4477 23 22C23 22.5523 22.5523 23 22 23H5.5C3.01472 23 1 20.9853 1 18.5V2C1 1.44772 1.44772 1 2 1Z" fill="currentColor"></path><path d="M6 18V16.5C6 15.9477 6.44772 15.5 7 15.5C7.55228 15.5 8 15.9477 8 16.5V18C8 18.5523 7.55228 19 7 19C6.44772 19 6 18.5523 6 18Z" fill="currentColor"></path><path d="M10 14.65V18C10 18.5523 10.4477 19 11 19C11.5523 19 12 18.5523 12 18L12 14.65C12 14.0977 11.5523 13.65 11 13.65C10.4477 13.65 10 14.0977 10 14.65Z" fill="currentColor"></path><path d="M15 19C14.4477 19 14 18.5523 14 18V12.8C14 12.2477 14.4477 11.8 15 11.8C15.5523 11.8 16 12.2477 16 12.8V18C16 18.5523 15.5523 19 15 19Z" fill="currentColor"></path><path d="M18 18C18 18.5523 18.4477 19 19 19C19.5523 19 20 18.5523 20 18L20 11C20 10.4477 19.5523 10 19 10C18.4477 10 18 10.4477 18 11L18 18Z" fill="currentColor"></path><path d="M15.25 3C15.25 2.44772 15.6977 2 16.25 2H20C20.5523 2 21 2.44772 21 3V6.75C21 7.30228 20.5523 7.75 20 7.75C19.4477 7.75 19 7.30228 19 6.75V5.50005C17.1832 7.36709 15.4559 8.78049 13.6128 9.81045C11.3417 11.0796 8.95023 11.7359 6.09048 11.9959C5.54046 12.0459 5.05405 11.6406 5.00405 11.0905C4.95405 10.5405 5.35939 10.0541 5.90941 10.0041C8.54966 9.76409 10.6582 9.17045 12.6371 8.06457C14.2955 7.13784 15.9009 5.83029 17.6686 4H16.25C15.6977 4 15.25 3.55228 15.25 3Z" fill="currentColor"></path></svg>`, t: 'Professional growth' },
+          { v: 'sharp', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M9.25 12C9.25 11.5858 9.58579 11.25 10 11.25H11.25V10C11.25 9.58579 11.5858 9.25 12 9.25C12.4142 9.25 12.75 9.58579 12.75 10V11.25H14C14.4142 11.25 14.75 11.5858 14.75 12C14.75 12.4142 14.4142 12.75 14 12.75H12.75V14C12.75 14.4142 12.4142 14.75 12 14.75C11.5858 14.75 11.25 14.4142 11.25 14V12.75H10C9.58579 12.75 9.25 12.4142 9.25 12Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25ZM11.25 2.77997C6.7395 3.14188 3.14188 6.7395 2.77997 11.25H5C5.41421 11.25 5.75 11.5858 5.75 12C5.75 12.4142 5.41421 12.75 5 12.75H2.77997C3.14188 17.2605 6.7395 20.8581 11.25 21.22V19C11.25 18.5858 11.5858 18.25 12 18.25C12.4142 18.25 12.75 18.5858 12.75 19V21.22C17.2605 20.8581 20.8581 17.2605 21.22 12.75H19C18.5858 12.75 18.25 12.4142 18.25 12C18.25 11.5858 18.5858 11.25 19 11.25H21.22C20.8581 6.7395 17.2605 3.14188 12.75 2.77997V5C12.75 5.41421 12.4142 5.75 12 5.75C11.5858 5.75 11.25 5.41421 11.25 5V2.77997Z" fill="currentColor"></path></svg>`, t: 'Staying sharp' },
+          { v: 'child', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.77409 12.4814C3.07033 12.778 3.07004 13.2586 2.77343 13.5548L2.61779 13.7103C2.48483 13.8431 2.48483 14.058 2.61779 14.1908C2.75125 14.3241 2.96801 14.3241 3.10147 14.1908L4.8136 12.4807C5.1102 12.1845 5.59079 12.1848 5.88704 12.4814C6.18328 12.778 6.18298 13.2586 5.88638 13.5548L4.17426 15.2648C3.4481 15.9901 2.27116 15.9901 1.545 15.2648C0.818334 14.5391 0.818333 13.362 1.545 12.6362L1.70065 12.4807C1.99725 12.1845 2.47784 12.1848 2.77409 12.4814ZM7.68665 13.4896C7.98307 13.7861 7.98307 14.2667 7.68665 14.5631L5.54424 16.7055C5.24782 17.0019 4.76723 17.0019 4.4708 16.7055C4.17438 16.409 4.17438 15.9285 4.4708 15.632L6.61321 13.4896C6.90963 13.1932 7.39023 13.1932 7.68665 13.4896ZM10.4958 16.2953C10.7922 16.5918 10.7922 17.0724 10.4958 17.3688L8.36805 19.4965C8.07162 19.7929 7.59103 19.7929 7.29461 19.4965C6.99818 19.2001 6.99818 18.7195 7.29461 18.4231L9.42237 16.2953C9.71879 15.9989 10.1994 15.9989 10.4958 16.2953ZM7.29719 16.696C7.5903 16.9957 7.58495 17.4762 7.28525 17.7693L5.55508 19.4614C5.25538 19.7545 4.77481 19.7491 4.48171 19.4494C4.1886 19.1497 4.19395 18.6692 4.49365 18.3761L6.22382 16.684C6.52352 16.3909 7.00409 16.3963 7.29719 16.696ZM11.4811 18.118C11.7774 18.4146 11.7771 18.8952 11.4805 19.1915L9.76834 20.9015C9.63539 21.0343 9.63539 21.2492 9.76834 21.382C9.9018 21.5153 10.1186 21.5153 10.252 21.382L10.4077 21.2265C10.7043 20.9303 11.1849 20.9306 11.4811 21.2272C11.7774 21.5238 11.7771 22.0044 11.4805 22.3006L11.3248 22.4561C10.5987 23.1813 9.42171 23.1813 8.69556 22.4561C7.96889 21.7303 7.96889 20.5532 8.69556 19.8274L10.4077 18.1174C10.7043 17.8211 11.1849 17.8214 11.4811 18.118Z" fill="currentColor"></path><path d="M10.8463 5.40912L8.65863 7.59023C8.2565 7.99113 7.88763 8.35888 7.59632 8.69132C7.40925 8.90481 7.2223 9.13847 7.06394 9.39666L7.04262 9.37541C7.00216 9.33507 6.98191 9.31487 6.96159 9.29516C6.58134 8.92621 6.13406 8.63287 5.64368 8.43084C5.61748 8.42004 5.59088 8.4095 5.53769 8.38842L5.21196 8.25936C4.77069 8.08451 4.65309 7.51645 4.98886 7.1817C5.9525 6.22099 7.10949 5.06751 7.66786 4.83584C8.1603 4.63152 8.69225 4.56354 9.20531 4.63936C9.67539 4.70883 10.1201 4.9503 10.8463 5.40912Z" fill="currentColor"></path><path d="M14.5818 16.8932C14.7581 17.0722 14.8752 17.1985 14.981 17.3336C15.1207 17.5118 15.2456 17.7011 15.3544 17.8995C15.4769 18.1229 15.5721 18.3615 15.7623 18.8388C15.9172 19.2273 16.4317 19.33 16.7306 19.032L16.8029 18.9599C17.7665 17.9992 18.9235 16.8457 19.1558 16.289C19.3608 15.7981 19.429 15.2677 19.3529 14.7562C19.2832 14.2876 19.0411 13.8443 18.581 13.1204L16.386 15.3088C15.9748 15.7188 15.5977 16.0948 15.2567 16.3893C15.0523 16.5658 14.8287 16.7422 14.5818 16.8932Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5023 14.3674L20.5319 9.35289C21.2563 8.63072 21.6185 8.26963 21.8092 7.81046C22 7.3513 22 6.84065 22 5.81937V5.33146C22 3.76099 22 2.97576 21.5106 2.48788C21.0213 2 20.2337 2 18.6585 2H18.1691C17.1447 2 16.6325 2 16.172 2.19019C15.7114 2.38039 15.3493 2.74147 14.6249 3.46364L9.59522 8.47817C8.74882 9.32202 8.224 9.84526 8.02078 10.3506C7.95657 10.5103 7.92446 10.6682 7.92446 10.8339C7.92446 11.5238 8.48138 12.0791 9.59522 13.1896L9.74492 13.3388L11.4985 11.5591C11.7486 11.3053 12.1571 11.3022 12.4109 11.5523C12.6647 11.8024 12.6678 12.2109 12.4177 12.4647L10.6587 14.2499L10.7766 14.3674C11.8905 15.4779 12.4474 16.0331 13.1394 16.0331C13.2924 16.0331 13.4387 16.006 13.5858 15.9518C14.1048 15.7607 14.6345 15.2325 15.5023 14.3674ZM17.8652 8.47854C17.2127 9.12904 16.1548 9.12904 15.5024 8.47854C14.8499 7.82803 14.8499 6.77335 15.5024 6.12284C16.1548 5.47233 17.2127 5.47233 17.8652 6.12284C18.5177 6.77335 18.5177 7.82803 17.8652 8.47854Z" fill="currentColor"></path></svg>`, t: 'Helping my child learn' },
+        ]
+      },
+      {
+        type: 'select', key: 'improve', title: 'Where could you improve the most?', cols: 3, options: [
+          { v: 'concepts', t: 'Understanding basic concepts' },
+          { v: 'daily', t: 'Reviewing daily for my classes' },
+          { v: 'exams', t: 'Studying for exams' },
+        ]
+      },
+      { type: 'age' },
+      { type: 'subjectinput' },
+      { type: 'select', key: 'level', title: 'How much do you already know?', cols: 4, ready: false, options: LEVEL_LADDER },
+      { type: 'goal' },
+      { type: 'topicmap' },
+      { type: 'experts' },
+      { type: 'signup' },
+    ];
+
+    let idx = 0;
+    const stage = document.getElementById('stage');
+    const foot = document.getElementById('foot');
+    const contBtn = document.getElementById('continue');
+    const backBtn = document.getElementById('backBtn');
+    const segs = document.getElementById('segs');
+    const segFills = [...segs.querySelectorAll('.seg > i')];
+    const speaker = document.getElementById('speaker');
+
+    // Content screens (between intro[0] and signup[last]) drive the progress bar.
+    const contentStart = 1, contentEnd = screens.length - 2; // inclusive
+    function updateChrome() {
+      const s = screens[idx];
+      const isIntro = s.type === 'intro';
+      const isSignup = s.type === 'signup';
+      backBtn.classList.toggle('hidden', idx === 0);
+      segs.classList.toggle('hidden', isIntro || isSignup);
+      speaker.classList.toggle('hidden', !(idx >= 3 && !isSignup)); // appears from sound screen on
+      foot.classList.toggle('hidden', isSignup || s.type === 'topicmap'); // signup has its own button; topicmap auto-advances
+      // progress across the 3 segments
+      if (!isIntro && !isSignup) {
+        const pos = idx - contentStart + 1;               // 1..N
+        const total = contentEnd - contentStart + 1;
+        const p = pos / total;
+        segFills.forEach((el, i) => { el.style.width = (Math.max(0, Math.min(1, (p - i / 3) / (1 / 3))) * 100) + '%'; });
+      } else if (isSignup) {
+        segFills.forEach(el => el.style.width = '100%');
+      }
+    }
+
+    // Tailor the "How much do you already know?" options to the typed subject.
+    // Prefetched the moment the subject is typed so the levels are ready before the
+    // user reaches the screen — no generic→adapted flicker. Until ready, the screen
+    // shows a loading skeleton; on any failure it falls back to the generic ladder.
+    let levelFetchedFor = null;
+    async function fetchLevelOptions(subject) {
+      subject = (subject || '').trim();
+      const scr = screens.find(x => x.key === 'level');
+      if (!scr) return;
+      if (!subject) { scr.ready = true; scr.options = LEVEL_LADDER; return; }
+      if (levelFetchedFor === subject) return;      // already fetching / fetched this subject
+      levelFetchedFor = subject;
+      scr.ready = false; scr.options = LEVEL_LADDER;   // reset while (re)fetching
+      const done = (opts) => {
+        if (levelFetchedFor !== subject) return;        // a newer subject superseded this
+        scr.options = opts; scr.ready = true;
+        if (screens[idx] && screens[idx].key === 'level') render();
+      };
+      try {
+        const sys = 'You generate onboarding UI options. Reply with ONLY minified JSON, no prose.';
+        const prompt = `A learner is about to teach the subject "${subject}". List exactly 4 starting knowledge levels for ${subject}, ordered beginner → advanced. Each references real ${subject} content. Return JSON: {"options":[{"t":"1-3 word label","d":"first-person one-liner, e.g. 'I can ...'"}]} — exactly 4 items.`;
+        const r = await fetch('/api/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 400, system: sys, messages: [{ role: 'user', content: prompt }] })
+        });
+        if (!r.ok) { done(LEVEL_LADDER); return; }
+        const data = await r.json();
+        const txt = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('') : '';
+        const m = txt.match(/\{[\s\S]*\}/);
+        const parsed = m ? JSON.parse(m[0]) : null;
+        if (parsed && Array.isArray(parsed.options) && parsed.options.length >= 4) {
+          done(parsed.options.slice(0, 4).map((o, i) => ({
+            v: 'lvl' + i,
+            t: String(o.t || '').trim().slice(0, 26), d: String(o.d || '').trim().slice(0, 90)
+          })));
+        } else { done(LEVEL_LADDER); }
+      } catch (e) { done(LEVEL_LADDER); }
+    }
+
+    // Load the UnicornStudio animated background once (vanilla embed). It renders into
+    // a fixed, full-screen #usbg layer that we fade in only on the "starting point"
+    // screen. If the CDN is unreachable the layer stays transparent and the app's
+    // purple gradient shows through — the logo + caption remain fully legible.
+    function ensureUsBg() {
+      if (document.getElementById('usbg')) return;
+      const d = document.createElement('div');
+      d.id = 'usbg'; d.setAttribute('data-us-project', '9tVO0xGS8DIar1DF4Sqc');
+      document.body.appendChild(d);
+      if (!window.UnicornStudio) {
+        window.UnicornStudio = { isInitialized: false };
+        const i = document.createElement('script');
+        i.src = 'https://cdn.unicorn.studio/v1.4.2/unicornStudio.umd.js';
+        i.onload = function () { try { if (!window.UnicornStudio.isInitialized) { window.UnicornStudio.init(); window.UnicornStudio.isInitialized = true; } } catch (e) { } };
+        (document.head || document.body).appendChild(i);
+      }
+    }
+
+    let autoAdvanceT = null;
+    function render() {
+      const s = screens[idx];
+      // Never show the animated UnicornStudio background — use the static purple gradient only
+      // The "Organizing your current starting point" screen is a 3s loader that
+      // auto-advances to the next screen. Clear any pending timer on every render
+      // so navigating back/forward never double-fires.
+      clearTimeout(autoAdvanceT); autoAdvanceT = null;
+      if (s.type === 'topicmap') { const at = idx; autoAdvanceT = setTimeout(() => { if (idx === at) go(idx + 1); }, 3000); }
+      if (s.key === 'level') {
+        const subj = (store.subject || '').trim();
+        s.title = subj ? `How much do you already know about ${subj}?` : 'How much do you already know?';
+        fetchLevelOptions(subj);
+      }
+      updateChrome();
+      contBtn.disabled = false;
+      let html = '';
+      switch (s.type) {
+        case 'intro':
+          html = `<div class="screen active intro">
+          ${mascotHTML('big float')}
+          <h1>Hi, I'm Axoura!<br>I'll be your personal tutor.</h1>
+        </div>`;
+          break;
+
+        case 'select': {
+          const loadingLevel = (s.key === 'level' && !s.ready);
+          const cardsHTML = loadingLevel
+            ? Array.from({ length: s.cols || 4 }).map(() => `<div class="card skel"><span class="skel-line w70"></span><span class="skel-line w90"></span><span class="skel-line w50"></span></div>`).join('')
+            : s.options.map(o => `<button class="card ${store[s.key] === o.v ? 'sel' : ''}" data-v="${o.v}">
+              ${o.icon ? `<span class="ic">${o.icon}</span>` : (o.emoji ? `<span class="emoji">${o.emoji}</span>` : '')}<span class="t">${o.t}</span>${o.d ? `<span class="d">${o.d}</span>` : ''}
+            </button>`).join('');
+          html = `<div class="screen active">
+          <div class="headrow">${mascotHTML('float')}<div><h1>${s.title}</h1>${s.sub ? `<div class="sub">${s.sub}</div>` : ''}</div></div>
+          <div class="cards c${s.cols}">${cardsHTML}</div>
+        </div>`;
+          contBtn.disabled = loadingLevel ? true : !store[s.key];
+          break;
+        }
+
+        case 'sound':
+          html = `<div class="screen active">
+          <h1 style="margin-top:26px;">How do you want me to sound?</h1>
+          <div class="sub">Turn up your volume if you can't hear me.</div>
+          <div class="sound">
+            <div class="tile ${store.voice_style !== 'deep' ? 'sel' : ''}" data-voice="melodic">${mascotHTML('')}<div class="t">Melodic</div></div>
+            <div class="tile off ${store.voice_style === 'deep' ? 'sel' : ''}" data-voice="deep"><div class="t">Deep</div></div>
+          </div>
+          <div class="voicerow">Voice on <div class="toggle ${store.voice_on === false ? '' : 'on'}" id="voiceToggle"><i></i></div></div>
+        </div>`;
+          break;
+
+        case 'age':
+          html = `<div class="screen active">
+          <div class="headrow">${mascotHTML('float')}<h1>How old are you?</h1></div>
+          <div class="agebox">
+            <input id="ageInput" type="number" inputmode="numeric" placeholder="Your age" value="${store.age || ''}">
+          </div>
+        </div>`;
+          contBtn.disabled = !store.age;
+          break;
+
+        case 'subjectinput':
+          html = `<div class="screen active">
+          <div class="headrow">${mascotHTML('float')}<div><h1>What do you want to learn first?</h1><div class="sub">You can add more subjects later on</div></div></div>
+          <div class="folderpick">
+            <svg class="folder-img" viewBox="0 0 200 158" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="folderGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#a78bfa"/>
+                  <stop offset="1" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+              <path d="M14 28 h52 a10 10 0 0 1 8 4 l10 13 h94 a14 14 0 0 1 14 14 v79 a14 14 0 0 1 -14 14 H14 a14 14 0 0 1 -14 -14 V42 a14 14 0 0 1 14 -14 z" fill="url(#folderGrad)" stroke="#c4b5fd" stroke-width="3" stroke-linejoin="round"/>
+            </svg>
+            <input id="subjectInput" class="subject-input" type="text" placeholder="Name a subject — e.g. Biology" value="${store.subject || ''}" spellcheck="false" autocomplete="off">
+          </div>
+        </div>`;
+          contBtn.disabled = !store.subject;
+          break;
+
+        case 'experts':
+          html = `<div class="screen active">
+          <h1 style="margin-top:22px;">Built by the youngest minds</h1>
+          <div class="info-media"><div class="experts">
+            ${FOUNDERS.map(f => `<div class="founder ${f.center ? 'center' : ''}">
+              <div class="photo"><img src="${f.img}" alt="${f.name}" style="object-position:${f.pos || '50% 50%'}" onerror="this.remove()"></div>
+              <div class="name">${f.name}</div>
+              <div class="accolade">${f.accolade}</div>
+            </div>`).join('')}
+          </div></div>
+        </div>`;
+          break;
+
+        case 'topicmap':
+          html = `<div class="screen active startpoint">
+          ${mascotHTML('float')}
+          <div class="sp-caption">Organizing your current starting point</div>
+        </div>`;
+          break;
+
+
+        case 'goal':
+          html = `<div class="screen active">
+          <div class="headrow">${mascotHTML('float')}<h1>What's your daily learning goal?</h1></div>
+          <div class="goals">
+            ${[['10 min', 'Quick Review'], ['20 min', 'Gain Better Understanding'], ['30 min', 'Develop A Solid Understanding'], ['60 min', 'Recommended for Content Mastery']].map(([t, d]) => `
+              <button class="goal ${store.goal === t ? 'sel' : ''}" data-goal="${t}"><span class="clock">⏱️</span><span class="t">${t}</span><span class="d">${d}</span></button>`).join('')}
+          </div>
+        </div>`;
+          contBtn.disabled = !store.goal;
+          break;
+
+        case 'signup':
+          html = `<div class="screen active signup">
+          ${mascotHTML('float signup-buddy')}
+          <h1>Create a free profile to<br>discover your learning plan</h1>
+          <button class="oauth" id="googleBtn"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></button>
+          <div class="or">OR</div>
+          <input class="email" id="emailInput" type="email" placeholder="Email">
+          <button class="signup-btn" id="signupBtn">Sign up</button>
+          <div class="legal">By clicking Sign up, I agree to Axoura's <a href="#">Terms</a> and <a href="#">Privacy Policy</a></div>
+          <div class="existing">Existing user? <a href="dashboard.html">Sign in</a></div>
+        </div>`;
+          break;
+      }
+      stage.innerHTML = html;
+      wireScreen(s);
+    }
+
+    function topicNode(label, xpct, ypct, dim) {
+      return `<span class="node ${dim ? 'dim' : ''}" style="left:${xpct}%; top:${ypct}%; transform:translate(-50%,-50%)"><span class="bar"></span>${label}</span>`;
+    }
+    function constellationDots() {
+      const cols = ['#c4b5fd', '#fca5a5', '#86efac', '#fcd34d', '#93c5fd', '#f9a8d4'];
+      let out = ''; const rows = 6, colsN = 11;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < colsN; c++) {
+          if (Math.abs(r - 2.5) < 0.6 && Math.abs(c - 5) < 0.6) continue;
+          const x = 6 + c * 8.2, y = 8 + r * 15, sz = (c + r) % 3 === 0 ? 9 : 6, col = cols[(r * colsN + c) % cols.length];
+          out += `<span class="dot" style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;background:${col}"></span>`;
+        }
+      }
+      return out;
+    }
+
+    function wireScreen(s) {
+      if (s.type === 'select') {
+        stage.querySelectorAll('.card[data-v]').forEach(c => c.addEventListener('click', () => {
+          stage.querySelectorAll('.card').forEach(x => x.classList.remove('sel'));
+          c.classList.add('sel'); set(s.key, c.dataset.v); contBtn.disabled = false;
+        }));
+      }
+      if (s.type === 'sound') {
+        stage.querySelectorAll('.tile').forEach(t => t.addEventListener('click', () => {
+          stage.querySelectorAll('.tile').forEach(x => { x.classList.remove('sel'); x.classList.toggle('off', x.dataset.voice === 'deep'); });
+          t.classList.add('sel'); t.classList.toggle('off', false); set('voice_style', t.dataset.voice);
+        }));
+        const tg = document.getElementById('voiceToggle');
+        tg.addEventListener('click', () => { tg.classList.toggle('on'); set('voice_on', tg.classList.contains('on')); });
+      }
+      if (s.type === 'subjectinput') {
+        const inp = document.getElementById('subjectInput');
+        let preT;
+        // Prefetch the subject-specific level options while the user is still typing,
+        // so the next screen already has them ready (no generic→adapted flicker).
+        const prefetch = () => { clearTimeout(preT); preT = setTimeout(() => { if (inp.value.trim()) fetchLevelOptions(inp.value.trim()); }, 500); };
+        inp.addEventListener('input', () => { set('subject', inp.value.trim()); contBtn.disabled = !inp.value.trim(); prefetch(); });
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter' && inp.value.trim()) { fetchLevelOptions(inp.value.trim()); go(idx + 1); } });
+        setTimeout(() => inp.focus(), 40);
+      }
+      if (s.type === 'age') {
+        const inp = document.getElementById('ageInput');
+        inp.addEventListener('input', () => { set('age', inp.value.trim()); contBtn.disabled = !inp.value.trim(); });
+        const bump = (d) => { let v = parseInt(inp.value || '0', 10); if (isNaN(v)) v = 0; v = Math.max(0, Math.min(120, v + d)); inp.value = v; set('age', String(v)); contBtn.disabled = false; };
+        stage.querySelector('.step-up')?.addEventListener('click', () => bump(1));
+        stage.querySelector('.step-down')?.addEventListener('click', () => bump(-1));
+        setTimeout(() => inp.focus(), 40);
+      }
+      if (s.type === 'goal') {
+        stage.querySelectorAll('.goal').forEach(g => g.addEventListener('click', () => {
+          stage.querySelectorAll('.goal').forEach(x => x.classList.remove('sel'));
+          g.classList.add('sel'); set('goal', g.dataset.goal); contBtn.disabled = false;
+        }));
+      }
+      if (s.type === 'signup') {
+        const finish = () => {
+          // Create the subject the user typed so it shows as a folder in the app.
+          const subj = (store.subject || '').trim();
+          if (subj) {
+            try {
+              const subs = JSON.parse(localStorage.getItem('TEACHLOOP_SUBJECTS') || '[]');
+              if (Array.isArray(subs) && !subs.includes(subj)) { subs.push(subj); localStorage.setItem('TEACHLOOP_SUBJECTS', JSON.stringify(subs)); }
+              let rec = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]'); if (!Array.isArray(rec)) rec = [];
+              rec = rec.filter(x => x !== subj); rec.unshift(subj); localStorage.setItem('TEACHLOOP_RECENTS', JSON.stringify(rec.slice(0, 8)));
+            } catch (e) { }
+          }
+          try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+          document.body.style.transition = 'opacity .3s ease'; document.body.style.opacity = '0';
+          setTimeout(() => { window.location.href = 'chatbot.html'; }, 300);
+        };
+        document.getElementById('googleBtn').addEventListener('click', finish);
+        document.getElementById('signupBtn').addEventListener('click', finish);
+        document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') finish(); });
+      }
+    }
+
+    function go(n) { idx = Math.max(0, Math.min(screens.length - 1, n)); render(); window.scrollTo(0, 0); }
+    contBtn.addEventListener('click', () => go(idx + 1));
+    backBtn.addEventListener('click', () => go(idx - 1));
+
+    ensureUsBg();
+    render();
+  </script>
+</body>
+
+</html>

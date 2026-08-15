@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <!-- Placeholder TeachLoop mascot (orbit + lens), purple so it reads on both the
+       white onboarding and the dark chat. Replace with your exact logo SVG. -->
+  <defs>
+    <linearGradient id="mascotGrad" x1="40" y1="40" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a866ee"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <path d="M78 78h44a40 40 0 0 1 40 40v44a40 40 0 0 1-40 40H78a40 40 0 0 1-40-40v-44a40 40 0 0 1 40-40z" fill="url(#mascotGrad)"/>
+  <ellipse cx="120" cy="120" rx="92" ry="40" transform="rotate(-45 120 120)" fill="none" stroke="url(#mascotGrad)" stroke-width="24"/>
+  <ellipse cx="150" cy="90" rx="38" ry="22" transform="rotate(-45 150 90)" fill="#ffffff"/>
+</svg>
