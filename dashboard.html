@@ -45,7 +45,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      max-width: 1080px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 22px 26px 0;
     }
@@ -53,7 +53,7 @@
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.3px; }
     .brand img { width: 30px; height: 30px; }
 
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 30px 26px 60px; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 30px 26px 60px; }
 
     .dash-header { text-align: center; margin-bottom: 10px; }
     .greet { font-size: clamp(36px, 5.4vw, 56px); font-weight: 800; letter-spacing: -1.4px; line-height: 1.04; }
@@ -169,10 +169,32 @@
       </div>
     </div>
 
-    <a class="cta" href="chatbot.html">Start teaching →</a>
+    <a class="cta" href="chatbot.html" id="startBtn">Start teaching →</a>
   </div>
 
   <script>
+    // Hide topbar when loaded inside the chatbot sidebar iframe
+    (function() {
+      var inSidebar = window.location !== window.parent.location ||
+                      window.location.search.indexOf('sidebar=1') !== -1;
+      if (inSidebar) {
+        var tb = document.querySelector('.topbar');
+        if (tb) tb.style.display = 'none';
+        var wrap = document.querySelector('.wrap');
+        if (wrap) wrap.style.paddingTop = '24px';
+        // clicking CTA should navigate parent not iframe
+        var btn = document.getElementById('startBtn');
+        if (btn) btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (window.parent && window.parent !== window) {
+            window.parent.location.href = 'chatbot.html';
+          } else {
+            window.location.href = 'chatbot.html';
+          }
+        });
+      }
+    })();
+
     (function () {
       var PALETTE = ['#8b5cf6', '#22c55e', '#f59e0b', '#ec4899', '#38bdf8', '#a78bfa', '#f43f5e', '#14b8a6'];
 

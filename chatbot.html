@@ -38,6 +38,7 @@ body {
   height:100vh;
   overflow:hidden;
   background:#0A0A0B;
+  position:relative;
 }
 
 /* ===== SIDEBAR ===== */
@@ -177,11 +178,12 @@ body.light-mode .nav-item svg.pen-icon, body.light-mode .nav-item svg.icon-book 
 .nav-item.active svg { stroke:#ffffff; }
 /* Dashboard iframe overlay */
 .dash-iframe-overlay {
-  display:none; position:fixed; inset:0; z-index:2000; background:#0A0A0B;
+  display:none; flex:1; min-width:0; z-index:200; background:#0A0A0B;
+  overflow-y:auto;
 }
-.dash-iframe-overlay.open { display:block; }
+.dash-iframe-overlay.open { display:flex; flex-direction:column; }
 .dash-iframe-overlay iframe {
-  width:100%; height:100%; border:none;
+  width:100%; flex:1; border:none; display:block;
 }
 .section { margin-top:20px; padding:0 6px; }
 .section-label { padding:6px 11px 9px; color:#8a8a8a; font-size:13px; font-weight:500; letter-spacing:-0.003em; user-select:none; }
@@ -591,24 +593,33 @@ body.light-mode .subject-chip { background:rgba(168,85,247,0.10); border-color:r
 .subject-menu button:hover { background:#26262b; color:#fff; }
 .subject-menu button.danger:hover { background:rgba(239,68,68,0.16); color:#fca5a5; }
 .waveform-btn {
-  width:40px;                          /* size-10 */
-  height:40px;
-  background:linear-gradient(to bottom, #f7f7f7, #ffffff);   /* dark-mode send */
-  border:none;
-  border-radius:9999px;               /* rounded-full */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), transform 0.2s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow:inset 2px 0 8px 2px rgba(24,24,24,0.1);
-  margin-left:4px;
+  width: 28px;
+  height: 28px;
+  background-color: #262626; /* dark:bg-neutral-800 */
+  color: #525252; /* dark:text-neutral-600 */
+  border: none;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  margin-left: 4px;
 }
-.waveform-btn:hover { transform:scale(1.06); box-shadow:0 0 0 4px rgba(255,255,255,0.1), inset 2px 0 8px 2px rgba(24,24,24,0.05); }
-.waveform-btn:active { transform:scale(0.94); }
-.waveform-btn svg { width:18px; height:18px; color:#111111; stroke-width:2.5; }
-.waveform-btn:hover .arrow-group { animation: arrow-bounce 0.5s ease-in-out; }
-@keyframes arrow-bounce { 0% { transform:translateY(0); } 50% { transform:translateY(-4px); } 100% { transform:translateY(0); } }
+.waveform-btn.is-typing {
+  background-color: #ffffff; /* user preferred white */
+  color: #171717; /* dark:text-neutral-900 */
+  cursor: pointer;
+}
+.waveform-btn.is-streaming {
+  background-color: #f5f5f5; /* dark:bg-neutral-100 */
+  color: #171717; /* dark:text-neutral-900 */
+  cursor: pointer;
+}
+.waveform-btn svg { width: 16px; height: 16px; stroke-width: 2; }
+.waveform-btn .icon-stop { display: none; }
+.waveform-btn.is-streaming .icon-arrow { display: none; }
+.waveform-btn.is-streaming .icon-stop { display: block; fill: currentColor; stroke: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1231,20 +1242,32 @@ body.light-mode .msg-ai.feedback-yellow .answer-content { background:rgba(212,16
 }
 .chat-controls .left, .chat-controls .right { display: flex; align-items: center; gap: 8px; }
 .chat-send-btn {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: #FFFFFF;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background-color: #262626; /* dark:bg-neutral-800 */
+  color: #525252; /* dark:text-neutral-600 */
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s, background 0.15s;
+  cursor: default;
+  transition: all 0.15s;
 }
-.chat-send-btn:hover { transform: scale(1.05); }
-.chat-send-btn:disabled { background: #2c2c30; cursor: not-allowed; }
-.chat-send-btn:disabled svg { stroke: #6b6b73; }
-.chat-send-btn svg { color: #191919; stroke-width: 2.5; }
+.chat-send-btn:not(:disabled) {
+  background-color: #ffffff; /* user preferred white */
+  color: #171717; /* dark:text-neutral-900 */
+  cursor: pointer;
+}
+.chat-send-btn.is-streaming {
+  background-color: #f5f5f5; /* dark:bg-neutral-100 */
+  color: #171717; /* dark:text-neutral-900 */
+  cursor: pointer;
+}
+.chat-send-btn svg { width: 16px; height: 16px; stroke-width: 2; }
+.chat-send-btn .icon-stop { display: none; }
+.chat-send-btn.is-streaming .icon-arrow { display: none; }
+.chat-send-btn.is-streaming .icon-stop { display: block; fill: currentColor; stroke: none; }
 
 /* Intro hide/show */
 .intro-view { display: flex; flex: 1; }
@@ -1303,9 +1326,9 @@ body.light-mode .settings-menu .sep { background:#e2e2e6; }
 body.light-mode .user-name { color:#1c1c1e; }
 body.light-mode .user-email { color:#8a8a8f; }
 body.light-mode .avatar { background:#dedee3; color:#333; }
-body.light-mode .waveform-btn, body.light-mode .chat-send-btn { background:linear-gradient(to bottom,#2a2a2a,#141414); box-shadow:none; }
-body.light-mode .waveform-btn svg, body.light-mode .chat-send-btn svg { color:#ffffff; }
-body.light-mode .chat-send-btn:disabled { background:#d1d1d6; }
+body.light-mode .waveform-btn, body.light-mode .chat-send-btn { background:#f5f5f5; color:#a3a3a3; }
+body.light-mode .waveform-btn.is-typing, body.light-mode .chat-send-btn:not(:disabled) { background:#3b82f6; color:#ffffff; }
+body.light-mode .waveform-btn.is-streaming, body.light-mode .chat-send-btn.is-streaming { background:#171717; color:#ffffff; }
 body.light-mode .attach-chip { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.1); }
 body.light-mode .attach-name { color:#3a3a3c; }
 body.light-mode .collapse { color:#6a6a6f; --background:#f0f0f2; }
@@ -1926,11 +1949,11 @@ body.light-mode .action-badge {
       </a>
       <a class="nav-item" id="aiStudentsNav">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-        <span>AI Students</span>
+        <span>Teach Studio</span>
       </a>
       <a class="nav-item active" id="chatNav">
         <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
-        <span>Teach</span>
+        <span>Chat</span>
       </a>
 
       <a class="nav-item" id="searchNav">
@@ -2040,6 +2063,11 @@ body.light-mode .action-badge {
           <span class="main-text" data-i18n="help">Help</span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6"/></svg>
         </div>
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+          <span class="main-text" data-i18n="feedback">Feedback</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
         <div class="sep"></div>
         <div class="row">
           <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
@@ -2050,8 +2078,9 @@ body.light-mode .action-badge {
     </div>
   </aside>
 
+  <div class="dash-iframe-overlay" id="dashIframeOverlay"></div>
+
   <main class="main" id="mainContent" style="position:relative;">
-    <div class="dash-iframe-overlay" id="dashIframeOverlay"></div>
     <div class="topbar-actions">
       <div class="streak-wrap">
         <button class="streak-badge" id="streakBadge" title="Learning streak" type="button">
@@ -2143,13 +2172,12 @@ body.light-mode .action-badge {
                   </svg>
                 </button>
 
-                <button class="waveform-btn" id="waveform" aria-label="Send">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <g class="arrow-group">
-                      <path d="M12 5l0 14"/>
-                      <path d="M16 9l-4 -4"/>
-                      <path d="M8 9l4 -4"/>
-                    </g>
+                <button class="waveform-btn is-typing" id="waveform" aria-label="Send">
+                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>
+                  </svg>
+                  <svg class="icon-stop" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
                   </svg>
                 </button>
               </div>
@@ -2256,9 +2284,12 @@ body.light-mode .action-badge {
                     </button>
                   </div>
                 </div>
-                <button class="chat-send-btn border-beam border-beam-sm" id="chatSendBtn" disabled aria-label="Send">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 5l0 14"/><path d="M16 9l-4 -4"/><path d="M8 9l4 -4"/>
+                <button class="chat-send-btn" id="chatSendBtn" disabled aria-label="Send">
+                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>
+                  </svg>
+                  <svg class="icon-stop" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
                   </svg>
                 </button>
               </div>
@@ -4602,9 +4633,12 @@ body.light-mode .action-badge {
     var overlay = document.getElementById('dashIframeOverlay');
     if (!dashBtn || !chatBtn || !overlay) return;
 
+    var mainContent = document.getElementById('mainContent');
+
     function openDash() {
       overlay.innerHTML = '<iframe src="dashboard.html" id="dashIframe"></iframe>';
       overlay.classList.add('open');
+      if (mainContent) mainContent.style.display = 'none';
       dashBtn.classList.add('active');
       chatBtn.classList.remove('active');
 
@@ -4612,23 +4646,21 @@ body.light-mode .action-badge {
       iframe.addEventListener('load', function () {
         try {
           var doc = iframe.contentDocument || iframe.contentWindow.document;
-          // Sync theme from parent
           if (document.body.classList.contains('light-mode')) {
             doc.body.classList.add('light-mode');
           }
           var topbar = doc.querySelector('.topbar');
           if (topbar) topbar.style.display = 'none';
-          var hamMenu = doc.querySelector('.ham-menu');
-          if (hamMenu) hamMenu.style.display = 'none';
           var wrap = doc.querySelector('.wrap');
           if (wrap) wrap.style.paddingTop = '24px';
-        } catch (e) { /* cross-origin safety */ }
+        } catch (e) {}
       });
     }
 
     function closeDash() {
       overlay.classList.remove('open');
       overlay.innerHTML = '';
+      if (mainContent) mainContent.style.display = '';
       dashBtn.classList.remove('active');
       chatBtn.classList.add('active');
     }
