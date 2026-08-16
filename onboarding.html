@@ -1117,7 +1117,11 @@
     .fh-screen { width: 100%; }
     .fh-scroll { width: min(96vw, 980px); height: 74vh; margin: 8px auto 0; overflow-y: auto; scroll-snap-type: none; border-radius: 26px; scrollbar-width: none; -ms-overflow-style: none; background: linear-gradient(180deg, #b7a2ff 0%, #8b5cf6 100%); }
     .fh-scroll::-webkit-scrollbar { display: none; }
-    .fh-panel { min-height: 74vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 30px 24px; }
+    /* Each founder is a tall section; the inner panel is pinned (sticky) while
+       the names converge, so the next founder stays off-screen until you scroll
+       past this section. */
+    .fh-section { position: relative; height: 296vh; }
+    .fh-sticky { position: sticky; top: 0; height: 74vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 30px 24px; }
     .fh-stack { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .fh-name { color: #000; font-weight: 800; letter-spacing: -0.05em; line-height: 0.84; text-transform: uppercase; font-size: clamp(56px, 13.5vw, 158px); position: relative; z-index: 1; will-change: transform; transition: transform .12s linear; }
     /* Photo sits in FRONT of the tightly-stacked name, overlapping its centre */
@@ -1129,11 +1133,8 @@
     .fh-down svg { width: 22px; height: 22px; }
     @keyframes fhBounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(5px); } }
     /* blur-in when a panel scrolls into view */
-    .fh-desc { filter: blur(12px); opacity: 0; transform: translateY(-16px); transition: filter .6s ease, opacity .6s ease, transform .6s ease; }
-    .fh-photo { filter: blur(12px); opacity: 0; transition: filter .6s ease, opacity .6s ease; }
-    .fh-panel.inview .fh-photo { filter: blur(0); opacity: 1; }
-    .fh-panel.inview .fh-desc { filter: blur(0); opacity: .82; transform: none; transition-delay: .12s; }
-    @media (prefers-reduced-motion: reduce) { .fh-desc { filter: none; opacity: 1; transform: none; } .fh-photo { filter: none; opacity: 1; } .fh-down { animation: none; } }
+    /* Photo + description are always fully visible for every founder. */
+    @media (prefers-reduced-motion: reduce) { .fh-down { animation: none; } }
   </style>
 </head>
 
@@ -1424,14 +1425,16 @@
             const top = parts[0] || '';
             const bottom = parts.slice(1).join(' ');
             const isLastF = i === FOUNDERS.length - 1;
-            return `<section class="fh-panel">
-              <div class="fh-stack">
-                <div class="fh-name">${top}</div>
-                <div class="fh-photo"><img src="${f.img}" alt="${f.name}" style="object-position:${f.pos || '50% 50%'}" onerror="this.style.opacity=0"></div>
-                ${bottom ? `<div class="fh-name">${bottom}</div>` : ''}
+            return `<section class="fh-section">
+              <div class="fh-sticky">
+                <div class="fh-stack">
+                  <div class="fh-name">${top}</div>
+                  <div class="fh-photo"><img src="${f.img}" alt="${f.name}" style="object-position:${f.pos || '50% 50%'}" onerror="this.style.opacity=0"></div>
+                  ${bottom ? `<div class="fh-name">${bottom}</div>` : ''}
+                </div>
+                <div class="fh-desc">${f.accolade || ''}</div>
+                ${!isLastF ? `<button type="button" class="fh-down" aria-label="Next founder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>` : ''}
               </div>
-              <div class="fh-desc">${f.accolade || ''}</div>
-              ${!isLastF ? `<button type="button" class="fh-down" aria-label="Next founder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>` : ''}
             </section>`;
           }).join('');
           html = `<div class="screen active fh-screen">
@@ -1496,29 +1499,30 @@
       if (s.type === 'experts') {
         const scroll = document.getElementById('fhScroll');
         if (scroll) {
-          const panels = [...scroll.querySelectorAll('.fh-panel')];
-          panels[0]?.classList.add('inview');   // reveal photo/desc for the first
-          const io = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('inview'); });
-          }, { root: scroll, threshold: 0.45 });
-          panels.forEach(p => io.observe(p));
+          const sections = [...scroll.querySelectorAll('.fh-section')];
           scroll.querySelectorAll('.fh-down').forEach((btn, i) => {
-            btn.addEventListener('click', () => panels[i + 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            btn.addEventListener('click', () => sections[i + 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
           });
 
-          // Scroll-driven convergence: names start at the top/bottom of the panel
-          // and slide together (behind the photo) as the panel reaches centre.
+          // Sticky-scroll convergence: while a founder's section is pinned, the two
+          // names start fully spread (top & bottom) and slide together as you scroll
+          // through the section. Only once converged does scrolling reveal the next.
           let raf = 0;
           const updateNames = () => {
             raf = 0;
             const cr = scroll.getBoundingClientRect();
-            const centerY = cr.top + cr.height / 2;
             const maxSpread = cr.height * 0.34;
-            panels.forEach(panel => {
-              const r = panel.getBoundingClientRect();
-              const d = (r.top + r.height / 2 - centerY) / cr.height;   // ~ -1..1
-              const spread = Math.min(Math.abs(d), 0.5) * 2 * maxSpread; // 0 centred → max at edges
-              const names = panel.querySelectorAll('.fh-name');
+            sections.forEach(sec => {
+              const r = sec.getBoundingClientRect();
+              const range = r.height - cr.height;                 // extra scroll room
+              const raw = range > 0 ? (cr.top - r.top) / range : 1; // 0 at entry → 1 fully scrolled
+              // Section scroll room ≈ 3 screen-heights: names converge over the
+              // first 2 (CONVERGE = 2/3), then the last screen-height holds the
+              // converged card pinned before scrolling on to the next founder.
+              const CONVERGE = 0.667;
+              const p = Math.max(0, Math.min(1, raw / CONVERGE));
+              const spread = (1 - p) * maxSpread;                 // spread at p=0, converged at p=1
+              const names = sec.querySelectorAll('.fh-name');
               if (names.length >= 2) {
                 names[0].style.transform = 'translateY(' + (-spread) + 'px)';
                 names[1].style.transform = 'translateY(' + spread + 'px)';
