@@ -177,7 +177,7 @@ body.light-mode .nav-item svg.pen-icon, body.light-mode .nav-item svg.icon-book 
 .nav-item.active svg { stroke:#ffffff; }
 /* Dashboard iframe overlay */
 .dash-iframe-overlay {
-  display:none; position:absolute; top:0; left:0; right:0; bottom:0; z-index:50; background:#0A0A0B;
+  display:none; position:fixed; inset:0; z-index:2000; background:#0A0A0B;
 }
 .dash-iframe-overlay.open { display:block; }
 .dash-iframe-overlay iframe {
@@ -298,6 +298,8 @@ body.light-mode .recents-empty { color:#9a9aa0; }
   to { opacity:1; transform:translateY(0); }
 }
 .title-necosmic { font-family:'Necosmic', Inter, sans-serif; letter-spacing:1px; }
+.welcome-greeting { text-align:center; font-size:16px; font-weight:600; letter-spacing:-0.1px; color:rgba(228,228,229,0.72); margin-bottom:10px; }
+body.light-mode .welcome-greeting { color:rgba(28,28,30,0.65); }
 .chat-title {
   display:flex;
   align-items:center;
@@ -2072,6 +2074,16 @@ body.light-mode .action-badge {
     </div>
     <div class="main-inner">
       <div class="chat-app">
+        <div class="welcome-greeting" id="welcomeGreeting" hidden></div>
+        <script>
+          (function () {
+            try {
+              var n = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
+              var el = document.getElementById('welcomeGreeting');
+              if (n && el) { el.textContent = 'Welcome back ' + n; el.hidden = false; }
+            } catch (e) { }
+          })();
+        </script>
         <h1 class="chat-title">
           <svg class="hero-pen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;flex-shrink:0"><path d="M11.4001 18.1612L11.4001 18.1612L18.796 10.7653C17.7894 10.3464 16.5972 9.6582 15.4697 8.53068C14.342 7.40298 13.6537 6.21058 13.2348 5.2039L5.83882 12.5999L5.83879 12.5999C5.26166 13.1771 4.97307 13.4657 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L7.47918 20.5844C8.25351 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5343 19.0269 10.823 18.7383 11.4001 18.1612Z" fill="currentColor"></path><path d="M20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178L14.3999 4.03882C14.4121 4.0755 14.4246 4.11268 14.4377 4.15035C14.7628 5.0875 15.3763 6.31601 16.5303 7.47002C17.6843 8.62403 18.9128 9.23749 19.85 9.56262C19.8875 9.57563 19.9245 9.58817 19.961 9.60026L20.8482 8.71306Z" fill="currentColor"></path></svg>
           <span class="title-necosmic" data-i18n="title">What are we learning today?</span>
@@ -4812,6 +4824,56 @@ body.light-mode .action-badge {
     <div class="pricing-note">Payments aren’t set up yet — this is a preview of the plans.</div>
   </div>
 </div>
+
+<script>
+  // ── Study-time tracker ─────────────────────────────────────────────
+  // Accurately accumulates real elapsed time (per subject, per day) while the
+  // user is actively on this page with a subject selected. Powers the
+  // dashboard's "Study balance" donut and "Activity" chart. Uses real
+  // timestamps so it never over-counts while the tab is hidden or the
+  // machine sleeps.
+  (function () {
+    const TIME_KEY = 'TEACHLOOP_STUDY_TIME';    // { subject: seconds }
+    const DAILY_KEY = 'TEACHLOOP_STUDY_DAILY';   // { 'YYYY-MM-DD': seconds }
+    const DAYS_KEY = 'TEACHLOOP_STUDY_DAYS';     // ['YYYY-MM-DD', ...] distinct study days
+
+    function readObj(k) { try { const v = JSON.parse(localStorage.getItem(k)); return (v && typeof v === 'object') ? v : {}; } catch (e) { return {}; } }
+    function readArr(k) { try { const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+    function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
+    function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+    function currentSubject() {
+      // Prefer the subject shown in the composer chip; fall back to most-recent.
+      const chip = document.querySelector('.subject-chip:not([hidden]) .subject-chip-name');
+      if (chip && chip.textContent.trim()) return chip.textContent.trim();
+      const rec = readArr('TEACHLOOP_RECENTS');
+      if (rec[0]) return rec[0];
+      const subs = readArr('TEACHLOOP_SUBJECTS');
+      return subs[0] || null;
+    }
+
+    let last = Date.now();
+    function tick() {
+      const now = Date.now();
+      const dt = (now - last) / 1000;
+      last = now;
+      if (document.visibilityState !== 'visible') return;   // only count active time
+      if (dt <= 0 || dt > 90) return;                        // ignore sleep / long gaps
+      const subj = currentSubject();
+      if (!subj) return;
+
+      const t = readObj(TIME_KEY); t[subj] = (t[subj] || 0) + dt; write(TIME_KEY, t);
+      const tk = todayKey();
+      const d = readObj(DAILY_KEY); d[tk] = (d[tk] || 0) + dt; write(DAILY_KEY, d);
+      const days = readArr(DAYS_KEY); if (days.indexOf(tk) < 0) { days.push(tk); write(DAYS_KEY, days); }
+    }
+
+    // Reset the clock when returning to the tab so hidden time isn't billed.
+    document.addEventListener('visibilitychange', () => { last = Date.now(); });
+    window.addEventListener('focus', () => { last = Date.now(); });
+    setInterval(tick, 5000);
+  })();
+</script>
 
 </body>
 </html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axoura — Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --text: #f4f4f6;
+      --muted: rgba(244, 244, 246, 0.6);
+      --card: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --accent: #8b5cf6;
+    }
+
+    html { background:
+        radial-gradient(1100px 620px at 50% -10%, rgba(139, 92, 246, 0.35), transparent 60%),
+        radial-gradient(900px 600px at 90% 110%, rgba(124, 58, 237, 0.28), transparent 60%),
+        linear-gradient(180deg, #0c0a13 0%, #131020 45%, #0b0a12 100%);
+      background-attachment: fixed;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: transparent;
+    }
+
+    body.light-mode {
+      --text: #16151c;
+      --muted: rgba(22, 21, 28, 0.55);
+      --card: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(20, 18, 30, 0.10);
+    }
+
+    body.light-mode html, body.light-mode { }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 22px 26px 0;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.3px; }
+    .brand img { width: 30px; height: 30px; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 30px 26px 60px; }
+
+    .dash-header { text-align: center; margin-bottom: 10px; }
+    .greet { font-size: clamp(36px, 5.4vw, 56px); font-weight: 800; letter-spacing: -1.4px; line-height: 1.04; }
+    .dash-sub { font-size: 16px; color: var(--muted); font-weight: 600; margin-top: 10px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 26px;
+    }
+
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 22px;
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+    }
+
+    .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .card-title { font-size: 17px; font-weight: 700; }
+    .card-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* Donut */
+    .donut-row { display: flex; align-items: center; gap: 22px; margin-top: 18px; flex-wrap: wrap; }
+    .donut { position: relative; width: 172px; height: 172px; flex-shrink: 0; border-radius: 50%;
+      background: conic-gradient(var(--accent) 0 100%);
+      transition: background .5s ease; }
+    .donut::after { content: ''; position: absolute; inset: 26px; border-radius: 50%;
+      background: #0c0a13; }
+    body.light-mode .donut::after { background: #efeef4; }
+    .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+    .donut-total { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .donut-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+    .legend { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 160px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+    .legend-name { font-weight: 600; }
+    .legend-val { margin-left: auto; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .legend-empty { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    /* Activity bars */
+    .act-top { display: flex; align-items: flex-end; gap: 18px; margin-top: 16px; }
+    .act-total { font-size: 44px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+    .act-note { font-size: 13px; color: var(--muted); margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+    .act-note .up { color: #22c55e; }
+    .bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; height: 110px; flex: 1; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; flex: 1; height: 100%; }
+    .bar { width: 100%; max-width: 26px; border-radius: 7px; background: linear-gradient(180deg, #a78bfa, #7c3aed);
+      transform-origin: bottom; animation: barGrow .6s cubic-bezier(.4, 0, .2, 1) both; min-height: 4px; }
+    .bar-day { font-size: 11px; color: var(--muted); font-weight: 600; }
+    @keyframes barGrow { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+
+    .cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; padding: 14px 26px; border-radius: 999px;
+      background: #fff; color: #111; font-weight: 700; font-size: 15px; text-decoration: none; }
+    .cta:hover { filter: brightness(.94); }
+
+    .full { grid-column: 1 / -1; }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="logo.png?v=3" alt="Axoura">Axoura</div>
+  </div>
+
+  <div class="wrap">
+    <div class="dash-header">
+      <div class="greet" id="greet">Welcome back</div>
+      <div class="dash-sub">Your learning dashboard</div>
+    </div>
+
+    <div class="grid">
+      <!-- Study balance donut -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Study balance</div>
+            <div class="card-sub">Time spent per subject</div>
+          </div>
+        </div>
+        <div class="donut-row">
+          <div class="donut" id="donut">
+            <div class="donut-center">
+              <div class="donut-total" id="donutTotal">0h</div>
+              <div class="donut-label">studied</div>
+            </div>
+          </div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+
+      <!-- Weekly activity -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Activity</div>
+            <div class="card-sub">This week</div>
+          </div>
+        </div>
+        <div class="act-top">
+          <div>
+            <div class="act-total" id="actTotal">0h</div>
+            <div class="act-note"><span class="up">▲</span> Keep your streak going</div>
+          </div>
+          <div class="bars" id="bars"></div>
+        </div>
+      </div>
+    </div>
+
+    <a class="cta" href="chatbot.html">Start teaching →</a>
+  </div>
+
+  <script>
+    (function () {
+      var PALETTE = ['#8b5cf6', '#22c55e', '#f59e0b', '#ec4899', '#38bdf8', '#a78bfa', '#f43f5e', '#14b8a6'];
+
+      function ls(key, fallback) {
+        try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; }
+        catch (e) { return fallback; }
+      }
+
+      // Greeting
+      var name = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
+      document.getElementById('greet').textContent = name ? ('Welcome back ' + name) : 'Welcome back';
+
+      // ---- Study balance donut ----
+      var subjects = (ls('TEACHLOOP_SUBJECTS', []) || []).filter(Boolean);
+      var studyTime = ls('TEACHLOOP_STUDY_TIME', {}) || {};   // { subject: seconds }
+
+      var donut = document.getElementById('donut');
+      var legend = document.getElementById('legend');
+      var donutTotalEl = document.getElementById('donutTotal');
+
+      function fmtDur(sec) {
+        if (!sec || sec < 60) return (sec ? Math.round(sec) + 's' : '0m');
+        var h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60);
+        if (h > 0) return m ? (h + 'h ' + m + 'm') : (h + 'h');
+        return m + 'm';
+      }
+
+      if (!subjects.length) {
+        donut.style.background = 'conic-gradient(rgba(255,255,255,0.10) 0 100%)';
+        legend.innerHTML = '<div class="legend-empty">Create your first subject in the chat to start tracking your study balance.</div>';
+        donutTotalEl.textContent = '0h';
+      } else {
+        var vals = subjects.map(function (s) { return Math.max(0, Number(studyTime[s]) || 0); });
+        var total = vals.reduce(function (a, b) { return a + b; }, 0);
+        // If no time logged yet, split evenly so each subject shows as a slice.
+        var weights = total > 0 ? vals : subjects.map(function () { return 1; });
+        var wTotal = weights.reduce(function (a, b) { return a + b; }, 0);
+
+        var stops = [], acc = 0;
+        subjects.forEach(function (s, i) {
+          var frac = weights[i] / wTotal;
+          var start = acc * 100, end = (acc + frac) * 100;
+          stops.push(PALETTE[i % PALETTE.length] + ' ' + start.toFixed(2) + '% ' + end.toFixed(2) + '%');
+          acc += frac;
+        });
+        donut.style.background = 'conic-gradient(' + stops.join(', ') + ')';
+        donutTotalEl.textContent = fmtDur(total);
+
+        legend.innerHTML = subjects.map(function (s, i) {
+          return '<div class="legend-item">' +
+            '<span class="legend-dot" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' +
+            '<span class="legend-name"></span>' +
+            '<span class="legend-val">' + fmtDur(vals[i]) + '</span></div>';
+        }).join('');
+        // Set names safely (avoid HTML injection from subject text)
+        var nameEls = legend.querySelectorAll('.legend-name');
+        subjects.forEach(function (s, i) { if (nameEls[i]) nameEls[i].textContent = s; });
+      }
+
+      // ---- Weekly activity bars ----
+      var daily = ls('TEACHLOOP_STUDY_DAILY', {}) || {};   // { 'YYYY-MM-DD': seconds }
+      var bars = document.getElementById('bars');
+      var actTotal = document.getElementById('actTotal');
+      var dayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+      var today = new Date();
+      var week = [];
+      for (var i = 6; i >= 0; i--) {
+        var d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+        var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        week.push({ letter: dayLetters[d.getDay()], sec: Math.max(0, Number(daily[key]) || 0) });
+      }
+      var maxSec = week.reduce(function (m, x) { return Math.max(m, x.sec); }, 0);
+      var weekTotal = week.reduce(function (a, x) { return a + x.sec; }, 0);
+      actTotal.textContent = fmtDur(weekTotal);
+
+      bars.innerHTML = week.map(function (x, i) {
+        var pct = maxSec > 0 ? Math.max(6, (x.sec / maxSec) * 100) : 6;
+        return '<div class="bar-col">' +
+          '<div class="bar" style="height:' + pct + '%; animation-delay:' + (i * 70) + 'ms"></div>' +
+          '<div class="bar-day">' + x.letter + '</div></div>';
+      }).join('');
+    })();
+  </script>
+</body>
+
+</html>
