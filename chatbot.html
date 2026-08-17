@@ -1574,8 +1574,10 @@ body.light-mode .confirm-cancel:hover { background:#f0f0f2; }
 }
 /* Hover + tap show a solid purple outline matching the New Subject card
    (same 1px thickness and #a866ee color, just solid instead of dashed). */
-.hsub-card:hover { background:#1d1d20; border-color:#a866ee; transform:translateY(-2px); }
+.hsub-card:hover { background:#1d1d20; border-color:#a866ee; transform:translateY(-2px); z-index:30; }
 .hsub-card.selected { border-color:#a866ee; }
+/* Keep a card (and its open ⋯ menu) above the tiles below it. */
+.hsub-card:has(.hsub-menu.open) { z-index:40; }
 .hsub-icon { width:22px; height:22px; color:#8a8a93; fill:currentColor; stroke:none; margin-bottom:auto; }
 .hsub-name { font-size:14.5px; font-weight:600; color:#f4f4f5; margin-top:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .hsub-add { align-items:center; justify-content:center; border-style:dashed; }
@@ -1906,19 +1908,21 @@ body.light-mode .pt-check { background:#fff; border-color:#111; color:#111; }
   position: relative; z-index: 10;
 }
 .action-box {
-  flex: 1; height: 108px; background: #161616; border: 1px solid #222; border-radius: 20px;
-  padding: 14px; display: flex; flex-direction: column; justify-content: space-between;
+  flex: 1; height: 48px; background: #161616; border: 1px solid #222; border-radius: 11px;
+  padding: 0 12px; display: flex; flex-direction: row; align-items: center; gap: 10px;
   text-align: left; cursor: pointer; position: relative; transition: background 0.15s, border-color 0.15s;
   color: #fff; text-decoration: none; font-family: inherit; outline: none;
 }
 .action-box:hover { background: #1b1b1b; }
+.action-box > svg { width: 17px; height: 17px; flex-shrink: 0; }
+.action-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .action-badge {
-  position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: 600;
+  position: absolute; top: 5px; right: 7px; font-size: 8.5px; font-weight: 600;
   background: #132A18; color: #4ade80; border: 1px solid #1a3a22;
-  padding: 2px 8px; border-radius: 999px; line-height: 1;
+  padding: 1px 5px; border-radius: 999px; line-height: 1;
 }
-.action-title { font-size: 15px; font-weight: 600; color: #fff; }
-.action-desc { font-size: 13px; color: #8a8a8a; margin-top: 1px; }
+.action-title { font-size: 12.5px; font-weight: 600; color: #fff; line-height: 1.15; }
+.action-desc { font-size: 11px; color: #8a8a8a; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Light mode overrides for action boxes */
 body.light-mode .action-box {
@@ -2247,6 +2251,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
             <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></span>
             <span class="pm-label" data-i18n="feedback">Feedback</span>
           </button>
+          <a class="pm-row" href="privacy.html" target="_blank" rel="noopener" style="text-decoration:none;">
+            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <span class="pm-label">Privacy Policy</span>
+          </a>
+          <a class="pm-row" href="terms.html" target="_blank" rel="noopener" style="text-decoration:none;">
+            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
+            <span class="pm-label">Terms &amp; Conditions</span>
+          </a>
           <div class="pm-sep"></div>
           <button class="pm-row pm-logout" type="button" id="pmLogout">
             <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
@@ -2642,6 +2654,10 @@ body.light-mode .aset-member .nm { color:#16151c; }
       setTimeout(() => { if (window.__axVoice && window.__axVoice.start) window.__axVoice.start(); }, 250);
       return;
     }
+
+    // Typed chat: make sure any leftover voice orb/session is cleared.
+    if (window.__axVoice && window.__axVoice.stop) window.__axVoice.stop();
+    else { const vs = document.getElementById('voiceStage'); if (vs) vs.hidden = true; }
 
     // Append user message
     appendUserMsg(firstMessage, attachment);
@@ -3419,6 +3435,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const text = chatInput.value.trim();
     const att = pendingAttachment;
     if (!text && !att) return;
+    // The voice orb belongs to speech-to-speech only — never show it for a
+    // typed message. (Voice's own turns keep __axVoice.active true.)
+    if (!(window.__axVoice && window.__axVoice.active)) {
+      const vs = document.getElementById('voiceStage'); if (vs) vs.hidden = true;
+    }
     chatInput.value = '';
     chatInput.style.height = 'auto';
     chatSendBtn.disabled = true;

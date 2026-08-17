@@ -13,3 +13,4 @@ scratch/
 
 # Supabase keys (local only)
 supabase-config.js
+_fontpreview.html

@@ -1470,8 +1470,10 @@
           <h1>Create a free profile to<br>discover your learning plan</h1>
           <button class="oauth" id="googleBtn"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></button>
           <div class="or">OR</div>
-          <input class="email" id="emailInput" type="email" placeholder="Email">
+          <input class="email" id="emailInput" type="email" placeholder="Email" autocomplete="email">
+          <input class="email" id="passwordInput" type="password" placeholder="Password (min 6 characters)" autocomplete="new-password">
           <button class="signup-btn" id="signupBtn">Sign up</button>
+          <div class="signup-msg" id="signupMsg" style="display:none;margin-top:12px;font-size:13.5px;line-height:1.5;max-width:340px;text-align:center;"></div>
           <div class="legal">By clicking Sign up, I agree to Axoura's <a href="#">Terms</a> and <a href="#">Privacy Policy</a></div>
           <div class="existing">Existing user? <a href="dashboard.html">Sign in</a></div>
         </div>`;
@@ -1626,17 +1628,58 @@
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
         };
 
-        // Email sign-up: works immediately (saved to the browser); also stored in
-        // Supabase when configured. Then continue to the dashboard.
+        // Real email + password sign-up via Supabase Auth. Creates an account
+        // under Authentication → Users and (if confirmations are on) emails a
+        // verification link. The profile row is attached after the session
+        // exists (immediately, or on the dashboard after they confirm).
+        const msgEl = () => document.getElementById('signupMsg');
+        const showMsg = (text, isError) => {
+          const m = msgEl(); if (!m) return;
+          m.style.display = 'block';
+          m.textContent = text;
+          m.style.color = isError ? '#ff6b6b' : '#c9b6ef';
+        };
+
         const finishEmail = async () => {
-          saveSubject();
           const email = (document.getElementById('emailInput')?.value || '').trim();
+          const password = (document.getElementById('passwordInput')?.value || '');
+          const btn = document.getElementById('signupBtn');
+          if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showMsg('Please enter a valid email address.', true); return; }
+          if (password.length < 6) { showMsg('Password must be at least 6 characters.', true); return; }
+
+          saveSubject();
           saveLocalAccount(email, 'email');
-          if (sb && email) {
-            try { await sb.from('profiles').upsert(profilePayload(email), { onConflict: 'email', ignoreDuplicates: true }); }
-            catch (e) { console.warn('Supabase save failed:', e.message || e); }
+
+          if (!sb) { goDashboard(); return; }   // local-only fallback (Supabase not configured)
+
+          if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
+          // Stash onboarding answers so the dashboard attaches them to the
+          // account once the session exists (now, or after email confirmation).
+          try { localStorage.setItem('AXOURA_PENDING_PROFILE', JSON.stringify(profilePayload(email))); } catch (e) { }
+          const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'dashboard.html');
+          try {
+            const { data, error } = await sb.auth.signUp({
+              email, password,
+              options: { data: { name: (store.name || '').trim() || null }, emailRedirectTo: redirectTo }
+            });
+            if (error) {
+              if (btn) { btn.disabled = false; btn.textContent = 'Sign up'; }
+              showMsg(error.message || 'Sign-up failed. Please try again.', true);
+              return;
+            }
+            if (data && data.session) {
+              // Email confirmations are OFF → signed in immediately.
+              try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+              goDashboard();
+            } else {
+              // Confirmations ON → they must click the link in their inbox.
+              if (btn) { btn.textContent = 'Confirmation sent'; }
+              showMsg('Almost there! We sent a confirmation link to ' + email + '. Open it to finish and land on your dashboard.', false);
+            }
+          } catch (e) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Sign up'; }
+            showMsg((e && e.message) || 'Sign-up failed. Please try again.', true);
           }
-          goDashboard();
         };
 
         // Google sign-up via Supabase OAuth. Falls back to a local account if
@@ -1662,6 +1705,7 @@
         document.getElementById('googleBtn').addEventListener('click', finishGoogle);
         document.getElementById('signupBtn').addEventListener('click', finishEmail);
         document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') finishEmail(); });
+        document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') finishEmail(); });
       }
     }
 
