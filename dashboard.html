@@ -118,6 +118,8 @@
 
     .full { grid-column: 1 / -1; }
   </style>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -203,9 +205,45 @@
         catch (e) { return fallback; }
       }
 
-      // Greeting
-      var name = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
-      document.getElementById('greet').textContent = name ? ('Welcome back ' + name) : 'Welcome back';
+      function renderGreeting() {
+        var name = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
+        document.getElementById('greet').textContent = name ? ('Welcome back ' + name) : 'Welcome back';
+      }
+      renderGreeting();
+
+      // ---- Finalize Google (Supabase) sign-in after the OAuth redirect ----
+      // When the user signs up with Google, they land back here with a session in
+      // the URL. Grab their profile, attach the onboarding answers we stashed, and
+      // save the account to Supabase.
+      (function finalizeSupabaseSignIn() {
+        if (!(window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase)) return;
+        var sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        sb.auth.getUser().then(function (res) {
+          var user = res && res.data && res.data.user;
+          if (!user) return;
+          var meta = user.user_metadata || {};
+          var gName = (meta.full_name || meta.name || '').trim();
+          if (gName && !(localStorage.getItem('TEACHLOOP_NAME') || '').trim()) {
+            try { localStorage.setItem('TEACHLOOP_NAME', gName); } catch (e) { }
+            renderGreeting();
+          }
+          var pending = {};
+          try { pending = JSON.parse(localStorage.getItem('AXOURA_PENDING_PROFILE') || '{}') || {}; } catch (e) { }
+          var profile = {
+            id: user.id,
+            email: user.email || pending.email || null,
+            name: (localStorage.getItem('TEACHLOOP_NAME') || pending.name || gName || null),
+            motivation: pending.motivation || null, improve: pending.improve || null,
+            age: pending.age || null, level: pending.level || null,
+            goal: pending.goal || null, subject: pending.subject || null,
+          };
+          try { localStorage.setItem('AXOURA_ACCOUNT', JSON.stringify(Object.assign({ provider: 'google' }, profile))); } catch (e) { }
+          sb.from('profiles').upsert(profile, { onConflict: 'id' }).then(function (r) {
+            if (r && r.error) console.warn('Supabase profile save failed:', r.error.message);
+            try { localStorage.removeItem('AXOURA_PENDING_PROFILE'); } catch (e) { }
+          });
+        }).catch(function () { });
+      })();
 
       // ---- Study balance donut ----
       var subjects = (ls('TEACHLOOP_SUBJECTS', []) || []).filter(Boolean);

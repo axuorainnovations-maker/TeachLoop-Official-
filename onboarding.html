@@ -1136,6 +1136,8 @@
     /* Photo + description are always fully visible for every founder. */
     @media (prefers-reduced-motion: reduce) { .fh-down { animation: none; } }
   </style>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -1580,27 +1582,86 @@
         }));
       }
       if (s.type === 'signup') {
-        const finish = () => {
-          // Create the subject the user typed so it shows as a folder in the app.
+        // Optional Supabase backend (configured in supabase-config.js). When the
+        // URL + anon key are set, accounts are stored in Supabase; otherwise the
+        // app runs local-only (account saved to the browser).
+        const sb = (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase)
+          ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
+
+        // Everything we collected during onboarding — attached to the account.
+        const profilePayload = (email) => ({
+          email: email || null,
+          name: (store.name || '').trim() || null,
+          motivation: store.motivation || null,
+          improve: store.improve || null,
+          age: store.age || null,
+          level: store.level || null,
+          goal: store.goal || null,
+          subject: (store.subject || '').trim() || null,
+        });
+
+        const saveLocalAccount = (email, provider) => {
+          const acc = profilePayload(email);
+          acc.provider = provider || 'email';
+          acc.created_at = new Date().toISOString();
+          try { localStorage.setItem('AXOURA_ACCOUNT', JSON.stringify(acc)); } catch (e) { }
+          if (acc.name) { try { localStorage.setItem('TEACHLOOP_NAME', acc.name); } catch (e) { } }
+          if (email) { try { localStorage.setItem('AXOURA_EMAIL', email); } catch (e) { } }
+        };
+
+        const saveSubject = () => {
           const subj = (store.subject || '').trim();
-          if (subj) {
-            try {
-              const subs = JSON.parse(localStorage.getItem('TEACHLOOP_SUBJECTS') || '[]');
-              if (Array.isArray(subs) && !subs.includes(subj)) { subs.push(subj); localStorage.setItem('TEACHLOOP_SUBJECTS', JSON.stringify(subs)); }
-              let rec = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]'); if (!Array.isArray(rec)) rec = [];
-              rec = rec.filter(x => x !== subj); rec.unshift(subj); localStorage.setItem('TEACHLOOP_RECENTS', JSON.stringify(rec.slice(0, 8)));
-            } catch (e) { }
-          }
-          // Save the user's name so the dashboard can greet them.
-          const nm = (store.name || '').trim();
-          if (nm) { try { localStorage.setItem('TEACHLOOP_NAME', nm); } catch (e) { } }
+          if (!subj) return;
+          try {
+            const subs = JSON.parse(localStorage.getItem('TEACHLOOP_SUBJECTS') || '[]');
+            if (Array.isArray(subs) && !subs.includes(subj)) { subs.push(subj); localStorage.setItem('TEACHLOOP_SUBJECTS', JSON.stringify(subs)); }
+            let rec = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]'); if (!Array.isArray(rec)) rec = [];
+            rec = rec.filter(x => x !== subj); rec.unshift(subj); localStorage.setItem('TEACHLOOP_RECENTS', JSON.stringify(rec.slice(0, 8)));
+          } catch (e) { }
+        };
+
+        const goDashboard = () => {
           try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
           document.body.style.transition = 'opacity .3s ease'; document.body.style.opacity = '0';
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
         };
-        document.getElementById('googleBtn').addEventListener('click', finish);
-        document.getElementById('signupBtn').addEventListener('click', finish);
-        document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') finish(); });
+
+        // Email sign-up: works immediately (saved to the browser); also stored in
+        // Supabase when configured. Then continue to the dashboard.
+        const finishEmail = async () => {
+          saveSubject();
+          const email = (document.getElementById('emailInput')?.value || '').trim();
+          saveLocalAccount(email, 'email');
+          if (sb && email) {
+            try { await sb.from('profiles').upsert(profilePayload(email), { onConflict: 'email', ignoreDuplicates: true }); }
+            catch (e) { console.warn('Supabase save failed:', e.message || e); }
+          }
+          goDashboard();
+        };
+
+        // Google sign-up via Supabase OAuth. Falls back to a local account if
+        // Supabase isn't configured yet.
+        const finishGoogle = async () => {
+          saveSubject();
+          saveLocalAccount(null, 'google');
+          if (sb) {
+            // Stash onboarding answers so the dashboard can attach them to the
+            // new account once Google redirects back.
+            try { localStorage.setItem('AXOURA_PENDING_PROFILE', JSON.stringify(profilePayload(null))); } catch (e) { }
+            try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+            const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'dashboard.html');
+            try {
+              const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+              if (error) throw error;
+            } catch (e) { alert('Google sign-in error: ' + (e.message || e)); }
+          } else {
+            goDashboard();   // local-only mode
+          }
+        };
+
+        document.getElementById('googleBtn').addEventListener('click', finishGoogle);
+        document.getElementById('signupBtn').addEventListener('click', finishEmail);
+        document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') finishEmail(); });
       }
     }
 
