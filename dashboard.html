@@ -54,16 +54,93 @@
     .brand img { width: 30px; height: 30px; }
 
     /* Learning-streak badge — top-right, mirrors the one in the chat header. */
+    .streak-wrap { position: fixed; top: 18px; right: 22px; z-index: 50; }
     .streak-badge {
-      position: fixed; top: 18px; right: 22px; z-index: 50;
       display: flex; align-items: center; gap: 6px;
       padding: 7px 14px 7px 11px; border-radius: 999px;
       background: rgba(233,118,4,0.08); border: 1px solid rgba(233,118,4,0.45);
-      cursor: default; user-select: none; font-family: inherit;
+      cursor: pointer; user-select: none; font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
     }
+    .streak-badge:hover, .streak-badge.open { border-color: #e97604; background: rgba(233,118,4,0.16); }
     .streak-badge svg { width: 19px; height: 19px; flex-shrink: 0; }
     .streak-count { font-size: 15px; font-weight: 700; color: #f0a500; }
     .streak-flame { animation: flameFlicker 2.4s ease-in-out infinite; transform-origin: center bottom; }
+
+    /* Streak dropdown */
+    .streak-menu {
+      position: absolute; top: 46px; right: 0; width: 330px; z-index: 60;
+      background: #161618; border: 1px solid #2a2a2e; border-radius: 18px; padding: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      opacity: 0; transform: translateY(-6px); pointer-events: none;
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+    .streak-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .streak-menu-top { display: flex; align-items: center; gap: 9px; }
+    .streak-menu-top svg { width: 26px; height: 26px; }
+    .streak-big { font-size: 27px; font-weight: 800; color: #f0a500; letter-spacing: -0.5px; }
+    .streak-menu-title { font-size: 16px; font-weight: 700; color: #f4f4f5; margin-top: 14px; }
+    .streak-menu-desc {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      font-size: 13px; line-height: 1.45; color: #a1a1aa; margin-top: 5px;
+    }
+    .streak-days { display: flex; justify-content: space-between; margin-top: 20px; }
+    .streak-day { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+    .streak-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #1e1e21; border: 1px solid #2e2e33;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .streak-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #3a3a40; }
+    .streak-day.active .streak-dot { background: rgba(233,118,4,0.18); border-color: #e97604; }
+    .streak-day.active .streak-dot::after { background: #e97604; }
+    .streak-day.today .streak-dot { border-color: #f0a500; }
+    .streak-day-label { font-size: 12px; font-weight: 600; color: #8a8a93; }
+    .streak-viewall {
+      position: absolute; top: 16px; right: 16px; z-index: 2;
+      padding: 6px 11px; border-radius: 8px; border: 1px solid rgba(168,102,238,0.35);
+      background: rgba(168,102,238,0.12); color: #c9a6f5; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: background 0.15s, border-color 0.15s;
+    }
+    .streak-viewall:hover { background: rgba(168,102,238,0.22); border-color: #a866ee; }
+
+    /* Lifetime activity heatmap modal */
+    .activity-overlay {
+      position: fixed; inset: 0; z-index: 410; display: flex; align-items: center; justify-content: center;
+      padding: 24px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+      opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
+    }
+    .activity-overlay.open { opacity: 1; pointer-events: auto; }
+    .activity-box {
+      position: relative; width: min(96vw, 900px); max-height: 92vh; overflow: auto;
+      background: #0f0f10; border: 1px solid #232327; border-radius: 22px; padding: 28px 30px 24px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6); transform: scale(0.96); transition: transform 0.18s ease;
+    }
+    .activity-overlay.open .activity-box { transform: scale(1); }
+    .activity-close {
+      position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border: none; border-radius: 9px;
+      background: transparent; color: #8a8a93; font-size: 22px; line-height: 1; cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .activity-close:hover { background: #26262b; color: #fff; }
+    .activity-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #f4f4f5; }
+    .activity-sub { font-size: 13.5px; color: #9a9a9a; margin-top: 6px; margin-bottom: 22px; }
+    .gh-scroll { overflow-x: auto; padding-bottom: 6px; }
+    .gh-wrap { display: flex; min-width: max-content; }
+    .gh-days { display: flex; flex-direction: column; gap: 3px; margin-top: 20px; margin-right: 7px; }
+    .gh-day { height: 11px; line-height: 11px; font-size: 9px; color: #8a8a93; }
+    .gh-months { display: flex; gap: 3px; margin-bottom: 6px; height: 12px; }
+    .gh-month { width: 11px; font-size: 10px; color: #8a8a93; white-space: nowrap; overflow: visible; }
+    .gh-grid { display: flex; gap: 3px; }
+    .gh-week { display: flex; flex-direction: column; gap: 3px; }
+    .gh-cell { width: 11px; height: 11px; border-radius: 3px; background: #1c1c20; border: 1px solid rgba(255,255,255,0.04); }
+    .gh-cell.on { background: #a866ee; border-color: #a866ee; }
+    .gh-cell.future { background: transparent; border-color: transparent; }
+    .gh-legend { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 16px; font-size: 11px; color: #8a8a93; }
+    .gh-legend .gh-cell { border: none; }
+    .gh-l0 { background: #1c1c20; } .gh-l1 { background: #3a2153; } .gh-l2 { background: #5a2f88; } .gh-l3 { background: #7c3ec0; } .gh-l4 { background: #a866ee; }
+    .gh-stats { display: flex; gap: 26px; margin-top: 18px; }
+    .gh-stat-num { font-size: 22px; font-weight: 700; color: #f4f4f5; }
+    .gh-stat-lbl { font-size: 12px; color: #9a9a9a; margin-top: 2px; }
     @keyframes flameFlicker {
       0%, 100% { transform: scale(1) rotate(0deg); }
       30% { transform: scale(1.08) rotate(-2deg); }
@@ -144,9 +221,55 @@
     <div class="brand"><img src="logo.png?v=3" alt="Axoura">Axoura</div>
   </div>
 
-  <div class="streak-badge" id="streakBadge" title="Learning streak">
-    <svg class="streak-flame" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M20 15.0002C20 19.2547 17.3819 21.1216 15.3588 21.7512C14.9274 21.8854 14.6438 21.3825 14.9019 21.0116C15.7823 19.7464 16.8 17.8161 16.8 16.0002C16.8 14.0496 15.1559 11.7467 13.8721 10.3263C13.5786 10.0016 13.0667 10.2164 13.0507 10.6539C12.9976 12.1031 12.7689 14.042 11.7828 15.5616C11.6241 15.8062 11.2872 15.8264 11.1063 15.5977C10.7982 15.208 10.4901 14.7267 10.182 14.3464C10.016 14.1416 9.71604 14.1388 9.52461 14.32C8.77825 15.0267 7.73333 16.1288 7.73333 17.5002C7.73333 18.4301 8.0936 19.405 8.50007 20.1893C8.72368 20.6208 8.32607 21.1402 7.89573 20.9144C6.11307 19.9789 4 18.0838 4 15.0002C4 11.8538 8.31029 7.49503 9.95605 3.37712C10.2157 2.72733 11.0161 2.42199 11.5727 2.84603C14.9439 5.41409 20 10.3783 20 15.0002Z" fill="#e97604"></path></svg>
-    <span class="streak-count" id="streakCount">0</span>
+  <div class="streak-wrap">
+    <button class="streak-badge" id="streakBadge" title="Learning streak" type="button">
+      <svg class="streak-flame" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M20 15.0002C20 19.2547 17.3819 21.1216 15.3588 21.7512C14.9274 21.8854 14.6438 21.3825 14.9019 21.0116C15.7823 19.7464 16.8 17.8161 16.8 16.0002C16.8 14.0496 15.1559 11.7467 13.8721 10.3263C13.5786 10.0016 13.0667 10.2164 13.0507 10.6539C12.9976 12.1031 12.7689 14.042 11.7828 15.5616C11.6241 15.8062 11.2872 15.8264 11.1063 15.5977C10.7982 15.208 10.4901 14.7267 10.182 14.3464C10.016 14.1416 9.71604 14.1388 9.52461 14.32C8.77825 15.0267 7.73333 16.1288 7.73333 17.5002C7.73333 18.4301 8.0936 19.405 8.50007 20.1893C8.72368 20.6208 8.32607 21.1402 7.89573 20.9144C6.11307 19.9789 4 18.0838 4 15.0002C4 11.8538 8.31029 7.49503 9.95605 3.37712C10.2157 2.72733 11.0161 2.42199 11.5727 2.84603C14.9439 5.41409 20 10.3783 20 15.0002Z" fill="#e97604"></path></svg>
+      <span class="streak-count" id="streakCount">0</span>
+    </button>
+    <div class="streak-menu" id="streakMenu">
+      <button class="streak-viewall" id="streakViewAll" type="button">View activity</button>
+      <div class="streak-menu-top">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M20 15.0002C20 19.2547 17.3819 21.1216 15.3588 21.7512C14.9274 21.8854 14.6438 21.3825 14.9019 21.0116C15.7823 19.7464 16.8 17.8161 16.8 16.0002C16.8 14.0496 15.1559 11.7467 13.8721 10.3263C13.5786 10.0016 13.0667 10.2164 13.0507 10.6539C12.9976 12.1031 12.7689 14.042 11.7828 15.5616C11.6241 15.8062 11.2872 15.8264 11.1063 15.5977C10.7982 15.208 10.4901 14.7267 10.182 14.3464C10.016 14.1416 9.71604 14.1388 9.52461 14.32C8.77825 15.0267 7.73333 16.1288 7.73333 17.5002C7.73333 18.4301 8.0936 19.405 8.50007 20.1893C8.72368 20.6208 8.32607 21.1402 7.89573 20.9144C6.11307 19.9789 4 18.0838 4 15.0002C4 11.8538 8.31029 7.49503 9.95605 3.37712C10.2157 2.72733 11.0161 2.42199 11.5727 2.84603C14.9439 5.41409 20 10.3783 20 15.0002Z" fill="#e97604"></path></svg>
+        <span class="streak-big" id="streakBigCount">0</span>
+      </div>
+      <div class="streak-menu-title">This Week</div>
+      <div class="streak-menu-desc">
+        <span id="streakDesc">Study today to start your streak.</span>
+      </div>
+      <div class="streak-days" id="streakDays"></div>
+    </div>
+  </div>
+
+  <!-- Lifetime activity heatmap modal -->
+  <div class="activity-overlay" id="activityOverlay">
+    <div class="activity-box" role="dialog" aria-modal="true">
+      <button class="activity-close" id="activityClose" type="button" aria-label="Close">×</button>
+      <div class="activity-title">Your Axoura activity</div>
+      <div class="activity-sub">Every purple square is a day you studied. Keep the streak alive!</div>
+      <div class="gh-scroll">
+        <div class="gh-wrap">
+          <div class="gh-days" id="ghDays"></div>
+          <div class="gh-body">
+            <div class="gh-months" id="ghMonths"></div>
+            <div class="gh-grid" id="ghGrid"></div>
+          </div>
+        </div>
+      </div>
+      <div class="gh-legend">
+        Less
+        <span class="gh-cell gh-l0"></span>
+        <span class="gh-cell gh-l1"></span>
+        <span class="gh-cell gh-l2"></span>
+        <span class="gh-cell gh-l3"></span>
+        <span class="gh-cell gh-l4"></span>
+        More
+      </div>
+      <div class="gh-stats">
+        <div><div class="gh-stat-num" id="ghTotalDays">0</div><div class="gh-stat-lbl">Days studied</div></div>
+        <div><div class="gh-stat-num" id="ghCurrentStreak">0</div><div class="gh-stat-lbl">Current streak</div></div>
+        <div><div class="gh-stat-num" id="ghBestStreak">0</div><div class="gh-stat-lbl">Longest streak</div></div>
+      </div>
+    </div>
   </div>
 
   <div class="wrap">
@@ -233,20 +356,159 @@
       }
       renderGreeting();
 
-      // Learning-streak count = distinct days studied this week (Mon–Sun),
-      // recording today. Mirrors the chat header's streak badge.
+      // Weekly learning streak — tracks which days (Mon–Sun) the student studied
+      // this week and opens a tap-to-view breakdown + lifetime activity heatmap.
+      // Ported from the chat header so both badges behave identically.
       (function () {
-        var KEY = 'TEACHLOOP_ACTIVE_DAYS';
-        function dayStr(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-        var active = ls(KEY, []); if (!Array.isArray(active)) active = [];
-        var today = new Date(), todayStr = dayStr(today);
-        if (active.indexOf(todayStr) === -1) active.push(todayStr);
+        const badge = document.getElementById('streakBadge');
+        const menu = document.getElementById('streakMenu');
+        const daysWrap = document.getElementById('streakDays');
+        if (!badge || !menu || !daysWrap) return;
+        const KEY = 'TEACHLOOP_ACTIVE_DAYS';
+        const LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+        // Local calendar day as YYYY-MM-DD (avoids UTC off-by-one).
+        function dayStr(d) {
+          return d.getFullYear() + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getDate()).padStart(2, '0');
+        }
+        // Monday of the week containing `d`.
+        function weekStart(d) {
+          const s = new Date(d);
+          const dow = (s.getDay() + 6) % 7;   // 0 = Monday
+          s.setDate(s.getDate() - dow);
+          s.setHours(0, 0, 0, 0);
+          return s;
+        }
+
+        // Load the set of active dates and record today.
+        let active = [];
+        try { active = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+        if (!Array.isArray(active)) active = [];
+        const today = new Date();
+        const todayStr = dayStr(today);
+        if (!active.includes(todayStr)) active.push(todayStr);
         try { localStorage.setItem(KEY, JSON.stringify(active)); } catch (e) {}
-        var monday = new Date(today); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7)); monday.setHours(0, 0, 0, 0);
-        var set = {}; active.forEach(function (d) { set[d] = 1; });
-        var studied = 0;
-        for (var i = 0; i < 7; i++) { var d = new Date(monday); d.setDate(monday.getDate() + i); if (set[dayStr(d)]) studied++; }
-        var el = document.getElementById('streakCount'); if (el) el.textContent = studied;
+
+        // Build this week's 7 days and mark which were studied.
+        const monday = weekStart(today);
+        const activeSet = new Set(active);
+        let studiedThisWeek = 0;
+
+        daysWrap.innerHTML = '';
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          const ds = dayStr(d);
+          const isActive = activeSet.has(ds);
+          if (isActive) studiedThisWeek++;
+
+          const cell = document.createElement('div');
+          cell.className = 'streak-day' + (isActive ? ' active' : '') + (ds === todayStr ? ' today' : '');
+          cell.innerHTML = '<div class="streak-dot"></div><div class="streak-day-label">' + LABELS[i] + '</div>';
+          daysWrap.appendChild(cell);
+        }
+
+        // Show a plain number: how many days studied this week.
+        document.getElementById('streakCount').textContent = studiedThisWeek;
+        document.getElementById('streakBigCount').textContent = studiedThisWeek;
+        const descEl = document.getElementById('streakDesc');
+        if (studiedThisWeek === 0) {
+          descEl.textContent = 'Study today to start your streak.';
+        } else {
+          descEl.textContent = "You've studied " + studiedThisWeek + ' day' + (studiedThisWeek === 1 ? '' : 's') + ' this week.';
+        }
+
+        // Tap the badge to toggle the dropdown.
+        badge.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = menu.classList.toggle('open');
+          badge.classList.toggle('open', open);
+        });
+        document.addEventListener('click', (e) => {
+          if (!menu.contains(e.target) && e.target !== badge) {
+            menu.classList.remove('open');
+            badge.classList.remove('open');
+          }
+        });
+
+        // ---- Lifetime activity heatmap (GitHub-style, purple) ----
+        const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const DAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+        function buildActivity() {
+          const grid = document.getElementById('ghGrid');
+          const monthsRow = document.getElementById('ghMonths');
+          const daysCol = document.getElementById('ghDays');
+          if (!grid || !monthsRow || !daysCol) return;
+
+          const set = new Set(active);
+          const t = new Date(); t.setHours(0, 0, 0, 0);
+          const start = new Date(t); start.setDate(start.getDate() - 364);
+          const weekStartSun = new Date(start); weekStartSun.setDate(weekStartSun.getDate() - weekStartSun.getDay());
+
+          daysCol.innerHTML = '';
+          DAY_ABBR.forEach(d => { const s = document.createElement('div'); s.className = 'gh-day'; s.textContent = d; daysCol.appendChild(s); });
+
+          grid.innerHTML = '';
+          monthsRow.innerHTML = '';
+          let lastMonth = -1;
+          for (let w = 0; w < 53; w++) {
+            const firstDay = new Date(weekStartSun); firstDay.setDate(weekStartSun.getDate() + w * 7);
+            const mspan = document.createElement('span'); mspan.className = 'gh-month';
+            if (firstDay.getMonth() !== lastMonth) { mspan.textContent = MONTHS[firstDay.getMonth()]; lastMonth = firstDay.getMonth(); }
+            monthsRow.appendChild(mspan);
+
+            const col = document.createElement('div'); col.className = 'gh-week';
+            for (let d = 0; d < 7; d++) {
+              const date = new Date(weekStartSun); date.setDate(weekStartSun.getDate() + w * 7 + d);
+              const cell = document.createElement('div'); cell.className = 'gh-cell';
+              const ds = dayStr(date);
+              if (date > t) cell.classList.add('future');
+              else if (set.has(ds)) { cell.classList.add('on'); cell.title = ds + ' — studied'; }
+              else cell.title = ds;
+              col.appendChild(cell);
+            }
+            grid.appendChild(col);
+          }
+
+          // Stats: total days studied, current streak, longest streak.
+          const studied = [...set].filter(ds => ds <= todayStr).sort();
+          let current = 0; const cur = new Date(t);
+          while (set.has(dayStr(cur))) { current++; cur.setDate(cur.getDate() - 1); }
+          let longest = 0, run = 0, prev = null;
+          studied.forEach(ds => {
+            if (prev) {
+              const exp = new Date(prev); exp.setDate(exp.getDate() + 1);
+              run = (dayStr(exp) === ds) ? run + 1 : 1;
+            } else run = 1;
+            if (run > longest) longest = run;
+            const p = ds.split('-').map(Number); prev = new Date(p[0], p[1] - 1, p[2]);
+          });
+
+          document.getElementById('ghTotalDays').textContent = studied.length;
+          document.getElementById('ghCurrentStreak').textContent = current;
+          document.getElementById('ghBestStreak').textContent = longest;
+        }
+
+        let activityWired = false;
+        const viewBtn = document.getElementById('streakViewAll');
+        if (viewBtn) {
+          viewBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            buildActivity();
+            const ov = document.getElementById('activityOverlay');
+            if (ov) ov.classList.add('open');
+            menu.classList.remove('open'); badge.classList.remove('open');
+            if (!activityWired && ov) {
+              activityWired = true;
+              document.getElementById('activityClose')?.addEventListener('click', () => ov.classList.remove('open'));
+              ov.addEventListener('click', (ev) => { if (ev.target === ov) ov.classList.remove('open'); });
+              document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') ov.classList.remove('open'); });
+            }
+          });
+        }
       })();
 
       // ---- Finalize Google (Supabase) sign-in after the OAuth redirect ----

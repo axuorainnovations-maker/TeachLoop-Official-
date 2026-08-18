@@ -1971,6 +1971,33 @@ body.light-mode .paste-sub { color:#6a6a6f; }
 body.light-mode .paste-textarea { background:#f6f6f7; border-color:#e2e2e6; color:#18181b; }
 body.light-mode .paste-cancel { border-color:#e2e2e6; color:#52525b; }
 body.light-mode .paste-cancel:hover { background:#f0f0f2; color:#18181b; }
+
+/* YouTube links modal */
+.yt-box { width:min(94vw,460px); background:#141416; border:1px solid #2a2a2f; border-radius:18px; padding:20px 20px 16px; box-shadow:0 30px 80px rgba(0,0,0,0.6); }
+.yt-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.yt-addrow { width:30px; height:30px; flex-shrink:0; border-radius:9px; background:#1e1e22; border:1px solid #2e2e34; color:#c7c7cc; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .15s, color .15s; }
+.yt-addrow:hover { background:#2a2a30; color:#fff; }
+.yt-addrow svg { width:16px; height:16px; }
+.yt-rows { display:flex; flex-direction:column; gap:10px; }
+.yt-row { position:relative; display:flex; align-items:center; gap:8px; background:#0f0f10; border:1px solid #2a2a2f; border-radius:11px; padding:6px 6px 6px 12px; transition:border-color .15s; }
+.yt-row:focus-within { border-color:#a866ee; }
+.yt-row-icon { width:16px; height:12px; flex-shrink:0; }
+.yt-input { flex:1; min-width:0; background:transparent; border:none; outline:none; color:#f4f4f5; font-size:14px; font-family:'Inter', sans-serif; }
+.yt-input::placeholder { color:#6a6a6a; }
+.yt-row-menu-btn { width:28px; height:28px; flex-shrink:0; border:none; background:transparent; border-radius:7px; color:#8a8a93; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .15s, color .15s; }
+.yt-row-menu-btn:hover, .yt-row-menu-btn.open { background:#26262b; color:#e4e4e5; }
+.yt-row-menu-btn svg { width:16px; height:16px; fill:currentColor; }
+.yt-row-menu { position:absolute; top:38px; right:6px; z-index:5; min-width:130px; padding:5px; border-radius:10px; background:#212124; border:1px solid #313135; box-shadow:0 12px 30px rgba(0,0,0,0.45); display:none; flex-direction:column; }
+.yt-row-menu.open { display:flex; }
+.yt-row-menu button { display:flex; align-items:center; gap:9px; width:100%; padding:8px 10px; border:none; background:transparent; border-radius:7px; font-size:13.5px; font-weight:500; color:#f87171; cursor:pointer; font-family:'Inter', sans-serif; text-align:left; }
+.yt-row-menu button:hover { background:#3a1f1f; }
+.yt-row-menu button svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+body.light-mode .yt-box { background:#fff; border-color:#e2e2e6; box-shadow:0 30px 80px rgba(0,0,0,0.18); }
+body.light-mode .yt-row { background:#f6f6f7; border-color:#e2e2e6; }
+body.light-mode .yt-input { color:#18181b; }
+body.light-mode .yt-addrow { background:#f0f0f2; border-color:#e2e2e6; color:#52525b; }
+body.light-mode .yt-row-menu { background:#fff; border-color:#e2e2e6; }
+
 body.light-mode .action-title { color: #1c1c1e; }
 body.light-mode .action-desc { color: #6e6e73; }
 body.light-mode .action-badge {
@@ -2162,7 +2189,10 @@ body.light-mode .aset-member .nm { color:#16151c; }
 <div class="app">
   <aside class="sidebar">
     <div class="sidebar-top">
-      <span class="brand-name">Axoura</span>
+      <span class="brand-wrap">
+        <span class="brand-name">Axoura</span>
+        <span class="brand-logo grad-logo" role="img" aria-label="Axoura"></span>
+      </span>
       <div class="logo-area" id="logoArea">
         <span class="logo-pencil">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M11.4001 18.1612L11.4001 18.1612L18.796 10.7653C17.7894 10.3464 16.5972 9.6582 15.4697 8.53068C14.342 7.40298 13.6537 6.21058 13.2348 5.2039L5.83882 12.5999L5.83879 12.5999C5.26166 13.1771 4.97307 13.4657 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L7.47918 20.5844C8.25351 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5343 19.0269 10.823 18.7383 11.4001 18.1612Z" fill="currentColor"></path><path d="M20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178L14.3999 4.03882C14.4121 4.0755 14.4246 4.11268 14.4377 4.15035C14.7628 5.0875 15.3763 6.31601 16.5303 7.47002C17.6843 8.62403 18.9128 9.23749 19.85 9.56262C19.8875 9.57563 19.9245 9.58817 19.961 9.60026L20.8482 8.71306Z" fill="currentColor"></path></svg>
@@ -2205,15 +2235,25 @@ body.light-mode .aset-member .nm { color:#16151c; }
     <nav class="nav">
       <a class="nav-item" id="dashboardNav">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 21.2488H21V9.97875C21 9.35875 20.72 8.77875 20.23 8.39875L19 7.43875L18.98 4.98875C18.98 4.43875 18.53 3.99875 17.98 3.99875H14.57L13.23 2.95875C12.51 2.38875 11.49 2.38875 10.77 2.95875L3.77 8.39875C3.28 8.77875 3 9.35875 3 9.96875L2.95 21.2488H2C1.59 21.2488 1.25 21.5888 1.25 21.9988C1.25 22.4088 1.59 22.7488 2 22.7488H22C22.41 22.7488 22.75 22.4088 22.75 21.9988C22.75 21.5888 22.41 21.2488 22 21.2488ZM6.5 12.7487V11.2487C6.5 10.6987 6.95 10.2487 7.5 10.2487H9.5C10.05 10.2487 10.5 10.6987 10.5 11.2487V12.7487C10.5 13.2987 10.05 13.7487 9.5 13.7487H7.5C6.95 13.7487 6.5 13.2987 6.5 12.7487ZM14.5 21.2488H9.5V18.4987C9.5 17.6687 10.17 16.9987 11 16.9987H13C13.83 16.9987 14.5 17.6687 14.5 18.4987V21.2488ZM17.5 12.7487C17.5 13.2987 17.05 13.7487 16.5 13.7487H14.5C13.95 13.7487 13.5 13.2987 13.5 12.7487V11.2487C13.5 10.6987 13.95 10.2487 14.5 10.2487H16.5C17.05 10.2487 17.5 10.6987 17.5 11.2487V12.7487Z"/></svg>
-        <span>Dashboard</span>
+        <span id="dashboardNavLabel">Dashboard</span>
       </a>
+      <script>
+        (function () {
+          try {
+            var n = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
+            var first = n.split(/\s+/)[0];
+            var el = document.getElementById('dashboardNavLabel');
+            if (first && el) { el.textContent = first + "'s Dashboard"; }
+          } catch (e) { }
+        })();
+      </script>
       <a class="nav-item" id="aiStudentsNav">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
         <span>Teach Studio</span>
       </a>
       <a class="nav-item active" id="chatNav">
         <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
-        <span>Chat</span>
+        <span>Study Assistant</span>
       </a>
 
       <a class="nav-item" id="searchNav">
@@ -2323,6 +2363,147 @@ body.light-mode .aset-member .nm { color:#16151c; }
     </div>
     <div class="main-inner">
       <div class="chat-app">
+        <!-- ===== Study Assistant intro: artifact-matched typebar, pills, subjects ===== -->
+        <style>
+          /* Bring the title down closer to the chatbox (spacing only — font/size unchanged). */
+          .chat-app .chat-title { margin-bottom:18px; }
+          /* Typebar card */
+          .chat-app .input-shell { max-width:760px; margin:0 auto; }
+          .chat-app .input-shell .input-container {
+            background:#1E1E1C; border:2px solid #2C2C2A; border-radius:18px;
+            padding:14px 16px 10px; box-shadow:0 8px 32px rgba(0,0,0,0.5);
+            transition:border-color .15s;
+          }
+          .chat-app .input-shell .input-container:focus-within { border-color:#7A6EF0; }
+          .chat-app .input-container .prompt-input,
+          .chat-app .input-container .rot-placeholder { font-size:15px; line-height:22px; }
+          .chat-app .input-container .prompt-input { color:#E8E8E6; caret-color:#fff; }
+          .chat-app .input-container .rot-placeholder { color:#7A7A78; }
+          .chat-app .input-container .controls { margin-top:12px; display:flex; align-items:center; justify-content:space-between; }
+          .chat-app .input-container .controls .left,
+          .chat-app .input-container .controls .right { display:flex; align-items:center; gap:10px; }
+          /* round chip buttons (attach + mic) */
+          .chat-app .input-container .controls .left .icon-btn,
+          .chat-app .input-container .speak-pill {
+            width:32px; height:32px; min-width:32px; padding:0; border-radius:999px;
+            background:#272723; border:1px solid #2E2E2C; color:#8A8A86;
+            display:flex; align-items:center; justify-content:center; box-shadow:none;
+          }
+          .chat-app .input-container .controls .left .icon-btn:hover,
+          .chat-app .input-container .speak-pill:hover { background:#2E2E2A; }
+          .chat-app .input-container .controls .left .icon-btn svg { width:16px; height:16px; }
+          .chat-app .input-container .speak-pill .speak-label,
+          .chat-app .input-container .speak-pill .speak-wave,
+          .chat-app .input-container .speak-pill .speak-stop { display:none !important; }
+          .chat-app .input-container .speak-pill .sa-mic { display:block; }
+          /* purple send */
+          .chat-app .input-container .waveform-btn {
+            width:36px; height:36px; border-radius:999px; background:#5B4E9C; border:none;
+            box-shadow:0 1px 0 0 rgba(255,255,255,0.12) inset;
+          }
+          .chat-app .input-container .waveform-btn:hover { background:#6758AD; }
+          .chat-app .input-container .waveform-btn .icon-arrow { stroke:#fff; }
+
+          /* Pills row */
+          .chat-app .action-boxes { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin:16px auto 0; max-width:760px; }
+          .chat-app .action-boxes .sa-pill {
+            height:32px; padding:0 14px; border-radius:999px; background:#272723; border:1px solid #33312E;
+            display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:#E8E8E6;
+            font-family:'Inter',sans-serif; cursor:pointer; transition:background .15s;
+          }
+          .chat-app .action-boxes .sa-pill:hover { background:#2E2E2A; }
+
+          /* Subjects */
+          .chat-app .hero-subjects { max-width:760px; margin-left:auto; margin-right:auto; }
+          .chat-app .hero-subjects-head-row { display:flex; align-items:center; justify-content:space-between; }
+          .chat-app .hero-subjects-head { font-size:22px; font-weight:700; letter-spacing:-0.02em; color:#fff; margin:0; }
+          .chat-app .sa-newsub { display:flex; align-items:center; gap:6px; background:none; border:none; color:#8A8A86; font-size:14px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; transition:color .15s; }
+          .chat-app .sa-newsub:hover { color:#A8A8A4; }
+          .chat-app .sa-newsub svg { width:14px; height:14px; }
+          .chat-app .hero-subjects-grid { display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+          .chat-app .hsub-card {
+            height:82px; min-height:82px; background:#1C1C19; border:1px solid #2A2A28; border-radius:16px; padding:0 20px;
+            display:flex; flex-direction:row; align-items:center; justify-content:space-between; text-align:left;
+            gap:12px; cursor:pointer; transition:border-color .15s;
+          }
+          .chat-app .hsub-card:hover { border-color:#33312E; }
+          .chat-app .hsub-card.selected { border-color:#5B4E9C; }
+          .chat-app .hsub-card-left { display:flex; align-items:center; gap:14px; min-width:0; }
+          .chat-app .hsub-tile { width:48px; height:48px; border-radius:12px; background:#241E38; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+          .chat-app .hsub-tile svg { width:22px; height:22px; fill:#9D7EF2; stroke:none; }
+          .chat-app .hsub-meta { min-width:0; }
+          .chat-app .hsub-name { font-size:16px; font-weight:600; line-height:20px; color:#fff; letter-spacing:-0.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+          .chat-app .hsub-sub { margin-top:4px; font-size:13.5px; line-height:16px; color:#8C8C88; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+          .chat-app .hsub-right { display:flex; align-items:center; flex-shrink:0; margin-left:12px; }
+          /* 3-dot options button lives inline on the right of every card (always visible). */
+          .chat-app .hsub-menu-btn { position:static; top:auto; right:auto; opacity:1; width:30px; height:30px; }
+          .chat-app .hsub-menu-btn svg { width:18px; height:18px; }
+
+          /* Fix: keep the whole hero reachable when it's taller than the viewport.
+             align-items:center clipped the top so you couldn't scroll back up;
+             margin auto keeps it centered when short but top-reachable when tall. */
+          .main-inner { align-items:flex-start; padding-top:64px; padding-bottom:64px; }
+          .chat-app { margin-top:auto; margin-bottom:auto; }
+
+          /* Gradient orbit logo (same purple gradient masked by logo.png as the login page). */
+          .grad-logo {
+            display:inline-block;
+            background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
+            -webkit-mask:url('logo.png?v=3') center/contain no-repeat;
+            mask:url('logo.png?v=3') center/contain no-repeat;
+          }
+          /* Gradient logo in the hero title */
+          img.hero-pen, .chat-title .hero-pen { display:inline-block; }
+          .chat-title .grad-logo.hero-pen { width:38px; height:38px; flex-shrink:0; }
+          /* "Axoura" wordmark in gradient + a small gradient logo snug to its right, pushed left */
+          .brand-wrap { display:inline-flex; align-items:center; gap:6px; margin-right:auto; }
+          .brand-name {
+            background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
+            -webkit-background-clip:text; background-clip:text;
+            -webkit-text-fill-color:transparent; color:transparent;
+            margin-right:0;
+          }
+          .brand-logo { width:20px; height:20px; flex-shrink:0; }
+          .sidebar.collapsed .brand-logo { display:none; }
+
+          /* "Countless" font for the hero title. Uses a locally-installed Countless
+             if present, otherwise drop Countless.woff2 / .otf / .ttf into the project
+             root; falls back to the sans stack until then. */
+          @font-face {
+            font-family: 'Countless';
+            src: local('Countless'), local('Countless Regular'),
+                 url('Countless.woff2') format('woff2'),
+                 url('Countless.otf') format('opentype'),
+                 url('Countless.ttf') format('truetype');
+            font-display: swap;
+          }
+          /* Bolder hero title, in Countless */
+          .chat-app .chat-title, .chat-app .chat-title .title-necosmic { font-weight:800; }
+          .chat-app .chat-title .title-necosmic { font-family:'Countless', Inter, sans-serif; letter-spacing:0.5px; }
+
+          /* Recents section removed from the sidebar. */
+          #historySection { display:none !important; }
+
+          /* "View all" toggle under the subjects list */
+          .chat-app .hsub-viewall {
+            align-self:center; margin-top:2px; padding:8px 16px; border-radius:999px;
+            background:#1C1C19; border:1px solid #2A2A28; color:#A8A8A4;
+            font-size:13.5px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer;
+            transition:background .15s, border-color .15s, color .15s;
+          }
+          .chat-app .hsub-viewall:hover { background:#242420; border-color:#33312E; color:#E8E8E6; }
+          body.light-mode .chat-app .hsub-viewall { background:#fff; border-color:#e6e6e9; color:#6a6a6f; }
+
+          /* Light-mode fallbacks */
+          body.light-mode .chat-app .input-shell .input-container { background:#fff; border-color:#e2e2e6; box-shadow:0 8px 32px rgba(0,0,0,0.08); }
+          body.light-mode .chat-app .input-container .prompt-input { color:#18181b; }
+          body.light-mode .chat-app .input-container .controls .left .icon-btn,
+          body.light-mode .chat-app .input-container .speak-pill { background:#f0f0f2; border-color:#e2e2e6; color:#6a6a6f; }
+          body.light-mode .chat-app .action-boxes .sa-pill { background:#f0f0f2; border-color:#e2e2e6; color:#27272a; }
+          body.light-mode .chat-app .hsub-card { background:#fff; border-color:#e6e6e9; }
+          body.light-mode .chat-app .hero-subjects-head,
+          body.light-mode .chat-app .hsub-name { color:#18181b; }
+        </style>
         <div class="welcome-greeting" id="welcomeGreeting" hidden></div>
         <script>
           (function () {
@@ -2334,23 +2515,23 @@ body.light-mode .aset-member .nm { color:#16151c; }
           })();
         </script>
         <h1 class="chat-title">
-          <svg class="hero-pen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" style="width:32px;height:32px;flex-shrink:0"><path d="M11.4001 18.1612L11.4001 18.1612L18.796 10.7653C17.7894 10.3464 16.5972 9.6582 15.4697 8.53068C14.342 7.40298 13.6537 6.21058 13.2348 5.2039L5.83882 12.5999L5.83879 12.5999C5.26166 13.1771 4.97307 13.4657 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L7.47918 20.5844C8.25351 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5343 19.0269 10.823 18.7383 11.4001 18.1612Z" fill="currentColor"></path><path d="M20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178L14.3999 4.03882C14.4121 4.0755 14.4246 4.11268 14.4377 4.15035C14.7628 5.0875 15.3763 6.31601 16.5303 7.47002C17.6843 8.62403 18.9128 9.23749 19.85 9.56262C19.8875 9.57563 19.9245 9.58817 19.961 9.60026L20.8482 8.71306Z" fill="currentColor"></path></svg>
-          <span class="title-necosmic" data-i18n="title">What are we learning today?</span>
+          <span class="hero-pen grad-logo" role="img" aria-label="Axoura"></span>
+          <span class="title-necosmic" data-i18n="title">What are we studying today?</span>
         </h1>
 
         <div class="input-shell">
-          <div class="input-container border-beam">
+          <div class="input-container">
             <div class="attach-preview" id="heroAttach"></div>
             <div class="ai-text-row" id="heroTextRow">
-              <span class="rot-placeholder" id="rotPlaceholder">What are we learning today?</span>
+              <span class="rot-placeholder" id="rotPlaceholder">Type a question here or type '@' to reference documents...</span>
               <input id="prompt" class="prompt-input" type="text" placeholder="" data-i18n-placeholder="placeholder" autocomplete="off" spellcheck="false">
             </div>
 
             <div class="controls">
               <div class="left">
                 <button class="icon-btn" aria-label="Add attachment">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <path d="M12 5v14M5 12h14"/>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                   </svg>
                 </button>
                 <div class="subject-chip" hidden>
@@ -2361,36 +2542,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
               </div>
 
               <div class="right">
-                <div class="orchestrator-wrap">
-                  <button class="orchestrator" type="button">
-                    <span class="orch-label">Beginner</span>
-                    <svg class="orch-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                  </button>
-                  <div class="orchestrator-menu">
-                    <button class="orch-option active" type="button" data-label="Axoura 1.0">
-                      <span class="orch-text"><span class="orch-tier">Beginner</span><span class="orch-sub">Axoura 1.0</span></span>
-                      <svg class="orch-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </button>
-                    <button class="orch-option" type="button" data-label="Axoura 2.0">
-                      <span class="orch-text"><span class="orch-tier">Intermediate</span><span class="orch-sub">Axoura 2.0</span></span>
-                      <svg class="orch-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </button>
-                    <button class="orch-option" type="button" data-label="Axoura 3.0">
-                      <span class="orch-text"><span class="orch-tier">Advanced</span><span class="orch-sub">Axoura 3.0</span></span>
-                      <svg class="orch-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </button>
-                  </div>
-                </div>
-                <button class="speak-pill" id="speakPillHome" type="button" aria-label="Speak">
-                  <span class="speak-label">Speak</span>
-                  <span class="speak-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-                </button>
-
                 <button class="waveform-btn is-typing" id="waveform" aria-label="Send">
-                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>
+                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19V5M5 12l7-7 7 7"/>
                   </svg>
                   <svg class="icon-stop" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
@@ -2402,39 +2556,31 @@ body.light-mode .aset-member .nm { color:#16151c; }
         </div>
 
         <div class="action-boxes">
-          <button class="action-box" onclick="document.querySelector('.icon-btn[aria-label=\'Add attachment\']')?.click()">
-            <span class="action-badge">Popular</span>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-            <div class="action-info">
-              <div class="action-title">Upload</div>
-              <div class="action-desc">File, audio, video</div>
-            </div>
+          <button class="sa-pill" onclick="document.querySelector('.icon-btn[aria-label=\'Add attachment\']')?.click()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v4a3 3 0 0 0 3 3Z" fill="#FF8A5B"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1" stroke="#FF8A5B" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M12 19v3" stroke="#FF8A5B" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            Record
           </button>
-          <button class="action-box" onclick="document.querySelector('.icon-btn[aria-label=\'Add attachment\']')?.click()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-            <div class="action-info">
-              <div class="action-title">Link</div>
-              <div class="action-desc">YouTube, Website</div>
-            </div>
-          </button>
-          <button class="action-box" onclick="window.openPasteModal && window.openPasteModal()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 12H8M16 12h-2M10 16H8M16 16h-2" /><path d="M18 10h-2V8" /></svg>
-            <div class="action-info">
-              <div class="action-title">Paste</div>
-              <div class="action-desc">Copied Text</div>
-            </div>
-          </button>
-          <button class="action-box" onclick="document.querySelector('.icon-btn[aria-label=\'Add attachment\']')?.click()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="22" /></svg>
-            <div class="action-info">
-              <div class="action-title">Record</div>
-              <div class="action-desc">Record Lecture</div>
-            </div>
+          <button class="sa-pill" onclick="window.openYtModal && window.openYtModal()">
+            <svg width="16" height="12" viewBox="0 0 24 16" fill="none">
+              <rect x="1" y="1" width="22" height="14" rx="3.5" fill="#FF6B5B"/>
+              <path d="M10 5.5L16 8L10 10.5V5.5Z" fill="white"/>
+            </svg>
+            YouTube
           </button>
         </div>
 
-        <div class="hero-subjects" id="heroSubjects" style="margin-top: 32px;">
-          <div class="hero-subjects-head" data-i18n="projects">Subjects</div>
+        <div class="hero-subjects" id="heroSubjects" style="margin-top: 40px;">
+          <div class="hero-subjects-head-row">
+            <h2 class="hero-subjects-head" data-i18n="projects">Subjects</h2>
+            <button class="sa-newsub" id="heroNewSubject" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              New subject
+            </button>
+          </div>
           <div class="hero-subjects-grid" id="heroSubjectsGrid"></div>
         </div>
       </div>
@@ -2491,26 +2637,6 @@ body.light-mode .aset-member .nm { color:#16151c; }
                 </div>
               </div>
               <div class="right">
-                <div class="orchestrator-wrap">
-                  <button class="orchestrator" type="button">
-                    <span class="orch-label">Beginner</span>
-                    <svg class="orch-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-                  </button>
-                  <div class="orchestrator-menu">
-                    <button class="orch-option active" type="button" data-label="Axoura 1.0">
-                      <span class="orch-text"><span class="orch-tier">Beginner</span><span class="orch-sub">Axoura 1.0</span></span>
-                      <svg class="orch-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </button>
-                    <button class="orch-option" type="button" data-label="Axoura 2.0">
-                      <span class="orch-text"><span class="orch-tier">Intermediate</span><span class="orch-sub">Axoura 2.0</span></span>
-                      <svg class="orch-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </button>
-                    <button class="orch-option" type="button" data-label="Axoura 3.0">
-                      <span class="orch-text"><span class="orch-tier">Advanced</span><span class="orch-sub">Axoura 3.0</span></span>
-                      <svg class="orch-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </button>
-                  </div>
-                </div>
                 <button class="chat-send-btn" id="chatSendBtn" disabled aria-label="Send">
                   <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>
@@ -2532,20 +2658,41 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
 <!-- Paste copied text modal (from the "Paste — Copied Text" action) -->
 <div class="paste-overlay" id="pasteOverlay">
-  <div class="paste-box" role="dialog" aria-modal="true" aria-label="Paste copied text">
-    <div class="paste-title">Paste copied text</div>
-    <div class="paste-sub">Paste or type the text you want Axoura to use, then add it.</div>
-    <textarea id="pasteText" class="paste-textarea" placeholder="Paste or type here…" spellcheck="false"></textarea>
+  <div class="paste-box" role="dialog" aria-modal="true" aria-label="Add text">
+    <div class="paste-title">Add text</div>
+    <div class="paste-sub">Type the text you want to study, then save it straight into the chat box.</div>
+    <textarea id="pasteText" class="paste-textarea" placeholder="Type here…" spellcheck="false"></textarea>
     <div class="paste-actions">
       <button class="paste-cancel" id="pasteCancel" type="button">Cancel</button>
-      <button class="paste-add" id="pasteAdd" type="button" disabled>Add text</button>
+      <button class="paste-add" id="pasteAdd" type="button" disabled>Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- YouTube links: add one or more links, "+" for more, per-link options menu -->
+<div class="paste-overlay yt-overlay" id="ytOverlay">
+  <div class="yt-box" role="dialog" aria-modal="true" aria-label="Add YouTube links">
+    <div class="yt-head">
+      <div>
+        <div class="paste-title">Add YouTube links</div>
+        <div class="paste-sub" style="margin-bottom:0">Paste a link, then use + to add more.</div>
+      </div>
+      <button class="yt-addrow" id="ytAddRow" type="button" aria-label="Add another link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+    <div class="yt-rows" id="ytRows"></div>
+    <div class="paste-actions">
+      <button class="paste-cancel" id="ytCancel" type="button">Cancel</button>
+      <button class="paste-add" id="ytAdd" type="button" disabled>Add</button>
     </div>
   </div>
 </div>
 <script src="systemPrompt.js"></script>
-<script src="beginnerPrompt.js"></script>
-<script src="intermediatePrompt.js"></script>
-<script src="advancedPrompt.js"></script>
+<!-- Single Study Assistant tutor prompt. The former Beginner/Intermediate/Advanced
+     tier prompts (beginnerPrompt.js / intermediatePrompt.js / advancedPrompt.js)
+     are no longer loaded, but remain in the project folder. -->
+<script src="studyAssistantPrompt.js"></script>
 <script>
   const input = document.getElementById('prompt');
   const waveform = document.getElementById('waveform');
@@ -2825,14 +2972,12 @@ body.light-mode .aset-member .nm { color:#16151c; }
   const VISION_MODEL = 'meta-llama/llama-3.2-11b-vision-instruct:free';
   const HOMEWORK_DIRECTIVE = "The student has uploaded their own homework or study material (an image and/or text is attached in this conversation). Read it carefully, identify the exact topic and problems, and base your teaching and quiz questions on THAT material — matched to the active tier's difficulty. Prefer quizzing the student on their own material over generic lecturing.";
 
-  // ── Learner tiers: Beginner (Axoura 1.0) & Intermediate (Axoura 2.0) ──
-  // Both run a controlled-learner prompt that returns a JSON object; the app
-  // shows only `message` and persists the student-brain (`state_patch`).
-  const LEARNER_TIERS = {
-    'Axoura 1.0': { profile: 'beginner',     prompt: () => window.BEGINNER_SYSTEM_PROMPT,     stateKey: 'TEACHLOOP_BEGINNER_STATE',     sessionKey: 'TEACHLOOP_BEGINNER_SESSION' },
-    'Axoura 2.0': { profile: 'intermediate', prompt: () => window.INTERMEDIATE_SYSTEM_PROMPT, stateKey: 'TEACHLOOP_INTERMEDIATE_STATE', sessionKey: 'TEACHLOOP_INTERMEDIATE_SESSION' },
-    'Axoura 3.0': { profile: 'advanced',     prompt: () => window.ADVANCED_SYSTEM_PROMPT,     stateKey: 'TEACHLOOP_ADVANCED_STATE',     sessionKey: 'TEACHLOOP_ADVANCED_SESSION' }
-  };
+  // ── Single Study Assistant ──
+  // The page now runs one AI tutor (studyAssistantPrompt.js). The former
+  // Beginner/Intermediate/Advanced learner tiers are retired, so this registry
+  // is intentionally empty: `activeLearnerTier()` always returns null and every
+  // turn uses the single Study Assistant prompt via the plain-text path.
+  const LEARNER_TIERS = {};
   let learnerTurnIndex = 0;
 
   // Active learner-tier config, or null if the current tier isn't a learner tier
@@ -3058,14 +3203,10 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
 
     // Anthropic uses a top-level `system` field (not a system message).
-    // Learner tiers (Beginner/Intermediate) run the controlled-learner prompt
-    // plus a trusted runtime packet; other tiers use the STEM tutor prompt.
-    const learnerCfg = activeLearnerTier();
-    let systemText = learnerCfg
-      ? (learnerCfg.prompt() + '\n\n' + buildLearnerRuntimePacket(learnerCfg))
-      : (SYSTEM_PROMPT
-          + (window.getTierDirective ? '\n\n' + window.getTierDirective() : '')
-          + (conversationHasHomework ? '\n\n' + HOMEWORK_DIRECTIVE : ''));
+    // One Study Assistant tutor prompt for every turn (studyAssistantPrompt.js),
+    // with the homework directive appended when the learner attached material.
+    let systemText = (window.STUDY_ASSISTANT_PROMPT || SYSTEM_PROMPT)
+      + (conversationHasHomework ? '\n\n' + HOMEWORK_DIRECTIVE : '');
 
     // The subject is fixed by the composer's subject chip and cannot be changed
     // mid-conversation. If the learner wants a different subject, point them to
@@ -3381,9 +3522,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
         setTimeout(() => { loadingDot.style.display = 'none'; }, 50);
       }
 
-      // Only the most advanced tier (Axoura 3.0) shows the "thinking" reveal.
-      // Every other tier skips straight to the answer.
-      const showThinking = (window.TEACHLOOP_TIER === 'Axoura 3.0');
+      // The single Study Assistant does not expose a "thinking" reveal; it goes
+      // straight to the answer.
+      const showThinking = false;
 
       if (thoughtText && showThinking) {
         // 2. Show thinking header with animation
@@ -3541,29 +3682,38 @@ body.light-mode .aset-member .nm { color:#16151c; }
     if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
   });
 
-  // "Paste — Copied Text": type or paste text into a box; store it as a text
-  // attachment (same pipeline as an uploaded text file), then focus the prompt.
+  // Drop text straight into the chat box (fires input so the send button and
+  // rotating placeholder update), then focus with the caret at the end.
+  function insertIntoPrompt(text) {
+    const p = document.getElementById('prompt');
+    if (!p || !text) return;
+    const cur = p.value.trim();
+    p.value = cur ? (cur + ' ' + text) : text;
+    p.dispatchEvent(new Event('input', { bubbles: true }));
+    p.focus();
+    try { p.setSelectionRange(p.value.length, p.value.length); } catch (e) {}
+  }
+
+  // "Text": type text into a box; Save drops it straight into the chat box.
   const pasteOverlay = document.getElementById('pasteOverlay');
   const pasteText = document.getElementById('pasteText');
   const pasteAdd = document.getElementById('pasteAdd');
   const pasteCancel = document.getElementById('pasteCancel');
   function closePasteModal() { if (pasteOverlay) pasteOverlay.classList.remove('open'); }
-  window.openPasteModal = function () {
+  window.openTextModal = function () {
     if (!pasteOverlay || !pasteText) return;
     pasteText.value = '';
     if (pasteAdd) pasteAdd.disabled = true;
     pasteOverlay.classList.add('open');
     setTimeout(() => pasteText.focus(), 30);
   };
+  window.openPasteModal = window.openTextModal;   // back-compat alias
   pasteText?.addEventListener('input', () => { if (pasteAdd) pasteAdd.disabled = !pasteText.value.trim(); });
   pasteAdd?.addEventListener('click', () => {
     const text = pasteText.value.trim();
     if (!text) return;
-    pendingAttachment = { name: 'Pasted text', kind: 'text', source: 'paste', text: text.slice(0, 12000) };
-    afterAttach();
+    insertIntoPrompt(text);
     closePasteModal();
-    const p = document.getElementById('prompt');
-    if (p) p.focus();
   });
   pasteCancel?.addEventListener('click', closePasteModal);
   pasteOverlay?.addEventListener('click', (e) => { if (e.target === pasteOverlay) closePasteModal(); });
@@ -3571,6 +3721,82 @@ body.light-mode .aset-member .nm { color:#16151c; }
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && pasteText.value.trim() && pasteAdd) pasteAdd.click();
     if (e.key === 'Escape') closePasteModal();
   });
+
+  // "YouTube": add one or more links. "+" adds a row; each row's 3-dot menu
+  // removes it; Add drops the links into the chat box.
+  const ytOverlay = document.getElementById('ytOverlay');
+  const ytRows = document.getElementById('ytRows');
+  const ytAdd = document.getElementById('ytAdd');
+  const ytCancel = document.getElementById('ytCancel');
+  const ytAddRow = document.getElementById('ytAddRow');
+  function ytCloseMenus() {
+    ytRows?.querySelectorAll('.yt-row-menu.open').forEach(m => m.classList.remove('open'));
+    ytRows?.querySelectorAll('.yt-row-menu-btn.open').forEach(b => b.classList.remove('open'));
+  }
+  function ytRefreshState() {
+    const any = [...(ytRows ? ytRows.querySelectorAll('.yt-input') : [])].some(i => i.value.trim());
+    if (ytAdd) ytAdd.disabled = !any;
+  }
+  function ytClose() { if (ytOverlay) ytOverlay.classList.remove('open'); }
+  function ytAddNewRow() {
+    const r = ytMakeRow();
+    ytRows.appendChild(r);
+    r.querySelector('.yt-input')?.focus();
+    ytRefreshState();
+    return r;
+  }
+  function ytMakeRow(value) {
+    const row = document.createElement('div');
+    row.className = 'yt-row';
+    row.innerHTML =
+      '<svg class="yt-row-icon" viewBox="0 0 24 16" fill="none"><rect x="1" y="1" width="22" height="14" rx="3.5" fill="#FF6B5B"/><path d="M10 5.5L16 8L10 10.5V5.5Z" fill="white"/></svg>' +
+      '<input class="yt-input" type="url" inputmode="url" placeholder="Paste a YouTube link…" spellcheck="false">' +
+      '<button type="button" class="yt-row-menu-btn" aria-label="Link options"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>' +
+      '<div class="yt-row-menu"><button type="button" data-act="remove"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Remove</button></div>';
+    const input = row.querySelector('.yt-input');
+    if (value) input.value = value;
+    input.addEventListener('input', ytRefreshState);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); ytAddNewRow(); }
+      if (e.key === 'Escape') ytClose();
+    });
+    const menuBtn = row.querySelector('.yt-row-menu-btn');
+    const menu = row.querySelector('.yt-row-menu');
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = menu.classList.contains('open');
+      ytCloseMenus();
+      if (!open) { menu.classList.add('open'); menuBtn.classList.add('open'); }
+    });
+    menu.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      e.stopPropagation();
+      if (b.dataset.act === 'remove') {
+        row.remove();
+        if (!ytRows.querySelector('.yt-row')) ytAddNewRow();   // always keep one row
+        ytRefreshState();
+      }
+    });
+    return row;
+  }
+  window.openYtModal = function () {
+    if (!ytOverlay || !ytRows) return;
+    ytRows.innerHTML = '';
+    ytRows.appendChild(ytMakeRow());
+    if (ytAdd) ytAdd.disabled = true;
+    ytOverlay.classList.add('open');
+    setTimeout(() => ytRows.querySelector('.yt-input')?.focus(), 30);
+  };
+  ytAddRow?.addEventListener('click', (e) => { e.stopPropagation(); ytAddNewRow(); });
+  ytCancel?.addEventListener('click', ytClose);
+  ytOverlay?.addEventListener('click', (e) => { if (e.target === ytOverlay) ytClose(); });
+  ytAdd?.addEventListener('click', () => {
+    const links = [...ytRows.querySelectorAll('.yt-input')].map(i => i.value.trim()).filter(Boolean);
+    if (!links.length) return;
+    insertIntoPrompt(links.join(' '));
+    ytClose();
+  });
+  document.addEventListener('click', ytCloseMenus);
 
   // Settings Menu Logic
   const userProfile = document.getElementById('userProfile');
@@ -3644,10 +3870,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const bNm = document.querySelector('.yl-profile .yl-name'); if (bNm) bNm.textContent = nm;
     const bEm = document.getElementById('ylEmail'); if (bEm) bEm.textContent = em || 'Signed in';
 
-    // Model badge → reflect the active learner tier.
+    // Model badge → single Study Assistant tutor.
     try {
-      const tier = (window.TEACHLOOP_TIER || localStorage.getItem('TEACHLOOP_TIER') || 'Axoura').trim();
-      const mb = document.getElementById('pmModelBadge'); if (mb && tier) mb.textContent = tier;
+      const mb = document.getElementById('pmModelBadge'); if (mb) mb.textContent = 'Study Assistant';
     } catch (e) {}
 
     // Profile + Model rows → open the Settings panel.
@@ -3695,7 +3920,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     search: "Search", new_chat: "New Chat",
     projects: "Subjects", new_project: "New Subject", history: "History", settings: "Settings",
     upgrade_plan: "Upgrade plan", appearance: "Appearance", dark: "Dark", light: "Light", system: "System",
-    language: "Language", help: "Help", sign_out: "Sign out", title: "What are we learning today?",
+    language: "Language", help: "Help", sign_out: "Sign out", title: "What are we studying today?",
     placeholder: "What should we work on next?"
   };
   const translations = {
@@ -4408,6 +4633,34 @@ body.light-mode .aset-member .nm { color:#16151c; }
       try { const a = JSON.parse(localStorage.getItem(RECENTS_KEY) || '[]'); return Array.isArray(a) ? a : []; }
       catch (e) { return []; }
     }
+
+    // Per-subject "last opened" timestamps → drives the "Opened X ago" subtitle.
+    const OPENED_KEY = 'TEACHLOOP_SUBJECT_OPENED';
+    function loadOpened() {
+      try { const o = JSON.parse(localStorage.getItem(OPENED_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+      catch (e) { return {}; }
+    }
+    function stampOpened(name) {
+      if (!name) return;
+      const o = loadOpened(); o[name] = Date.now();
+      try { localStorage.setItem(OPENED_KEY, JSON.stringify(o)); } catch (e) {}
+    }
+    function openedAgo(name) {
+      const t = loadOpened()[name];
+      if (!t) return 'Tap to start studying';
+      const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+      if (s < 60) return 'Opened less than a minute ago';
+      const m = Math.floor(s / 60);
+      if (m < 60) return 'Opened ' + m + (m === 1 ? ' minute ago' : ' minutes ago');
+      const h = Math.floor(m / 60);
+      if (h < 24) return 'Opened ' + h + (h === 1 ? ' hour ago' : ' hours ago');
+      const d = Math.floor(h / 24);
+      if (d === 1) return 'Opened yesterday';
+      if (d < 7) return 'Opened ' + d + ' days ago';
+      const w = Math.floor(d / 7);
+      return 'Opened ' + w + (w === 1 ? ' week ago' : ' weeks ago');
+    }
+
     // Record a subject as most-recently opened (dedup, newest first, cap 8).
     function recordRecent(name) {
       if (!name) return;
@@ -4415,8 +4668,10 @@ body.light-mode .aset-member .nm { color:#16151c; }
       a.unshift(name);
       a = a.slice(0, 8);
       try { localStorage.setItem(RECENTS_KEY, JSON.stringify(a)); } catch (e) {}
+      stampOpened(name);
       renderRecents();
       updateSubjectChip(name);
+      renderHeroCards();
     }
 
     // Shows the current subject beside the tier selector in every composer.
@@ -4471,20 +4726,21 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
 
     // Mirror the sidebar subjects as clickable cards under the hero chat box.
+    let heroShowAll = false;   // "View all" toggle: show only the first 5 until expanded
     function renderHeroCards() {
       if (!heroGrid) return;
-      const names = [...list.querySelectorAll('.subject-name')].map(n => n.textContent.trim()).filter(Boolean);
       heroGrid.innerHTML = '';
 
-      const addCard = document.createElement('button');
-      addCard.type = 'button';
-      addCard.className = 'hsub-card hsub-add';
-      addCard.innerHTML = '<span class="hsub-plus">+</span><span class="hsub-add-label">New Subject</span>';
-      addCard.addEventListener('click', () => goToNewSubject());
-      heroGrid.appendChild(addCard);
+      // Only the first 5 subjects show by default; the rest live behind "View all".
+      const HERO_LIMIT = 5;
+      const allItems = [...list.querySelectorAll('.subject-item')].filter(si => {
+        const n = si.querySelector('.subject-name');
+        return n && n.textContent.trim();
+      });
+      const visible = heroShowAll ? allItems : allItems.slice(0, HERO_LIMIT);
 
-      // Iterate the real sidebar items so each card maps to one subject.
-      [...list.querySelectorAll('.subject-item')].forEach(sidebarItem => {
+      // Iterate the visible sidebar items so each card maps to one subject.
+      visible.forEach(sidebarItem => {
         const nameEl = sidebarItem.querySelector('.subject-name');
         const name = nameEl ? nameEl.textContent.trim() : '';
         if (!name) return;
@@ -4492,17 +4748,22 @@ body.light-mode .aset-member .nm { color:#16151c; }
         const card = document.createElement('div');
         card.className = 'hsub-card';
         card.innerHTML =
-          '<svg class="hsub-icon" viewBox="0 0 24 24">' + BOOK_ICON + '</svg>' +
-          '<span class="hsub-name"></span>' +
-          '<button type="button" class="hsub-menu-btn" aria-label="Subject options">' +
-            '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>' +
-          '</button>' +
+          '<div class="hsub-card-left">' +
+            '<div class="hsub-tile"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4.5a1 1 0 0 1 .8.4l1.4 1.6a1 1 0 0 0 .8.4H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></div>' +
+            '<div class="hsub-meta"><div class="hsub-name"></div><div class="hsub-sub"></div></div>' +
+          '</div>' +
+          '<div class="hsub-right">' +
+            '<button type="button" class="hsub-menu-btn" aria-label="Subject options">' +
+              '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>' +
+            '</button>' +
+          '</div>' +
           '<div class="hsub-menu">' +
             '<button type="button" data-act="addfile"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6M9 15h6"/></svg>Add file</button>' +
             '<button type="button" data-act="rename"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>Rename</button>' +
             '<button type="button" class="danger" data-act="delete"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Delete</button>' +
           '</div>';
         card.querySelector('.hsub-name').textContent = name;
+        card.querySelector('.hsub-sub').textContent = openedAgo(name);
 
         const menuBtn = card.querySelector('.hsub-menu-btn');
         const menu = card.querySelector('.hsub-menu');
@@ -4539,6 +4800,16 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
         heroGrid.appendChild(card);
       });
+
+      // "View all (N)" / "Show less" toggle when there are more than 5 subjects.
+      if (allItems.length > HERO_LIMIT) {
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'hsub-viewall';
+        toggle.textContent = heroShowAll ? 'Show less' : ('View all (' + allItems.length + ')');
+        toggle.addEventListener('click', () => { heroShowAll = !heroShowAll; renderHeroCards(); });
+        heroGrid.appendChild(toggle);
+      }
     }
 
     // Rename a subject directly on its hero card; syncs back to the sidebar.
@@ -4720,6 +4991,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     updateSubjectChip(loadRecents()[0] || subjectNames()[0] || '');   // show current subject in composer
 
     newSubjectBtn?.addEventListener('click', (e) => { e.preventDefault(); goToNewSubject(); });
+    document.getElementById('heroNewSubject')?.addEventListener('click', (e) => { e.preventDefault(); goToNewSubject(); });
 
     // ── Composer subject chip → tap to switch subject ──────────────────
     function closeSubjectPickers() { document.querySelectorAll('.subject-picker').forEach(m => m.remove()); }
@@ -5406,8 +5678,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       // Language label + flag
       syncLangLabel();
       // Plan
-      const tier = localStorage.getItem('TEACHLOOP_TIER') || '';
-      setTxt('asetPlanSub', tier ? ('You are on ' + tier) : 'You are currently on the free plan');
+      setTxt('asetPlanSub', 'You are currently on the free plan');
     }
 
     function selectTab(name) {
