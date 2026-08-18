@@ -93,6 +93,12 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 .grok-mark { width:20px; height:20px; color:#e5e5e5; stroke-width:2; }
 
 /* ===== Sidebar template (Spaces / Recents / download / profile) ===== */
+/* Scrollable middle: Spaces + Recents shrink/scroll here so the profile at the
+   bottom is ALWAYS visible, no matter the screen height. */
+.sidebar-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:#2a2a2f transparent; }
+.sidebar-scroll::-webkit-scrollbar { width:8px; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background:#2a2a2f; border-radius:8px; border:2px solid transparent; background-clip:content-box; }
+.sidebar-top, .sidebar > .nav, .yl-bottom { flex-shrink:0; }
 .yl-section { padding:0 14px; margin-bottom:16px; }
 .yl-label { font-size:13px; font-weight:500; color:#8A8A8A; margin-bottom:10px; letter-spacing:-0.003em; user-select:none; }
 .yl-items { display:flex; flex-direction:column; gap:2px; }
@@ -127,23 +133,26 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 .yl-download-desc { font-size:12px; line-height:16px; color:#8A8A8A; }
 .yl-profile-wrap { position:relative; }
 .yl-profile {
-  width:100%; height:44px; background:#161616; border:1px solid #2A2A2A; border-radius:14px;
-  display:flex; align-items:center; justify-content:space-between; padding:0 10px; cursor:pointer;
-  transition:background 0.15s;
+  width:100%; min-height:56px; background:#161616; border:1px solid #2A2A2A; border-radius:16px;
+  display:flex; align-items:center; gap:10px; padding:8px 11px; cursor:pointer;
+  transition:background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
-.yl-profile:hover { background:#1C1C1C; }
-.yl-profile-left { display:flex; align-items:center; gap:9px; }
-.yl-avatar { width:26px; height:26px; border-radius:50%; background:#2A2A2A; border:1px solid #333; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#fff; }
-.yl-name { font-size:13px; font-weight:600; color:#fff; }
-.yl-profile-chevron { width:14px; height:14px; stroke:#8A8A8A; fill:none; stroke-width:2; flex-shrink:0; transition:transform 0.2s ease; }
-.yl-profile-wrap:has(.settings-menu.open) .yl-profile-chevron { transform:rotate(180deg); }
+.yl-profile:hover { background:#1C1C1C; border-color:#3a3a3a; box-shadow:0 1px 3px rgba(0,0,0,0.35); }
+.yl-profile-id { display:flex; flex-direction:column; min-width:0; flex:1; text-align:left; }
+.yl-name { font-size:13px; font-weight:600; color:#fff; line-height:16px; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.yl-email { font-size:11px; color:#8A8A8A; line-height:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.yl-avatar-ring { width:36px; height:36px; border-radius:50%; padding:2px; flex-shrink:0; display:flex; background:linear-gradient(135deg,#a855f7 0%,#ec4899 55%,#fb923c 100%); }
+.yl-avatar { width:100%; height:100%; border-radius:50%; background:#161616; border:none; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#fff; text-transform:uppercase; }
+.yl-bend { flex-shrink:0; color:#6b6b73; transition:color 0.2s ease, transform 0.2s ease; }
+.yl-profile:hover .yl-bend { color:#a1a1aa; }
+.yl-profile-wrap:has(.settings-menu.open) .yl-bend { color:#8b5cf6; transform:scaleX(1.15); }
 
 .sidebar.collapsed .yl-section,
 .sidebar.collapsed .yl-download,
-.sidebar.collapsed .yl-name,
-.sidebar.collapsed .yl-profile-chevron { display:none !important; }
+.sidebar.collapsed .yl-profile-id,
+.sidebar.collapsed .yl-bend { display:none !important; }
 .sidebar.collapsed .yl-bottom { padding:0 8px 12px; }
-.sidebar.collapsed .yl-profile { justify-content:center; padding:0; }
+.sidebar.collapsed .yl-profile { justify-content:center; gap:0; padding:8px 0; }
 
 body.light-mode .yl-item { color:#48484a; }
 body.light-mode .yl-item:hover { background:#e6e6ea; }
@@ -152,9 +161,10 @@ body.light-mode .yl-recent:hover { background:#e6e6ea; }
 body.light-mode .yl-download { background:#f6f6f7; border-color:#e2e2e6; }
 body.light-mode .yl-download-title { color:#18181b; }
 body.light-mode .yl-profile { background:#f0f0f2; border-color:#e2e2e6; }
-body.light-mode .yl-profile:hover { background:#e6e6ea; }
-body.light-mode .yl-avatar { background:#dedee3; border-color:#d0d0d4; color:#333; }
+body.light-mode .yl-profile:hover { background:#e6e6ea; border-color:#d4d4d8; }
+body.light-mode .yl-avatar { background:#f0f0f2; border:none; color:#18181b; }
 body.light-mode .yl-name { color:#18181b; }
+body.light-mode .yl-email { color:#8a8a8f; }
 .collapse { --background:#0a0a0a; background:none; border:none; color:#6b6b73; cursor:pointer; padding:4px; border-radius:6px; display:none; transition: color 0.15s; }
 .collapse:hover { background:#141414; color:#b0b0ba; }
 .collapse:focus, .collapse:focus-visible { outline:none; }
@@ -300,8 +310,11 @@ body.light-mode .recents-empty { color:#9a9aa0; }
   to { opacity:1; transform:translateY(0); }
 }
 .title-necosmic { font-family:'Necosmic', Inter, sans-serif; letter-spacing:1px; }
-.welcome-greeting { text-align:center; font-size:16px; font-weight:600; letter-spacing:-0.1px; color:rgba(228,228,229,0.72); margin-bottom:10px; }
-body.light-mode .welcome-greeting { color:rgba(28,28,30,0.65); }
+.welcome-greeting {
+  text-align:center; font-size:clamp(19px, 2.1vw, 26px); font-weight:500; letter-spacing:-0.01em;
+  color:#e4e4e6; margin:0 0 16px; line-height:1.15;
+}
+body.light-mode .welcome-greeting { color:#16151c; }
 .chat-title {
   display:flex;
   align-items:center;
@@ -468,10 +481,14 @@ body.light-mode .welcome-greeting { color:rgba(28,28,30,0.65); }
 .subject-chip-caret { width:12px !important; height:12px !important; opacity:.7; flex-shrink:0; }
 /* Subject switcher popover */
 .subject-picker {
-  position:absolute; bottom:calc(100% + 8px); left:0; z-index:60; min-width:210px; max-height:280px; overflow-y:auto;
+  position:fixed; z-index:9999; min-width:210px; max-height:280px; overflow-y:auto;
   background:#1a1a1f; border:1px solid #2a2a30; border-radius:12px; padding:6px;
   box-shadow:0 16px 44px rgba(0,0,0,0.55); display:flex; flex-direction:column; gap:2px;
+  scrollbar-width:thin; scrollbar-color:#000 transparent;
 }
+.subject-picker::-webkit-scrollbar { width:8px; }
+.subject-picker::-webkit-scrollbar-track { background:transparent; }
+.subject-picker::-webkit-scrollbar-thumb { background:#000; border-radius:8px; border:2px solid transparent; background-clip:content-box; }
 .sp-item {
   display:flex; align-items:center; gap:9px; width:100%; padding:9px 10px; border:none; background:transparent;
   border-radius:8px; color:#d7d7de; font-size:13.5px; font-weight:500; font-family:'Inter',sans-serif; cursor:pointer;
@@ -1383,6 +1400,8 @@ body.light-mode .chat-send-btn:disabled { background:#d1d1d6; }
 body.light-mode .speak-pill { background:#16151c; border-color:rgba(255,255,255,0.12); color:#fff; }
 /* ===== Voice stage (orb + status above typebar) ===== */
 .voice-stage { display:flex; flex-direction:column; align-items:center; gap:14px; padding:10px 0 22px; }
+/* The [hidden] attribute must win over the display:flex above, or the orb never hides. */
+.voice-stage[hidden] { display:none !important; }
 .voice-orb {
   width:96px; height:96px; border-radius:50%;
   background:radial-gradient(circle at 32% 28%, #4b4b52 0%, #1c1c22 55%, #0a0a0d 100%);
@@ -1959,30 +1978,39 @@ body.light-mode .action-badge {
 }
 
 /* ===== Redesigned profile menu (bottom-left) ===== */
-.pm-menu { width: 288px !important; padding: 6px !important; }
-.pm-header { display:flex; align-items:center; gap:12px; padding:12px 12px 10px; }
-.pm-avatar { width:44px; height:44px; border-radius:50%; background:#7c3aed; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:600; flex-shrink:0; text-transform:uppercase; }
+.pm-menu { width: 288px !important; padding: 8px !important; border-radius:18px !important; }
+.pm-header { display:flex; align-items:center; gap:12px; padding:8px 10px 10px; }
+.pm-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,#a855f7 0%,#ec4899 55%,#fb923c 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; flex-shrink:0; text-transform:uppercase; box-shadow:inset 0 0 0 2px rgba(255,255,255,0.06); }
 .pm-id { display:flex; flex-direction:column; min-width:0; gap:2px; }
-.pm-id .pm-name { color:#fff; font-size:15px; font-weight:600; line-height:19px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pm-id .pm-name { color:#fff; font-size:15px; font-weight:600; line-height:19px; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pm-id .pm-email { color:#8E8E93; font-size:12.5px; line-height:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:210px; }
-.pm-sep { height:1px; background:rgba(255,255,255,0.08); margin:4px 6px; }
-.pm-menu .pm-row { display:flex; align-items:center; gap:13px; width:100%; height:46px; padding:0 12px; border:none; background:transparent; color:#fff; font-size:15px; font-weight:500; cursor:pointer; border-radius:10px; text-align:left; transition:background .12s ease; }
-.pm-menu .pm-row:hover { background:rgba(255,255,255,0.06); }
-.pm-ic { display:flex; align-items:center; justify-content:center; width:22px; height:22px; color:#fff; flex-shrink:0; }
-.pm-ic svg { width:20px; height:20px; }
+.pm-sep { height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent); margin:8px 4px; border:none; }
+.pm-menu .pm-row { display:flex; align-items:center; gap:12px; width:100%; height:44px; padding:0 12px; border:1px solid transparent; background:transparent; color:#fff; font-size:14.5px; font-weight:500; letter-spacing:-.01em; cursor:pointer; border-radius:12px; text-align:left; transition:background .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.pm-menu .pm-row:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.08); box-shadow:0 1px 2px rgba(0,0,0,0.25); }
+.pm-ic { display:flex; align-items:center; justify-content:center; width:20px; height:20px; color:#d4d4d8; flex-shrink:0; }
+.pm-ic svg { width:18px; height:18px; }
 .pm-label { flex:1; }
+.pm-badge { flex-shrink:0; margin-left:auto; font-size:11px; font-weight:600; letter-spacing:-.01em; padding:3px 8px; border-radius:7px; color:#c4b5fd; background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.25); }
+.pm-badge.pm-badge-blue { color:#93c5fd; background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.28); }
+body.light-mode .pm-badge.pm-badge-blue { color:#2563eb; background:rgba(37,99,235,0.08); border-color:rgba(37,99,235,0.20); }
 .pm-appearance { cursor:default !important; }
-.pm-appearance:hover { background:transparent !important; }
+.pm-appearance:hover { background:transparent !important; border-color:transparent !important; box-shadow:none !important; }
 .pm-toggle { width:46px; height:26px; border-radius:999px; background:rgba(255,255,255,0.20); border:none; position:relative; cursor:pointer; flex-shrink:0; transition:background .2s; padding:0; }
 .pm-toggle i { position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s; }
 .pm-toggle.on { background:#8b5cf6; }
 .pm-toggle.on i { left:23px; }
-body.light-mode .pm-avatar { background:#7c3aed; }
+.pm-menu .pm-row.pm-logout { background:rgba(239,68,68,0.10); color:#f87171; border-color:transparent; }
+.pm-menu .pm-row.pm-logout .pm-ic { color:#f87171; }
+.pm-menu .pm-row.pm-logout:hover { background:rgba(239,68,68,0.18); border-color:rgba(239,68,68,0.30); color:#ef4444; }
+.pm-menu .pm-row.pm-logout:hover .pm-ic { color:#ef4444; }
 body.light-mode .pm-id .pm-name { color:#16151c; }
 body.light-mode .pm-menu .pm-row { color:#16151c; }
-body.light-mode .pm-ic { color:#16151c; }
-body.light-mode .pm-sep { background:rgba(0,0,0,0.08); }
-body.light-mode .pm-menu .pm-row:hover { background:rgba(0,0,0,0.05); }
+body.light-mode .pm-ic { color:#48484a; }
+body.light-mode .pm-sep { background:linear-gradient(90deg,transparent,rgba(0,0,0,0.12),transparent); }
+body.light-mode .pm-menu .pm-row:hover { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.06); }
+body.light-mode .pm-badge { color:#7c3aed; background:rgba(124,58,237,0.08); border-color:rgba(124,58,237,0.18); }
+body.light-mode .pm-menu .pm-row.pm-logout { background:rgba(239,68,68,0.08); color:#dc2626; }
+body.light-mode .pm-menu .pm-row.pm-logout .pm-ic { color:#dc2626; }
 
 /* ===== Settings modal (opened from the profile "Settings" row) ===== */
 .aset-overlay {
@@ -2194,20 +2222,22 @@ body.light-mode .aset-member .nm { color:#16151c; }
       </a>
     </nav>
 
-    <div class="yl-section" id="subjectsSection">
-      <div class="yl-label">Spaces</div>
-      <div class="yl-items">
-        <a class="yl-item" id="newSubjectBtn">
-          <svg class="yl-ic-plus" viewBox="0 0 16 16"><path d="M8 2.5V13.5M2.5 8H13.5"/></svg>
-          <span data-i18n="new_project">New Subject</span>
-        </a>
-        <div id="subjectsList"></div>
+    <div class="sidebar-scroll">
+      <div class="yl-section" id="subjectsSection">
+        <div class="yl-label">Spaces</div>
+        <div class="yl-items">
+          <a class="yl-item" id="newSubjectBtn">
+            <svg class="yl-ic-plus" viewBox="0 0 16 16"><path d="M8 2.5V13.5M2.5 8H13.5"/></svg>
+            <span data-i18n="new_project">New Subject</span>
+          </a>
+          <div id="subjectsList"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="yl-section" id="historySection">
-      <div class="yl-label">Recents</div>
-      <div id="recentsList"></div>
+      <div class="yl-section" id="historySection">
+        <div class="yl-label">Recents</div>
+        <div id="recentsList"></div>
+      </div>
     </div>
 
     <div class="yl-bottom">
@@ -2220,11 +2250,12 @@ body.light-mode .aset-member .nm { color:#16151c; }
       </div>
       <div class="yl-profile-wrap" id="userProfile">
         <button class="yl-profile" type="button">
-          <div class="yl-profile-left">
-            <div class="yl-avatar">A</div>
+          <div class="yl-profile-id">
             <span class="yl-name">Your account</span>
+            <span class="yl-email" id="ylEmail">Signed in</span>
           </div>
-          <svg class="yl-profile-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+          <span class="yl-avatar-ring"><span class="yl-avatar">A</span></span>
+          <svg class="yl-bend" width="12" height="24" viewBox="0 0 12 24" fill="none" aria-hidden="true"><path d="M2 4C6 8 6 16 2 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
         </button>
         <div class="settings-menu pm-menu" id="settingsMenu">
           <div class="pm-header">
@@ -2235,34 +2266,32 @@ body.light-mode .aset-member .nm { color:#16151c; }
             </div>
           </div>
           <div class="pm-sep"></div>
+          <button class="pm-row" type="button" id="pmProfile">
+            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="pm-label">Profile</span>
+          </button>
+          <button class="pm-row" type="button" id="pmModel">
+            <span class="pm-ic"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pmModelGrad" x1="0%" y1="100%" x2="70%" y2="30%"><stop offset="0%" stop-color="#1C7DFF"/><stop offset="52%" stop-color="#1C69FF"/><stop offset="100%" stop-color="#F0DCD6"/></linearGradient></defs><path d="M12 2 L14.6 9.4 L22 12 L14.6 14.6 L12 22 L9.4 14.6 L2 12 L9.4 9.4 Z" fill="url(#pmModelGrad)"/></svg></span>
+            <span class="pm-label">Model</span>
+            <span class="pm-badge pm-badge-blue" id="pmModelBadge">Axoura</span>
+          </button>
+          <button class="pm-row" type="button" id="upgradePlanTab">
+            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
+            <span class="pm-label">Subscription</span>
+            <span class="pm-badge" id="pmPlanBadge">Free</span>
+          </button>
           <button class="pm-row" type="button" id="pmSettings">
             <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
             <span class="pm-label" data-i18n="settings">Settings</span>
           </button>
-          <button class="pm-row" type="button" id="upgradePlanTab">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19.5h20"/><path d="M3 19.5V8.5l4 3.5 5-6.5 5 6.5 4-3.5V19.5H3z"/></svg></span>
-            <span class="pm-label">Pricing</span>
-          </button>
-          <div class="pm-row pm-appearance">
-            <span class="pm-label" data-i18n="appearance">Appearance</span>
-            <button class="pm-toggle" id="pmThemeToggle" type="button" role="switch" aria-label="Toggle dark mode"><i></i></button>
-          </div>
-          <button class="pm-row" type="button" id="pmFeedback">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></span>
-            <span class="pm-label" data-i18n="feedback">Feedback</span>
-          </button>
-          <a class="pm-row" href="privacy.html" target="_blank" rel="noopener" style="text-decoration:none;">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-            <span class="pm-label">Privacy Policy</span>
-          </a>
           <a class="pm-row" href="terms.html" target="_blank" rel="noopener" style="text-decoration:none;">
             <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
-            <span class="pm-label">Terms &amp; Conditions</span>
+            <span class="pm-label">Terms &amp; Policies</span>
           </a>
           <div class="pm-sep"></div>
           <button class="pm-row pm-logout" type="button" id="pmLogout">
             <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
-            <span class="pm-label">Log out</span>
+            <span class="pm-label">Sign Out</span>
           </button>
         </div>
       </div>
@@ -2300,7 +2329,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
             try {
               var n = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
               var el = document.getElementById('welcomeGreeting');
-              if (n && el) { el.textContent = 'Welcome back ' + n; el.hidden = false; }
+              if (n && el) { el.textContent = 'Welcome back, ' + n + '!'; el.hidden = false; }
             } catch (e) { }
           })();
         </script>
@@ -3435,10 +3464,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const text = chatInput.value.trim();
     const att = pendingAttachment;
     if (!text && !att) return;
-    // The voice orb belongs to speech-to-speech only — never show it for a
-    // typed message. (Voice's own turns keep __axVoice.active true.)
-    if (!(window.__axVoice && window.__axVoice.active)) {
-      const vs = document.getElementById('voiceStage'); if (vs) vs.hidden = true;
+    // A message the user TYPED (not one voice mode is sending on their behalf)
+    // means they want plain text chat — fully exit voice mode so the orb, status,
+    // mic, and spoken replies never appear for a typed message.
+    if (!window.__axVoiceSending && window.__axVoice && window.__axVoice.stop) {
+      window.__axVoice.stop();
     }
     chatInput.value = '';
     chatInput.style.height = 'auto';
@@ -3612,6 +3642,21 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const pmAv = document.getElementById('pmAvatar'); if (pmAv) pmAv.textContent = initials.charAt(0);
     const bAv = document.querySelector('.yl-profile .yl-avatar'); if (bAv) bAv.textContent = initials;
     const bNm = document.querySelector('.yl-profile .yl-name'); if (bNm) bNm.textContent = nm;
+    const bEm = document.getElementById('ylEmail'); if (bEm) bEm.textContent = em || 'Signed in';
+
+    // Model badge → reflect the active learner tier.
+    try {
+      const tier = (window.TEACHLOOP_TIER || localStorage.getItem('TEACHLOOP_TIER') || 'Axoura').trim();
+      const mb = document.getElementById('pmModelBadge'); if (mb && tier) mb.textContent = tier;
+    } catch (e) {}
+
+    // Profile + Model rows → open the Settings panel.
+    const openSet = (e) => { e.stopPropagation();
+      const menu = document.getElementById('settingsMenu'); if (menu) menu.classList.remove('open');
+      if (window.openAxouraSettings) window.openAxouraSettings();
+    };
+    document.getElementById('pmProfile')?.addEventListener('click', openSet);
+    document.getElementById('pmModel')?.addEventListener('click', openSet);
 
     // Appearance toggle → dark/light (ON = dark).
     const tgl = document.getElementById('pmThemeToggle');
@@ -4704,14 +4749,32 @@ body.light-mode .aset-member .nm { color:#16151c; }
       add.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>New subject</span>';
       add.addEventListener('click', (e) => { e.stopPropagation(); closeSubjectPickers(); goToNewSubject(); });
       menu.appendChild(add);
-      chip.appendChild(menu);
+      // Attach to <body> as a fixed-position layer so it renders above the
+      // composer, cards, and tiles (escapes every stacking context).
+      document.body.appendChild(menu);
+
+      // Open toward whichever side has more room, and never run off the page.
+      const r = chip.getBoundingClientRect();
+      const spaceAbove = r.top - 12;
+      const spaceBelow = window.innerHeight - r.bottom - 12;
+      menu.style.left = Math.round(r.left) + 'px';
+      menu.style.minWidth = Math.max(210, Math.round(r.width)) + 'px';
+      if (spaceBelow >= spaceAbove) {
+        menu.style.top = Math.round(r.bottom + 8) + 'px';
+        menu.style.bottom = 'auto';
+        menu.style.maxHeight = Math.max(150, Math.floor(spaceBelow)) + 'px';
+      } else {
+        menu.style.bottom = Math.round(window.innerHeight - r.top + 8) + 'px';
+        menu.style.top = 'auto';
+        menu.style.maxHeight = Math.max(150, Math.floor(spaceAbove)) + 'px';
+      }
     }
     document.querySelectorAll('.subject-chip').forEach(chip => {
       chip.setAttribute('role', 'button');
       chip.setAttribute('aria-label', 'Switch subject');
       chip.addEventListener('click', (e) => {
         e.stopPropagation();
-        const wasOpen = chip.querySelector('.subject-picker');
+        const wasOpen = document.querySelector('.subject-picker');
         closeSubjectPickers();
         if (!wasOpen) buildSubjectPicker(chip);
       });
@@ -5558,9 +5621,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
     function sendTranscript(text) {
       if (!text) return;
       phase = 'thinking';
+      // Mark this whole send as voice-initiated (covering the input event + the
+      // send click) so it isn't mistaken for the user typing.
+      window.__axVoiceSending = true;
       chatInput.value = text;
       chatInput.dispatchEvent(new Event('input', { bubbles: true }));
       if (sendBtn) sendBtn.click();
+      window.__axVoiceSending = false;
       setStatus('<b>Student</b> is thinking…', null);
     }
 
@@ -5624,6 +5691,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
     function beginListening() {
       phase = 'listening';
       pcmChunks = []; speechDetected = false; silenceMs = 0; bargeMs = 0; lastTs = performance.now();
+      // Only now (mic granted, actually listening) does the orb appear.
+      if (active) stage.hidden = false;
       setStatus('<b>Student</b> is listening', 'listening');
     }
 
@@ -5666,6 +5735,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       if (!active) return;
       if (!clean) { beginListening(); return; }
       phase = 'speaking'; bargeMs = 0; lastTs = performance.now();
+      if (active) stage.hidden = false;
       setStatus('<b>Student</b> is speaking', 'speaking');
       // Magpie caps input length — speak a sentence-bounded slice, chat shows the full reply.
       let speakText = clean;
@@ -5702,13 +5772,15 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
     function startVoice() {
       active = true; phase = 'idle';
-      stage.hidden = false;
+      // Do NOT show the orb yet — only once the mic is granted and we're actually
+      // listening (see beginListening). So the orb never lingers on "Connecting…"
+      // or when the user changes their mind and types instead.
       pill.classList.add('active', 'listening');
       if (label) label.textContent = 'Stop';
       setStatus('Connecting to <b>student</b>…', null);
       ensureGraph()
         .then(() => { if (active) beginListening(); })
-        .catch(() => { setStatus('Microphone blocked — allow mic access to talk', null); stopVoice(); });
+        .catch(() => { stopVoice(); });
     }
 
     function stopVoice() {
@@ -5726,6 +5798,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
 
     pill.addEventListener('click', () => { active ? stopVoice() : startVoice(); });
+
+    // The orb belongs to speech-to-speech only. The instant the user clicks into
+    // the text box to type (or presses a key there), fully exit voice mode so the
+    // orb never shows for typing. Voice's own sends set __axVoiceSending, so they
+    // don't trigger this.
+    const exitVoiceForTyping = () => { if (!window.__axVoiceSending && (active || !stage.hidden)) stopVoice(); };
+    chatInput.addEventListener('focus', exitVoiceForTyping);
+    chatInput.addEventListener('keydown', exitVoiceForTyping);
 
     // Home composer "Speak" → open the chat view straight into a voice conversation.
     const homePill = document.getElementById('speakPillHome');
