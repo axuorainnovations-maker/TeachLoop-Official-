@@ -18,9 +18,13 @@ try:
 except FileNotFoundError:
     pass
 
-# Generate config.js for the browser
+# Generate config.js for the browser.
+# SECRETS (API keys/tokens) are deliberately excluded — they must stay server-side.
+_SECRET_HINTS = ('KEY', 'SECRET', 'TOKEN', 'PASSWORD')
+public_env = {k: v for k, v in env_vars.items()
+              if not any(h in k.upper() for h in _SECRET_HINTS)}
 with open('config.js', 'w') as f:
-    f.write(f'const ENV = {repr(env_vars)};\n')
+    f.write(f'const ENV = {repr(public_env)};\n')
 
 PORT = 3006
 
@@ -29,7 +33,10 @@ PORT = 3006
 NVIDIA_API_KEY = env_vars.get('NVIDIA_API_KEY', '')
 RIVA_URI = 'grpc.nvcf.nvidia.com:443'
 ASR_FUNCTION_ID = '71203149-d3b7-4460-8231-1be2543a1fca'
-TTS_FUNCTION_ID = '877104f7-e885-42b9-8de8-f6e4c6303969'
+# TTS model is env-driven and defaults to magpie-tts-multilingual.
+NVIDIA_TTS_MODEL = env_vars.get('NVIDIA_TTS_MODEL', '') or 'magpie-tts-multilingual'
+TTS_FUNCTION_IDS = {'magpie-tts-multilingual': '877104f7-e885-42b9-8de8-f6e4c6303969'}
+TTS_FUNCTION_ID = TTS_FUNCTION_IDS.get(NVIDIA_TTS_MODEL, TTS_FUNCTION_IDS['magpie-tts-multilingual'])
 TTS_VOICE = 'Magpie-Multilingual.EN-US.Mia'
 TTS_RATE = 44100
 
@@ -68,6 +75,24 @@ def pcm_to_wav(pcm, rate, channels=1, bits=16):
               + b'fmt ' + struct.pack('<IHHIIHH', 16, 1, channels, rate, byte_rate, block_align, bits)
               + b'data' + struct.pack('<I', data_len))
     return header + pcm
+
+def _split_for_tts(text, limit=700):
+    """Split a long script into sentence-aligned chunks the TTS service accepts."""
+    text = ' '.join(str(text).split())
+    if len(text) <= limit:
+        return [text]
+    parts, cur = [], ''
+    import re as _re
+    for sentence in _re.split(r'(?<=[.!?])\s+', text):
+        if len(cur) + len(sentence) + 1 > limit and cur:
+            parts.append(cur.strip())
+            cur = sentence
+        else:
+            cur = (cur + ' ' + sentence).strip()
+    if cur:
+        parts.append(cur.strip())
+    return [p for p in parts if p]
+
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
@@ -163,10 +188,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             voice = data.get('voice') or TTS_VOICE
             language = data.get('language') or 'en-US'
             try:
-                resp = get_tts_service().synthesize(
-                    text=text, voice_name=voice, language_code=language,
-                    sample_rate_hz=TTS_RATE, encoding=riva.client.AudioEncoding.LINEAR_PCM)
-                wav = pcm_to_wav(resp.audio, TTS_RATE, 1)
+                svc = get_tts_service()
+                pcm = b''
+                for chunk in _split_for_tts(text):
+                    r = svc.synthesize(
+                        text=chunk, voice_name=voice, language_code=language,
+                        sample_rate_hz=TTS_RATE, encoding=riva.client.AudioEncoding.LINEAR_PCM)
+                    pcm += r.audio
+                wav = pcm_to_wav(pcm, TTS_RATE, 1)
                 self.send_response(200)
                 self.send_header('Content-Type', 'audio/wav')
                 self.send_header('Access-Control-Allow-Origin', '*')

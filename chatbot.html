@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Axoura AI</title>
+<title>Noura AI</title>
 <script src="https://cdn.lordicon.com/lordicon.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 <style>
-/* Necosmic (Limitype) — futuristic display font, used only for the "Axoura"
+/* Necosmic (Limitype) — futuristic display font, used only for the "Noura"
    wordmark and the "What are we learning today?" hero title. Drop a font file
    named Necosmic.woff2 / Necosmic.otf / Necosmic.ttf into the project root, OR
    have it installed on the system, and it will render automatically. */
@@ -45,7 +45,7 @@ body {
 .sidebar {
   width:248px;
   background:#101010;
-  border-right:1px solid #1E1E1E;
+  border-right:none;
   display:flex;
   flex-direction:column;
   flex-shrink:0;
@@ -71,6 +71,7 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 .sidebar.collapsed .nav-item svg { margin:0; }
 .sidebar.collapsed .nav-item span,
 .sidebar.collapsed .brand-name,
+.sidebar.collapsed .brand-wrap,
 .sidebar.collapsed .section,
 .sidebar.collapsed .history,
 .sidebar.collapsed .user-info,
@@ -131,6 +132,14 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 .yl-download-title { font-size:13px; font-weight:600; color:#fff; line-height:1.2; }
 .yl-download-badge { font-size:10px; font-weight:600; background:#0F1F3A; color:#6BA3FF; padding:2px 6px; border-radius:5px; white-space:nowrap; }
 .yl-download-desc { font-size:12px; line-height:16px; color:#8A8A8A; }
+/* Daily study reminder signup card */
+.yl-reminder { background:#0A0A0A; border:1px solid #1E1E1E; border-radius:14px; padding:12px; }
+.yl-reminder-badge { font-size:10px; font-weight:600; background:rgba(233,118,4,0.14); color:#f0a500; padding:2px 6px; border-radius:5px; white-space:nowrap; }
+.yl-reminder-btn { margin-top:10px; width:100%; display:flex; align-items:center; justify-content:center; gap:7px; height:34px; border-radius:9px; border:1px solid rgba(168,102,238,0.40); background:rgba(168,102,238,0.14); color:#c9b6ef; font-size:12.5px; font-weight:600; cursor:pointer; font-family:'Inter', sans-serif; transition:background .15s, border-color .15s, color .15s; }
+.yl-reminder-btn:hover { background:rgba(168,102,238,0.22); border-color:rgba(168,102,238,0.6); }
+.yl-reminder-btn svg { width:15px; height:15px; flex-shrink:0; }
+.yl-reminder-btn.on { background:rgba(233,118,4,0.14); border-color:rgba(233,118,4,0.45); color:#f0a500; }
+body.light-mode .yl-reminder { background:#f6f6f7; border-color:#e2e2e6; }
 .yl-profile-wrap { position:relative; }
 .yl-profile {
   width:100%; min-height:56px; background:#161616; border:1px solid #2A2A2A; border-radius:16px;
@@ -149,6 +158,7 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 
 .sidebar.collapsed .yl-section,
 .sidebar.collapsed .yl-download,
+.sidebar.collapsed .yl-reminder,
 .sidebar.collapsed .yl-profile-id,
 .sidebar.collapsed .yl-bend { display:none !important; }
 .sidebar.collapsed .yl-bottom { padding:0 8px 12px; }
@@ -2190,8 +2200,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
   <aside class="sidebar">
     <div class="sidebar-top">
       <span class="brand-wrap">
-        <span class="brand-name">Axoura</span>
-        <span class="brand-logo grad-logo" role="img" aria-label="Axoura"></span>
+        <span class="brand-logo grad-logo" role="img" aria-label="Noura"></span>
+        <span class="brand-name">Noura</span>
       </span>
       <div class="logo-area" id="logoArea">
         <span class="logo-pencil">
@@ -2247,13 +2257,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
           } catch (e) { }
         })();
       </script>
+      <a class="nav-item active" id="chatNav">
+        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+        <span>Study</span>
+      </a>
       <a class="nav-item" id="aiStudentsNav">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
         <span>Teach Studio</span>
-      </a>
-      <a class="nav-item active" id="chatNav">
-        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
-        <span>Study Assistant</span>
       </a>
 
       <a class="nav-item" id="searchNav">
@@ -2281,12 +2291,16 @@ body.light-mode .aset-member .nm { color:#16151c; }
     </div>
 
     <div class="yl-bottom">
-      <div class="yl-download">
+      <div class="yl-reminder">
         <div class="yl-download-head">
-          <span class="yl-download-title">Download the Axoura…</span>
-          <span class="yl-download-badge">New</span>
+          <span class="yl-download-title">Daily study reminder</span>
+          <span class="yl-reminder-badge">Streak</span>
         </div>
-        <p class="yl-download-desc">Access Axoura anywhere and anytime.</p>
+        <p class="yl-download-desc">Get a daily nudge to study and keep your streak alive.</p>
+        <button class="yl-reminder-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="yl-reminder-label">Remind me daily</span>
+        </button>
       </div>
       <div class="yl-profile-wrap" id="userProfile">
         <button class="yl-profile" type="button">
@@ -2313,7 +2327,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
           <button class="pm-row" type="button" id="pmModel">
             <span class="pm-ic"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pmModelGrad" x1="0%" y1="100%" x2="70%" y2="30%"><stop offset="0%" stop-color="#1C7DFF"/><stop offset="52%" stop-color="#1C69FF"/><stop offset="100%" stop-color="#F0DCD6"/></linearGradient></defs><path d="M12 2 L14.6 9.4 L22 12 L14.6 14.6 L12 22 L9.4 14.6 L2 12 L9.4 9.4 Z" fill="url(#pmModelGrad)"/></svg></span>
             <span class="pm-label">Model</span>
-            <span class="pm-badge pm-badge-blue" id="pmModelBadge">Axoura</span>
+            <span class="pm-badge pm-badge-blue" id="pmModelBadge">Noura</span>
           </button>
           <button class="pm-row" type="button" id="upgradePlanTab">
             <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
@@ -2442,8 +2456,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
           /* Fix: keep the whole hero reachable when it's taller than the viewport.
              align-items:center clipped the top so you couldn't scroll back up;
              margin auto keeps it centered when short but top-reachable when tall. */
-          .main-inner { align-items:flex-start; padding-top:64px; padding-bottom:64px; }
-          .chat-app { margin-top:auto; margin-bottom:auto; }
+          .main-inner { align-items:flex-start; padding-top:max(56px, calc(50vh - 320px)); padding-bottom:96px; }
+          .chat-app { margin-top:0; margin-bottom:0; }
 
           /* Gradient orbit logo (same purple gradient masked by logo.png as the login page). */
           .grad-logo {
@@ -2455,7 +2469,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
           /* Gradient logo in the hero title */
           img.hero-pen, .chat-title .hero-pen { display:inline-block; }
           .chat-title .grad-logo.hero-pen { width:38px; height:38px; flex-shrink:0; }
-          /* "Axoura" wordmark in gradient + a small gradient logo snug to its right, pushed left */
+          /* "Noura" wordmark in gradient + a small gradient logo snug to its right, pushed left */
           .brand-wrap { display:inline-flex; align-items:center; gap:6px; margin-right:auto; }
           .brand-name {
             background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
@@ -2494,6 +2508,29 @@ body.light-mode .aset-member .nm { color:#16151c; }
           .chat-app .hsub-viewall:hover { background:#242420; border-color:#33312E; color:#E8E8E6; }
           body.light-mode .chat-app .hsub-viewall { background:#fff; border-color:#e6e6e9; color:#6a6a6f; }
 
+          /* Lesson flow: clarifying chips + Generate Lesson card */
+          .lesson-chips { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+          .lesson-chip { background:#1E1E1C; border:1px solid #2C2C2A; border-radius:999px; padding:10px 16px; font-size:14px; font-weight:600; color:#fff; cursor:pointer; font-family:'Inter',sans-serif; transition:background .15s,border-color .15s,opacity .15s; }
+          .lesson-chip:hover { background:#242420; border-color:#3A3A38; }
+          .lesson-chips.used .lesson-chip { opacity:.45; pointer-events:none; }
+          .lesson-chips.used .lesson-chip.picked { opacity:1; border-color:#7A6EF0; color:#c9b6ef; }
+          .lesson-card { margin:38px auto 0; background:#1E1E1C; border:1px solid #2C2C2A; border-radius:16px; padding:18px; max-width:560px; width:100%; }
+          .lesson-card-head { display:flex; align-items:flex-start; gap:12px; }
+          .lesson-card-logo { width:26px; height:26px; flex-shrink:0; margin-top:2px; }
+          .lesson-card-label { font-size:11px; font-weight:700; letter-spacing:.12em; color:#8A8A86; text-transform:uppercase; }
+          .lesson-card-title { margin-top:4px; font-size:18px; font-weight:700; line-height:22px; color:#fff; letter-spacing:-.01em; }
+          .lesson-card-btn { margin-top:16px; width:100%; height:46px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:600; letter-spacing:-.01em; cursor:pointer; font-family:'Inter',sans-serif; box-shadow:0 8px 20px rgba(123,92,250,0.25), inset 0 1px 0 rgba(255,255,255,0.15); transition:filter .15s, transform .1s; }
+          .lesson-card-btn:hover { filter:brightness(1.07); }
+          .lesson-card-btn:active { transform:scale(.99); }
+          .subject-offer-btns { display:flex; gap:10px; margin-top:16px; }
+          .lesson-card-btn.half { flex:1; margin-top:0; height:44px; }
+          .lesson-card-btn.ghost { background:transparent; border:1px solid #2e2e34; color:#c7c7cc; box-shadow:none; }
+          .lesson-card-btn.ghost:hover { background:#242428; color:#fff; filter:none; }
+          .lesson-card-note { margin-top:16px; font-size:14px; line-height:1.5; color:#c9b6ef; background:rgba(168,102,238,0.10); border:1px solid rgba(168,102,238,0.30); border-radius:11px; padding:11px 14px; }
+          body.light-mode .lesson-chip { background:#f0f0f2; border-color:#e2e2e6; color:#18181b; }
+          body.light-mode .lesson-card { background:#fff; border-color:#e2e2e6; }
+          body.light-mode .lesson-card-title { color:#18181b; }
+
           /* Light-mode fallbacks */
           body.light-mode .chat-app .input-shell .input-container { background:#fff; border-color:#e2e2e6; box-shadow:0 8px 32px rgba(0,0,0,0.08); }
           body.light-mode .chat-app .input-container .prompt-input { color:#18181b; }
@@ -2515,7 +2552,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
           })();
         </script>
         <h1 class="chat-title">
-          <span class="hero-pen grad-logo" role="img" aria-label="Axoura"></span>
+          <span class="hero-pen grad-logo" role="img" aria-label="Noura"></span>
           <span class="title-necosmic" data-i18n="title">What are we studying today?</span>
         </h1>
 
@@ -2590,7 +2627,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
 <!-- CHAT VIEW OVERLAY (hidden until send is pressed) -->
 <div class="app" id="chatApp" style="display:none; position:fixed; inset:0; z-index:100;">
-  <img class="chat-mascot" src="logo.png?v=3" alt="Axoura logo">
+  <img class="chat-mascot" src="logo.png?v=3" alt="Noura logo">
   <aside class="sidebar" id="chatSidebar">
     <!-- Sidebar content injected by JS -->
   </aside>
@@ -2761,7 +2798,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
   // Return from a chat to the main dashboard (hide the chat overlay).
   function goToDashboard() { if (chatApp) chatApp.style.display = 'none'; }
-  // Tapping the Axoura wordmark (main sidebar) goes home.
+  // Tapping the Noura wordmark (main sidebar) goes home.
   origSidebar?.querySelector('.brand-name')?.addEventListener('click', goToDashboard);
   // Back arrow next to the chat title goes home too.
   document.getElementById('chatBackBtn')?.addEventListener('click', goToDashboard);
@@ -2811,7 +2848,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const chatLogoArea = chatSidebar.querySelector('#logoArea');
     chatCollapseBtn?.addEventListener('click', () => { chatSidebar.classList.toggle('collapsed'); });
     chatLogoArea?.addEventListener('click', () => { chatSidebar.classList.toggle('collapsed'); });
-    // Axoura wordmark in the chat sidebar returns to the dashboard.
+    // Noura wordmark in the chat sidebar returns to the dashboard.
     chatSidebar.querySelector('.brand-name')?.addEventListener('click', goToDashboard);
     // Wire nav items in chat sidebar
     chatSidebar.querySelectorAll('.nav-item').forEach(item => {
@@ -2874,7 +2911,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
               <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path style="opacity:0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span class="thinking-label">Axoura is thinking</span>
+            <span class="thinking-label">Noura is thinking</span>
             <span class="thinking-timer">0s</span>
           </div>
           
@@ -3217,11 +3254,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
       const subjName = curSubj ? curSubj.textContent.trim() : '';
       systemText += '\n\nSUBJECT LOCK: This conversation is tied to the current subject'
         + (subjName ? ' ("' + subjName + '")' : '')
-        + '. You cannot change or switch the subject yourself. If the learner asks to study, switch to, or work on a different subject or topic, briefly tell them you can\'t change subjects on your own and that they need to tap the subject button in the chat bar (next to the "+" at the bottom) to switch it manually. Then continue with the current subject.';
+        + '. You cannot change or switch the subject yourself. If the learner asks to study, learn about, or work on a topic that clearly belongs to a DIFFERENT subject than the current one (for example asking about business while inside a biology subject), do NOT teach that topic. Instead reply with one or two short sentences telling them that topic deserves its own subject folder, and ask whether they would like to create it themselves or have you set it up for them. Then end your message with a marker on its own final line exactly like: [[NEWSUBJECT: Business]] (a short title-cased name for the new subject). The app shows buttons that handle creating it - never mention the marker or the buttons themselves. For small tangents or genuinely related questions, just answer normally in the current subject.';
 
       systemText += '\n\nSTYLE: This is a spoken, back-and-forth conversation, so write the way a warm, friendly person actually talks. Keep a friendly, encouraging, upbeat tone. Use plain, natural, everyday English. Do NOT use dashes of any kind (no em dashes "—", no en dashes, no hyphens joining clauses) and do NOT use the equals sign "=" or other math/symbol shorthand — write those out in words instead (for example, say "the amygdala means emotions and fear", not "amygdala = emotions and fear"). Prefer short sentences and commas over dashes. Avoid markdown symbols, bullet characters, and asterisks; just speak in normal sentences.';
 
       systemText += '\n\nFACT-CHECK THE LEARNER (IMPORTANT): You have a live web_search tool for full internet access. Whenever the learner teaches, states, or asserts a fact, judge whether it is actually true, and use web_search to verify it whenever you are not fully certain (especially names, dates, numbers, definitions, causes, and mechanisms). If what they said is incorrect, outdated, oversimplified into something false, or a common misconception, you must NOT accept it, agree with it, praise it, or act as though you "learned" it. Instead, kindly tell them that that part is mistaken, briefly say what is actually correct (and mention the source if you searched), and invite them to try explaining it again. Only acknowledge that you have learned or understood something, or that they taught it well, when the information is actually correct. Never confirm, repeat as true, or build on wrong information. Express all of this inside your normal response format.';
+
+      systemText += "\n\nLESSON FLOW (UI MARKERS): The app renders interactive elements from special markers placed on the FINAL line of your reply. (1) When the learner asks to learn or study a topic that is broad or ambiguous (for example 'I want to learn eco'), reply with ONE short clarifying question (a single sentence, nothing else) and end with a marker listing 3 to 5 short interpretations, exactly like: [[CHIPS: Ecology and ecosystems | Economics basics | Environmental science | A general overview]]. (2) Once the learner names or picks a specific topic they want to learn, reply with one short friendly sentence (for example inviting them to tap Generate Lesson, or asking if they want it focused on anything specific) and end with: [[LESSON: Short Lesson Title]] - the app then shows a Generate Lesson card that builds a full lesson page. Rules: the marker must be the very last line of the message; never put both markers in one message; never mention, explain, or read the markers aloud; only use them when the learner wants to learn a topic - not for ordinary questions, homework help, or mid-conversation tutoring. If the topic belongs to a different subject than the current one, do not use CHIPS or LESSON - follow the SUBJECT LOCK rules instead.";
     }
 
     // Convert our chat context to Anthropic's message format (image_url -> base64 source block)
@@ -3307,6 +3346,18 @@ body.light-mode .aset-member .nm { color:#16151c; }
         }
       }
 
+      // ── Lesson-flow markers: [[CHIPS: a | b | c]] and [[LESSON: Title]] ──
+      let lessonChips = null, lessonTitle = null, newSubjectName = null;
+      {
+        const cm = finalText.match(/\[\[\s*CHIPS\s*:\s*([^\]]+)\]\]/i);
+        if (cm) { lessonChips = cm[1].split('|').map(t => t.trim()).filter(Boolean).slice(0, 5); finalText = finalText.replace(cm[0], '').trim(); }
+        const lm = finalText.match(/\[\[\s*LESSON\s*:\s*([^\]]+)\]\]/i);
+        if (lm) { lessonTitle = lm[1].trim(); finalText = finalText.replace(lm[0], '').trim(); if (lessonChips) lessonChips = null; }
+        const nsm = finalText.match(/\[\[\s*NEWSUBJECT\s*:\s*([^\]]+)\]\]/i);
+        if (nsm) { newSubjectName = nsm[1].trim(); finalText = finalText.replace(nsm[0], '').trim(); lessonChips = null; lessonTitle = null; }
+        if (!finalText && (lessonChips || lessonTitle || newSubjectName)) finalText = newSubjectName ? 'That topic deserves its own subject folder.' : (lessonTitle ? 'Ready when you are.' : 'Which one are you after?');
+      }
+
       // Get the existing active message container
       const aiMsgDiv = document.getElementById('thinkingMsg');
       if (!aiMsgDiv) return;
@@ -3381,6 +3432,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
         if (result.type === 'tool') {
           answerContent.innerHTML = '';
           renderToolCardInline(result.json, answerContent);
+          renderLessonExtras(aiMsgDiv, lessonChips, lessonTitle, newSubjectName);
         } else {
           // Chunked HTML typing animation
           answerContent.innerHTML = '';
@@ -3425,6 +3477,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
               // Trigger diagrams now that typing is done
               triggerDiagrams();
 
+              // Lesson flow: clarifying chips / Generate Lesson card
+              renderLessonExtras(aiMsgDiv, lessonChips, lessonTitle, newSubjectName);
+
               // Voice mode: speak the student's reply aloud
               if (window.__axVoice && window.__axVoice.active) window.__axVoice.speakReply(finalText);
             }
@@ -3436,14 +3491,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
           // ── Diagram Generation ──────────────────────────────
           const diagPrompt = result.diagPrompt;
-          console.log('[Axoura] diagPrompt:', diagPrompt);
+          console.log('[Noura] diagPrompt:', diagPrompt);
           if (diagPrompt) {
             let diagData = null;
             try {
               const jsonStr = diagPrompt.replace(/^```json\s*/,'').replace(/```\s*$/,'').trim();
               diagData = JSON.parse(jsonStr);
             } catch(e) {
-              console.warn('[Axoura] diagPrompt not valid JSON, skipping diagram render');
+              console.warn('[Noura] diagPrompt not valid JSON, skipping diagram render');
             }
 
             if (diagData && diagData.parts && diagData.parts.length > 0) {
@@ -3601,6 +3656,85 @@ body.light-mode .aset-member .nm { color:#16151c; }
   });
 
   // Chat send
+  // ── Lesson flow UI: clarifying chips + "Generate Lesson" card ──
+  function sendQuickMessage(text) {
+    if (!text) return;
+    appendUserMsg(text, null);
+    fetchAIResponse(text, null);
+  }
+  function currentSubjectName() {
+    const el = document.querySelector('.chat-input-wrap .subject-chip:not([hidden]) .subject-chip-name')
+      || document.querySelector('.subject-chip:not([hidden]) .subject-chip-name');
+    return el ? el.textContent.trim() : '';
+  }
+  function renderLessonExtras(msgDiv, chips, lessonTitle, newSubjectName) {
+    if (!msgDiv || (!chips && !lessonTitle && !newSubjectName)) return;
+    const host = msgDiv.querySelector('.answer-content') || msgDiv;
+    if (chips && chips.length) {
+      const row = document.createElement('div');
+      row.className = 'lesson-chips';
+      chips.forEach(label => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'lesson-chip'; b.textContent = label;
+        b.addEventListener('click', () => {
+          if (row.classList.contains('used')) return;
+          row.classList.add('used');
+          b.classList.add('picked');
+          sendQuickMessage(label);
+        });
+        row.appendChild(b);
+      });
+      host.appendChild(row);
+    }
+    if (lessonTitle) {
+      const card = document.createElement('div');
+      card.className = 'lesson-card';
+      card.innerHTML =
+        '<div class="lesson-card-head">' +
+          '<span class="lesson-card-logo grad-logo" aria-hidden="true"></span>' +
+          '<div><div class="lesson-card-label">Ready to build</div><div class="lesson-card-title"></div></div>' +
+        '</div>' +
+        '<button type="button" class="lesson-card-btn">Generate Lesson</button>';
+      card.querySelector('.lesson-card-title').textContent = lessonTitle;
+      card.querySelector('.lesson-card-btn').addEventListener('click', () => {
+        const subj = currentSubjectName();
+        window.location.href = 'lesson.html?title=' + encodeURIComponent(lessonTitle) + (subj ? '&subject=' + encodeURIComponent(subj) : '');
+      });
+      host.appendChild(card);
+    }
+    if (newSubjectName) {
+      const card = document.createElement('div');
+      card.className = 'lesson-card subject-offer';
+      card.innerHTML =
+        '<div class="lesson-card-head">' +
+          '<span class="lesson-card-logo grad-logo" aria-hidden="true"></span>' +
+          '<div><div class="lesson-card-label">New subject</div><div class="lesson-card-title"></div></div>' +
+        '</div>' +
+        '<div class="subject-offer-btns">' +
+          '<button type="button" class="lesson-card-btn half" data-act="auto">Create it for me</button>' +
+          '<button type="button" class="lesson-card-btn half ghost" data-act="self">I\'ll do it myself</button>' +
+        '</div>';
+      card.querySelector('.lesson-card-title').textContent = newSubjectName;
+      card.addEventListener('click', (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        const note = document.createElement('div');
+        note.className = 'lesson-card-note';
+        if (b.dataset.act === 'auto') {
+          const created = (typeof window.createSubject === 'function') && window.createSubject(newSubjectName);
+          note.textContent = created
+            ? ('"' + created + '" is ready and selected - ask your question again and we\'ll study it there.')
+            : 'Could not create the subject automatically - use "New Subject" in the sidebar instead.';
+        } else {
+          note.textContent = 'No problem - tap "New Subject" in the sidebar (or the subject chip next to the paperclip) to create and switch to it.';
+        }
+        card.querySelector('.subject-offer-btns').replaceWith(note);
+      }, { once: true });
+      host.appendChild(card);
+    }
+    if (typeof scrollToBottom === 'function') scrollToBottom();
+  }
+  window._renderLessonExtras = renderLessonExtras;   // debug hook
+
   function sendChatMessage() {
     const text = chatInput.value.trim();
     const att = pendingAttachment;
@@ -3859,9 +3993,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
   (function () {
     // Fill the avatar / name / email from the saved account.
     let acc = {};
-    try { acc = JSON.parse(localStorage.getItem('AXOURA_ACCOUNT') || 'null') || {}; } catch (e) { }
+    try { acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null') || {}; } catch (e) { }
     const nm = (acc.name || localStorage.getItem('TEACHLOOP_NAME') || 'Your account').trim();
-    const em = (acc.email || localStorage.getItem('AXOURA_EMAIL') || '').trim();
+    const em = (acc.email || localStorage.getItem('NOURA_EMAIL') || '').trim();
     const initials = (nm.split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'A').toUpperCase();
     const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
     set('pmName', nm); set('pmEmail', em || 'Signed in');
@@ -3872,13 +4006,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
     // Model badge → single Study Assistant tutor.
     try {
-      const mb = document.getElementById('pmModelBadge'); if (mb) mb.textContent = 'Study Assistant';
+      const mb = document.getElementById('pmModelBadge'); if (mb) mb.textContent = 'Study';
     } catch (e) {}
 
     // Profile + Model rows → open the Settings panel.
     const openSet = (e) => { e.stopPropagation();
       const menu = document.getElementById('settingsMenu'); if (menu) menu.classList.remove('open');
-      if (window.openAxouraSettings) window.openAxouraSettings();
+      if (window.openNouraSettings) window.openNouraSettings();
     };
     document.getElementById('pmProfile')?.addEventListener('click', openSet);
     document.getElementById('pmModel')?.addEventListener('click', openSet);
@@ -3899,7 +4033,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       e.stopPropagation();
       const menu = document.getElementById('settingsMenu');
       if (menu) menu.classList.remove('open');
-      try { window.location.href = 'mailto:axuorainnovations@gmail.com?subject=Axoura%20Feedback'; } catch (err) {}
+      try { window.location.href = 'mailto:axuorainnovations@gmail.com?subject=Noura%20Feedback'; } catch (err) {}
     });
 
     // Log out → clear the local session (+ Supabase if configured) and restart.
@@ -3910,7 +4044,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
           window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY).auth.signOut();
         }
       } catch (err) { }
-      ['AXOURA_ACCOUNT', 'AXOURA_EMAIL', 'AXOURA_PENDING_PROFILE', 'TEACHLOOP_ONBOARDED'].forEach(k => { try { localStorage.removeItem(k); } catch (err) { } });
+      ['NOURA_ACCOUNT', 'NOURA_EMAIL', 'NOURA_PENDING_PROFILE', 'TEACHLOOP_ONBOARDED'].forEach(k => { try { localStorage.removeItem(k); } catch (err) { } });
       window.location.href = 'onboarding.html';
     });
   })();
@@ -4477,33 +4611,33 @@ body.light-mode .aset-member .nm { color:#16151c; }
 </script>
 
 <script>
-  // Tier selector (Axoura 1.0 / 2.0 / 3.0) — keeps both orchestrators in sync
+  // Tier selector (Noura 1.0 / 2.0 / 3.0) — keeps both orchestrators in sync
   // and drives the AI difficulty/structure, shared with onboarding via localStorage.
   (function () {
     const wraps = document.querySelectorAll('.orchestrator-wrap');
 
     // Each tier maps to a difficulty level + a directive injected into the AI system prompt.
     const TIER_CONFIG = {
-      'Axoura 1.0': {
+      'Noura 1.0': {
         level: 'Beginner',
-        directive: 'ACTIVE TIER: Axoura 1.0 (Beginner). Override STEP 1 and STEP 4 — force Difficulty = Beginner for this whole session. The student is just starting out: assume no prior knowledge, define every term the first time it appears, use plain language with minimal jargon, keep steps small and explanations short, and prefer simple visuals. When you ask the student a question, keep it gentle and foundational (one idea at a time) to build confidence.'
+        directive: 'ACTIVE TIER: Noura 1.0 (Beginner). Override STEP 1 and STEP 4 — force Difficulty = Beginner for this whole session. The student is just starting out: assume no prior knowledge, define every term the first time it appears, use plain language with minimal jargon, keep steps small and explanations short, and prefer simple visuals. When you ask the student a question, keep it gentle and foundational (one idea at a time) to build confidence.'
       },
-      'Axoura 2.0': {
+      'Noura 2.0': {
         level: 'Intermediate',
-        directive: 'ACTIVE TIER: Axoura 2.0 (Intermediate). Override STEP 1 and STEP 4 — force Difficulty = Intermediate for this whole session. Assume the student already knows the basics: use structured reasoning, full step-by-step logic, and clear diagrams. When you ask the student a question, make it moderately challenging and aimed at connecting concepts together, not just recall.'
+        directive: 'ACTIVE TIER: Noura 2.0 (Intermediate). Override STEP 1 and STEP 4 — force Difficulty = Intermediate for this whole session. Assume the student already knows the basics: use structured reasoning, full step-by-step logic, and clear diagrams. When you ask the student a question, make it moderately challenging and aimed at connecting concepts together, not just recall.'
       },
-      'Axoura 3.0': {
+      'Noura 3.0': {
         level: 'Advanced',
-        directive: 'ACTIVE TIER: Axoura 3.0 (Review / exam-prep mode). Assume the student has ALREADY learned this material and is now revising. Prioritize active recall over first-time teaching: open with a tight summary of the key points, then quiz the student with focused practice questions, surface the mistakes people commonly make, and give rapid, corrective feedback. Keep explanations concise and testing-oriented rather than introductory.'
+        directive: 'ACTIVE TIER: Noura 3.0 (Review / exam-prep mode). Assume the student has ALREADY learned this material and is now revising. Prioritize active recall over first-time teaching: open with a tight summary of the key points, then quiz the student with focused practice questions, surface the mistakes people commonly make, and give rapid, corrective feedback. Keep explanations concise and testing-oriented rather than introductory.'
       }
     };
-    const DEFAULT_TIER = 'Axoura 1.0';
+    const DEFAULT_TIER = 'Noura 1.0';
 
     // Short, human explanation shown in the side panel when a tier is hovered/selected.
     const TIER_DESC = {
-      'Axoura 1.0': "A total beginner with no background who gets lost at the first undefined term — for rehearsing an explanation from scratch.",
-      'Axoura 2.0': "A sharp peer who thinks well but doesn't know your jargon — for talks and explaining your work across fields.",
-      'Axoura 3.0': "A skeptic who knows the area and probes for weak points — for defending your work under real pushback."
+      'Noura 1.0': "A total beginner with no background who gets lost at the first undefined term — for rehearsing an explanation from scratch.",
+      'Noura 2.0': "A sharp peer who thinks well but doesn't know your jargon — for talks and explaining your work across fields.",
+      'Noura 3.0': "A skeptic who knows the area and probes for weak points — for defending your work under real pushback."
     };
 
     window.TEACHLOOP_TIER = localStorage.getItem('TEACHLOOP_TIER') || DEFAULT_TIER;
@@ -4993,6 +5127,17 @@ body.light-mode .aset-member .nm { color:#16151c; }
     newSubjectBtn?.addEventListener('click', (e) => { e.preventDefault(); goToNewSubject(); });
     document.getElementById('heroNewSubject')?.addEventListener('click', (e) => { e.preventDefault(); goToNewSubject(); });
 
+    // Programmatic creation used by the Study Assistant's "new subject" offer:
+    // creates the subject if missing, selects it (chip + recents), and persists.
+    window.createSubject = function (name) {
+      name = String(name || '').trim();
+      if (!name) return false;
+      const existing = subjectNames().find(n => n.toLowerCase() === name.toLowerCase());
+      if (!existing) { buildItem(name); save(); }
+      recordRecent(existing || name);
+      return existing || name;
+    };
+
     // ── Composer subject chip → tap to switch subject ──────────────────
     function closeSubjectPickers() { document.querySelectorAll('.subject-picker').forEach(m => m.remove()); }
     function buildSubjectPicker(chip) {
@@ -5419,7 +5564,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 <div class="activity-overlay" id="activityOverlay">
   <div class="activity-box" role="dialog" aria-modal="true">
     <button class="activity-close" id="activityClose" type="button" aria-label="Close">×</button>
-    <div class="activity-title">Your Axoura activity</div>
+    <div class="activity-title">Your Noura activity</div>
     <div class="activity-sub">Every purple square is a day you studied. Keep the streak alive!</div>
     <div class="gh-scroll">
       <div class="gh-wrap">
@@ -5649,13 +5794,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
     function readAccount() {
       let acc = {};
-      try { acc = JSON.parse(localStorage.getItem('AXOURA_ACCOUNT') || 'null') || {}; } catch (e) {}
+      try { acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null') || {}; } catch (e) {}
       return acc;
     }
     function fill() {
       const acc = readAccount();
       const nm = (acc.name || localStorage.getItem('TEACHLOOP_NAME') || 'Your account').trim();
-      const em = (acc.email || localStorage.getItem('AXOURA_EMAIL') || '').trim();
+      const em = (acc.email || localStorage.getItem('NOURA_EMAIL') || '').trim();
       const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
       setTxt('asetName', nm);
       setTxt('asetEmail', em || 'Signed in');
@@ -5695,7 +5840,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       overlay.classList.add('open');
     }
     function closeSettings() { overlay.classList.remove('open'); }
-    window.openAxouraSettings = openSettings;
+    window.openNouraSettings = openSettings;
 
     document.getElementById('pmSettings')?.addEventListener('click', (e) => { e.stopPropagation(); openSettings(); });
     document.getElementById('asetClose')?.addEventListener('click', closeSettings);
@@ -5710,7 +5855,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       const nm = next.trim();
       if (!nm) return;
       const acc = readAccount(); acc.name = nm;
-      try { localStorage.setItem('AXOURA_ACCOUNT', JSON.stringify(acc)); } catch (e) {}
+      try { localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc)); } catch (e) {}
       try { localStorage.setItem('TEACHLOOP_NAME', nm); } catch (e) {}
       // Reflect everywhere the name shows
       const initials = (nm.split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'A').toUpperCase();
@@ -5724,7 +5869,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     // Referral copy
     document.getElementById('asetCopy')?.addEventListener('click', (e) => {
       const btn = e.currentTarget;
-      const link = location.origin + location.pathname + '?ref=' + encodeURIComponent((readAccount().email || 'axoura').split('@')[0]);
+      const link = location.origin + location.pathname + '?ref=' + encodeURIComponent((readAccount().email || 'noura').split('@')[0]);
       const done = () => { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 1600); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done).catch(done);
       else done();
@@ -5829,13 +5974,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
     // Delete account
     document.getElementById('asetDelete')?.addEventListener('click', () => {
-      if (!window.confirm('Delete your account and clear all Axoura data on this device? This cannot be undone.')) return;
+      if (!window.confirm('Delete your account and clear all Noura data on this device? This cannot be undone.')) return;
       try {
         if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase) {
           window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY).auth.signOut();
         }
       } catch (e) {}
-      Object.keys(localStorage).filter(k => k.startsWith('TEACHLOOP_') || k.startsWith('AXOURA_')).forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+      Object.keys(localStorage).filter(k => k.startsWith('TEACHLOOP_') || k.startsWith('NOURA_')).forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
       window.location.href = 'onboarding.html';
     });
   })();
@@ -6142,6 +6287,32 @@ body.light-mode .aset-member .nm { color:#16151c; }
     document.addEventListener('visibilitychange', () => { last = Date.now(); });
     window.addEventListener('focus', () => { last = Date.now(); });
     setInterval(tick, 5000);
+  })();
+</script>
+
+<script>
+  // Daily study reminder signup toggle (persists preference; delivery wired later).
+  (function () {
+    var KEY = 'NOURA_DAILY_REMINDER';
+    function isOn() { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+    function apply() {
+      var on = isOn();
+      document.querySelectorAll('.yl-reminder-btn').forEach(function (b) {
+        b.classList.toggle('on', on);
+        var l = b.querySelector('.yl-reminder-label');
+        if (l) l.textContent = on ? 'Reminders on' : 'Remind me daily';
+      });
+    }
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('.yl-reminder-btn');
+      if (!b) return;
+      var on = !isOn();
+      try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e2) {}
+      apply();
+    });
+    if (document.readyState !== 'loading') apply();
+    else document.addEventListener('DOMContentLoaded', apply);
+    setTimeout(apply, 400);  // re-apply after the sidebar clone is built
   })();
 </script>
 

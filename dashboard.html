@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Axoura — Dashboard</title>
+  <title>Noura — Dashboard</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -218,7 +218,7 @@
 
 <body>
   <div class="topbar">
-    <div class="brand"><img src="logo.png?v=3" alt="Axoura">Axoura</div>
+    <div class="brand"><span role="img" aria-label="Noura" style="width:30px;height:30px;display:inline-block;flex-shrink:0;background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);-webkit-mask:url('logo.png?v=3') center/contain no-repeat;mask:url('logo.png?v=3') center/contain no-repeat;"></span><span style="background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Noura</span></div>
   </div>
 
   <div class="streak-wrap">
@@ -244,7 +244,7 @@
   <div class="activity-overlay" id="activityOverlay">
     <div class="activity-box" role="dialog" aria-modal="true">
       <button class="activity-close" id="activityClose" type="button" aria-label="Close">×</button>
-      <div class="activity-title">Your Axoura activity</div>
+      <div class="activity-title">Your Noura activity</div>
       <div class="activity-sub">Every purple square is a day you studied. Keep the streak alive!</div>
       <div class="gh-scroll">
         <div class="gh-wrap">
@@ -528,7 +528,7 @@
             renderGreeting();
           }
           var pending = {};
-          try { pending = JSON.parse(localStorage.getItem('AXOURA_PENDING_PROFILE') || '{}') || {}; } catch (e) { }
+          try { pending = JSON.parse(localStorage.getItem('NOURA_PENDING_PROFILE') || '{}') || {}; } catch (e) { }
           var profile = {
             id: user.id,
             email: user.email || pending.email || null,
@@ -537,10 +537,10 @@
             age: pending.age || null, level: pending.level || null,
             goal: pending.goal || null, subject: pending.subject || null,
           };
-          try { localStorage.setItem('AXOURA_ACCOUNT', JSON.stringify(Object.assign({ provider: 'google' }, profile))); } catch (e) { }
+          try { localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(Object.assign({ provider: 'google' }, profile))); } catch (e) { }
           sb.from('profiles').upsert(profile, { onConflict: 'id' }).then(function (r) {
             if (r && r.error) console.warn('Supabase profile save failed:', r.error.message);
-            try { localStorage.removeItem('AXOURA_PENDING_PROFILE'); } catch (e) { }
+            try { localStorage.removeItem('NOURA_PENDING_PROFILE'); } catch (e) { }
           });
         }).catch(function () { });
       })();

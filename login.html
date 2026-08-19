@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Log in — Axoura</title>
+<title>Log in — Noura</title>
 <script src="supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -93,7 +93,7 @@
   .glow-band{ position:absolute; width:100%; height:58%; bottom:0; left:0; background:linear-gradient(180deg, transparent 0%, rgba(124,58,237,0.18) 30%, rgba(139,92,246,0.42) 68%, rgba(167,139,250,0.55) 100%); filter:blur(22px); }
   .glow-core{ position:absolute; width:85%; height:52%; left:5%; bottom:-16%; background:radial-gradient(ellipse at center, #8b5cf6 0%, #5b21b6 42%, transparent 78%); filter:blur(44px); opacity:.9; border-radius:50%; }
 
-  /* Floating Axoura prompt mockup — centered in the gradient */
+  /* Floating Noura prompt mockup — centered in the gradient */
   .mock-wrap{ position:absolute; inset:0; z-index:10; display:flex; align-items:center; justify-content:center; padding:24px; }
   .mock-bar{
     display:flex; align-items:center; justify-content:space-between;
@@ -120,7 +120,7 @@
   <!-- LEFT: form -->
   <div class="auth-left">
     <div class="auth-inner">
-      <span class="auth-logo" role="img" aria-label="Axoura"></span>
+      <span class="auth-logo" role="img" aria-label="Noura"></span>
 
       <h1 class="auth-h1" id="authTitle">Log in</h1>
 
@@ -214,8 +214,8 @@
       const saveLocal = (email) => {
         try {
           const acc = { email: email || '', method: 'email' };
-          localStorage.setItem('AXOURA_ACCOUNT', JSON.stringify(acc));
-          if (email) localStorage.setItem('AXOURA_EMAIL', email);
+          localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
+          if (email) localStorage.setItem('NOURA_EMAIL', email);
         } catch (e) {}
       };
 
@@ -273,7 +273,7 @@
       $('emailInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitEmail(); });
       $('passwordInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitEmail(); });
 
-      // Cycle the Axoura prompt mockup text for a little life.
+      // Cycle the Noura prompt mockup text for a little life.
       const prompts = [
         'Teach your student about photosynthesis…',
         'Explain the water cycle to your student…',
