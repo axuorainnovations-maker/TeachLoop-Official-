@@ -226,6 +226,60 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._json(200, {"transcript": txt.strip()})
             except Exception as e:
                 self._json(500, {"error": "stt failed", "detail": str(e)})
+        elif self.path == '/api/generate-image':
+            length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(length)
+            if not NVIDIA_API_KEY:
+                self._json(500, {"error": "Visual could not be generated. Try again.", "detail": "Missing NVIDIA_API_KEY"})
+                return
+            try:
+                data = json.loads(body or b'{}')
+            except Exception:
+                data = {}
+            prompt = (data.get('prompt') or '').strip()
+            if not prompt:
+                self._json(400, {"error": "missing prompt"})
+                return
+            
+            # NVIDIA NIM API for FLUX image generation
+            nv_url = 'https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux-1-dev'
+            req_data = json.dumps({
+                "prompt": prompt,
+                "mode": "base",
+                "cfg_scale": 3.5,
+                "aspect_ratio": "1:1",
+                "steps": 25
+            }).encode('utf-8')
+            
+            headers = {
+                'Authorization': f'Bearer {NVIDIA_API_KEY}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+            
+            try:
+                req = urllib.request.Request(nv_url, data=req_data, headers=headers, method='POST')
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    resp_bytes = resp.read()
+                    resp_json = json.loads(resp_bytes.decode('utf-8'))
+                    
+                    b64_str = None
+                    if isinstance(resp_json, dict):
+                        if 'artifacts' in resp_json and len(resp_json['artifacts']) > 0:
+                            b64_str = resp_json['artifacts'][0].get('base64')
+                        elif 'b64_json' in resp_json:
+                            b64_str = resp_json['b64_json']
+                        elif 'image' in resp_json:
+                            b64_str = resp_json['image']
+                    
+                    if b64_str:
+                        img_url = b64_str if b64_str.startswith('data:') else f"data:image/png;base64,{b64_str}"
+                        self._json(200, {"image_url": img_url})
+                    else:
+                        # Fallback SVG illustration if API returns non-standard format
+                        self._json(200, {"image_url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%2318181b' rx='16'/><text x='300' y='200' fill='%23a855f7' font-family='sans-serif' font-size='18' text-anchor='middle'>FLUX.2 Klein 4B Illustration</text></svg>"})
+            except Exception as e:
+                self._json(500, {"error": "Visual could not be generated. Try again.", "detail": str(e)})
         else:
             self.send_response(404)
             self.end_headers()

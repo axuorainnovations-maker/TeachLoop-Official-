@@ -37,14 +37,14 @@ body {
   width:100%;
   height:100vh;
   overflow:hidden;
-  background:#0A0A0B;
+  background:#000000;
   position:relative;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
   width:248px;
-  background:#101010;
+  background:#090909;
   border-right:none;
   display:flex;
   flex-direction:column;
@@ -281,7 +281,7 @@ body.light-mode .recents-empty { color:#9a9aa0; }
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  background:#0A0A0B;
+  background:#000000;
 }
 .main-inner {
   flex:1;
@@ -290,6 +290,7 @@ body.light-mode .recents-empty { color:#9a9aa0; }
   justify-content:center;
   padding:24px;
   overflow-y:auto;
+  background: radial-gradient(ellipse 85% 65% at 50% 115%, rgba(168, 85, 247, 0.42) 0%, rgba(124, 58, 237, 0.24) 40%, rgba(109, 40, 217, 0.08) 68%, transparent 92%), #000000;
 }
 .chat-app {
   width:100%;
@@ -341,46 +342,31 @@ body.light-mode .welcome-greeting { color:#16151c; }
 .input-shell {
   position:relative;
   width:100%;
-  max-width:680px;
+  max-width:720px;
+  margin:0 auto;
   animation: inputPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
 }
 @keyframes inputPop {
   from { opacity:0; transform:scale(0.92); }
   to { opacity:1; transform:scale(1); }
 }
-.input-shell::before {
-  content:'';
-  position:absolute;
-  inset:-40px;
-  background:radial-gradient(50% 45% at 50% 50%, rgba(168,85,247,0.13) 0%, rgba(168,85,247,0.07) 25%, rgba(168,85,247,0.03) 50%, transparent 70%);
-  filter:blur(36px);
-  opacity:0.75;
-  z-index:0;
-  pointer-events:none;
-  animation: glowPulse 2s ease-in-out infinite;
-}
-@keyframes glowPulse {
-  0%, 100% { opacity:0.85; transform:scale(1); }
-  50% { opacity:1; transform:scale(1.02); }
-}
 .input-container {
   position:relative;
   z-index:1;
   width:100%;
-  background:#131313;
-  border-radius:28px;                 /* rounded-[1.75rem] */
-  padding:16px 18px 14px;             /* p-4 */
-  border:2px solid rgba(255,255,255,0.08);   /* border-2 */
-  box-shadow:0 0 40px rgba(168,85,247,0.07), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 0 1px rgba(255,255,255,0.04);
-  transition:all 0.15s cubic-bezier(0.2, 0, 0, 1);
+  background:#1a1a1a;
+  border-radius:24px;
+  padding:4px 4px 12px;
+  border:1px solid rgba(255,255,255,0.10);
+  box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  transition:border-color 0.15s, box-shadow 0.15s;
 }
 .input-container:focus-within {
-  border-color:rgba(168,85,247,0.2);
-  box-shadow:0 0 34px rgba(168,85,247,0.09), inset 0 1px 0 rgba(255,255,255,0.06);
-  transform:translateY(-1px);
+  border-color:rgba(168,85,247,0.35);
+  box-shadow:0 4px 32px rgba(168,85,247,0.10);
 }
 /* Auto-growing text row + rotating placeholder overlay */
-.ai-text-row { position:relative; min-height:28px; padding:2px 0; }
+.ai-text-row { position:relative; min-height:44px; padding:12px 16px 4px; }
 .prompt-input {
   position:relative;
   z-index:2;
@@ -391,26 +377,27 @@ body.light-mode .welcome-greeting { color:#16151c; }
   color:#E4E4E5;
   font-size:15px;
   font-family:'Inter', sans-serif;
-  line-height:28px;                   /* leading-7 */
-  padding:0 4px;
+  line-height:1.3;
+  padding:0;
 }
-.prompt-input::placeholder { color:transparent; }   /* overlay drives the hint */
+.prompt-input::placeholder { color:transparent; }
 .rot-placeholder {
-  position:absolute; left:4px; top:0; z-index:1;
-  line-height:28px; font-size:15px; color:#7C7C80;
-  pointer-events:none; white-space:nowrap; overflow:hidden; max-width:calc(100% - 8px);
+  position:absolute; left:16px; top:12px; z-index:1;
+  font-size:15px; line-height:1.3; color:#7C7C80;
+  pointer-events:none; white-space:nowrap; overflow:hidden; max-width:calc(100% - 32px);
   transition:opacity 0.35s cubic-bezier(0.2,0,0,1), transform 0.35s cubic-bezier(0.2,0,0,1);
 }
 .rot-placeholder.swap { opacity:0; transform:translateY(-6px); }
 .ai-text-row.hide-ph .rot-placeholder { opacity:0; }
 
-/* Toolbar row separated from the text by a divider (border-t pt-3 mt-3) */
+/* Toolbar row */
 .controls {
   display:flex; justify-content:space-between; align-items:center;
-  margin-top:6px;
+  margin-top:8px;
+  padding:0 12px;
 }
-.controls .left, .controls .right { display:flex; align-items:center; gap:6px; }
-/* size-9 rounded-xl toolbar buttons */
+.controls .left, .controls .right { display:flex; align-items:center; gap:8px; }
+/* size-9 rounded-full outline buttons */
 .icon-btn {
   width:36px;
   height:36px;
@@ -418,42 +405,93 @@ body.light-mode .welcome-greeting { color:#16151c; }
   align-items:center;
   justify-content:center;
   background:transparent;
-  border:none;
-  border-radius:12px;
-  color:#8b8b90;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:999px;
+  color:#a1a1aa;
   cursor:pointer;
-  transition:background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition:background-color 0.15s, border-color 0.15s, color 0.15s;
 }
-.icon-btn:hover { background:rgba(255,255,255,0.06); color:#e4e4e5; }
-.icon-btn:active { transform:scale(0.96); }
+.icon-btn:hover { background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.2); color:#e4e4e5; }
+.icon-btn:active { transform:scale(0.95); }
 .icon-btn svg { width:18px; height:18px; }
-/* The + button glows purple on hover, like the tier selector beside it */
+/* Plus button: same outline style */
 .controls .left .icon-btn:hover {
-  background:rgba(168,85,247,0.16); color:#ffffff;
-  box-shadow:0 0 16px rgba(168,85,247,0.35), 0 0 6px rgba(168,85,247,0.22);
+  background:rgba(255,255,255,0.07); color:#e4e4e5;
+  box-shadow:none;
 }
 .telephone-btn { color:#c9c9cf; }
 .telephone-btn:hover { color:#ffffff; }
 
 /* Homework attachment preview (uploaded file / photo) */
 .attach-preview { display:none; flex-wrap:wrap; gap:8px; margin-bottom:10px; padding:0 2px; }
-.attach-chip {
-  display:inline-flex; align-items:center; gap:8px; max-width:240px;
-  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-  border-radius:12px; padding:6px 8px 6px 6px;
+.attach-img-thumb-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 6px;
 }
-.attach-chip img { width:34px; height:34px; border-radius:8px; object-fit:cover; flex-shrink:0; display:block; }
+.attach-img-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+body.light-mode .attach-img-thumb {
+  border-color: #d4d4d8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.attach-img-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #27272a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f4f4f5;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s, background 0.15s;
+}
+.attach-img-remove:hover {
+  background: #ef4444;
+  color: #fff;
+  transform: scale(1.1);
+}
+body.light-mode .attach-img-remove {
+  background: #e4e4e7;
+  border-color: #d4d4d8;
+  color: #18181b;
+}
+body.light-mode .attach-img-remove:hover {
+  background: #ef4444;
+  color: #fff;
+}
+.attach-chip {
+  display:inline-flex; align-items:center; gap:10px; max-width:320px;
+  background:#242426; border:1px solid rgba(255,255,255,0.12);
+  border-radius:14px; padding:6px 12px 6px 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
 .attach-fileicon {
-  width:34px; height:34px; border-radius:8px; flex-shrink:0; font-size:17px;
+  width:36px; height:36px; border-radius:8px; flex-shrink:0; font-size:18px;
   display:flex; align-items:center; justify-content:center; background:rgba(168,85,247,0.18);
 }
-.attach-name { font-size:12.5px; color:#d4d4d8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.attach-name { font-size:13.5px; font-weight:450; color:#e4e4e7; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px; }
 .attach-remove {
-  flex-shrink:0; width:18px; height:18px; border:none; border-radius:50%; cursor:pointer;
-  background:rgba(255,255,255,0.1); color:#e4e4e5; font-size:14px; line-height:1;
-  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; width:20px; height:20px; border:none; border-radius:50%; cursor:pointer;
+  background:rgba(255,255,255,0.14); color:#e4e4e5; font-size:13px; line-height:1;
+  display:flex; align-items:center; justify-content:center; margin-left:2px; transition:background 0.15s, color 0.15s;
 }
-.attach-remove:hover { background:rgba(168,85,247,0.45); color:#fff; }
+.attach-remove:hover { background:rgba(255,255,255,0.3); color:#fff; }
 .msg-user-img { max-width:220px; max-height:240px; border-radius:12px; display:block; }
 .telephone-btn:hover { color:#FFFFFF; background:rgba(255,255,255,0.08); }
 .telephone-btn svg path { transition:transform 0.25s ease-out; }
@@ -700,6 +738,7 @@ body.light-mode .subject-chip { background:rgba(168,85,247,0.10); border-color:r
   height: 100%;
   width: 100%;
   position: relative;
+  background: radial-gradient(ellipse 85% 65% at 50% 115%, rgba(168, 85, 247, 0.42) 0%, rgba(124, 58, 237, 0.24) 40%, rgba(109, 40, 217, 0.08) 68%, transparent 92%), #000000;
 }
 .chat-view.active { display: flex; }
 
@@ -1248,6 +1287,7 @@ body.light-mode .msg-ai.feedback-yellow .answer-content { background:rgba(212,16
 
 /* Chat input bar (bottom of chat view) */
 .chat-input-wrap {
+  width: 100%;
   padding: 10px 0 22px;
   flex-shrink: 0;
   display: flex;
@@ -1257,6 +1297,9 @@ body.light-mode .msg-ai.feedback-yellow .answer-content { background:rgba(212,16
   width: 100%;
   max-width: 780px;
   padding: 0 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .chat-input-shell {
   position: relative;
@@ -1374,15 +1417,13 @@ body.light-mode .subject-menu button { color:#3a3a3c; }
 body.light-mode .settings-menu .main-text { color:#1c1c1e; }
 body.light-mode .settings-menu .sub-text, body.light-mode .settings-menu .email,
 body.light-mode .settings-menu .shortcut { color:#8a8a8f; }
-body.light-mode .settings-menu .icon { stroke:#48484a; }
-body.light-mode .settings-menu .sep { background:#e2e2e6; }
 body.light-mode .user-name { color:#1c1c1e; }
 body.light-mode .user-email { color:#8a8a8f; }
 body.light-mode .avatar { background:#dedee3; color:#333; }
 body.light-mode .waveform-btn, body.light-mode .chat-send-btn { background:#f5f5f5; color:#a3a3a3; }
-body.light-mode .waveform-btn.is-typing, body.light-mode .chat-send-btn:not(:disabled) { background:#3b82f6; color:#ffffff; }
+body.light-mode .waveform-btn.is-typing, body.light-mode .chat-send-btn.is-typing { background:#3b82f6; color:#ffffff; }
+body.light-mode .waveform-btn:disabled, body.light-mode .chat-send-btn:disabled { background:#e5e7eb; color:#9ca3af; }
 body.light-mode .waveform-btn.is-streaming, body.light-mode .chat-send-btn.is-streaming { background:#171717; color:#ffffff; }
-body.light-mode .chat-send-btn:disabled { background:#d1d1d6; }
 /* ===== Speak pill (composer) ===== */
 .speak-pill {
   display:inline-flex; align-items:center; gap:9px; height:36px; padding:0 16px;
@@ -1404,7 +1445,6 @@ body.light-mode .chat-send-btn:disabled { background:#d1d1d6; }
 .speak-stop { display:none; align-items:center; justify-content:center; }
 .speak-stop svg { width:15px; height:15px; }
 .speak-pill.active { background:#7c3aed; border-color:#8b5cf6; }
-.speak-pill.active .speak-label { }
 .speak-pill.active .speak-wave { display:none; }
 .speak-pill.active .speak-stop { display:inline-flex; }
 body.light-mode .speak-pill { background:#16151c; border-color:rgba(255,255,255,0.12); color:#fff; }
@@ -1432,8 +1472,10 @@ body.light-mode .speak-pill { background:#16151c; border-color:rgba(255,255,255,
 .voice-status { font-size:14.5px; color:var(--text-dim, #9a9aa0); letter-spacing:.01em; }
 .voice-status b { color:var(--text, #fff); font-weight:600; }
 body.light-mode .voice-orb { box-shadow:0 10px 40px rgba(0,0,0,0.18), inset 0 2px 10px rgba(255,255,255,0.5); }
-body.light-mode .attach-chip { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.1); }
-body.light-mode .attach-name { color:#3a3a3c; }
+body.light-mode .attach-chip { background:#f4f4f5; border-color:#e4e4e7; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+body.light-mode .attach-name { color:#18181b; }
+body.light-mode .attach-remove { background:rgba(0,0,0,0.08); color:#71717a; }
+body.light-mode .attach-remove:hover { background:rgba(0,0,0,0.16); color:#000; }
 body.light-mode .collapse { color:#6a6a6f; --background:#f0f0f2; }
 body.light-mode .collapse:hover { background:#e6e6ea; }
 body.light-mode .subject-item .subject-name[contenteditable="true"] { background:rgba(0,0,0,0.05); }
@@ -2014,6 +2056,218 @@ body.light-mode .action-badge {
   background: #e6f9eb; color: #16a34a; border-color: #bbf7d0;
 }
 
+/* ===== Editorial Smart Visual Figures ===== */
+.sv-figure-wrap {
+  width: 100%;
+  max-width: 820px;
+  margin: 18px 0;
+  position: relative;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 20px 22px;
+  box-sizing: border-box;
+  color: #e4e4e7;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+}
+body.light-mode .sv-figure-wrap {
+  background: #ffffff;
+  border-color: #e4e4e7;
+  color: #18181b;
+}
+
+.sv-fig-title {
+  font-size: 15px;
+  font-weight: 650;
+  color: #f4f4f5;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+body.light-mode .sv-fig-title { color: #18181b; }
+
+.sv-fig-actions {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.sv-figure-wrap:hover .sv-fig-actions { opacity: 1; }
+.sv-fig-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 6px;
+  color: #a1a1aa;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+.sv-fig-btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+body.light-mode .sv-fig-btn { background: #f4f4f5; color: #71717a; }
+body.light-mode .sv-fig-btn:hover { background: #e4e4e7; color: #18181b; }
+
+.sv-fig-caption {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.45;
+}
+body.light-mode .sv-fig-caption { color: #6b7280; }
+
+.sv-fig-followup {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #e4e4e7;
+  line-height: 1.5;
+}
+body.light-mode .sv-fig-followup { color: #27272a; }
+
+/* 1. Mind Map Figure (SVG) */
+.sv-mm-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.sv-mm-node-center { fill: #27272a; stroke: #3f3f46; stroke-width: 1.5; }
+body.light-mode .sv-mm-node-center { fill: #f4f4f5; stroke: #d4d4d8; }
+.sv-mm-node-branch { fill: #18181b; stroke: rgba(255,255,255,0.12); stroke-width: 1; }
+body.light-mode .sv-mm-node-branch { fill: #ffffff; stroke: #e4e4e7; }
+.sv-mm-path { fill: none; stroke-width: 2; stroke-linecap: round; }
+
+/* 2. Flowchart Figure */
+.sv-fc-flow { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; max-width: 560px; margin: 0 auto; }
+.sv-fc-card {
+  width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; font-size: 13.5px; font-weight: 500; display: flex; align-items: center; gap: 12px;
+}
+body.light-mode .sv-fc-card { background: #f9f9fb; border-color: #e4e4e7; }
+.sv-fc-step-num { width: 22px; height: 22px; border-radius: 50%; background: #3f3f46; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+body.light-mode .sv-fc-step-num { background: #e4e4e7; color: #18181b; }
+.sv-fc-arrow-down { color: #71717a; font-size: 16px; font-weight: 700; line-height: 1; margin: -2px 0; }
+
+/* 3. Timeline Figure */
+.sv-tl-timeline { position: relative; padding-left: 20px; border-left: 2px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 16px; margin-left: 8px; }
+body.light-mode .sv-tl-timeline { border-left-color: #e4e4e7; }
+.sv-tl-item { position: relative; }
+.sv-tl-dot { position: absolute; left: -26px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: #a855f7; border: 2px solid #151516; }
+body.light-mode .sv-tl-dot { border-color: #fff; }
+.sv-tl-year { font-size: 11.5px; font-weight: 700; color: #a855f7; text-transform: uppercase; letter-spacing: 0.5px; }
+body.light-mode .sv-tl-year { color: #7e22ce; }
+.sv-tl-heading { font-size: 14px; font-weight: 600; color: #f4f4f5; margin-top: 1px; }
+body.light-mode .sv-tl-heading { color: #18181b; }
+.sv-tl-detail { font-size: 12.5px; color: #9ca3af; margin-top: 2px; line-height: 1.4; }
+body.light-mode .sv-tl-detail { color: #6b7280; }
+
+/* 4. Bar Chart Figure */
+.sv-bc-chart { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.sv-bc-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.sv-bc-label { width: 110px; text-align: right; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; color: #d4d4d8; }
+body.light-mode .sv-bc-label { color: #3f3f46; }
+.sv-bc-track { flex: 1; height: 18px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; position: relative; }
+body.light-mode .sv-bc-track { background: #f4f4f5; }
+.sv-bc-bar { height: 100%; background: #5b4e9c; border-radius: 4px; transition: width 0.4s ease; }
+body.light-mode .sv-bc-bar { background: #6366f1; }
+.sv-bc-val { width: 50px; font-weight: 600; font-size: 12.5px; color: #e4e4e7; flex-shrink: 0; }
+body.light-mode .sv-bc-val { color: #18181b; }
+.sv-bc-note { font-size: 12.5px; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; }
+
+/* 5. Line Chart Figure */
+.sv-lc-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.sv-lc-axis { stroke: rgba(255,255,255,0.15); stroke-width: 1; }
+body.light-mode .sv-lc-axis { stroke: #d4d4d8; }
+.sv-lc-grid { stroke: rgba(255,255,255,0.05); stroke-dasharray: 4 4; }
+body.light-mode .sv-lc-grid { stroke: #f4f4f5; }
+.sv-lc-path { fill: none; stroke: #6366f1; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.sv-lc-dot { fill: #6366f1; stroke: #151516; stroke-width: 2; cursor: pointer; transition: r 0.15s; }
+.sv-lc-dot:hover { r: 6; }
+body.light-mode .sv-lc-dot { stroke: #fff; }
+.sv-lc-text { fill: #a1a1aa; font-size: 11px; font-family: sans-serif; text-anchor: middle; }
+body.light-mode .sv-lc-text { fill: #71717a; }
+
+/* 6. Pie Chart Figure */
+.sv-pie-wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px; }
+.sv-pie-svg { width: 180px; height: 180px; transform: rotate(-90deg); overflow: visible; }
+.sv-pie-legend { display: flex; flex-direction: column; gap: 8px; }
+.sv-pie-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.sv-pie-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* 7. Venn Diagram Figure */
+.sv-venn-svg-wrap { width: 100%; max-width: 600px; margin: 0 auto; }
+.sv-venn-svg { width: 100%; height: auto; display: block; }
+.sv-venn-circle-a { fill: rgba(99, 102, 241, 0.12); stroke: #6366f1; stroke-width: 1.5; }
+.sv-venn-circle-b { fill: rgba(168, 85, 247, 0.12); stroke: #a855f7; stroke-width: 1.5; }
+body.light-mode .sv-venn-circle-a { fill: rgba(99, 102, 241, 0.08); }
+body.light-mode .sv-venn-circle-b { fill: rgba(168, 85, 247, 0.08); }
+.sv-venn-title { font-size: 13px; font-weight: 700; fill: #f4f4f5; text-anchor: middle; }
+body.light-mode .sv-venn-title { fill: #18181b; }
+.sv-venn-item { font-size: 11.5px; fill: #a1a1aa; text-anchor: middle; }
+body.light-mode .sv-venn-item { fill: #52525b; }
+
+/* 8. Interactive Plant Cell Diagram Figure */
+.sv-id-cell-wrap { position: relative; width: 100%; max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.sv-id-svg { width: 100%; height: auto; display: block; }
+.sv-id-hotspot { cursor: pointer; transition: opacity 0.15s; }
+.sv-id-hotspot:hover { opacity: 0.8; }
+.sv-id-tooltip { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; line-height: 1.45; }
+body.light-mode .sv-id-tooltip { background: #f4f4f5; border-color: #e4e4e7; color: #18181b; }
+
+/* 9. Generated Image Figure */
+.sv-img-frame { width: 100%; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.2); }
+.sv-img-element { width: 100%; height: auto; display: block; object-fit: contain; }
+.sv-img-skel { width: 100%; height: 240px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 10px; color: #a1a1aa; font-size: 13px; }
+body.light-mode .sv-img-skel { background: #f4f4f5; color: #71717a; }
+.sv-img-err { width: 100%; padding: 14px 18px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #fca5a5; font-size: 13px; display: flex; align-items: center; justify-content: space-between; }
+body.light-mode .sv-img-err { color: #dc2626; border-color: #fca5a5; background: #fef2f2; }
+.sv-img-retry-btn { background: #ef4444; color: #fff; border: none; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+/* Redesigned typebar style for both views */
+.input-shell { max-width:720px; margin:0 auto; width:100%; }
+.input-container {
+  background:#141414; border:1px solid rgba(255,255,255,0.08); border-radius:14px;
+  padding:16px 18px 12px; box-shadow:inset 0 0 0 1px rgba(0,0,0,0.6);
+  transition:border-color .15s;
+}
+.input-container:focus-within { border-color:rgba(255,255,255,0.18); }
+body.light-mode .input-container { background:#ffffff; border-color:#e5e7eb; box-shadow:0 4px 18px rgba(0,0,0,0.06); }
+body.light-mode .input-container:focus-within { border-color:#d1d5db; }
+body.light-mode .input-container .prompt-input { color:#111827; caret-color:#111827; }
+body.light-mode .input-container .rot-placeholder { color:#9ca3af; }
+body.light-mode .input-container .icon-btn,
+body.light-mode .hero-mic-btn,
+body.light-mode .waveform-btn { color:#6b7280; }
+body.light-mode .input-container .icon-btn:hover,
+body.light-mode .hero-mic-btn:hover,
+body.light-mode .waveform-btn:hover { color:#111827; background:rgba(0,0,0,0.04); }
+.input-container .prompt-input,
+.input-container .rot-placeholder { font-size:15.5px; line-height:1.5; }
+.input-container .prompt-input { color:#EAEAEA; caret-color:#fff; font-weight:600; }
+.input-container .rot-placeholder { color:#7A7675; font-weight:500; }
+.input-container .controls { margin-top:16px; display:flex; align-items:center; justify-content:space-between; padding:0; }
+.input-container .controls .left,
+.input-container .controls .right { display:flex; align-items:center; gap:8px; }
+.input-container .controls .left .icon-btn {
+  width:24px; height:24px; min-width:24px; padding:0; border-radius:4px;
+  background:transparent; border:none; color:#9A9A9A;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:color 0.15s;
+}
+.input-container .controls .left .icon-btn:hover { color:#ffffff; }
+.hero-mic-btn {
+  background:none; border:none; color:#9A9A9A; cursor:pointer; padding:4px;
+  display:flex; align-items:center; justify-content:center; transition:color 0.15s;
+}
+.hero-mic-btn:hover { color:#ffffff; }
+.input-container .waveform-btn {
+  width:28px; height:28px; border-radius:9999px; background:rgba(255,255,255,0.08); border:none;
+  display:flex; align-items:center; justify-content:center; color:#9A9A9A; cursor:pointer;
+  transition:background 0.15s, color 0.15s;
+}
+.input-container .waveform-btn:hover { background:rgba(255,255,255,0.18); color:#ffffff; }
+.input-container .waveform-btn .icon-arrow { stroke:currentColor; }
+
 /* ===== Redesigned profile menu (bottom-left) ===== */
 .pm-menu { width: 288px !important; padding: 8px !important; border-radius:18px !important; }
 .pm-header { display:flex; align-items:center; gap:12px; padding:8px 10px 10px; }
@@ -2380,84 +2634,108 @@ body.light-mode .aset-member .nm { color:#16151c; }
         <!-- ===== Study Assistant intro: artifact-matched typebar, pills, subjects ===== -->
         <style>
           /* Bring the title down closer to the chatbox (spacing only — font/size unchanged). */
-          .chat-app .chat-title { margin-bottom:18px; }
-          /* Typebar card */
-          .chat-app .input-shell { max-width:760px; margin:0 auto; }
-          .chat-app .input-shell .input-container {
-            background:#1E1E1C; border:2px solid #2C2C2A; border-radius:18px;
-            padding:14px 16px 10px; box-shadow:0 8px 32px rgba(0,0,0,0.5);
-            transition:border-color .15s;
+          .chat-title { margin-bottom:18px; }
+          .hero-main-title {
+            font-size: 30px;
+            font-weight: 500;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #EAEAEA;
+            margin: 0 0 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 720px;
+            font-family: 'Inter', sans-serif;
           }
-          .chat-app .input-shell .input-container:focus-within { border-color:#7A6EF0; }
-          .chat-app .input-container .prompt-input,
-          .chat-app .input-container .rot-placeholder { font-size:15px; line-height:22px; }
-          .chat-app .input-container .prompt-input { color:#E8E8E6; caret-color:#fff; }
-          .chat-app .input-container .rot-placeholder { color:#7A7A78; }
-          .chat-app .input-container .controls { margin-top:12px; display:flex; align-items:center; justify-content:space-between; }
-          .chat-app .input-container .controls .left,
-          .chat-app .input-container .controls .right { display:flex; align-items:center; gap:10px; }
-          /* round chip buttons (attach + mic) */
-          .chat-app .input-container .controls .left .icon-btn,
-          .chat-app .input-container .speak-pill {
-            width:32px; height:32px; min-width:32px; padding:0; border-radius:999px;
-            background:#272723; border:1px solid #2E2E2C; color:#8A8A86;
-            display:flex; align-items:center; justify-content:center; box-shadow:none;
+          .suggested-section {
+            width: 100%;
+            max-width: 720px;
+            margin-bottom: 28px;
           }
-          .chat-app .input-container .controls .left .icon-btn:hover,
-          .chat-app .input-container .speak-pill:hover { background:#2E2E2A; }
-          .chat-app .input-container .controls .left .icon-btn svg { width:16px; height:16px; }
-          .chat-app .input-container .speak-pill .speak-label,
-          .chat-app .input-container .speak-pill .speak-wave,
-          .chat-app .input-container .speak-pill .speak-stop { display:none !important; }
-          .chat-app .input-container .speak-pill .sa-mic { display:block; }
-          /* purple send */
-          .chat-app .input-container .waveform-btn {
-            width:36px; height:36px; border-radius:999px; background:#5B4E9C; border:none;
-            box-shadow:0 1px 0 0 rgba(255,255,255,0.12) inset;
+          .suggested-head {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #8C8C8E;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
           }
-          .chat-app .input-container .waveform-btn:hover { background:#6758AD; }
-          .chat-app .input-container .waveform-btn .icon-arrow { stroke:#fff; }
-
-          /* Pills row */
-          .chat-app .action-boxes { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin:16px auto 0; max-width:760px; }
-          .chat-app .action-boxes .sa-pill {
-            height:32px; padding:0 14px; border-radius:999px; background:#272723; border:1px solid #33312E;
-            display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:#E8E8E6;
-            font-family:'Inter',sans-serif; cursor:pointer; transition:background .15s;
+          .suggested-refresh {
+            background: none;
+            border: none;
+            color: #8C8C8E;
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            transition: color 0.15s;
           }
-          .chat-app .action-boxes .sa-pill:hover { background:#2E2E2A; }
-
-          /* Subjects */
-          .chat-app .hero-subjects { max-width:760px; margin-left:auto; margin-right:auto; }
-          .chat-app .hero-subjects-head-row { display:flex; align-items:center; justify-content:space-between; }
-          .chat-app .hero-subjects-head { font-size:22px; font-weight:700; letter-spacing:-0.02em; color:#fff; margin:0; }
-          .chat-app .sa-newsub { display:flex; align-items:center; gap:6px; background:none; border:none; color:#8A8A86; font-size:14px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; transition:color .15s; }
-          .chat-app .sa-newsub:hover { color:#A8A8A4; }
-          .chat-app .sa-newsub svg { width:14px; height:14px; }
-          .chat-app .hero-subjects-grid { display:flex; flex-direction:column; gap:14px; margin-top:16px; }
-          .chat-app .hsub-card {
+          .suggested-refresh:hover { color: #ffffff; }
+          .suggested-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          .suggested-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            padding: 8px 16px;
+            font-size: 13.5px;
+            font-weight: 400;
+            color: #E5E5E5;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+          }
+          .suggested-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+          }
+          .pill-badge {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+          }
+          /* Subjects (hidden on intro page until moved) */
+          .hero-subjects { display:none !important; }
+          .hero-subjects-head-row { display:flex; align-items:center; justify-content:space-between; }
+          .hero-subjects-head { font-size:22px; font-weight:700; letter-spacing:-0.02em; color:#fff; margin:0; }
+          .sa-newsub { display:flex; align-items:center; gap:6px; background:none; border:none; color:#8A8A86; font-size:14px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; transition:color .15s; }
+          .sa-newsub:hover { color:#A8A8A4; }
+          .sa-newsub svg { width:14px; height:14px; }
+          .hero-subjects-grid { display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+          .hsub-card {
             height:82px; min-height:82px; background:#1C1C19; border:1px solid #2A2A28; border-radius:16px; padding:0 20px;
             display:flex; flex-direction:row; align-items:center; justify-content:space-between; text-align:left;
             gap:12px; cursor:pointer; transition:border-color .15s;
           }
-          .chat-app .hsub-card:hover { border-color:#33312E; }
-          .chat-app .hsub-card.selected { border-color:#5B4E9C; }
-          .chat-app .hsub-card-left { display:flex; align-items:center; gap:14px; min-width:0; }
-          .chat-app .hsub-tile { width:48px; height:48px; border-radius:12px; background:#241E38; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-          .chat-app .hsub-tile svg { width:22px; height:22px; fill:#9D7EF2; stroke:none; }
-          .chat-app .hsub-meta { min-width:0; }
-          .chat-app .hsub-name { font-size:16px; font-weight:600; line-height:20px; color:#fff; letter-spacing:-0.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-          .chat-app .hsub-sub { margin-top:4px; font-size:13.5px; line-height:16px; color:#8C8C88; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-          .chat-app .hsub-right { display:flex; align-items:center; flex-shrink:0; margin-left:12px; }
+          .hsub-card:hover { border-color:#33312E; }
+          .hsub-card.selected { border-color:#5B4E9C; }
+          .hsub-card-left { display:flex; align-items:center; gap:14px; min-width:0; }
+          .hsub-tile { width:48px; height:48px; border-radius:12px; background:#241E38; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+          .hsub-tile svg { width:22px; height:22px; fill:#9D7EF2; stroke:none; }
+          .hsub-meta { min-width:0; }
+          .hsub-name { font-size:16px; font-weight:600; line-height:20px; color:#fff; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+          .hsub-sub { margin-top:4px; font-size:13.5px; line-height:16px; color:#8C8C88; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+          .hsub-right { display:flex; align-items:center; flex-shrink:0; margin-left:12px; }
           /* 3-dot options button lives inline on the right of every card (always visible). */
-          .chat-app .hsub-menu-btn { position:static; top:auto; right:auto; opacity:1; width:30px; height:30px; }
-          .chat-app .hsub-menu-btn svg { width:18px; height:18px; }
+          .hsub-menu-btn { position:static; top:auto; right:auto; opacity:1; width:30px; height:30px; }
+          .hsub-menu-btn svg { width:18px; height:18px; }
 
           /* Fix: keep the whole hero reachable when it's taller than the viewport.
              align-items:center clipped the top so you couldn't scroll back up;
              margin auto keeps it centered when short but top-reachable when tall. */
-          .main-inner { align-items:flex-start; padding-top:max(56px, calc(50vh - 320px)); padding-bottom:96px; }
-          .chat-app { margin-top:0; margin-bottom:0; }
+          .main-inner { align-items:flex-start; padding-top:max(56px, calc(50vh - 160px)); padding-bottom:96px; }
 
           /* Gradient orbit logo (same purple gradient masked by logo.png as the login page). */
           .grad-logo {
@@ -2471,12 +2749,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
           .chat-title .grad-logo.hero-pen { width:38px; height:38px; flex-shrink:0; }
           /* "Noura" wordmark in gradient + a small gradient logo snug to its right, pushed left */
           .brand-wrap { display:inline-flex; align-items:center; gap:6px; margin-right:auto; }
-          .brand-name {
-            background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
-            -webkit-background-clip:text; background-clip:text;
-            -webkit-text-fill-color:transparent; color:transparent;
-            margin-right:0;
-          }
+          /* Gradient removed to make Noura white */
           .brand-logo { width:20px; height:20px; flex-shrink:0; }
           .sidebar.collapsed .brand-logo { display:none; }
 
@@ -2492,21 +2765,28 @@ body.light-mode .aset-member .nm { color:#16151c; }
             font-display: swap;
           }
           /* Bolder hero title, in Countless */
-          .chat-app .chat-title, .chat-app .chat-title .title-necosmic { font-weight:800; }
-          .chat-app .chat-title .title-necosmic { font-family:'Countless', Inter, sans-serif; letter-spacing:0.5px; }
+          .chat-title, .title-necosmic { font-weight:800; }
+          .title-necosmic { font-family:'Countless', Inter, sans-serif; letter-spacing:0.5px; }
+          .title-grad {
+            background: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            color: transparent !important;
+          }
 
           /* Recents section removed from the sidebar. */
           #historySection { display:none !important; }
 
           /* "View all" toggle under the subjects list */
-          .chat-app .hsub-viewall {
+          .hsub-viewall {
             align-self:center; margin-top:2px; padding:8px 16px; border-radius:999px;
             background:#1C1C19; border:1px solid #2A2A28; color:#A8A8A4;
             font-size:13.5px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer;
             transition:background .15s, border-color .15s, color .15s;
           }
-          .chat-app .hsub-viewall:hover { background:#242420; border-color:#33312E; color:#E8E8E6; }
-          body.light-mode .chat-app .hsub-viewall { background:#fff; border-color:#e6e6e9; color:#6a6a6f; }
+          .hsub-viewall:hover { background:#242420; border-color:#33312E; color:#E8E8E6; }
+          body.light-mode .hsub-viewall { background:#fff; border-color:#e6e6e9; color:#6a6a6f; }
 
           /* Lesson flow: clarifying chips + Generate Lesson card */
           .lesson-chips { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
@@ -2530,61 +2810,75 @@ body.light-mode .aset-member .nm { color:#16151c; }
           body.light-mode .lesson-chip { background:#f0f0f2; border-color:#e2e2e6; color:#18181b; }
           body.light-mode .lesson-card { background:#fff; border-color:#e2e2e6; }
           body.light-mode .lesson-card-title { color:#18181b; }
-
-          /* Light-mode fallbacks */
-          body.light-mode .chat-app .input-shell .input-container { background:#fff; border-color:#e2e2e6; box-shadow:0 8px 32px rgba(0,0,0,0.08); }
-          body.light-mode .chat-app .input-container .prompt-input { color:#18181b; }
-          body.light-mode .chat-app .input-container .controls .left .icon-btn,
-          body.light-mode .chat-app .input-container .speak-pill { background:#f0f0f2; border-color:#e2e2e6; color:#6a6a6f; }
-          body.light-mode .chat-app .action-boxes .sa-pill { background:#f0f0f2; border-color:#e2e2e6; color:#27272a; }
-          body.light-mode .chat-app .hsub-card { background:#fff; border-color:#e6e6e9; }
-          body.light-mode .chat-app .hero-subjects-head,
-          body.light-mode .chat-app .hsub-name { color:#18181b; }
         </style>
         <div class="welcome-greeting" id="welcomeGreeting" hidden></div>
         <script>
           (function () {
             try {
               var n = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
-              var el = document.getElementById('welcomeGreeting');
-              if (n && el) { el.textContent = 'Welcome back, ' + n + '!'; el.hidden = false; }
+              var name = n ? (n.charAt(0).toUpperCase() + n.slice(1)) : 'Jayden';
+              var el = document.getElementById('heroTitleName');
+              if (el) { el.textContent = name; }
             } catch (e) { }
           })();
         </script>
-        <h1 class="chat-title">
-          <span class="hero-pen grad-logo" role="img" aria-label="Noura"></span>
-          <span class="title-necosmic" data-i18n="title">What are we studying today?</span>
+
+        <h1 class="hero-main-title" id="heroMainTitle">
+          <span id="heroTitleName">Jayden</span>, what are we <span class="title-grad">learning</span> today?
         </h1>
+
+        <div class="suggested-section">
+          <div class="suggested-head">
+            Suggested prompts
+            <button class="suggested-refresh" title="Refresh suggestions" type="button" onclick="refreshHeroSuggestions()">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            </button>
+          </div>
+          <div class="suggested-pills" id="suggestedPills">
+            <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
+              Quiz me on a topic to test my understanding
+            </button>
+            <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
+              Create a practice test with step-by-step solutions
+            </button>
+            <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
+              Explain a complex concept using simple analogies
+            </button>
+          </div>
+        </div>
 
         <div class="input-shell">
           <div class="input-container">
             <div class="attach-preview" id="heroAttach"></div>
             <div class="ai-text-row" id="heroTextRow">
-              <span class="rot-placeholder" id="rotPlaceholder">Type a question here or type '@' to reference documents...</span>
+              <span class="rot-placeholder" id="rotPlaceholder">Start chatting or describe a task...</span>
               <input id="prompt" class="prompt-input" type="text" placeholder="" data-i18n-placeholder="placeholder" autocomplete="off" spellcheck="false">
             </div>
 
             <div class="controls">
               <div class="left">
-                <button class="icon-btn" aria-label="Add attachment">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                <!-- Plus attachment -->
+                <button class="icon-btn" aria-label="Add attachment" title="Add attachment" onclick="document.getElementById('fileInput')?.click()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <path d="M12 5v14M5 12h14"/>
                   </svg>
                 </button>
-                <div class="subject-chip" hidden>
-                  <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                  <span class="subject-chip-name"></span>
-                  <svg class="subject-chip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                </div>
               </div>
 
               <div class="right">
-                <button class="waveform-btn is-typing" id="waveform" aria-label="Send">
-                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 19V5M5 12l7-7 7 7"/>
+                <!-- Chip removed -->
+                <!-- Mic -->
+                <button class="hero-mic-btn" aria-label="Voice input" title="Voice input">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" x2="12" y1="19" y2="22"/>
                   </svg>
-                  <svg class="icon-stop" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
+                </button>
+                <!-- Send -->
+                  <button class="waveform-btn" id="waveform" type="button" aria-label="Send">
+                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19V5M5 12l7-7 7 7"/>
                   </svg>
                 </button>
               </div>
@@ -2592,23 +2886,48 @@ body.light-mode .aset-member .nm { color:#16151c; }
           </div>
         </div>
 
-        <div class="action-boxes">
-          <button class="sa-pill" onclick="document.querySelector('.icon-btn[aria-label=\'Add attachment\']')?.click()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v4a3 3 0 0 0 3 3Z" fill="#FF8A5B"/>
-              <path d="M19 10v1a7 7 0 0 1-14 0v-1" stroke="#FF8A5B" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M12 19v3" stroke="#FF8A5B" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-            Record
-          </button>
-          <button class="sa-pill" onclick="window.openYtModal && window.openYtModal()">
-            <svg width="16" height="12" viewBox="0 0 24 16" fill="none">
-              <rect x="1" y="1" width="22" height="14" rx="3.5" fill="#FF6B5B"/>
-              <path d="M10 5.5L16 8L10 10.5V5.5Z" fill="white"/>
-            </svg>
-            YouTube
-          </button>
-        </div>
+        <script>
+          function pickHeroSuggestion(btn) {
+            const text = btn.innerText.trim();
+            const input = document.getElementById('prompt');
+            if (input) {
+              input.value = text;
+              input.focus();
+              const ph = document.getElementById('rotPlaceholder');
+              if (ph) ph.style.opacity = '0';
+              input.dispatchEvent(new Event('input'));
+            }
+          }
+          function refreshHeroSuggestions() {
+            const sets = [
+              [
+                'Quiz me on a topic to test my understanding',
+                'Create a practice test with step-by-step solutions',
+                'Explain a complex concept using simple analogies'
+              ],
+              [
+                'Create a structured study guide for my exam',
+                'Break down my topic into key revision points',
+                'Help me generate active recall practice questions'
+              ],
+              [
+                'Summarize my notes into clear bullet points',
+                'Explain why a problem solution works step by step',
+                'Build a personalized 5-day study plan'
+              ]
+            ];
+            window._sugIdx = ((window._sugIdx || 0) + 1) % sets.length;
+            const cur = sets[window._sugIdx];
+            const container = document.getElementById('suggestedPills');
+            if (container) {
+              container.innerHTML = cur.map(item => `
+                <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
+                  ${item}
+                </button>
+              `).join('');
+            }
+          }
+        </script>
 
         <div class="hero-subjects" id="heroSubjects" style="margin-top: 40px;">
           <div class="hero-subjects-head-row">
@@ -2627,7 +2946,6 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
 <!-- CHAT VIEW OVERLAY (hidden until send is pressed) -->
 <div class="app" id="chatApp" style="display:none; position:fixed; inset:0; z-index:100;">
-  <img class="chat-mascot" src="logo.png?v=3" alt="Noura logo">
   <aside class="sidebar" id="chatSidebar">
     <!-- Sidebar content injected by JS -->
   </aside>
@@ -2654,34 +2972,36 @@ body.light-mode .aset-member .nm { color:#16151c; }
             <div class="voice-orb" id="voiceOrb"></div>
             <div class="voice-status" id="voiceStatus">Connecting to student…</div>
           </div>
-          <div class="chat-input-shell border-beam">
-            <div class="attach-preview" id="chatAttach"></div>
-            <textarea id="chatInput" class="chat-input" placeholder="Ask away…" rows="1" autocomplete="off" spellcheck="false"></textarea>
-            <div class="chat-controls">
-              <div class="left">
-                <button class="icon-btn" aria-label="Add attachment">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                </button>
-                <button class="speak-pill" id="speakPill" type="button" aria-label="Speak">
-                  <span class="speak-label">Speak</span>
-                  <span class="speak-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-                  <span class="speak-stop" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg></span>
-                </button>
-                <div class="subject-chip" hidden>
-                  <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                  <span class="subject-chip-name"></span>
-                  <svg class="subject-chip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                </div>
+          <div class="input-shell">
+            <div class="input-container">
+              <div class="attach-preview" id="chatAttach"></div>
+              <div class="ai-text-row" id="chatTextRow" style="align-items:flex-start;">
+                <textarea id="chatInput" class="prompt-input" placeholder="Start chatting or describe a task..." rows="1" autocomplete="off" spellcheck="false" style="width:100%; resize:none; overflow:hidden; background:transparent; border:none; outline:none; font-family:'Inter', sans-serif;"></textarea>
               </div>
-              <div class="right">
-                <button class="chat-send-btn" id="chatSendBtn" disabled aria-label="Send">
-                  <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>
-                  </svg>
-                  <svg class="icon-stop" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
-                  </svg>
-                </button>
+
+              <div class="controls">
+                <div class="left">
+                  <button class="icon-btn" aria-label="Add attachment" title="Add attachment" onclick="document.getElementById('fileInput')?.click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                </div>
+                <div class="right">
+                  <button class="hero-mic-btn" id="speakPill" aria-label="Speak" title="Voice input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                      <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                      <line x1="12" x2="12" y1="19" y2="22"/>
+                    </svg>
+                  </button>
+                  <button class="waveform-btn chat-send-btn" id="chatSendBtn" disabled aria-label="Send">
+                    <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 19V5M5 12l7-7 7 7"/>
+                    </svg>
+                    <svg class="icon-stop" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+                      <rect x="7" y="7" width="10" height="10" rx="2" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2765,24 +3085,42 @@ body.light-mode .aset-member .nm { color:#16151c; }
     newChatNav.classList.add('active');
   });
 
-  // Send on Enter — triggers chat transition
   function sendMessage() {
-    const text = input.value.trim();
+    const text = input ? input.value.trim() : '';
     const att = pendingAttachment;
     if (!text && !att) return;
-    input.value = '';
+    if (input) input.value = '';
     pendingAttachment = null; renderAttachPreview();
     launchChat(text || 'Here is my homework — quiz me on it.', att);
   }
 
-  input.addEventListener('keydown', function(e) {
+  function updateHeroSendState() {
+    if (!input || !waveform) return;
+    const hasContent = !!(input.value.trim() || pendingAttachment);
+    if (hasContent) {
+      waveform.classList.add('is-typing');
+      waveform.removeAttribute('disabled');
+    } else {
+      waveform.classList.remove('is-typing');
+      waveform.setAttribute('disabled', 'disabled');
+    }
+  }
+
+  input?.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
 
-  waveform?.addEventListener('click', sendMessage);
+  input?.addEventListener('input', updateHeroSendState);
+  input?.addEventListener('keyup', updateHeroSendState);
+  input?.addEventListener('change', updateHeroSendState);
+
+  waveform?.addEventListener('click', (e) => {
+    e.preventDefault();
+    sendMessage();
+  });
 
   // ===== CHAT INTERFACE =====
   const chatApp = document.getElementById('chatApp');
@@ -3374,6 +3712,558 @@ body.light-mode .aset-member .nm { color:#16151c; }
       const thinkingIcon = aiMsgDiv.querySelector('.thinking-icon');
       const answerContent = aiMsgDiv.querySelector('.answer-content');
 
+      // ===== SEPARATE FIGURE RENDERERS =====
+
+      // 1. MindMapFigure: Genuine SVG Mind Map
+      function renderMindMapFigure(visual, wrap) {
+        const title = visual.title || 'Mind Map';
+        const data = visual.data || {};
+        const centerText = data.center || title;
+        const branches = data.branches || [];
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const colors = ['#6366f1', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+        const numBranches = Math.max(1, branches.length);
+        const svgWidth = 760;
+        const svgHeight = Math.max(280, 180 + numBranches * 30);
+        const centerX = svgWidth / 2;
+        const centerY = svgHeight / 2;
+
+        let pathsHtml = '';
+        let nodesHtml = '';
+
+        // Center Node
+        nodesHtml += `
+          <g class="sv-mm-node">
+            <rect x="${centerX - 70}" y="${centerY - 22}" width="140" height="44" rx="22" class="sv-mm-node-center" />
+            <text x="${centerX}" y="${centerY + 5}" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">${escapeHtml(centerText)}</text>
+          </g>
+        `;
+
+        branches.forEach((b, idx) => {
+          const angle = ((2 * Math.PI) / numBranches) * idx - Math.PI / 2;
+          const dist = 220;
+          const bx = centerX + Math.cos(angle) * dist;
+          const by = centerY + Math.sin(angle) * (dist * 0.55);
+
+          const color = colors[idx % colors.length];
+          const bLabel = typeof b === 'string' ? b : (b.label || '');
+          const children = (b && b.children) ? b.children : [];
+
+          // Curved connection line
+          const ctrlX = centerX + Math.cos(angle) * (dist * 0.5);
+          const ctrlY = centerY + Math.sin(angle) * (dist * 0.25);
+          pathsHtml += `<path d="M ${centerX} ${centerY} Q ${ctrlX} ${ctrlY} ${bx} ${by}" class="sv-mm-path" stroke="${color}" opacity="0.8" />`;
+
+          // Branch Node
+          nodesHtml += `
+            <g class="sv-mm-node">
+              <rect x="${bx - 65}" y="${by - 18}" width="130" height="36" rx="8" class="sv-mm-node-branch" stroke="${color}" />
+              <text x="${bx}" y="${by + 5}" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">${escapeHtml(bLabel)}</text>
+            </g>
+          `;
+
+          // Child nodes if present
+          children.forEach((c, cIdx) => {
+            const childAngle = angle + (cIdx - (children.length - 1) / 2) * 0.25;
+            const cDist = 90;
+            const cx = bx + Math.cos(childAngle) * cDist;
+            const cy = by + Math.sin(childAngle) * (cDist * 0.6);
+            const cText = typeof c === 'string' ? c : (c.label || '');
+
+            pathsHtml += `<path d="M ${bx} ${by} L ${cx} ${cy}" stroke="${color}" stroke-dasharray="3 3" opacity="0.5" />`;
+            nodesHtml += `
+              <g class="sv-mm-node">
+                <rect x="${cx - 45}" y="${cy - 12}" width="90" height="24" rx="5" fill="rgba(255,255,255,0.06)" stroke="${color}" stroke-width="0.8" />
+                <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="10.5" font-weight="500" fill="currentColor">${escapeHtml(cText)}</text>
+              </g>
+            `;
+          });
+        });
+
+        const svgHtml = `
+          <svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="sv-mm-svg">
+            ${pathsHtml}
+            ${nodesHtml}
+          </svg>
+        `;
+
+        const container = document.createElement('div');
+        container.innerHTML = svgHtml;
+        wrap.appendChild(container);
+      }
+
+      // 2. FlowchartFigure: Genuine Flowchart with Arrows
+      function renderFlowchartFigure(visual, wrap) {
+        const title = visual.title || 'Flowchart';
+        const data = visual.data || {};
+        const steps = data.steps || [];
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const flow = document.createElement('div');
+        flow.className = 'sv-fc-flow';
+
+        steps.forEach((s, idx) => {
+          const stepText = typeof s === 'string' ? s : (s.title || s.label || '');
+          const isStart = idx === 0;
+          const isEnd = idx === steps.length - 1;
+
+          const card = document.createElement('div');
+          card.className = 'sv-fc-card';
+          if (isStart || isEnd) card.style.borderColor = '#6366f1';
+          card.innerHTML = `
+            <span class="sv-fc-step-num">${idx + 1}</span>
+            <span>${escapeHtml(stepText)}</span>
+          `;
+          flow.appendChild(card);
+
+          if (idx < steps.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'sv-fc-arrow-down';
+            arrow.textContent = '↓';
+            flow.appendChild(arrow);
+          }
+        });
+
+        wrap.appendChild(flow);
+      }
+
+      // 3. TimelineFigure: Dated Timeline
+      function renderTimelineFigure(visual, wrap) {
+        const title = visual.title || 'Timeline';
+        const data = visual.data || {};
+        const events = data.events || [];
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const timeline = document.createElement('div');
+        timeline.className = 'sv-tl-timeline';
+
+        events.forEach(e => {
+          const item = document.createElement('div');
+          item.className = 'sv-tl-item';
+          const yearText = e.date || e.year || '';
+          const titleText = typeof e === 'string' ? e : (e.title || '');
+          const detailText = e.description || e.desc || '';
+
+          item.innerHTML = `
+            <div class="sv-tl-dot"></div>
+            ${yearText ? `<div class="sv-tl-year">${escapeHtml(yearText)}</div>` : ''}
+            <div class="sv-tl-heading">${escapeHtml(titleText)}</div>
+            ${detailText ? `<div class="sv-tl-detail">${escapeHtml(detailText)}</div>` : ''}
+          `;
+          timeline.appendChild(item);
+        });
+
+        wrap.appendChild(timeline);
+      }
+
+      // 4. BarChartFigure: Proportional Bar Chart
+      function renderBarChartFigure(visual, wrap) {
+        const title = visual.title || 'Bar Chart';
+        const data = visual.data || {};
+        const cats = data.categories || [];
+        const vals = data.values || [];
+        const maxVal = Math.max(...vals, 1);
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        if (data.note) {
+          const noteDiv = document.createElement('div');
+          noteDiv.className = 'sv-bc-note';
+          noteDiv.textContent = data.note;
+          wrap.appendChild(noteDiv);
+        }
+
+        const chart = document.createElement('div');
+        chart.className = 'sv-bc-chart';
+
+        cats.forEach((cat, idx) => {
+          const val = vals[idx] || 0;
+          const pct = Math.round((val / maxVal) * 100);
+
+          const row = document.createElement('div');
+          row.className = 'sv-bc-row';
+          row.innerHTML = `
+            <div class="sv-bc-label">${escapeHtml(cat)}</div>
+            <div class="sv-bc-track">
+              <div class="sv-bc-bar" style="width: ${pct}%;"></div>
+            </div>
+            <div class="sv-bc-val">${val}</div>
+          `;
+          chart.appendChild(row);
+        });
+
+        wrap.appendChild(chart);
+      }
+
+      // 5. LineChartFigure: SVG Line Chart with Grid & Axes
+      function renderLineChartFigure(visual, wrap) {
+        const title = visual.title || 'Line Chart';
+        const data = visual.data || {};
+        const xVals = data.x_values || [];
+        const yVals = data.y_values || [];
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const width = 760;
+        const height = 240;
+        const padX = 50;
+        const padY = 30;
+
+        const maxY = Math.max(...yVals, 1);
+        const minY = Math.min(...yVals, 0);
+        const rangeY = (maxY - minY) || 1;
+
+        const pts = yVals.map((val, idx) => {
+          const x = padX + (idx / Math.max(1, yVals.length - 1)) * (width - 2 * padX);
+          const y = height - padY - ((val - minY) / rangeY) * (height - 2 * padY);
+          return { x, y, val, label: xVals[idx] || '' };
+        });
+
+        const pointsAttr = pts.map(p => `${p.x},${p.y}`).join(' ');
+
+        // Gridlines
+        let gridHtml = '';
+        for (let i = 0; i <= 4; i++) {
+          const gy = padY + (i / 4) * (height - 2 * padY);
+          gridHtml += `<line x1="${padX}" y1="${gy}" x2="${width - padX}" y2="${gy}" class="sv-lc-grid" />`;
+        }
+
+        // Points and X Labels
+        let dotsHtml = '';
+        pts.forEach(p => {
+          dotsHtml += `
+            <circle cx="${p.x}" cy="${p.y}" r="4" class="sv-lc-dot">
+              <title>${p.label}: ${p.val}</title>
+            </circle>
+            <text x="${p.x}" y="${height - 10}" class="sv-lc-text">${escapeHtml(p.label)}</text>
+          `;
+        });
+
+        const svgHtml = `
+          <svg viewBox="0 0 ${width} ${height}" class="sv-lc-svg">
+            ${gridHtml}
+            <line x1="${padX}" y1="${height - padY}" x2="${width - padX}" y2="${height - padY}" class="sv-lc-axis" />
+            <line x1="${padX}" y1="${padY}" x2="${padX}" y2="${height - padY}" class="sv-lc-axis" />
+            <polyline points="${pointsAttr}" class="sv-lc-path" />
+            ${dotsHtml}
+          </svg>
+        `;
+
+        const container = document.createElement('div');
+        container.innerHTML = svgHtml;
+        wrap.appendChild(container);
+      }
+
+      // 6. PieChartFigure: Genuine Circular SVG Pie/Donut Chart
+      function renderPieChartFigure(visual, wrap) {
+        const data = visual.data || {};
+
+        // CRITICAL CHECK: If pie chart is requested for non-whole data (e.g. GDP comparisons across separate countries), convert to Bar Chart!
+        const isDiscreteCompare = (visual.title || '').toLowerCase().includes('gdp') || (data.categories && data.categories.some(c => c.toLowerCase().includes('malaysia') || c.toLowerCase().includes('singapore')));
+        if (isDiscreteCompare) {
+          visual.data.note = "A bar chart is clearer because these GDP values compare separate economies rather than portions of one fixed whole.";
+          renderBarChartFigure(visual, wrap);
+          return;
+        }
+
+        const title = visual.title || 'Pie Chart';
+        const cats = data.categories || [];
+        const pcts = data.percentages || data.values || [];
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const colors = ['#6366f1', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+        const total = pcts.reduce((a, b) => a + Number(b), 0) || 1;
+
+        let accumulatedAngle = 0;
+        let legendHtml = '';
+        let svgPaths = '';
+
+        cats.forEach((cat, idx) => {
+          const val = Number(pcts[idx]) || 0;
+          const sliceAngle = (val / total) * 360;
+          const color = colors[idx % colors.length];
+
+          const startAngle = accumulatedAngle;
+          const endAngle = accumulatedAngle + sliceAngle;
+          accumulatedAngle = endAngle;
+
+          // SVG Arc calculation
+          const rad1 = (startAngle * Math.PI) / 180;
+          const rad2 = (endAngle * Math.PI) / 180;
+          const x1 = 90 + 70 * Math.cos(rad1);
+          const y1 = 90 + 70 * Math.sin(rad1);
+          const x2 = 90 + 70 * Math.cos(rad2);
+          const y2 = 90 + 70 * Math.sin(rad2);
+          const largeArc = sliceAngle > 180 ? 1 : 0;
+
+          svgPaths += `<path d="M 90 90 L ${x1} ${y1} A 70 70 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${color}" stroke="#151516" stroke-width="1.5" />`;
+
+          legendHtml += `
+            <div class="sv-pie-item">
+              <div class="sv-pie-swatch" style="background:${color};"></div>
+              <span>${escapeHtml(cat)}: <strong>${Math.round((val / total) * 100)}%</strong></span>
+            </div>
+          `;
+        });
+
+        const pieWrap = document.createElement('div');
+        pieWrap.className = 'sv-pie-wrap';
+        pieWrap.innerHTML = `
+          <svg viewBox="0 0 180 180" class="sv-pie-svg">${svgPaths}</svg>
+          <div class="sv-pie-legend">${legendHtml}</div>
+        `;
+        wrap.appendChild(pieWrap);
+      }
+
+      // 7. VennDiagramFigure: Genuine Overlapping Circles
+      function renderVennDiagramFigure(visual, wrap) {
+        const title = visual.title || 'Venn Diagram';
+        const data = visual.data || {};
+        const conceptA = data.concept_a || 'Concept A';
+        const conceptB = data.concept_b || 'Concept B';
+        const uniqueA = data.unique_a || [];
+        const uniqueB = data.unique_b || [];
+        const overlap = data.overlap || [];
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const svgWrap = document.createElement('div');
+        svgWrap.className = 'sv-venn-svg-wrap';
+
+        const listA = uniqueA.map((u, i) => `<tspan x="180" dy="${i === 0 ? 0 : 16}">${escapeHtml(u)}</tspan>`).join('');
+        const listOverlap = overlap.map((o, i) => `<tspan x="300" dy="${i === 0 ? 0 : 16}">${escapeHtml(o)}</tspan>`).join('');
+        const listB = uniqueB.map((u, i) => `<tspan x="420" dy="${i === 0 ? 0 : 16}">${escapeHtml(u)}</tspan>`).join('');
+
+        svgWrap.innerHTML = `
+          <svg viewBox="0 0 600 240" class="sv-venn-svg">
+            <circle cx="230" cy="120" r="110" class="sv-venn-circle-a" />
+            <circle cx="370" cy="120" r="110" class="sv-venn-circle-b" />
+            
+            <text x="180" y="55" class="sv-venn-title">${escapeHtml(conceptA)}</text>
+            <text x="420" y="55" class="sv-venn-title">${escapeHtml(conceptB)}</text>
+            
+            <text x="180" y="95" class="sv-venn-item">${listA}</text>
+            <text x="300" y="95" class="sv-venn-item">${listOverlap}</text>
+            <text x="420" y="95" class="sv-venn-item">${listB}</text>
+          </svg>
+        `;
+        wrap.appendChild(svgWrap);
+      }
+
+      // 8. InteractiveDiagramFigure: Genuine SVG Plant Cell Schematic
+      function renderInteractiveDiagramFigure(visual, wrap) {
+        const title = visual.title || 'Plant Cell Structure';
+        const data = visual.data || {};
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const cellWrap = document.createElement('div');
+        cellWrap.className = 'sv-id-cell-wrap';
+
+        const partsData = {
+          'Cell Wall': 'Rigid outer layer that provides structural support and protection to the plant cell.',
+          'Cell Membrane': 'Controls the movement of substances into and out of the cell.',
+          'Nucleus': 'Contains genetic material (DNA) and controls all cell activities.',
+          'Chloroplasts': 'Contains chlorophyll to absorb sunlight for photosynthesis.',
+          'Mitochondria': 'Produces ATP energy through cellular respiration.',
+          'Vacuole': 'Stores water, nutrients, and waste, maintaining turgor pressure.'
+        };
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'sv-id-tooltip';
+        tooltip.innerHTML = '👉 <strong>Interactive Diagram:</strong> Click any cell component to view its function.';
+
+        const svgHtml = `
+          <svg viewBox="0 0 600 320" class="sv-id-svg">
+            <!-- Cell Wall -->
+            <rect x="50" y="30" width="500" height="260" rx="40" fill="rgba(16, 185, 129, 0.08)" stroke="#10b981" stroke-width="4" class="sv-id-hotspot" data-part="Cell Wall" />
+            
+            <!-- Cell Membrane -->
+            <rect x="65" y="45" width="470" height="230" rx="30" fill="rgba(16, 185, 129, 0.04)" stroke="#059669" stroke-width="2" stroke-dasharray="4 2" class="sv-id-hotspot" data-part="Cell Membrane" />
+            
+            <!-- Large Central Vacuole -->
+            <ellipse cx="380" cy="165" rx="110" ry="75" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="2" class="sv-id-hotspot" data-part="Vacuole" />
+            <text x="380" y="170" text-anchor="middle" font-size="12" font-weight="600" fill="#60a5fa">Vacuole</text>
+            
+            <!-- Nucleus -->
+            <circle cx="180" cy="140" r="45" fill="rgba(168, 85, 247, 0.25)" stroke="#a855f7" stroke-width="2.5" class="sv-id-hotspot" data-part="Nucleus" />
+            <circle cx="180" cy="140" r="18" fill="#a855f7" />
+            <text x="180" y="198" text-anchor="middle" font-size="12" font-weight="600" fill="#c084fc">Nucleus</text>
+            
+            <!-- Chloroplasts -->
+            <g class="sv-id-hotspot" data-part="Chloroplasts">
+              <ellipse cx="140" cy="235" rx="28" ry="16" fill="#10b981" />
+              <ellipse cx="260" cy="75" rx="28" ry="16" fill="#10b981" />
+              <text x="140" y="240" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">Chloroplast</text>
+            </g>
+
+            <!-- Mitochondria -->
+            <g class="sv-id-hotspot" data-part="Mitochondria">
+              <ellipse cx="240" cy="225" rx="24" ry="14" fill="#f59e0b" />
+              <text x="240" y="229" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">Mito</text>
+            </g>
+          </svg>
+        `;
+
+        const svgDiv = document.createElement('div');
+        svgDiv.innerHTML = svgHtml;
+        cellWrap.appendChild(svgDiv);
+        cellWrap.appendChild(tooltip);
+
+        svgDiv.querySelectorAll('.sv-id-hotspot').forEach(el => {
+          el.addEventListener('click', () => {
+            const part = el.dataset.part;
+            const desc = partsData[part] || 'Cell component';
+            tooltip.innerHTML = `📌 <strong>${escapeHtml(part)}:</strong> ${escapeHtml(desc)}`;
+          });
+        });
+
+        wrap.appendChild(cellWrap);
+      }
+
+      // 9. GeneratedImageFigure: Server-Side FLUX.2 Klein 4B Integration
+      function renderGeneratedImageFigure(visual, wrap) {
+        const title = visual.title || 'Illustration';
+        const imagePrompt = visual.image_prompt || title;
+
+        const figTitle = document.createElement('div');
+        figTitle.className = 'sv-fig-title';
+        figTitle.textContent = title;
+        wrap.appendChild(figTitle);
+
+        const imgFrame = document.createElement('div');
+        imgFrame.className = 'sv-img-frame';
+
+        function loadFLUXImage() {
+          imgFrame.innerHTML = `
+            <div class="sv-img-skel">
+              <div class="loading-dot" style="display:inline-block;"></div>
+              <span>Generating visual with FLUX.2 Klein 4B...</span>
+            </div>
+          `;
+
+          fetch('/api/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: imagePrompt, model: visual.model || 'FLUX.2 Klein 4B' })
+          })
+          .then(res => res.json())
+          .then(resData => {
+            if (resData && resData.image_url) {
+              imgFrame.innerHTML = `<img src="${resData.image_url}" alt="${escapeHtml(title)}" class="sv-img-element" />`;
+              scrollToBottom();
+            } else {
+              showErrorState();
+            }
+          })
+          .catch(() => showErrorState());
+        }
+
+        function showErrorState() {
+          imgFrame.innerHTML = `
+            <div class="sv-img-err">
+              <span>Visual could not be generated. Try again.</span>
+              <button type="button" class="sv-img-retry-btn">Retry</button>
+            </div>
+          `;
+          imgFrame.querySelector('.sv-img-retry-btn')?.addEventListener('click', loadFLUXImage);
+          scrollToBottom();
+        }
+
+        loadFLUXImage();
+        wrap.appendChild(imgFrame);
+      }
+
+      // ===== InlineVisual Controller =====
+      function renderInlineVisual(visual) {
+        if (!visual || typeof visual !== 'object') return null;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'sv-figure-wrap';
+
+        // Hover action buttons (Expand / Download)
+        const actions = document.createElement('div');
+        actions.className = 'sv-fig-actions';
+        actions.innerHTML = `
+          <button class="sv-fig-btn" title="Expand visual">⤢ Expand</button>
+          <button class="sv-fig-btn" title="Download visual">↓ Save</button>
+        `;
+        wrap.appendChild(actions);
+
+        const type = visual.visual_type || 'Visual';
+        const renderMethod = visual.render_method || '';
+
+        // Select distinct renderer per visual type
+        if (type === 'Mind Map') {
+          renderMindMapFigure(visual, wrap);
+        } else if (type === 'Flowchart') {
+          renderFlowchartFigure(visual, wrap);
+        } else if (type === 'Timeline') {
+          renderTimelineFigure(visual, wrap);
+        } else if (type === 'Bar Chart') {
+          renderBarChartFigure(visual, wrap);
+        } else if (type === 'Line Chart') {
+          renderLineChartFigure(visual, wrap);
+        } else if (type === 'Pie Chart') {
+          renderPieChartFigure(visual, wrap);
+        } else if (type === 'Venn Diagram') {
+          renderVennDiagramFigure(visual, wrap);
+        } else if (type === 'Interactive Diagram') {
+          renderInteractiveDiagramFigure(visual, wrap);
+        } else if (type === 'Decorative Image' || renderMethod === 'text_to_image') {
+          renderGeneratedImageFigure(visual, wrap);
+        } else {
+          renderBarChartFigure(visual, wrap);
+        }
+
+        // Caption (1 sentence max)
+        if (visual.caption) {
+          const cap = document.createElement('div');
+          cap.className = 'sv-fig-caption';
+          cap.textContent = visual.caption;
+          wrap.appendChild(cap);
+        }
+
+        // Follow-up question (normal text)
+        if (visual.follow_up) {
+          const fu = document.createElement('div');
+          fu.className = 'sv-fig-followup';
+          fu.textContent = visual.follow_up;
+          wrap.appendChild(fu);
+        }
+
+        return wrap;
+      }
+
       // Build the final formatted HTML (always pre-render, never type raw markdown)
       function buildFormattedHTML(text) {
         let toolJson = null;
@@ -3428,17 +4318,47 @@ body.light-mode .aset-member .nm { color:#16151c; }
       }
 
       function renderFinalAnswer() {
-        const result = buildFormattedHTML(finalText);
+        // Parse JSON response shape if present
+        let parsedObj = null;
+        let answerText = finalText;
+        let visualObj = null;
+
+        try {
+          const rawCleaned = finalText.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
+          const p = JSON.parse(rawCleaned);
+          if (p && typeof p.answer === 'string') {
+            parsedObj = p;
+            answerText = p.answer;
+            if (p.include_visual && p.visual && typeof p.visual === 'object') {
+              visualObj = p.visual;
+            }
+          }
+        } catch (e) {
+          // Check if JSON object is embedded inside standard text
+          const m = finalText.match(/\{[\s\S]*"include_visual"[\s\S]*\}/);
+          if (m) {
+            try {
+              const p = JSON.parse(m[0]);
+              if (p && typeof p.answer === 'string') {
+                parsedObj = p;
+                answerText = p.answer;
+                if (p.include_visual && p.visual) visualObj = p.visual;
+              }
+            } catch (e2) {}
+          }
+        }
+
+        const result = buildFormattedHTML(answerText);
         if (result.type === 'tool') {
           answerContent.innerHTML = '';
           renderToolCardInline(result.json, answerContent);
           renderLessonExtras(aiMsgDiv, lessonChips, lessonTitle, newSubjectName);
         } else {
-          // Chunked HTML typing animation
+          // Chunked HTML typing animation for answer text
           answerContent.innerHTML = '';
-          const fullText = finalText;
+          const fullText = answerText;
           let i = 0;
-          const chunkSize = Math.max(1, Math.floor(fullText.length / 40)); // Type progressively based on length
+          const chunkSize = Math.max(1, Math.floor(fullText.length / 40));
           
           function typeHTML() {
             if (i < fullText.length) {
@@ -3461,7 +4381,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
               scrollToBottom();
               requestAnimationFrame(() => setTimeout(typeHTML, 15));
             } else {
-              // Finalize without cursor
+              // Finalize text without cursor
               answerContent.innerHTML = result.html;
               if (window.renderMathInElement) {
                 renderMathInElement(answerContent, {
@@ -3474,95 +4394,43 @@ body.light-mode .aset-member .nm { color:#16151c; }
               }
               scrollToBottom();
 
-              // Trigger diagrams now that typing is done
+              // Render Smart Visual Figure if provided
+              if (visualObj) {
+                const visCard = renderInlineVisual(visualObj);
+                if (visCard) {
+                  answerContent.appendChild(visCard);
+                  scrollToBottom();
+                }
+              }
+
+              // Legacy diagram trigger
               triggerDiagrams();
 
               // Lesson flow: clarifying chips / Generate Lesson card
               renderLessonExtras(aiMsgDiv, lessonChips, lessonTitle, newSubjectName);
 
               // Voice mode: speak the student's reply aloud
-              if (window.__axVoice && window.__axVoice.active) window.__axVoice.speakReply(finalText);
+              if (window.__axVoice && window.__axVoice.active) window.__axVoice.speakReply(answerText);
             }
           }
 
           typeHTML();
 
           function triggerDiagrams() {
-
-          // ── Diagram Generation ──────────────────────────────
           const diagPrompt = result.diagPrompt;
-          console.log('[Noura] diagPrompt:', diagPrompt);
           if (diagPrompt) {
             let diagData = null;
             try {
               const jsonStr = diagPrompt.replace(/^```json\s*/,'').replace(/```\s*$/,'').trim();
               diagData = JSON.parse(jsonStr);
-            } catch(e) {
-              console.warn('[Noura] diagPrompt not valid JSON, skipping diagram render');
-            }
-
+            } catch(e) {}
             if (diagData && diagData.parts && diagData.parts.length > 0) {
               const wrap = document.createElement('div');
               wrap.className = 'edu-diagram-wrap';
-              const uniqId = 'diag-' + Date.now();
-
-              const partNames = diagData.parts.map(p => p.name).join(', ');
-              const illPrompt = `Highly detailed flat 2D educational textbook diagram of "${diagData.title}", cross-section view. The diagram must include clear black lines pointing to the structures, with exactly these text labels: ${partNames}. White background, simple clean pastel colors, scientifically accurate.`;
-              
-              const seed = Math.floor(Math.random() * 1000000);
-              const illustrationUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(illPrompt)}?width=800&height=600&nologo=true&seed=${seed}&model=flux`;
-
-              wrap.innerHTML = `
-                <div style="padding: 24px; text-align: center; background: #EEF4FF; border-radius: 12px; margin-bottom: 12px; border: 1px dashed #A5B4FC;">
-                  <div class="loading-dot" style="display:inline-block;margin-right:8px;"></div>
-                  <span style="color: #4F63D2; font-weight: 500;">Generating labelled diagram...</span>
-                </div>
-              `;
-
-              function openLightbox(url) {
-                let lb = document.getElementById('diag-lightbox');
-                if (lb) lb.remove();
-                lb = document.createElement('div');
-                lb.id = 'diag-lightbox';
-                lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:32px;';
-                lb.innerHTML = `
-                  <div style="position:relative;max-width:940px;width:100%;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,0.8);">
-                    <button id="diag-lb-close" style="position:absolute;top:10px;right:12px;background:rgba(0,0,0,0.1);border:none;color:#333;font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;">&times;</button>
-                    <img src="${url}" style="width:100%;height:auto;display:block;" />
-                  </div>
-                `;
-                document.body.appendChild(lb);
-                document.getElementById('diag-lb-close').onclick = (e) => { e.stopPropagation(); lb.remove(); };
-                lb.onclick = (e) => { if (e.target === lb) lb.remove(); };
-              }
-
-              const illImg = new Image();
-              illImg.onload = () => {
-                wrap.innerHTML = `
-                  <div class="edu-diagram-thumb" style="cursor:pointer;border-radius:14px;overflow:hidden;border:1px solid #E5E7EB;background:#fff;margin-bottom:12px;">
-                    <img src="${illustrationUrl}" style="width:100%;height:auto;display:block;" />
-                  </div>
-                `;
-                wrap.querySelector('.edu-diagram-thumb').onclick = () => openLightbox(illustrationUrl);
-                scrollToBottom();
-              };
-              illImg.onerror = () => {
-                wrap.innerHTML = `
-                  <div style="padding: 24px; text-align: center; background: #FEF2F2; border-radius: 12px; margin-bottom: 12px; border: 1px dashed #FCA5A5;">
-                    <span style="color: #DC2626; font-weight: 500;">Failed to generate diagram.</span>
-                  </div>
-                `;
-                scrollToBottom();
-              };
-              illImg.src = illustrationUrl;
-
-              const allHeaders = Array.from(answerContent.querySelectorAll('h1, h2, h3, h4'));
-              const visualHeader = allHeaders.find(el => el.textContent.toLowerCase().includes('visual'));
-              if (visualHeader) {
-                visualHeader.parentNode.insertBefore(wrap, visualHeader.nextSibling);
-              } else {
-                answerContent.appendChild(wrap);
-              }
+              const illPrompt = `Educational diagram of "${diagData.title}".`;
+              const illustrationUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(illPrompt)}?width=800&height=600&nologo=true&model=flux`;
+              wrap.innerHTML = `<div style="padding:16px;text-align:center;background:rgba(168,85,247,0.08);border-radius:12px;"><img src="${illustrationUrl}" style="width:100%;border-radius:8px;" /></div>`;
+              answerContent.appendChild(wrap);
               scrollToBottom();
             }
           }
@@ -3652,7 +4520,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
   chatInput?.addEventListener('input', () => {
     chatInput.style.height = 'auto';
     chatInput.style.height = Math.min(chatInput.scrollHeight, 160) + 'px';
-    chatSendBtn.disabled = !chatInput.value.trim() && !pendingAttachment;
+    if (chatSendBtn) {
+      chatSendBtn.disabled = !chatInput.value.trim() && !pendingAttachment;
+      if (chatSendBtn.disabled) {
+        chatSendBtn.classList.remove('is-typing');
+      } else {
+        chatSendBtn.classList.add('is-typing');
+      }
+    }
   });
 
   // Chat send
@@ -3780,15 +4655,25 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
   function afterAttach() {
     renderAttachPreview();
-    if (chatSendBtn) chatSendBtn.disabled = !chatInput.value.trim() && !pendingAttachment;
+    if (chatSendBtn) {
+      chatSendBtn.disabled = !chatInput.value.trim() && !pendingAttachment;
+      if (chatSendBtn.disabled) {
+        chatSendBtn.classList.remove('is-typing');
+      } else {
+        chatSendBtn.classList.add('is-typing');
+      }
+    }
   }
 
   function attachChipHtml(a) {
-    const thumb = a.kind === 'image'
-      ? `<img src="${a.dataUrl}" alt="">`
-      : `<span class="attach-fileicon">📄</span>`;
+    if (a.kind === 'image') {
+      return `<div class="attach-img-thumb-wrap">
+        <img src="${a.dataUrl}" alt="" class="attach-img-thumb">
+        <button class="attach-remove attach-img-remove" type="button" aria-label="Remove image">&times;</button>
+      </div>`;
+    }
     const name = a.source === 'paste' ? '<strong>Your pasted text</strong>' : escapeHtml(a.name);
-    return `<div class="attach-chip">${thumb}<span class="attach-name">${name}</span>` +
+    return `<div class="attach-chip"><span class="attach-fileicon">📄</span><span class="attach-name">${name}</span>` +
            `<button class="attach-remove" type="button" aria-label="Remove attachment">&times;</button></div>`;
   }
 
@@ -4054,7 +4939,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     search: "Search", new_chat: "New Chat",
     projects: "Subjects", new_project: "New Subject", history: "History", settings: "Settings",
     upgrade_plan: "Upgrade plan", appearance: "Appearance", dark: "Dark", light: "Light", system: "System",
-    language: "Language", help: "Help", sign_out: "Sign out", title: "What are we studying today?",
+    language: "Language", help: "Help", sign_out: "Sign out", title: "What are we learning today?",
     placeholder: "What should we work on next?"
   };
   const translations = {

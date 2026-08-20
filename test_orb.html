@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="module">
+  import React from 'https://esm.sh/react@18';
+  import { createRoot } from 'https://esm.sh/react-dom@18/client';
+  import { ThinkingOrb } from 'https://esm.sh/thinking-orbs';
+
+  const container = document.getElementById('orb');
+  const root = createRoot(container);
+  root.render(React.createElement(ThinkingOrb, { state: 'solving', size: 64, theme: 'dark' }));
+</script>
+</head>
+<body style="background: black;">
+  <div id="orb" style="filter: hue-rotate(260deg) saturate(3) brightness(1.5);"></div>
+</body>
+</html>
