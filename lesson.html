@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Noura — Lesson</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
@@ -14,8 +14,8 @@
   :root { --grad: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%); --purple:#8b5cf6; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { height:100%; }
-  body { background:#0A0A0B; color:#E8E8E6; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
-  button { font-family:'Inter',sans-serif; }
+  body { background:#0A0A0B; color:#E8E8E6; font-family:'Plus Jakarta Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
+  button { font-family:'Plus Jakarta Sans','Inter',sans-serif; }
 
   .grad-logo { display:inline-block; background:var(--grad); -webkit-mask:url('logo.png?v=3') center/contain no-repeat; mask:url('logo.png?v=3') center/contain no-repeat; }
   .grad-text { background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
@@ -40,7 +40,7 @@
   .rail-item.soon { opacity:.55; }
   .rail-item.locked { opacity:.38; cursor:not-allowed; position:relative; }
   .rail-item.locked:hover { background:transparent; color:#8a8a93; }
-  .rail-item .rail-lock { position:absolute; top:17px; left:calc(50% + 1px); width:11px; height:11px; stroke:#9a9aa2; fill:#0c0c0e; stroke-width:2.4; display:none; }
+  .rail-item .rail-lock { position:absolute; top:17px; left:calc(50% + 1px); width:11px; height:11px; stroke:#a855f7; fill:#0c0c0e; stroke-width:2.4; display:none; }
   .rail-item.locked .rail-lock { display:block; }
   .rail-item .rail-lock rect { fill:#0c0c0e; }
 
@@ -54,9 +54,26 @@
   @keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.06);opacity:.85;} }
   .load-kicker { font-size:13px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#b79df5; margin-bottom:18px; }
   .load-title { font-size:clamp(30px,4.6vw,46px); font-weight:800; letter-spacing:-.02em; line-height:1.15; color:#fff; max-width:760px; }
-  .load-progress { width:min(420px,74vw); height:6px; margin-top:30px; border-radius:99px; background:#1c1c20; overflow:hidden; }
-  .load-progress i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .4s ease; }
-  .load-status { margin-top:16px; font-size:15px; color:#8a8a93; }
+  .load-progress {
+    width:min(420px,74vw); height:10px; margin-top:0; border-radius:999px; background:#1c1c20; overflow:hidden;
+    box-shadow:inset 0 2px 3px rgba(0,0,0,0.45), inset 0 -1px 2px rgba(255,255,255,0.05);
+  }
+  .load-progress i {
+    display:block; position:relative; overflow:hidden; height:100%; width:0%; border-radius:999px;
+    background:linear-gradient(90deg,#7c3aed 0%,#9d7bf5 35%,#c4b5fd 55%,#9d7bf5 78%,#7c3aed 100%);
+    box-shadow:0 0 18px rgba(139,92,246,0.55), 0 0 32px rgba(196,181,253,0.35),
+               inset 0 1.5px 0 rgba(255,255,255,0.45), inset 0 -2px 3px rgba(60,20,120,0.35);
+  }
+  /* Bright sheen gliding along the filled part */
+  .load-progress i::after {
+    content:''; position:absolute; top:0; bottom:0; left:0; width:50%; border-radius:999px;
+    background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    mix-blend-mode:screen; animation:fluxSheen 1.6s linear infinite;
+  }
+  /* Animated thinking orb rendered on a canvas, centred above the bar */
+  @keyframes fluxSheen { from { transform:translateX(-110%); } to { transform:translateX(210%); } }
+  @media (prefers-reduced-motion: reduce) { .load-progress i::after { animation:none; opacity:0; } }
+  .load-status { margin-top:0; font-size:22px; letter-spacing:-.01em; color:#8a8a93; }
   .load-pct { margin-left:8px; color:#c9b6ef; font-weight:600; }
   .load-status .dots::after { content:''; animation:dots 1.4s steps(4,end) infinite; }
   @keyframes dots { 0%{content:'';} 25%{content:'.';} 50%{content:'..';} 75%{content:'...';} }
@@ -67,6 +84,15 @@
   /* ── Overview (contents) view ── */
   .overview { display:none; max-width:880px; margin:0 auto; padding:56px 28px 40px; }
   .ov-hero { display:flex; align-items:center; gap:34px; margin-bottom:40px; }
+  /* Study Brief now leads with the logo hero, so its head aligns to the top and
+     the hero owns the bottom spacing. */
+  .br-head.hero-head { align-items:center; justify-content:center; margin-bottom:0; }
+  /* flex:0 1 auto so a short title hugs the logo and the pair sits centred,
+     rather than the hero stretching to fill the row. */
+  .br-head.hero-head .ov-hero { margin-bottom:26px; justify-content:center; flex:0 1 auto; }
+  .br-head.hero-head .br-regen { margin-top:6px; }
+  /* Learn now leads with the small purple kicker instead of the hero. */
+  .ov-head { margin-bottom:34px; }
   .ov-logo { width:150px; height:150px; flex-shrink:0; position:relative; }
   .ov-logo .grad-logo { width:100%; height:100%; }
   .ov-title { font-size:clamp(30px,4vw,44px); font-weight:800; letter-spacing:-.02em; line-height:1.15; color:#fff; }
@@ -80,20 +106,20 @@
   .contents-head h2 { font-size:26px; font-weight:800; letter-spacing:-.02em; color:#fff; }
   .contents-head .prog { font-size:14px; color:#9a9aa2; }
   .timeline { position:relative; }
-  .timeline::before { content:''; position:absolute; left:25px; top:14px; bottom:14px; width:2px; background:#232327; }
+  .timeline::before { content:''; position:absolute; left:25px; top:var(--tl-top, 14px); height:var(--tl-track, 0px); width:2px; background:#232327; }
   /* Neon progress line that grows through the completed steps */
   .timeline::after {
-    content:''; position:absolute; left:25px; top:14px; width:2px; border-radius:2px;
+    content:''; position:absolute; left:25px; top:var(--tl-top, 14px); width:2px; border-radius:2px;
     height:var(--tl-fill, 0px);
     background:linear-gradient(180deg,#c4b5fd 0%,#a78bfa 45%,#7c3aed 100%);
     box-shadow:0 0 8px rgba(139,92,246,0.75), 0 0 18px rgba(139,92,246,0.35);
     transition:height .45s ease;
   }
   .tl-dot, .tl-card { position:relative; z-index:1; }
-  .tl-row.done .tl-dot { box-shadow:0 0 10px rgba(139,92,246,0.55); }
+  .tl-row.done .tl-dot { box-shadow:none; }
   .tl-row { position:relative; display:flex; align-items:center; gap:20px; padding:15px 0; }
   .tl-dot { position:relative; z-index:1; width:52px; height:52px; flex-shrink:0; border-radius:50%; background:#141416; border:2px solid #2a2a2e; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#9a9aa2; }
-  .tl-row.current .tl-dot { border-color:#8b5cf6; background:#221a38; color:#fff; box-shadow:0 0 0 4px rgba(139,92,246,0.18); }
+  .tl-row.current .tl-dot { border-color:#8b5cf6; background:#221a38; color:#fff; }
   .tl-row.done .tl-dot { background:#8b5cf6; border-color:#8b5cf6; color:#fff; }
   .tl-dot svg { width:20px; height:20px; }
   .tl-title { font-size:17px; font-weight:600; color:#e8e8e6; }
@@ -114,6 +140,20 @@
 
   /* ── Study Brief ── */
   .brief { display:none; max-width:880px; margin:0 auto; padding:48px 28px 40px; }
+  /* ── Study Brief document layout (mirrors the note page) ──── */
+  .br-doc { max-width:760px; font-size:16px; line-height:1.75; color:#D4D4D4; letter-spacing:-.003em; }
+  .br-doc .br-sub { color:#6B6B6B; font-size:14px; letter-spacing:-.01em; margin:-14px 0 30px; }
+  .br-doc h2 { font-size:24px; font-weight:700; color:#fff; letter-spacing:-.015em; margin:34px 0 10px; line-height:1.3; }
+  .br-doc p { margin:0 0 10px; }
+  .br-doc ul { list-style:none; margin:0 0 12px; padding:0; }
+  .br-doc li { position:relative; padding-left:26px; margin:0 0 7px; }
+  .br-doc li::before { content:''; position:absolute; left:9px; top:11px; width:5px; height:5px; border-radius:50%; background:#8b5cf6; }
+  .br-doc b, .br-doc strong { color:#fff; font-weight:600; }
+  .br-doc .br-callout {
+    display:flex; gap:12px; padding:16px 18px; margin:0 0 8px; border-radius:10px;
+    background:rgba(139,92,246,0.10); border:1px solid rgba(139,92,246,0.24); color:#e7e2f7;
+  }
+  .br-doc .br-callout .ico { flex-shrink:0; font-size:17px; line-height:1.5; }
   .br-head { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:26px; }
   .br-kicker { font-size:11.5px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#b79df5; margin-bottom:8px; }
   .br-title { font-size:clamp(24px,3.2vw,34px); font-weight:800; letter-spacing:-.02em; line-height:1.2; color:#fff; }
@@ -152,10 +192,50 @@
   .flow-btn { width:100%; padding:15px; border:none; border-radius:14px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:0 8px 22px rgba(123,92,250,0.28); transition:filter .15s; }
   .flow-btn:hover { filter:brightness(1.07); }
 
+  /* Animated shimmer for loading labels — a highlight sweeps across the text. */
+  .shimmer-text {
+    display:inline-block; white-space:pre;
+    /* Tiled so the gradient always covers every letter — the text stays put and
+       only the bright band travels across it. */
+    background-image:linear-gradient(90deg,#6e6e78 0%,#6e6e78 42%,#ffffff 50%,#6e6e78 58%,#6e6e78 100%);
+    background-size:200% 100%;
+    background-repeat:repeat-x;
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent; -webkit-text-fill-color:transparent;
+    animation:textShimmer 2.4s linear infinite;
+  }
+  @keyframes textShimmer {
+    from { background-position:200% center; }
+    to   { background-position:0% center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer-text { animation:none; color:#a1a1aa; -webkit-text-fill-color:#a1a1aa; }
+  }
+
+  /* Loading screens show only the status text and the progress bar. */
+  .loadwrap .load-logo, .loadwrap .load-kicker, .loadwrap .load-title,
+  .tab-load .grad-logo { display:none !important; }
+  .loadwrap .load-status { order:1; margin:0 0 20px; }
+  .loadwrap .load-progress { order:2; }
+  /* While loading, pin the block to the content area so text + bar sit dead
+     centre of the page regardless of each tab's own padding. */
+  .is-loading .tab-load, .loadwrap {
+    position:fixed; top:58px; left:86px; right:0; bottom:0;
+    /* bottom padding offsets the 58px top bar, so the block reads as centred
+       on the page rather than 29px low within the content area */
+    min-height:0; padding:0 20px 58px; margin:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  @media (max-width:720px) { .is-loading .tab-load, .loadwrap { left:0; } }
+  .tab-load .load-progress { margin-top:0; }
+  .is-loading .br-head { display:none !important; }
+  .tab-load .tab-load-txt { order:1; margin:0 0 20px; }
+  .tab-load .load-progress { order:2; }
+
   /* Shared loading block for the side tabs (same bar as the Learn tab) */
   .tab-load { display:flex; flex-direction:column; align-items:center; padding:64px 20px; }
   .tab-load .grad-logo { width:46px; height:46px; animation:pulse 2.6s ease-in-out infinite; }
-  .tab-load-txt { margin-top:20px; font-size:15px; color:#8a8a93; }
+  .tab-load-txt { margin-top:0; font-size:22px; letter-spacing:-.01em; color:#8a8a93; }
   .tab-load .load-progress { margin-top:18px; }
 
   /* ── Recall (active recall practice) ── */
@@ -173,7 +253,7 @@
   .rc-type { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#c9b6ef; background:rgba(139,92,246,0.14); border:1px solid rgba(139,92,246,0.30); padding:5px 11px; border-radius:999px; margin-bottom:16px; }
   .rc-prompt { font-size:20px; font-weight:700; line-height:1.4; color:#fff; letter-spacing:-.01em; margin-bottom:18px; }
   .rc-label { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#8a8a93; margin-bottom:8px; }
-  .rc-input { width:100%; min-height:96px; resize:vertical; background:#0f0f10; border:1px solid #2a2a2e; border-radius:12px; padding:13px 15px; color:#e8e8e6; font-size:15px; line-height:1.55; font-family:'Inter',sans-serif; outline:none; }
+  .rc-input { width:100%; min-height:96px; resize:vertical; background:#0f0f10; border:1px solid #2a2a2e; border-radius:12px; padding:13px 15px; color:#e8e8e6; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif; outline:none; }
   .rc-input:focus { border-color:#7c3aed; }
   .rc-input::placeholder { color:#6a6a72; }
   .rc-reveal { margin-top:16px; width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.26); }
@@ -203,8 +283,82 @@
   .rc-restart { margin-top:22px; padding:12px 28px; border:1px solid #2e2e34; border-radius:12px; background:transparent; color:#c7c7cc; font-size:14.5px; font-weight:600; cursor:pointer; }
   .rc-restart:hover { background:#1c1c20; color:#fff; }
 
-  /* ── StudyCast (audio-style recap) ── */
+  /* ── Audio Recap (audio-style recap) ── */
   .studycast { display:none; max-width:780px; margin:0 auto; padding:48px 28px 40px; }
+  /* ── Audio Recap player (podcast-style) ────────────────────── */
+  /* The recap title already appears inside the player card, so the page-level
+     kicker and heading are redundant here — keep only the Regenerate action. */
+  #castView .br-kicker, #castView .br-title { display:none; }
+  #castView .br-head { margin-bottom:0; justify-content:flex-end; }
+  #castView { padding-top:24px; }
+  #castView .pc-card { margin-top:12px; }
+  .pc-wrap { max-width:760px; margin:0 auto; padding-bottom:120px; }
+  .pc-card { margin-top:14px; border:1px solid #252525; background:#171717; border-radius:20px; padding:20px; }
+  .pc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .pc-title { font-size:17px; font-weight:600; line-height:22px; letter-spacing:-.2px; color:#fff; }
+  .pc-time { margin-top:4px; font-size:14px; line-height:20px; color:#8A8A8A; font-variant-numeric:tabular-nums; }
+  .pc-seek { position:relative; margin-top:18px; height:16px; cursor:pointer; touch-action:manipulation; }
+  .pc-seek-bg { position:absolute; top:50%; height:4px; width:100%; transform:translateY(-50%); border-radius:99px; background:#2A2A2A; }
+  .pc-seek-fill { position:absolute; top:50%; height:4px; transform:translateY(-50%); border-radius:99px; background:#fff; width:0%; }
+  .pc-knob { position:absolute; top:50%; height:12px; width:12px; transform:translateY(-50%); border-radius:50%; background:#fff; box-shadow:0 0 0 3px #171717; left:-6px; }
+  .pc-ctrls { margin-top:20px; height:48px; display:flex; align-items:center; justify-content:space-between; }
+  .pc-left { display:flex; align-items:center; gap:16px; }
+  .pc-play { height:48px; width:48px; border:none; border-radius:50%;
+    background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    box-shadow:0 6px 18px rgba(124,58,237,0.34); transition:transform .15s, filter .15s; }
+  .pc-play:hover { filter:brightness(1.08); }
+  .pc-play:active { transform:scale(.97); }
+  .pc-play[disabled] { opacity:.55; pointer-events:none; }
+  .pc-play svg { width:14px; height:14px; fill:currentColor; }
+  .pc-right { display:flex; align-items:center; gap:18px; }
+  .pc-speed { display:inline-flex; height:40px; align-items:center; gap:5px; padding:0 14px; border-radius:99px;
+    background:#1E1E1E; border:1px solid #252525; color:#8A8A8A; cursor:pointer;
+    font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:14px; font-weight:600; letter-spacing:-.1px;
+    transition:color .15s, border-color .15s; }
+  .pc-speed:hover { color:#E0E0E0; border-color:#2F2F2F; }
+  .pc-speed svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-pill { margin-top:14px; display:inline-flex; height:28px; align-items:center; gap:6px; border-radius:99px; border:1px solid #252525; background:#1E1E1E; padding:0 12px; }
+  .pc-pill svg { width:14px; height:14px; fill:none; stroke:#8A8A8A; stroke-width:1.3; stroke-linecap:round; }
+  .pc-pill span { font-size:13px; font-weight:600; line-height:1; letter-spacing:-.1px; color:#E0E0E0; }
+  .pc-bar { margin-top:28px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .pc-toggle { display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; }
+  .pc-toggle svg { width:16px; height:16px; fill:none; stroke:#8A8A8A; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-toggle span { font-size:15px; font-weight:600; letter-spacing:-.2px; color:#fff; }
+  .pc-chip { display:inline-flex; height:36px; align-items:center; gap:6px; border-radius:99px; border:1px solid #252525; background:#1E1E1E; padding:0 14px; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:13.5px; font-weight:600; letter-spacing:-.1px; color:#fff; cursor:pointer; }
+  .pc-chip.on { border-color:rgba(139,92,246,0.55); background:rgba(139,92,246,0.16); color:#e6ddff;
+    box-shadow:0 0 0 3px rgba(139,92,246,0.14), 0 0 16px rgba(139,92,246,0.35); }
+  .pc-chip.on svg { stroke:#c9b6ef; }
+  .pc-chip svg { width:12px; height:12px; fill:none; stroke:#B0B0B0; stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-tr { margin-top:32px; }
+  .pc-seg { margin-top:36px; padding:0 20px; transition:opacity .25s ease; }
+  .pc-seg:first-child { margin-top:0; }
+  .pc-seg-head { display:flex; align-items:center; gap:6px; }
+  /* Same vibrant violet as the loading bar, not the muted lavender. */
+  .pc-seg-name { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:#a78bfa; opacity:.78; transition:opacity .2s ease; }
+  .pc-seg.past .pc-seg-name { opacity:.9; }
+  .pc-seg.live .pc-seg-name { opacity:1; }
+  .pc-seg-at { font-size:13px; font-weight:500; letter-spacing:-.1px; color:#5A5A5A; font-variant-numeric:tabular-nums; }
+  .pc-seg-text { margin-top:12px; font-size:18px; font-weight:400; line-height:29px; letter-spacing:-.15px; color:#5A5A5A; }
+  .pc-seg.past .pc-seg-text { color:#8A8A8A; }
+  /* The segment currently being spoken lifts into a card, like the reference. */
+  .pc-seg.live { margin-top:32px; padding:18px 20px; border-radius:20px; background:#1E1E1E; }
+  .pc-seg.live .pc-seg-at { color:#6E6E6E; }
+  .pc-seg.live .pc-seg-text { font-size:19px; font-weight:500; line-height:30px; letter-spacing:-.2px; color:#fff; }
+  .pc-ask-wrap { position:fixed; bottom:0; left:86px; right:0; z-index:20; background:#0d0d0f; }
+  @media (max-width:720px) { .pc-ask-wrap { left:0; } }
+  .pc-ask-inner { max-width:760px; margin:0 auto; padding:8px 20px 18px; }
+  .pc-ask { display:flex; height:56px; align-items:center; justify-content:space-between; border-radius:99px; border:1px solid #2A2A2A; background:#1B1B1B; padding-left:20px; padding-right:6px; transition:border-color .15s; }
+  .pc-ask:focus-within { border-color:#3A3A3A; }
+  .pc-ask input { height:100%; flex:1; min-width:0; background:transparent; border:none; outline:none; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:16px; letter-spacing:-.1px; color:#fff; }
+  .pc-ask input::placeholder { color:#6E6E6E; }
+  .pc-ask-btn { display:inline-flex; height:40px; flex-shrink:0; align-items:center; gap:6px; border:none; border-radius:99px; background:#fff; color:#121212; padding:0 16px; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:14px; font-weight:600; letter-spacing:-.1px; transition:transform .15s; }
+  .pc-ask-btn:active { transform:scale(.98); }
+  .pc-ask-btn[disabled] { opacity:.5; pointer-events:none; }
+  .pc-ask-btn svg { width:16px; height:16px; fill:none; stroke:#121212; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-answer { margin-top:16px; padding:16px 20px; border-radius:16px; background:#1E1E1E; border:1px solid #252525; font-size:15.5px; line-height:1.65; color:#d6d6d4; }
+  .pc-note { margin-top:14px; font-size:13.5px; line-height:1.5; color:#f0b3ae; background:rgba(248,81,73,0.07); border:1px solid rgba(248,81,73,0.28); border-radius:11px; padding:11px 13px; }
   .sc-player { background:linear-gradient(150deg, rgba(139,92,246,0.16) 0%, #161618 62%); border:1px solid rgba(139,92,246,0.34); border-radius:18px; padding:20px 22px; }
   .sc-player-top { display:flex; align-items:center; gap:16px; }
   .sc-play { width:54px; height:54px; flex-shrink:0; border:none; border-radius:50%; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 8px 20px rgba(123,92,250,0.32); }
@@ -237,7 +391,7 @@
   .sc-cta-line { font-size:16px; font-weight:700; color:#fff; }
   /* Collapsible Main recap */
   .sc-card.drop { padding:0; }
-  .sc-drop-head { width:100%; display:flex; align-items:center; gap:9px; padding:18px 20px; background:transparent; border:none; cursor:pointer; text-align:left; font-family:'Inter',sans-serif; }
+  .sc-drop-head { width:100%; display:flex; align-items:center; gap:9px; padding:18px 20px; background:transparent; border:none; cursor:pointer; text-align:left; font-family:'Plus Jakarta Sans','Inter',sans-serif; }
   .sc-drop-head .sc-ct { margin-bottom:0; }
   .sc-drop-sub { margin-left:auto; display:flex; align-items:center; gap:11px; font-size:13px; color:#8a8a93; flex-shrink:0; }
   .sc-chev { width:17px; height:17px; stroke:#8a8a93; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; transition:transform .2s ease; }
@@ -267,7 +421,7 @@
   .cp-opt.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
   .cp-opt.wrong .num { border-color:#f85149; color:#f85149; }
   .cp-opt.locked { pointer-events:none; }
-  .cp-input { width:100%; min-height:92px; resize:vertical; background:#0f0f10; border:1px solid #2a2a2e; border-radius:12px; padding:13px 15px; color:#e8e8e6; font-size:15px; line-height:1.55; font-family:'Inter',sans-serif; outline:none; }
+  .cp-input { width:100%; min-height:92px; resize:vertical; background:#0f0f10; border:1px solid #2a2a2e; border-radius:12px; padding:13px 15px; color:#e8e8e6; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif; outline:none; }
   .cp-input:focus { border-color:#7c3aed; }
   .cp-input::placeholder { color:#6a6a72; }
   .cp-input[readonly] { opacity:.75; }
@@ -345,6 +499,48 @@
   .pl-next:hover { filter:brightness(1.07); }
 
   /* Checkpoint quiz */
+  /* ── Quiz / Checkpoint layout (raised-key option cards) ────── */
+  .qz-opt, .cp-opt {
+    display:flex; align-items:center; gap:12px; text-align:left; width:100%;
+    background:#1c1c1c; border:1px solid #2e2e2e;
+    border-radius:18px; padding:14px 18px; color:#d0d0d0;
+    font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em; cursor:pointer;
+    box-shadow:none;
+    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .qz-opts, .cp-opts { gap:10px; }
+  .qz-opt:hover, .cp-opt:hover { border-color:#3a3a3a; }
+  /* Letter marker replaces the boxed number */
+  .qz-opt .num, .cp-opt .num {
+    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
+    display:inline-flex; align-items:center; justify-content:flex-start;
+    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
+  }
+  /* Selected: purple glow behind the card instead of a drop shadow. */
+  .qz-opt.sel, .cp-opt.sel {
+    background:#1f1a2b; border-color:rgba(139,92,246,0.62);
+    box-shadow:0 0 0 3px rgba(139,92,246,0.16), 0 0 22px rgba(139,92,246,0.42);
+  }
+  .qz-opt.sel .num, .cp-opt.sel .num { color:#c9b6ef; }
+  .qz-opt.correct, .cp-opt.correct {
+    background:#1c1c1c; border:2px solid #2ec06a;
+    box-shadow:0 0 0 3px rgba(46,192,106,0.13), 0 0 20px rgba(46,192,106,0.30);
+  }
+  .qz-opt.correct .num, .cp-opt.correct .num { color:#2ec06a; }
+  .qz-opt.wrong, .cp-opt.wrong {
+    background:#1c1c1c; border:2px solid #ef4444;
+    box-shadow:0 0 0 3px rgba(239,68,68,0.12), 0 0 20px rgba(239,68,68,0.28);
+  }
+  .qz-opt.wrong .num, .cp-opt.wrong .num { color:#ef4444; }
+  /* Question + progress, matching the reference proportions */
+  .qz-q, .cp-q {
+    font-size:17px; font-weight:400; line-height:1.6; letter-spacing:-.01em;
+    color:#e8e8e8; margin-bottom:22px;
+  }
+  .cp-bar { height:8px; background:#242424; margin-bottom:26px; }
+  .cp-bar i { background:#2ec06a; }
+  .cp-count, .cp-score { font-size:14px; font-weight:600; color:#7a7a7a; font-variant-numeric:tabular-nums; }
+  .cp-card { background:transparent; border:none; padding:0; }
   .qz-q { font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-.015em; line-height:1.3; color:#fff; margin-bottom:30px; }
   .qz-opts { display:flex; flex-direction:column; gap:14px; }
   .qz-opt { display:flex; align-items:center; gap:16px; text-align:left; padding:20px 22px; background:#161618; border:1.5px solid #2a2a2e; border-radius:16px; color:#e4e4e5; font-size:16.5px; line-height:1.45; cursor:pointer; transition:border-color .12s, background .12s; }
@@ -357,28 +553,34 @@
   .qz-opt.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
   .qz-opt.wrong .num { border-color:#f85149; color:#f85149; }
   .qz-opt.disabled { pointer-events:none; }
-  /* Question-type badge + non-MC answer controls (same visual language) */
-  .qz-type { display:inline-flex; align-items:center; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#c9b6ef; background:rgba(139,92,246,0.14); border:1px solid rgba(139,92,246,0.30); padding:5px 11px; border-radius:999px; margin-bottom:16px; }
-  .qz-opts.tf { flex-direction:row; gap:12px; }
-  .qz-opts.tf .qz-opt { flex:1; justify-content:center; }
-  .qz-input { width:100%; min-height:104px; resize:vertical; background:#0f0f10; border:1.5px solid #2a2a2e; border-radius:14px; padding:14px 16px; color:#e8e8e6; font-size:16px; line-height:1.6; font-family:'Inter',sans-serif; outline:none; }
-  .qz-input:focus { border-color:#7c3aed; }
-  .qz-input::placeholder { color:#6a6a72; }
-  .qz-input[readonly] { opacity:.75; }
-  .qz-order { display:flex; flex-direction:column; gap:10px; }
-  .qz-order-row { display:flex; align-items:center; gap:14px; padding:14px 16px; background:#161618; border:1.5px solid #2a2a2e; border-radius:14px; font-size:16px; line-height:1.45; color:#e4e4e5; }
-  .qz-order-row .pos { width:28px; height:28px; flex-shrink:0; border-radius:8px; border:1.5px solid #3a3a40; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#9a9aa2; }
-  .qz-order-row .txt { flex:1; min-width:0; }
-  .qz-order-row .moves { display:flex; flex-direction:column; gap:3px; flex-shrink:0; }
-  .qz-order-row .mv { width:26px; height:19px; border:1px solid #2e2e34; border-radius:6px; background:transparent; color:#9a9aa2; font-size:9px; line-height:1; cursor:pointer; }
-  .qz-order-row .mv:hover { background:#26262c; color:#fff; }
-  .qz-order-row .mv[disabled] { opacity:.3; pointer-events:none; }
-  .qz-order-row.locked .mv { display:none; }
-  .qz-order-row.correct { border-color:#3fb950; background:rgba(63,185,80,0.10); }
-  .qz-order-row.correct .pos { border-color:#3fb950; color:#3fb950; }
-  .qz-order-row.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
-  .qz-order-row.wrong .pos { border-color:#f85149; color:#f85149; }
-  .qz-ideal { margin-top:11px; padding-top:11px; border-top:1px solid rgba(255,255,255,0.10); color:#cfc6ea; }
+  /* Same raised-key treatment as the Checkpoint tab. Declared after the
+     original .qz-* rules so it actually wins the cascade. */
+  .qz-opt {
+    gap:12px; padding:14px 18px; background:#1c1c1c;
+    border:1px solid #2e2e2e; border-radius:18px;
+    color:#d0d0d0; font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em;
+    box-shadow:none;
+    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .qz-opts { gap:10px; }
+  .qz-opt:hover { border-color:#3a3a3a; }
+  .qz-opt .num {
+    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
+    display:inline-flex; align-items:center; justify-content:flex-start;
+    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
+  }
+  .qz-opt.sel {
+    background:#1f1a2b; border-color:rgba(139,92,246,0.62);
+    box-shadow:0 0 0 3px rgba(139,92,246,0.16), 0 0 22px rgba(139,92,246,0.42);
+  }
+  .qz-opt.sel .num { color:#c9b6ef; }
+  .qz-opt.correct { background:#1c1c1c; border:2px solid #2ec06a;
+    box-shadow:0 0 0 3px rgba(46,192,106,0.13), 0 0 20px rgba(46,192,106,0.30); }
+  .qz-opt.correct .num { color:#2ec06a; }
+  .qz-opt.wrong { background:#1c1c1c; border:2px solid #ef4444;
+    box-shadow:0 0 0 3px rgba(239,68,68,0.12), 0 0 20px rgba(239,68,68,0.28); }
+  .qz-opt.wrong .num { color:#ef4444; }
+  .qz-q { font-size:17px; font-weight:400; line-height:1.6; letter-spacing:-.01em; color:#e8e8e8; margin-bottom:22px; }
   .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#cfc6ea; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.28); border-radius:13px; padding:14px 17px; display:none; }
   .qz-explain.bad { color:#f0b3ae; background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3); }
   .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
@@ -415,13 +617,13 @@
 </div>
 
 <div class="rail">
-  <button class="rail-item active" type="button" id="railLearn">
-    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-    Learn
-  </button>
-  <button class="rail-item" type="button" id="railBrief">
+  <button class="rail-item active" type="button" id="railBrief">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
     Study Brief
+  </button>
+  <button class="rail-item" type="button" id="railLearn">
+    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Learn
   </button>
   <button class="rail-item" type="button" id="railCheck">
     <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m8 12 2.5 2.5L16 9"/></svg>
@@ -433,7 +635,7 @@
   </button>
   <button class="rail-item" type="button" id="railCast">
     <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
-    StudyCast
+    Audio Recap
   </button>
 </div>
 
@@ -444,16 +646,16 @@
     <div class="load-kicker">Writing your lesson</div>
     <h1 class="load-title" id="loadTitle">Your lesson</h1>
     <div class="load-progress" id="loadProgress"><i id="loadProgressFill"></i></div>
-    <div class="load-status" id="loadStatus">Getting started<span class="dots"></span></div>
+    <div class="load-status" id="loadStatus"><span class="lbl shimmer-text">Getting started…</span></div>
     <div class="load-error" id="loadError" hidden></div>
     <button class="retry-btn" id="retryBtn" type="button" hidden>Try again</button>
   </div>
 
   <!-- Overview / contents -->
   <div class="overview" id="overview">
-    <div class="ov-hero">
-      <div class="ov-logo"><span class="grad-logo"></span></div>
-      <h1 class="ov-title" id="ovTitle"></h1>
+    <div class="ov-head">
+      <div class="br-kicker">Learn</div>
+      <h1 class="br-title" id="ovTitle"></h1>
     </div>
     <div class="ov-start-row">
       <button class="start-btn" id="startLessonBtn" type="button">Start lesson</button>
@@ -468,21 +670,21 @@
 
   <!-- Study Brief -->
   <div class="brief" id="briefView">
-    <div class="br-head">
-      <div>
-        <div class="br-kicker">Study Brief</div>
-        <h1 class="br-title" id="brTitle"></h1>
+    <div class="br-head hero-head">
+      <div class="ov-hero">
+        <div class="ov-logo"><span class="grad-logo"></span></div>
+        <h1 class="ov-title" id="brTitle"></h1>
       </div>
       <button class="br-regen" id="brRegen" type="button" title="Regenerate">Regenerate</button>
     </div>
     <div id="brBody"></div>
   </div>
 
-  <!-- StudyCast -->
+  <!-- Audio Recap -->
   <div class="studycast" id="castView">
     <div class="br-head">
       <div>
-        <div class="br-kicker">StudyCast</div>
+        <div class="br-kicker">Audio Recap</div>
         <h1 class="br-title" id="scTitle"></h1>
       </div>
       <button class="br-regen" id="scRegen" type="button" title="Regenerate">Regenerate</button>
@@ -577,6 +779,77 @@
     const html = marked.parse(String(text || ''), { gfm: true, breaks: false });
     return html;
   }
+  // ── Plain-language maths ────────────────────────────────────
+  // The models sometimes reply with LaTeX ($F(x)=\int_{-\infty}^{x} f(t)dt$),
+  // which is unreadable to a learner if it is not typeset. We ask for plain
+  // wording in every prompt, and run this over all generated text so anything
+  // already cached — or any slip — still reads as ordinary words and numbers.
+  const GREEK = {
+    alpha:'alpha', beta:'beta', gamma:'gamma', delta:'delta', epsilon:'epsilon',
+    theta:'theta', lambda:'lambda', mu:'mu', pi:'pi', rho:'rho', sigma:'sigma',
+    tau:'tau', phi:'phi', omega:'omega', Delta:'Delta', Sigma:'Sigma', Omega:'Omega'
+  };
+  function plainMath(str) {
+    if (typeof str !== 'string' || str.indexOf('\\') === -1 && str.indexOf('$') === -1) return str;
+    let t = str;
+
+    // Drop the math delimiters themselves.
+    t = t.replace(/\$\$([\s\S]*?)\$\$/g, ' $1 ').replace(/\$([^$\n]*?)\$/g, '$1');
+
+    // Integrals, sums, limits → spoken form.
+    t = t.replace(/\\int\s*_\{?([^{}\s]*)\}?\s*\^\s*\{?([^{}\s]*)\}?/g,
+      (m, a, b) => 'the integral from ' + a + ' to ' + b + ' of');
+    t = t.replace(/\\int/g, 'the integral of');
+    t = t.replace(/\\sum\s*_\{?([^{}]*)\}?\s*\^\s*\{?([^{}]*)\}?/g,
+      (m, a, b) => 'the sum from ' + a + ' to ' + b + ' of');
+    t = t.replace(/\\sum/g, 'the sum of');
+    t = t.replace(/\\lim\s*_\{?([^{}]*?)\\to([^{}]*?)\}?(?=\s|$)/g,
+      (m, v, a) => 'the limit as ' + v.trim() + ' approaches ' + a.trim() + ' of');
+    t = t.replace(/\\lim/g, 'the limit of');
+    t = t.replace(/\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, '($1)/($2)');
+    t = t.replace(/\\sqrt\s*\{([^{}]*)\}/g, 'the square root of ($1)');
+
+    // Symbols → words the learner already knows.
+    t = t.replace(/\\infty/g, 'infinity')
+         .replace(/\\times/g, ' times ').replace(/\\cdot/g, ' times ')
+         .replace(/\\div/g, ' divided by ')
+         .replace(/\\pm/g, ' plus or minus ')
+         .replace(/\\leq|\\le\b/g, ' <= ').replace(/\\geq|\\ge\b/g, ' >= ')
+         .replace(/\\neq|\\ne\b/g, ' is not equal to ')
+         .replace(/\\approx/g, ' is about ')
+         .replace(/\\to|\\rightarrow/g, ' to ')
+         .replace(/\\in\b/g, ' in ')
+         .replace(/\\prime/g, "'");
+    t = t.replace(/\\(alpha|beta|gamma|delta|epsilon|theta|lambda|mu|pi|rho|sigma|tau|phi|omega|Delta|Sigma|Omega)\b/g,
+      (m, g) => GREEK[g] || g);
+
+    // Structural noise.
+    t = t.replace(/\\left|\\right/g, '')
+         .replace(/\\!|\\,|\;|\\:/g, ' ')
+         .replace(/\\text\s*\{([^{}]*)\}/g, '$1')
+         .replace(/\\mathrm\s*\{([^{}]*)\}/g, '$1')
+         .replace(/\\begin\{[^}]*\}|\\end\{[^}]*\}/g, ' ');
+
+    // Superscripts / subscripts in a form people read normally.
+    t = t.replace(/\^\s*\{([^{}]*)\}/g, '^$1').replace(/_\s*\{([^{}]*)\}/g, '_$1');
+    t = t.replace(/\^2\b/g, ' squared').replace(/\^3\b/g, ' cubed');
+
+    // Anything left over, plus tidy spacing.
+    t = t.replace(/\\[a-zA-Z]+/g, '').replace(/[{}]/g, '');
+    return t.replace(/[ \t]{2,}/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim();
+  }
+  // Walk a parsed object and clean every string it holds.
+  function plainMathDeep(v) {
+    if (typeof v === 'string') return plainMath(v);
+    if (Array.isArray(v)) return v.map(plainMathDeep);
+    if (v && typeof v === 'object') {
+      const o = {};
+      for (const k in v) if (Object.prototype.hasOwnProperty.call(v, k)) o[k] = plainMathDeep(v[k]);
+      return o;
+    }
+    return v;
+  }
+
   function mathify(el) {
     if (window.renderMathInElement) renderMathInElement(el, { delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}], throwOnError:false });
   }
@@ -613,11 +886,11 @@
   }
   // Tabs unlock in order: each one needs the previous step finished.
   const RAIL = [
-    { key: 'learn',  btn: railLearn,  label: 'Learn',       needs: null,     open: () => { if (lesson) renderOverview(); else show('load'); } },
-    { key: 'brief',  btn: railBrief,  label: 'Study Brief', needs: 'learn',  open: () => openBrief() },
+    { key: 'brief',  btn: railBrief,  label: 'Study Brief', needs: null,     open: () => openBrief() },
+    { key: 'learn',  btn: railLearn,  label: 'Learn',       needs: 'brief',  open: () => { if (lesson) renderOverview(); else generate(false); } },
     { key: 'check',  btn: railCheck,  label: 'Checkpoint',  needs: 'brief',  open: () => openCheck() },
     { key: 'recall', btn: railRecall, label: 'Recall',      needs: 'check',  open: () => openRecall() },
-    { key: 'cast',   btn: railCast,   label: 'StudyCast',   needs: 'recall', open: () => openCast() }
+    { key: 'cast',   btn: railCast,   label: 'Audio Recap',  needs: 'recall', open: () => openCast() }
   ];
   const LOCK_SVG = '<svg class="rail-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   const RAIL_LABEL = {};
@@ -654,6 +927,9 @@
   const LOCK = '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
   function renderOverview() {
+    // Reachable before the lesson exists (e.g. the "Next: Learn" flow button,
+    // now that Study Brief comes first). Build it instead of rendering a shell.
+    if (!lesson || !Array.isArray(lesson.items) || !lesson.items.length) { generate(false); return; }
     show('overview');
     const cur = firstIncomplete();
     document.getElementById('upNext').textContent = cur === -1 ? 'All complete' : lesson.items[cur].title;
@@ -726,16 +1002,18 @@
     // still fills when the page is opened in a background tab (rAF is throttled there).
     function paintTimelineFill() {
       const rows = [...tl.querySelectorAll('.tl-row')];
+      if (!rows.length) return;
+      // Rows are positioned, so offset the dot within its row, then the row within the timeline.
+      const centre = r => { const d = r.querySelector('.tl-dot'); return r.offsetTop + d.offsetTop + d.offsetHeight / 2; };
+      // The track spans first dot centre → last dot centre, so it never overhangs.
+      const top = centre(rows[0]);
+      const bottom = centre(rows[rows.length - 1]);
       const doneRows = rows.filter(r => r.classList.contains('done'));
-      let fill = 0;
-      if (doneRows.length) {
-        if (doneRows.length === rows.length) {
-          fill = Math.max(0, tl.offsetHeight - 28);          // all done → full track
-        } else {
-          const dot = doneRows[doneRows.length - 1].querySelector('.tl-dot');
-          fill = Math.max(0, dot.offsetTop + dot.offsetHeight / 2 - 14);
-        }
-      }
+      const fill = doneRows.length
+        ? Math.max(0, Math.min(bottom, centre(doneRows[doneRows.length - 1])) - top)
+        : 0;
+      tl.style.setProperty('--tl-top', top + 'px');
+      tl.style.setProperty('--tl-track', Math.max(0, bottom - top) + 'px');
       tl.style.setProperty('--tl-fill', fill + 'px');
     }
     paintTimelineFill();
@@ -806,147 +1084,61 @@
   }
 
   // ── Checkpoint quiz ──
-  // Six question types share one layout: prompt → answer control → Check →
-  // feedback → Continue. Free-text answers are graded by the tutor.
   function playCheckpoint(idx, item) {
     plScore.hidden = false;
-    let q = 0, score = 0;
+    let q = 0, score = 0, picked = -1, checked = false;
     const baseScore = totalScore() - (state.scores[idx] || 0);   // score from other checkpoints
     plScoreN.textContent = String(baseScore);
-
     function render() {
       const question = item.questions[q];
-      const qType = question.type || 'mc';
-      let picked = -1, checked = false, orderState = null;
-
       plLabel.innerHTML = '<span class="star">★</span><span>Checkpoint</span><span class="dim">· ' + escapeHtml(item.title) + ' · ' + (q + 1) + ' of ' + item.questions.length + '</span>';
       plBarFill.style.width = Math.round((q / item.questions.length) * 100) + '%';
       plBody.innerHTML = '';
-
-      const badge = document.createElement('div');
-      badge.className = 'qz-type';
-      badge.textContent = QTYPE[qType] || 'Question';
-      plBody.appendChild(badge);
+      picked = -1; checked = false;
 
       const h = document.createElement('div'); h.className = 'qz-q'; h.textContent = question.q;
       plBody.appendChild(h);
 
+      const opts = document.createElement('div'); opts.className = 'qz-opts';
+      question.options.forEach((opt, oi) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'qz-opt';
+        b.innerHTML = '<span class="num">' + 'ABCDEFGH'[oi] + '.</span><span class="txt"></span>';
+        b.querySelector('.txt').textContent = opt;
+        b.addEventListener('click', () => {
+          if (checked) return;
+          picked = oi;
+          opts.querySelectorAll('.qz-opt').forEach(o => o.classList.remove('sel'));
+          b.classList.add('sel');
+          checkBtn.disabled = false;
+        });
+        opts.appendChild(b);
+      });
+      plBody.appendChild(opts);
+
       const explain = document.createElement('div'); explain.className = 'qz-explain';
+      plBody.appendChild(explain);
+
       const actions = document.createElement('div'); actions.className = 'qz-actions';
       const checkBtn = document.createElement('button');
       checkBtn.type = 'button'; checkBtn.className = 'qz-check'; checkBtn.textContent = 'Check'; checkBtn.disabled = true;
-
-      let opts = null, textEl = null, orderList = null;
-
-      if (qType === 'mc' || qType === 'tf') {
-        opts = document.createElement('div');
-        opts.className = 'qz-opts' + (qType === 'tf' ? ' tf' : '');
-        question.options.forEach((opt, oi) => {
-          const b = document.createElement('button');
-          b.type = 'button'; b.className = 'qz-opt';
-          b.innerHTML = '<span class="num">' + (oi + 1) + '</span><span class="txt"></span>';
-          b.querySelector('.txt').textContent = opt;
-          b.addEventListener('click', () => {
-            if (checked) return;
-            picked = oi;
-            opts.querySelectorAll('.qz-opt').forEach(o => o.classList.remove('sel'));
-            b.classList.add('sel');
-            checkBtn.disabled = false;
-          });
-          opts.appendChild(b);
-        });
-        plBody.appendChild(opts);
-      } else if (qType === 'order') {
-        // Shuffled steps the student reorders with the arrows.
-        orderState = question.steps.map((t, i) => ({ t: t, i: i }));
-        for (let k = orderState.length - 1; k > 0; k--) {
-          const j = Math.floor(Math.random() * (k + 1));
-          const tmp = orderState[k]; orderState[k] = orderState[j]; orderState[j] = tmp;
-        }
-        if (orderState.every((o, i) => o.i === i)) orderState.push(orderState.shift());
-        orderList = document.createElement('div');
-        orderList.className = 'qz-order';
-        plBody.appendChild(orderList);
-        paintOrder();
-        checkBtn.disabled = false;
-      } else {
-        textEl = document.createElement('textarea');
-        textEl.className = 'qz-input';
-        textEl.placeholder = qType === 'mistake' ? 'What is wrong here, and what should it be?' : 'Answer in a sentence or two…';
-        textEl.spellcheck = false;
-        textEl.addEventListener('input', () => { checkBtn.disabled = !textEl.value.trim(); });
-        plBody.appendChild(textEl);
-      }
-
-      plBody.appendChild(explain);
       actions.appendChild(checkBtn);
       plBody.appendChild(actions);
 
-      function paintOrder() {
-        orderList.innerHTML = '';
-        orderState.forEach((step, si) => {
-          const row = document.createElement('div');
-          row.className = 'qz-order-row';
-          row.innerHTML = '<span class="pos">' + (si + 1) + '</span><span class="txt"></span>' +
-            '<span class="moves">' +
-              '<button type="button" class="mv" data-dir="-1" aria-label="Move up"' + (si === 0 ? ' disabled' : '') + '>&#9650;</button>' +
-              '<button type="button" class="mv" data-dir="1" aria-label="Move down"' + (si === orderState.length - 1 ? ' disabled' : '') + '>&#9660;</button>' +
-            '</span>';
-          row.querySelector('.txt').textContent = step.t;
-          row.querySelectorAll('.mv').forEach(b => b.addEventListener('click', () => {
-            if (checked) return;
-            const dir = parseInt(b.dataset.dir, 10);
-            const to = si + dir;
-            if (to < 0 || to >= orderState.length) return;
-            const tmp = orderState[si]; orderState[si] = orderState[to]; orderState[to] = tmp;
-            paintOrder();
-          }));
-          orderList.appendChild(row);
-        });
-      }
-
-      checkBtn.addEventListener('click', async () => {
+      checkBtn.addEventListener('click', () => {
         if (!checked) {
           checked = true;
-          let right = false;
-
-          if (qType === 'mc' || qType === 'tf') {
-            opts.querySelectorAll('.qz-opt').forEach((o, oi) => {
-              o.classList.add('disabled');
-              if (oi === question.answer) o.classList.add('correct');
-              else if (oi === picked) o.classList.add('wrong');
-            });
-            right = picked === question.answer;
-            explain.textContent = (right ? 'Correct! ' : 'Not quite. ') + (question.explain || '');
-          } else if (qType === 'order') {
-            right = orderState.every((step, si) => step.i === si);
-            orderList.querySelectorAll('.qz-order-row').forEach((row, si) => {
-              row.classList.add('locked');
-              row.classList.add(orderState[si].i === si ? 'correct' : 'wrong');
-            });
-            if (!right) {
-              const correct = question.steps.map((t, i) => (i + 1) + '. ' + t).join('  ');
-              explain.textContent = 'Not quite. Correct order: ' + correct + (question.explain ? ' — ' + question.explain : '');
-            } else {
-              explain.textContent = 'Correct! ' + (question.explain || '');
-            }
-          } else {
-            textEl.readOnly = true;
-            checkBtn.textContent = 'Checking…';
-            const graded = await gradeOpen({ q: question.q, ideal: question.ideal }, textEl.value.trim());
-            right = graded.correct === true;
-            explain.textContent = (graded.feedback || '') + (question.explain ? ' ' + question.explain : '');
-            if (!right && question.ideal) {
-              const ideal = document.createElement('div');
-              ideal.className = 'qz-ideal';
-              ideal.textContent = 'Ideal answer: ' + question.ideal;
-              explain.appendChild(ideal);
-            }
-          }
-
+          const optEls = opts.querySelectorAll('.qz-opt');
+          optEls.forEach((o, oi) => {
+            o.classList.add('disabled');
+            if (oi === question.answer) o.classList.add('correct');
+            else if (oi === picked) o.classList.add('wrong');
+          });
+          const right = picked === question.answer;
           if (right) { score++; plScoreN.textContent = String(baseScore + score); }
           explain.style.display = 'block';
           explain.classList.toggle('bad', !right);
+          explain.textContent = (right ? 'Correct! ' : 'Not quite. ') + (question.explain || '');
           checkBtn.textContent = q === item.questions.length - 1 ? 'Finish' : 'Continue';
         } else {
           if (q === item.questions.length - 1) {
@@ -958,7 +1150,6 @@
       });
       window.scrollTo(0, 0);
     }
-
     function renderDone() {
       plBarFill.style.width = '100%';
       plBody.innerHTML = '';
@@ -980,14 +1171,14 @@
   function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
   // ── Guided tab flow ──────────────────────────────────────────
-  // Learn → Study Brief → Checkpoint → Recall → StudyCast, then Teach Studio.
+  // Study Brief → Learn → Checkpoint → Recall → Audio Recap, then Teach Studio.
   // Each finished tab shows one button: the next step in that order.
   const FLOW = [
-    { key: 'learn',  label: 'Learn' },
     { key: 'brief',  label: 'Study Brief' },
+    { key: 'learn',  label: 'Learn' },
     { key: 'check',  label: 'Checkpoint' },
     { key: 'recall', label: 'Recall' },
-    { key: 'cast',   label: 'StudyCast' }
+    { key: 'cast',   label: 'Audio Recap' }
   ];
   const CORE = ['learn', 'brief', 'check', 'recall', 'cast'];
   function markFlow(k) {
@@ -1000,7 +1191,11 @@
   function allCoreDone() { return CORE.every(k => flow[k]); }
   // One button only: the next tab in the flow, or Teach Studio once everything is done.
   function flowFooter(currentKey) {
-    if (allCoreDone()) return '<div class="flow-foot"><button class="flow-btn" data-flow="teach" type="button">Open Teach Studio</button></div>';
+    // Teach Studio unlocks only on the final tab, and only once every step is
+    // finished. Earlier tabs always keep their "Next: …" link.
+    if (allCoreDone() && currentKey === FLOW[FLOW.length - 1].key) {
+      return '<div class="flow-foot"><button class="flow-btn" data-flow="teach" type="button">Open Teach Studio</button></div>';
+    }
     const i = FLOW.findIndex(f => f.key === currentKey);
     const next = FLOW[(i + 1) % FLOW.length];
     return '<div class="flow-foot"><button class="flow-btn" data-flow="' + next.key + '" type="button">Next: ' + next.label + ' →</button></div>';
@@ -1019,25 +1214,138 @@
 
   // Time-based progress bar shared by the side tabs. Eases toward 92%
   // while the request is in flight, then snaps to 100% on completion.
-  function tabLoading(host, label, estMs) {
-    host.innerHTML = '<div class="tab-load"><span class="grad-logo"></span>' +
-      '<div class="tab-load-txt"><span class="lbl"></span><span class="load-pct">0%</span></div>' +
-      '<div class="load-progress"><i></i></div></div>';
-    host.querySelector('.lbl').textContent = label;
-    const fill = host.querySelector('.load-progress i');
-    const pctEl = host.querySelector('.load-pct');
-    const started = Date.now();
-    function tick() {
-      const el = Date.now() - started;
-      const pct = Math.min(92, Math.round(92 * (1 - Math.exp(-el / (estMs * 0.55)))));
-      fill.style.width = pct + '%';
-      pctEl.textContent = pct + '%';
+  // ── Streaming chat ──────────────────────────────────────────
+  // Streams the model's reply over SSE so the loader can follow real
+  // generation progress instead of guessing from a timer. `onText` is called
+  // with the running output length after every delta.
+  async function streamChat(payload, onText) {
+    const r = await fetch('/api/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({}, payload, { stream: true }))
+    });
+    if (!r.ok) {
+      let msg = 'HTTP ' + r.status;
+      try { const j = await r.json(); if (j && j.error) msg = j.error.message || msg; } catch (e) {}
+      throw new Error(msg);
     }
-    tick();
-    const t = setInterval(tick, 400);
+    // No streaming body available (very old browser) — fall back to one shot.
+    if (!r.body || !r.body.getReader) {
+      const data = await r.json();
+      if (data.error) throw new Error(data.error.message || 'API error');
+      return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    }
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', text = '', apiErr = null;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let nl;
+      while ((nl = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, nl).trim();
+        buf = buf.slice(nl + 1);
+        if (line.slice(0, 5) !== 'data:') continue;
+        const raw = line.slice(5).trim();
+        if (!raw) continue;
+        let ev; try { ev = JSON.parse(raw); } catch (e) { continue; }
+        if (ev.type === 'content_block_delta' && ev.delta && typeof ev.delta.text === 'string') {
+          text += ev.delta.text;
+          if (onText) onText(text.length);
+        } else if (ev.type === 'error' && ev.error) {
+          apiErr = ev.error.message || 'stream error';
+        }
+      }
+    }
+    if (apiErr) throw new Error(apiErr);
+    if (!text) throw new Error('Empty response.');
+    return text;
+  }
+
+
+  // Sets the shimmer text and scales the highlight to the label length,
+  // mirroring the reference component's dynamic spread.
+  function applyShimmer(el, text) {
+    if (!el) return;
+    el.textContent = text;
+    el.classList.add('shimmer-text');
+  }
+
+  // Loader whose bar is driven by real generation progress. `expectChars` is
+  // the rough output size we asked the model for; `report(n)` feeds it the
+  // characters received so far. A slow time-based creep runs underneath so the
+  // bar still moves during the initial wait before the first token lands.
+  function tabLoading(host, label, expectChars, calKey) {
+    const view = host.parentElement;
+    if (view) view.classList.add('is-loading');
+    host.innerHTML = '<div class="tab-load"><span class="grad-logo"></span>' +
+      '<div class="tab-load-txt"><span class="lbl shimmer-text"></span></div>' +
+      '<div class="load-progress"><i></i></div></div>';
+    applyShimmer(host.querySelector('.lbl'), label);
+    const fill = host.querySelector('.load-progress i');
+    return driveBar(fill, view, expectChars, calKey);
+  }
+
+  // Shared bar driver: eases the painted width toward the real target every
+  // frame, so the bar glides instead of stepping.
+  // Remembers how many characters each generator actually produced last time,
+  // so the bar's denominator converges on reality instead of staying a guess.
+  function calChars(key, fallback) {
+    try {
+      const v = parseFloat(localStorage.getItem('NOURA_CAL_' + key) || '');
+      if (isFinite(v) && v > 200) return v;
+    } catch (e) {}
+    return fallback;
+  }
+  function learnChars(key, actual) {
+    if (!key || !(actual > 200)) return;
+    try {
+      const prev = parseFloat(localStorage.getItem('NOURA_CAL_' + key) || '') || actual;
+      localStorage.setItem('NOURA_CAL_' + key, String(Math.round(prev * 0.6 + actual * 0.4)));
+    } catch (e) {}
+  }
+
+  function driveBar(fill, view, expectChars, calKey) {
+    const started = Date.now();
+    let shown = 0, chars = 0, finishing = false, ended = false;
+    let raf = 0, timer = 0, last = Date.now();
+    if (calKey) expectChars = calChars(calKey, expectChars);
+
+    function computeTarget() {
+      if (finishing) return 100;
+      // Real progress once tokens arrive; capped so it never claims to be done.
+      const real = expectChars > 0 ? Math.min(0.97, chars / expectChars) : 0;
+      // Pre-token creep: eases to ~18% during the wait before the first token.
+      const creep = 0.18 * (1 - Math.exp(-(Date.now() - started) / 2600));
+      return Math.max(real, creep) * 100;
+    }
+
+    // Time-based easing, so the motion is identical whether it is driven at
+    // 120fps or by the fallback timer in a throttled background tab.
+    function step() {
+      if (ended) return;
+      const now = Date.now();
+      const dt = Math.min(250, now - last);
+      last = now;
+      const target = computeTarget();
+      shown += (target - shown) * (1 - Math.exp(-dt / 170));
+      if (target - shown < 0.15) shown = target;
+      fill.style.width = shown.toFixed(2) + '%';
+      if (finishing && shown >= 99.9) { fill.style.width = '100%'; halt(); }
+    }
+
+    function frame() { step(); if (!ended) raf = requestAnimationFrame(frame); }
+    function halt() { ended = true; cancelAnimationFrame(raf); clearInterval(timer); }
+
+    raf = requestAnimationFrame(frame);
+    timer = setInterval(step, 60);   // keeps moving when rAF is throttled
+
+    const clearFlag = function () { if (view) view.classList.remove('is-loading'); };
     return {
-      done: function () { clearInterval(t); fill.style.width = '100%'; pctEl.textContent = '100%'; },
-      stop: function () { clearInterval(t); }
+      // Called from the stream as text arrives.
+      report: function (n) { chars = n; },
+      done: function () { finishing = true; learnChars(calKey, chars); clearFlag(); },
+      stop: function () { halt(); clearFlag(); }
     };
   }
 
@@ -1071,22 +1379,26 @@
   function esc(t) { const d = document.createElement('div'); d.textContent = String(t == null ? '' : t); return d.innerHTML; }
   function listHtml(arr, cls) { return '<ul class="br-list ' + (cls || '') + '">' + arr.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'; }
 
+  // Document layout, matching the note page: one flowing column of headings
+  // and bullets rather than a grid of cards.
   function renderBrief() {
+    const li = arr => '<ul>' + arr.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     brBody.innerHTML =
-      '<div class="br-grid">' +
-        card('full big', 'idea', 'Big Idea', '<div class="br-big-text">' + esc(brief.bigIdea) + '</div>') +
-        card('', 'key', 'Key Concepts', listHtml(brief.keyConcepts.slice(0, 6))) +
-        card('', 'term', 'Must-Know Terms',
-          '<div class="br-terms">' + brief.terms.slice(0, 6).map(t =>
-            '<div class="br-term"><b>' + esc(t.term) + '</b> — ' + esc(t.definition) + '</div>').join('') + '</div>') +
-        card('full', 'ex', 'Simple Example', '<div class="br-example">' + esc(brief.example) + '</div>') +
-        card('', 'warn', 'Common Mistakes', listHtml(brief.mistakes.slice(0, 4), 'warn')) +
-        card('', 'goal', 'What You Must Be Able To Explain', listHtml(brief.explainGoals.slice(0, 4), 'goal')) +
+      '<div class="br-doc">' +
+        '<div class="br-sub">Study Brief note</div>' +
+        '<div class="br-callout"><span class="ico">💡</span><div><b>Big idea</b><br>' + esc(brief.bigIdea) + '</div></div>' +
+        '<h2>Key concepts</h2>' + li(brief.keyConcepts) +
+        '<h2>Must-know terms</h2><ul>' + brief.terms.map(t =>
+          '<li><b>' + esc(t.term) + '</b> — ' + esc(t.definition) + '</li>').join('') + '</ul>' +
+        '<h2>Simple example</h2><p>' + esc(brief.example) + '</p>' +
+        '<h2>Common mistakes</h2>' + li(brief.mistakes) +
+        '<h2>What you must be able to explain</h2>' + li(brief.explainGoals) +
       '</div>';
     markFlow('brief');
     brBody.insertAdjacentHTML('beforeend', flowFooter('brief'));
     wireFlow(brBody);
-    document.getElementById('brRegen').hidden = false;
+    // No Regenerate in the normal view — it only appears if generation failed.
+    document.getElementById('brRegen').hidden = true;
   }
   function renderBriefEmpty() {
     brBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>Add a topic or material to generate your StudyBrief.</p></div>';
@@ -1094,7 +1406,7 @@
   }
   function renderBriefLoading() {
     document.getElementById('brRegen').hidden = true;
-    return tabLoading(brBody, 'Writing your StudyBrief… ', 14000);
+    return tabLoading(brBody, 'Writing your StudyBrief… ', 1500, 'brief');
   }
   function renderBriefError(msg) {
     brBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>' + esc(msg) + '</p></div>';
@@ -1107,27 +1419,24 @@
     if (!title || title === 'Your lesson') { renderBriefEmpty(); return; }
     if (brief && !force) { renderBrief(); return; }
     if (!force) {
-      try { const c = JSON.parse(localStorage.getItem(BRIEF_KEY) || 'null'); if (validBrief(c)) { brief = c; renderBrief(); return; } } catch (e) {}
+      try { const c = JSON.parse(localStorage.getItem(BRIEF_KEY) || 'null'); if (validBrief(c)) { brief = plainMathDeep(c); renderBrief(); return; } } catch (e) {}
     }
     if (briefBusy) return;
     briefBusy = true;
     const prog = renderBriefLoading();
-    const system = 'You are Noura, a study tutor writing a short pre-study brief. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"bigIdea": string (1-2 sentences), "keyConcepts": [string x3-6] (each under 20 words), "terms": [{"term": string, "definition": string (under 18 words)} x3-6], "example": string (one concrete example, mini scenario or analogy, 2-3 sentences), "mistakes": [string x2-4] (each a specific misunderstanding students have, under 22 words), "explainGoals": [string x2-4] (each starting with a verb, something the student must be able to say in their own words)}. Be concise and concrete - no filler, no repetition of the title.';
+    const system = 'You are Noura, a study tutor writing a short pre-study brief. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"bigIdea": string (1-2 sentences), "keyConcepts": [string x3-6] (each under 20 words), "terms": [{"term": string, "definition": string (under 18 words)} x3-6], "example": string (one concrete example, mini scenario or analogy, 2-3 sentences), "mistakes": [string x2-4] (each a specific misunderstanding students have, under 22 words), "explainGoals": [string x2-4] (each starting with a verb, something the student must be able to say in their own words)}. Be concise and concrete - no filler, no repetition of the title. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
     const user = 'Write the StudyBrief for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
-      const r = await fetch('/api/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] })
-      });
-      const data = await r.json();
-      if (!r.ok || data.error) throw new Error((data && data.error && (data.error.message || JSON.stringify(data.error))) || ('HTTP ' + r.status));
-      const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
+      const raw = (await streamChat(
+        { model: 'claude-sonnet-5', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
+        n => prog.report(n)
+      )).trim();
       const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
       if (a === -1 || b === -1) throw new Error('No JSON in response.');
       const parsed = JSON.parse(raw.slice(a, b + 1));
       if (!validBrief(parsed)) throw new Error('Brief incomplete.');
       prog.done();
-      brief = parsed;
+      brief = plainMathDeep(parsed);
       try { localStorage.setItem(BRIEF_KEY, JSON.stringify(parsed)); } catch (e) {}
       renderBrief();
     } catch (err) {
@@ -1168,7 +1477,7 @@
   }
   function renderRecallLoading() {
     document.getElementById('rcRegen').hidden = true;
-    return tabLoading(rcBody, 'Building your Recall cards… ', 22000);
+    return tabLoading(rcBody, 'Building your Recall cards… ', 3200, 'recall');
   }
   function renderRecallError(msg) {
     rcBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>' + esc(msg) + '</p></div>';
@@ -1285,29 +1594,26 @@
     if (!title || title === 'Your lesson') { renderRecallEmpty(); return; }
     if (recall && !force) { renderRecallCard(); return; }
     if (!force) {
-      try { const c = JSON.parse(localStorage.getItem(RECALL_KEY) || 'null'); if (validRecall(c)) { recall = c; renderRecallCard(); return; } } catch (e) {}
+      try { const c = JSON.parse(localStorage.getItem(RECALL_KEY) || 'null'); if (validRecall(c)) { recall = plainMathDeep(c); renderRecallCard(); return; } } catch (e) {}
     } else {
       rcState = { conf: {}, answers: {}, why: {} }; saveRcState(); rcIndex = 0;
     }
     if (recallBusy) return;
     recallBusy = true;
     const prog = renderRecallLoading();
-    const system = 'You are Noura, a study tutor building ACTIVE RECALL prompts (not flashcards). Reply with ONLY a valid JSON array, no markdown fences, no commentary. Schema: [{"type": one of "define"|"explain"|"compare"|"example"|"mistake", "prompt": string (the question asked to the student, answerable from memory), "answer": string (the ideal answer, 1-3 sentences, concrete and complete)} x8]. Include a mix: at least one of each type. "define" asks for a key term, "explain" asks the student to explain an idea, "compare" asks them to contrast two concepts, "example" asks for a real-world example, "mistake" presents a common misconception to identify or correct. Prompts must be specific to the topic, never generic. No numbering in the prompt text.';
+    const system = 'You are Noura, a study tutor building ACTIVE RECALL prompts (not flashcards). Reply with ONLY a valid JSON array, no markdown fences, no commentary. Schema: [{"type": one of "define"|"explain"|"compare"|"example"|"mistake", "prompt": string (the question asked to the student, answerable from memory), "answer": string (the ideal answer, 1-3 sentences, concrete and complete)} x8]. Include a mix: at least one of each type. "define" asks for a key term, "explain" asks the student to explain an idea, "compare" asks them to contrast two concepts, "example" asks for a real-world example, "mistake" presents a common misconception to identify or correct. Prompts must be specific to the topic, never generic. No numbering in the prompt text. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
     const user = 'Write the Recall cards for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
-      const r = await fetch('/api/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] })
-      });
-      const data = await r.json();
-      if (!r.ok || data.error) throw new Error((data && data.error && (data.error.message || JSON.stringify(data.error))) || ('HTTP ' + r.status));
-      const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
+      const raw = (await streamChat(
+        { model: 'claude-sonnet-5', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
+        n => prog.report(n)
+      )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
       if (a === -1 || b === -1) throw new Error('No JSON in response.');
       const parsed = JSON.parse(raw.slice(a, b + 1)).filter(c => c && c.prompt && c.answer && RC_TYPES[c.type]);
       if (!validRecall(parsed)) throw new Error('Cards incomplete.');
       prog.done();
-      recall = parsed; rcIndex = 0;
+      recall = plainMathDeep(parsed); rcIndex = 0;
       try { localStorage.setItem(RECALL_KEY, JSON.stringify(parsed)); } catch (e) {}
       renderRecallCard();
     } catch (err) {
@@ -1339,7 +1645,7 @@
   }
   function renderCheckLoading(msg) {
     document.getElementById('cpRegen').hidden = true;
-    return tabLoading(cpBody, (msg || 'Building your Checkpoint… '), 20000);
+    return tabLoading(cpBody, (msg || 'Building your Checkpoint… '), 2600, 'check');
   }
   function renderCheckError(msg) {
     cpBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>' + esc(msg) + '</p></div>';
@@ -1378,7 +1684,7 @@
       item.options.forEach((opt, oi) => {
         const b = document.createElement('button');
         b.type = 'button'; b.className = 'cp-opt';
-        b.innerHTML = '<span class="num">' + (oi + 1) + '</span><span class="txt"></span>';
+        b.innerHTML = '<span class="num">' + 'ABCDEFGH'[oi] + '.</span><span class="txt"></span>';
         b.querySelector('.txt').textContent = opt;
         b.addEventListener('click', () => {
           picked = oi;
@@ -1504,21 +1810,18 @@
     if (!title || title === 'Your lesson') { renderCheckEmpty(); return; }
     if (check && !force) { renderCheckQuestion(); return; }
     if (!force) {
-      try { const c = JSON.parse(localStorage.getItem(CHECK_KEY) || 'null'); if (validCheck(c)) { check = c; cpIndex = 0; cpResults = []; renderCheckQuestion(); return; } } catch (e) {}
+      try { const c = JSON.parse(localStorage.getItem(CHECK_KEY) || 'null'); if (validCheck(c)) { check = plainMathDeep(c); cpIndex = 0; cpResults = []; renderCheckQuestion(); return; } } catch (e) {}
     }
     if (checkBusy) return;
     checkBusy = true;
     const prog = renderCheckLoading();
-    const system = 'You are Noura, a study tutor writing a short UNDERSTANDING CHECK (not a memorisation quiz). Reply with ONLY a valid JSON array, no markdown fences, no commentary. Schema: [{"type": one of "mc"|"short"|"reasoning"|"misconception"|"scenario", "concept": string (2-4 word label for the idea being tested, used to report strong/weak areas), "q": string (the question), "options": [string x4] (ONLY for type mc), "answer": number 0-based (ONLY for type mc), "ideal": string (the ideal answer, 1-2 sentences - required for every non-mc type), "why": string (1-2 sentences explaining why the correct answer is right), "whyWrong": string (ONLY for mc: 1 sentence naming the likely mistake), "followUp": string (REQUIRED for every question - one short follow-up question to ask if the student gets it wrong, pushing them to reason rather than recall)} x5]. EVERY object must include concept, why and followUp. Use FIVE questions covering five different types: one mc, one short, one reasoning (why/how), one misconception check, one scenario (apply it). Questions must test understanding of the topic, be concise, and be answerable in a sentence or two. No numbering in the question text.';
+    const system = 'You are Noura, a study tutor writing a short UNDERSTANDING CHECK (not a memorisation quiz). Reply with ONLY a valid JSON array, no markdown fences, no commentary. Schema: [{"type": one of "mc"|"short"|"reasoning"|"misconception"|"scenario", "concept": string (2-4 word label for the idea being tested, used to report strong/weak areas), "q": string (the question), "options": [string x4] (ONLY for type mc), "answer": number 0-based (ONLY for type mc), "ideal": string (the ideal answer, 1-2 sentences - required for every non-mc type), "why": string (1-2 sentences explaining why the correct answer is right), "whyWrong": string (ONLY for mc: 1 sentence naming the likely mistake), "followUp": string (REQUIRED for every question - one short follow-up question to ask if the student gets it wrong, pushing them to reason rather than recall)} x5]. EVERY object must include concept, why and followUp. Use FIVE questions covering five different types: one mc, one short, one reasoning (why/how), one misconception check, one scenario (apply it). Questions must test understanding of the topic, be concise, and be answerable in a sentence or two. No numbering in the question text. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
     const user = 'Write the Checkpoint questions for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
-      const r = await fetch('/api/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] })
-      });
-      const data = await r.json();
-      if (!r.ok || data.error) throw new Error((data && data.error && (data.error.message || JSON.stringify(data.error))) || ('HTTP ' + r.status));
-      const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
+      const raw = (await streamChat(
+        { model: 'claude-sonnet-5', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        n => prog.report(n)
+      )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
       if (a === -1 || b === -1) throw new Error('No JSON in response.');
       const parsed = JSON.parse(raw.slice(a, b + 1)).filter(c =>
@@ -1527,7 +1830,7 @@
         (c.type === 'mc' || c.ideal)).slice(0, 5);
       if (!validCheck(parsed)) throw new Error('Questions incomplete.');
       prog.done();
-      check = parsed; cpIndex = 0; cpResults = [];
+      check = plainMathDeep(parsed); cpIndex = 0; cpResults = [];
       try { localStorage.setItem(CHECK_KEY, JSON.stringify(parsed)); } catch (e) {}
       renderCheckQuestion();
     } catch (err) {
@@ -1537,13 +1840,14 @@
   }
   document.getElementById('cpRegen').addEventListener('click', () => openCheck(true));
 
-  // ── StudyCast ───────────────────────────────────────────────
+  // ── Audio Recap ─────────────────────────────────────────────
   // A short audio-style recap. The script is generated here; the audio is
   // synthesised by the server (/api/tts → NVIDIA magpie-tts-multilingual).
   // The NVIDIA key stays server-side and is never sent to the browser.
   const CAST_KEY = 'NOURA_CAST_' + slug;
   let cast = null, castBusy = false;
   let castAudio = null, castUrl = null, castRate = 1;   // audio cached for the session
+  let castGen = null;   // in-flight TTS request, so play can await it
   const scBody = document.getElementById('scBody');
   document.getElementById('scTitle').textContent = title;
 
@@ -1565,29 +1869,33 @@
       Array.isArray(c.mistakes) && c.mistakes.length && c.summary;
   }
   // Everything the narrator says, in order — this is what goes to the server.
-  function castScript(c) {
-    const parts = [c.intro];
+  // One ordered list of spoken segments. The audio script and the on-screen
+  // transcript are both built from this, so highlight timings can never drift.
+  function castSegments(c) {
+    const segs = [{ label: 'Introduction', text: c.intro }];
+    let pause = 0;
     c.recap.forEach((p, i) => {
-      parts.push(p);
-      if (c.pausePoints[i]) parts.push(c.pausePoints[i]);
+      segs.push({ label: 'Part ' + (i + 1), text: p });
+      if (c.pausePoints[i]) segs.push({ label: 'Pause and think', text: c.pausePoints[i] });
     });
-    c.pausePoints.slice(c.recap.length).forEach(p => parts.push(p));
-    c.questions.forEach(q => parts.push(q));
-    parts.push('A couple of common mistakes to watch for.');
-    c.mistakes.forEach(m => parts.push(m));
-    parts.push(c.summary);
-    parts.push(CAST_CTA);
-    return parts.join(' ');
+    c.pausePoints.slice(c.recap.length).forEach(p => segs.push({ label: 'Pause and think', text: p }));
+    c.questions.forEach((q, i) => segs.push({ label: 'Question ' + (i + 1), text: q }));
+    segs.push({ label: 'Common mistakes', text: 'A couple of common mistakes to watch for.' });
+    c.mistakes.forEach((m, i) => segs.push({ label: 'Mistake ' + (i + 1), text: m }));
+    segs.push({ label: 'Summary', text: c.summary });
+    segs.push({ label: 'Up next', text: CAST_CTA });
+    return segs;
   }
+  function castScript(c) { return castSegments(c).map(s => s.text).join(' '); }
   const CAST_CTA = "When you're ready, prove it in Teach Studio.";
 
   function renderCastEmpty() {
-    scBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>Add a topic or material to generate a StudyCast.</p></div>';
+    scBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>Add a topic or material to generate an Audio Recap.</p></div>';
     document.getElementById('scRegen').hidden = true;
   }
   function renderCastLoading() {
     document.getElementById('scRegen').hidden = true;
-    return tabLoading(scBody, 'Writing your StudyCast… ', 18000);
+    return tabLoading(scBody, 'Writing your Audio Recap… ', 2800, 'cast');
   }
   function renderCastError(msg) {
     scBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>' + esc(msg) + '</p></div>';
@@ -1603,109 +1911,143 @@
   }
   function scList(arr, cls) { return '<ul class="sc-list ' + (cls || '') + '">' + arr.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'; }
 
+  const PC = {
+    caret: '<svg viewBox="0 0 12 12"><path d="M2.5 4.5L6 8L9.5 4.5"/></svg>',
+    clock: '<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M7 4V7L9 8"/></svg>',
+    eye: '<svg viewBox="0 0 16 16"><path d="M2 8C2 8 4.2 3.8 8 3.8C11.8 3.8 14 8 14 8C14 8 11.8 12.2 8 12.2C4.2 12.2 2 8 2 8Z"/><circle cx="8" cy="8" r="1.6" fill="#8A8A8A" stroke="none"/><path d="M1 1L15 15" stroke-width="1.2"/></svg>',
+    scroll: '<svg viewBox="0 0 12 12"><path d="M3 2.5L3 3.5M3 8.5L3 9.5M9 2.5L9 3.5M9 8.5L9 9.5"/><path d="M2 5L4 5M8 5L10 5M2 7L4 7M8 7L10 7"/></svg>',
+    mic: '<svg viewBox="0 0 16 16"><path d="M8 11.5C9.38 11.5 10.5 10.38 10.5 9V4.5C10.5 3.12 9.38 2 8 2C6.62 2 5.5 3.12 5.5 4.5V9C5.5 10.38 6.62 11.5 8 11.5Z"/><path d="M12.5 8.5C12.5 10.5 10.5 12.5 8 12.5C5.5 12.5 3.5 10.5 3.5 8.5"/><path d="M8 12.5V14"/></svg>'
+  };
+
   function renderCast() {
     document.getElementById('scRegen').hidden = false;
+    const segs = castSegments(cast);
     const mins = Math.max(2, Math.round(castScript(cast).split(/\s+/).length / 150));
+
     scBody.innerHTML =
-      '<div class="sc-player">' +
-        '<div class="sc-player-top">' +
-          '<button class="sc-play" id="scPlay" type="button" aria-label="Play">' + PLAY_SVG + '</button>' +
-          '<div class="sc-pinfo">' +
-            '<div class="sc-plabel">Audio recap</div>' +
-            '<div class="sc-psub" id="scStatus">About ' + mins + ' min · tap play to generate the audio</div>' +
+      '<div class="pc-wrap">' +
+        '<div class="pc-card">' +
+          '<div class="pc-top">' +
+            '<div style="min-width:0;">' +
+              '<div class="pc-title">' + esc(title) + '</div>' +
+              '<div class="pc-time"><span id="pcCur">0:00</span> / <span id="pcDur">' + mins + ':00</span></div>' +
+            '</div>' +
           '</div>' +
-          '<div class="sc-ctrls">' +
-            '<button class="sc-ctrl" id="scRestart" type="button">Restart</button>' +
-            '<button class="sc-ctrl" id="scSpeed" type="button">1x</button>' +
+          '<div class="pc-seek" id="pcSeek">' +
+            '<div class="pc-seek-bg"></div><div class="pc-seek-fill" id="pcFill"></div><div class="pc-knob" id="pcKnob"></div>' +
+          '</div>' +
+          '<div class="pc-ctrls">' +
+            '<div class="pc-left">' +
+              '<button class="pc-play" id="pcPlay" type="button" aria-label="Play"><svg viewBox="0 0 14 14"><path d="M3 1.3C3 .6 3.75.2 4.35.56L12.1 6.26C12.66 6.6 12.66 7.4 12.1 7.74L4.35 13.44C3.75 13.8 3 13.4 3 12.7V1.3Z"/></svg></button>' +
+            '</div>' +
+            '<div class="pc-right">' +
+              '<button class="pc-speed" id="pcSpeed" type="button"><span>1x</span>' + PC.caret + '</button>' +
+            '</div>' +
           '</div>' +
         '</div>' +
-        '<div class="sc-seek" id="scSeek"><i id="scSeekFill"></i></div>' +
-        '<div class="sc-times"><span id="scCur">0:00</span><span id="scDur">0:00</span></div>' +
-        '<div id="scNote"></div>' +
+        '<div class="pc-pill">' + PC.clock + '<span id="pcState">About ' + mins + ' min</span></div>' +
+        '<div id="pcNote"></div>' +
+        '<div class="pc-bar">' +
+          '<button class="pc-toggle" id="pcHide" type="button">' + PC.eye + '<span>Hide Transcript</span></button>' +
+          '<button class="pc-chip on" id="pcAuto" type="button">' + PC.scroll + 'Auto Scroll</button>' +
+        '</div>' +
+        '<div class="pc-tr" id="pcTr">' +
+          segs.map((sg, i) =>
+            '<div class="pc-seg" data-seg="' + i + '">' +
+              '<div class="pc-seg-head"><span class="pc-seg-name">' + esc(sg.label) + '</span></div>' +
+              '<div class="pc-seg-text">' + esc(sg.text) + '</div>' +
+            '</div>').join('') +
+        '</div>' +
+        '<div id="pcAnswer"></div>' +
       '</div>' +
-      '<div class="sc-sections">' +
-        sectionCard('intro', 'Intro', '<div class="sc-text">' + esc(cast.intro) + '</div>') +
-        '<div class="sc-card drop" id="scRecapCard">' +
-          '<button class="sc-drop-head" id="scRecapToggle" type="button" aria-expanded="false">' +
-            '<span class="sc-ct">' + SC_ICON.recap + 'Main recap</span>' +
-            '<span class="sc-drop-sub"><span id="scRecapHint">Show transcript</span>' +
-              '<svg class="sc-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>' +
-          '</button>' +
-          '<div class="sc-drop-body"><div class="sc-text">' + cast.recap.map(p => '<p>' + esc(p) + '</p>').join('') + '</div></div>' +
-        '</div>' +
-        sectionCard('pause', 'Pause points', scList(cast.pausePoints, 'pause')) +
-        sectionCard('ask', 'Quick questions', scList(cast.questions)) +
-        sectionCard('warn', 'Common mistakes', scList(cast.mistakes, 'warn')) +
-        sectionCard('sum', 'Final summary', '<div class="sc-text">' + esc(cast.summary) + '</div>') +
-        '<div class="sc-card"><div class="sc-cta-line">' + esc(CAST_CTA) + '</div></div>' +
-      '</div>';
+      '<div class="pc-ask-wrap"><div class="pc-ask-inner"><div class="pc-ask">' +
+        '<input id="pcAsk" type="text" placeholder="Ask about this recap…" autocomplete="off">' +
+        '<button class="pc-ask-btn" id="pcAskBtn" type="button">' + PC.mic + '<span>Ask</span></button>' +
+      '</div></div></div>';
 
     markFlow('cast');
-    scBody.insertAdjacentHTML('beforeend', flowFooter('cast'));
+    document.getElementById('pcTr').insertAdjacentHTML('afterend', flowFooter('cast'));
     wireFlow(scBody);
-    wireCastPlayer();
-
-    // Main recap collapses into a simple box; tap to reveal the full transcript.
-    const recapCard = document.getElementById('scRecapCard');
-    const recapToggle = document.getElementById('scRecapToggle');
-    const recapHint = document.getElementById('scRecapHint');
-    recapToggle.addEventListener('click', () => {
-      const open = recapCard.classList.toggle('open');
-      recapToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      recapHint.textContent = open ? 'Hide transcript' : 'Show transcript';
-    });
+    wireCastPlayer(segs);
   }
 
-  function wireCastPlayer() {
-    const playBtn = document.getElementById('scPlay');
-    const status = document.getElementById('scStatus');
-    const note = document.getElementById('scNote');
-    const seek = document.getElementById('scSeek');
-    const fill = document.getElementById('scSeekFill');
-    const curEl = document.getElementById('scCur');
-    const durEl = document.getElementById('scDur');
-    const speedBtn = document.getElementById('scSpeed');
-    const SPEEDS = [1, 1.25, 1.5];
+  function wireCastPlayer(segs) {
+    const playBtn = document.getElementById('pcPlay');
+    const state = document.getElementById('pcState');
+    const note = document.getElementById('pcNote');
+    const seek = document.getElementById('pcSeek');
+    const fill = document.getElementById('pcFill');
+    const knob = document.getElementById('pcKnob');
+    const curEl = document.getElementById('pcCur');
+    const durEl = document.getElementById('pcDur');
+    const speedBtn = document.getElementById('pcSpeed');
+    const tr = document.getElementById('pcTr');
+    const SPEEDS = [1, 1.25, 1.5, 2];
 
-    function bindAudio() {
-      castAudio.playbackRate = castRate;
-      castAudio.ontimeupdate = () => {
-        const d = castAudio.duration || 0;
-        fill.style.width = d ? Math.min(100, (castAudio.currentTime / d) * 100) + '%' : '0%';
-        curEl.textContent = fmtTime(castAudio.currentTime);
-        // Right side counts down: time remaining, mirroring the elapsed timer.
-        durEl.textContent = fmtTime(Math.max(0, d - castAudio.currentTime));
-        syncPlayIcon();
-      };
-      castAudio.onended = () => { syncPlayIcon(); status.textContent = 'Finished — replay any time'; };
-      castAudio.onplay = () => { syncPlayIcon(); status.textContent = 'Playing your recap'; };
-      castAudio.onpause = () => { syncPlayIcon(); if (!castAudio.ended) status.textContent = 'Paused'; };
+    // No word-level timings come back from TTS, so segment starts are derived
+    // from character share of the whole script — accurate enough to follow along.
+    const lens = segs.map(sg => sg.text.length);
+    const total = lens.reduce((a, b) => a + b, 0) || 1;
+    let starts = [];
+    function computeStarts(dur) {
+      starts = []; let acc = 0;
+      for (let k = 0; k < lens.length; k++) { starts.push((acc / total) * dur); acc += lens[k]; }
     }
-    // Keep the button glyph honest: pause bars while playing, triangle when not.
+
+    let live = -1;
+    function syncTranscript(t) {
+      let idx = 0;
+      for (let k = 0; k < starts.length; k++) if (t >= starts[k]) idx = k;
+      if (idx === live) return;
+      live = idx;
+      tr.querySelectorAll('.pc-seg').forEach((el, k) => {
+        el.classList.toggle('live', k === idx);
+        el.classList.toggle('past', k < idx);
+      });
+      const el = tr.querySelector('.pc-seg.live');
+      if (el && document.getElementById('pcAuto').classList.contains('on')) {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    }
+
+    function paint() {
+      const d = castAudio && castAudio.duration ? castAudio.duration : 0;
+      const t = castAudio ? castAudio.currentTime : 0;
+      const pct = d ? Math.min(100, (t / d) * 100) : 0;
+      fill.style.width = pct + '%';
+      knob.style.left = 'calc(' + pct + '% - 6px)';
+      curEl.textContent = fmtTime(t);
+      durEl.textContent = fmtTime(d);
+      if (d) syncTranscript(t);
+    }
     function syncPlayIcon() {
       const playing = castAudio && !castAudio.paused && !castAudio.ended;
-      playBtn.innerHTML = playing ? PAUSE_SVG : PLAY_SVG;
+      playBtn.innerHTML = playing
+        ? '<svg viewBox="0 0 14 14"><path d="M2 1.2C2 .54 2.54 0 3.2 0H5.2C5.86 0 6.4 .54 6.4 1.2V12.8C6.4 13.46 5.86 14 5.2 14H3.2C2.54 14 2 13.46 2 12.8V1.2Z"/><path d="M8 1.2C8 .54 8.54 0 9.2 0H11.2C11.86 0 12.4 .54 12.4 1.2V12.8C12.4 13.46 11.86 14 11.2 14H9.2C8.54 14 8 13.46 8 12.8V1.2Z"/></svg>'
+        : '<svg viewBox="0 0 14 14"><path d="M3 1.3C3 .6 3.75.2 4.35.56L12.1 6.26C12.66 6.6 12.66 7.4 12.1 7.74L4.35 13.44C3.75 13.8 3 13.4 3 12.7V1.3Z"/></svg>';
       playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     }
+    function bindAudio() {
+      castAudio.playbackRate = castRate;
+      castAudio.ontimeupdate = paint;
+      castAudio.onloadedmetadata = () => { computeStarts(castAudio.duration || 0); paint(); };
+      castAudio.onended = () => { syncPlayIcon(); state.textContent = 'Finished — replay any time'; };
+      castAudio.onplay = () => { syncPlayIcon(); state.textContent = 'Playing'; };
+      castAudio.onpause = () => { syncPlayIcon(); if (!castAudio.ended) state.textContent = 'Paused'; };
+    }
     if (castAudio) {
-      bindAudio();
-      syncPlayIcon();
-      const d = castAudio.duration || 0;
-      curEl.textContent = fmtTime(castAudio.currentTime);
-      durEl.textContent = fmtTime(Math.max(0, d - castAudio.currentTime));
-      status.textContent = castAudio.paused ? (castAudio.currentTime ? 'Paused' : 'Ready to play') : 'Playing your recap';
+      bindAudio(); syncPlayIcon();
+      computeStarts(castAudio.duration || 0); paint();
+      state.textContent = castAudio.paused ? (castAudio.currentTime ? 'Paused' : 'Ready to play') : 'Playing';
     }
 
-    playBtn.addEventListener('click', async () => {
-      if (castAudio) {
-        if (castAudio.paused) castAudio.play(); else castAudio.pause();
-        return;
-      }
-      // First play → generate the audio server-side, then cache it for the session.
-      playBtn.disabled = true;
-      status.textContent = 'Generating audio…';
+    // The voice takes a while to synthesise, so kick it off as soon as the
+    // recap exists rather than waiting for the learner to press play.
+    function generateAudio() {
+      if (castGen) return castGen;
+      state.textContent = 'Preparing audio…';
       note.innerHTML = '';
-      try {
+      castGen = (async () => {
         const r = await fetch('/api/tts', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: castScript(cast) })
@@ -1719,33 +2061,74 @@
         castUrl = URL.createObjectURL(blob);
         castAudio = new Audio(castUrl);
         bindAudio();
-        castAudio.onloadedmetadata = () => { durEl.textContent = fmtTime(castAudio.duration || 0); };
+        return castAudio;
+      })();
+      castGen.then(() => {
+        if (state.textContent === 'Preparing audio…') state.textContent = 'Ready to play';
+      }).catch(err => {
+        castGen = null;   // let the learner retry by pressing play
+        state.textContent = 'Audio unavailable';
+        note.innerHTML = '<div class="pc-note">' + esc(err.message) + '</div>';
+      });
+      return castGen;
+    }
+
+    playBtn.addEventListener('click', async () => {
+      if (castAudio) { if (castAudio.paused) castAudio.play(); else castAudio.pause(); return; }
+      playBtn.disabled = true;
+      try {
+        const a = await generateAudio();
         playBtn.disabled = false;
-        castAudio.play();
-        syncPlayIcon();
-      } catch (err) {
-        playBtn.disabled = false;
-        status.textContent = 'Audio unavailable';
-        note.innerHTML = '<div class="sc-note">Audio is unavailable right now, but you can still read your StudyCast.</div>';
-      }
+        if (a) { a.play(); syncPlayIcon(); }
+      } catch (err) { playBtn.disabled = false; }
     });
 
-    document.getElementById('scRestart').addEventListener('click', () => {
-      if (!castAudio) return;
-      castAudio.currentTime = 0;
-      castAudio.play();
-    });
+    // Start synthesising immediately unless it is already done or running.
+    if (!castAudio && !castGen) generateAudio();
+
     speedBtn.addEventListener('click', () => {
       castRate = SPEEDS[(SPEEDS.indexOf(castRate) + 1) % SPEEDS.length];
-      speedBtn.textContent = castRate + 'x';
-      speedBtn.classList.toggle('on', castRate !== 1);
+      speedBtn.querySelector('span').textContent = castRate + 'x';
       if (castAudio) castAudio.playbackRate = castRate;
     });
     seek.addEventListener('click', (e) => {
       if (!castAudio || !castAudio.duration) return;
       const rect = seek.getBoundingClientRect();
-      castAudio.currentTime = ((e.clientX - rect.left) / rect.width) * castAudio.duration;
+      castAudio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * castAudio.duration;
+      paint();
     });
+
+    const hideBtn = document.getElementById('pcHide');
+    hideBtn.addEventListener('click', () => {
+      const hidden = tr.style.display === 'none';
+      tr.style.display = hidden ? '' : 'none';
+      hideBtn.querySelector('span').textContent = hidden ? 'Hide Transcript' : 'Show Transcript';
+    });
+    document.getElementById('pcAuto').addEventListener('click', (e) => e.currentTarget.classList.toggle('on'));
+
+    // Ask a question about this recap; answered from the recap text itself.
+    const askIn = document.getElementById('pcAsk');
+    const askBtn = document.getElementById('pcAskBtn');
+    const answer = document.getElementById('pcAnswer');
+    async function ask() {
+      const q = askIn.value.trim();
+      if (!q) return;
+      askBtn.disabled = true;
+      answer.innerHTML = '<div class="pc-answer"><span class="shimmer-text">Thinking…</span></div>';
+      try {
+        const text = await streamChat({
+          model: 'claude-sonnet-5', max_tokens: 700,
+          system: 'You are Noura, answering a learner\'s question about an audio recap they just heard. Answer in 2-4 plain sentences using the recap below; if it does not cover the answer, say so briefly and then answer from your own knowledge. MATHS MUST BE PLAIN READABLE TEXT: no LaTeX, no dollar signs, no backslash commands.\n\nRECAP:\n' + castScript(cast),
+          messages: [{ role: 'user', content: q }]
+        });
+        answer.innerHTML = '<div class="pc-answer">' + md(text.trim()) + '</div>';
+        askIn.value = '';
+      } catch (err) {
+        answer.innerHTML = '<div class="pc-note">' + esc(err.message) + '</div>';
+      } finally { askBtn.disabled = false; }
+    }
+    askBtn.addEventListener('click', ask);
+    askIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') ask(); });
   }
 
   async function openCast(force) {
@@ -1757,21 +2140,18 @@
     } else {
       if (castAudio) { castAudio.pause(); }
       if (castUrl) { URL.revokeObjectURL(castUrl); }
-      castAudio = null; castUrl = null;
+      castAudio = null; castUrl = null; castGen = null;
     }
     if (castBusy) return;
     castBusy = true;
     const prog = renderCastLoading();
     const system = 'You are Noura, writing a short spoken-word study recap that will be read aloud by a text-to-speech voice. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"intro": string (one warm opening line, must start with "Here\'s your quick recap of" and name the topic), "recap": [string x4-6] (the main recap, each item one spoken paragraph of 50-80 words, conversational, explaining the topic clearly and building in order), "pausePoints": [string x3] (each a spoken instruction telling the listener to pause and think, e.g. "Pause for a second. Can you explain why this matters in your own words?"), "questions": [string x3] (short reflection questions to ask the listener), "mistakes": [string x2] (each names a common misunderstanding and corrects it, spoken aloud), "summary": string (a 40-60 word spoken recap of the most important ideas)}. Write for the EAR: plain spoken sentences, no headings, no bullet characters, no markdown, no symbols, no LaTeX, no numbers written as formulas - spell out any maths in words. Total speaking time should be about 2-4 minutes.';
-    const user = 'Write the StudyCast for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
+    const user = 'Write the Audio Recap for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
-      const r = await fetch('/api/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] })
-      });
-      const data = await r.json();
-      if (!r.ok || data.error) throw new Error((data && data.error && (data.error.message || JSON.stringify(data.error))) || ('HTTP ' + r.status));
-      const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
+      const raw = (await streamChat(
+        { model: 'claude-sonnet-5', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        n => prog.report(n)
+      )).trim();
       const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
       if (a === -1 || b === -1) throw new Error('No JSON in response.');
       const parsed = JSON.parse(raw.slice(a, b + 1));
@@ -1782,30 +2162,19 @@
       renderCast();
     } catch (err) {
       prog.stop();
-      renderCastError('Could not build your StudyCast (' + err.message + '). Tap Regenerate to try again.');
+      renderCastError('Could not build your Audio Recap (' + err.message + '). Tap Regenerate to try again.');
     } finally { castBusy = false; }
   }
   document.getElementById('scRegen').addEventListener('click', () => openCast(true));
 
   // ── Generation ──
   const statusLines = ['Getting started', 'Planning the sections', 'Writing explanations and examples', 'Building your checkpoints', 'Polishing your lesson'];
-  let statusIdx = 0, statusT = null;
+  let statusIdx = 0;
 
-  // Six checkpoint question types. Malformed questions are dropped rather than
-  // breaking the whole lesson.
-  const QTYPE = { short:'Short answer', scenario:'Scenario', mistake:'Spot the mistake', tf:'True or false', mc:'Multiple choice', order:'Put in order' };
-  function okQuestion(qq) {
-    if (!qq || !qq.q) return false;
-    const t = qq.type || 'mc';
-    if (t === 'mc' || t === 'tf') return Array.isArray(qq.options) && qq.options.length >= 2 && typeof qq.answer === 'number';
-    if (t === 'order') return Array.isArray(qq.steps) && qq.steps.length >= 3;
-    if (t === 'short' || t === 'scenario' || t === 'mistake') return !!qq.ideal;
-    return false;
-  }
   function okItem(it) {
     return (it && it.type === 'section' && it.title && Array.isArray(it.pages) && it.pages.length) ||
       (it && it.type === 'checkpoint' && it.title && Array.isArray(it.questions) && it.questions.length &&
-        it.questions.every(okQuestion));
+        it.questions.every(qq => qq && qq.q && Array.isArray(qq.options) && qq.options.length >= 2 && typeof qq.answer === 'number'));
   }
   function validLesson(o) { return !!(o && Array.isArray(o.items) && o.items.length && o.items.every(okItem)); }
 
@@ -1848,50 +2217,45 @@
 
   async function generate(force) {
     if (!force) {
-      try { const c = JSON.parse(localStorage.getItem(DATA_KEY) || 'null'); if (validLesson(c)) { lesson = c; renderOverview(); return; } } catch (e) {}
+      try { const c = JSON.parse(localStorage.getItem(DATA_KEY) || 'null'); if (validLesson(c)) { lesson = plainMathDeep(c); renderOverview(); return; } } catch (e) {}
     } else {
       state = { done: [], scores: {} }; saveState();
     }
     show('load');
     loadError.hidden = true; retryBtn.hidden = true; loadStatus.hidden = false;
     statusIdx = 0;
-    clearInterval(statusT);
     const fill = document.getElementById('loadProgressFill');
     document.getElementById('loadProgress').style.display = 'block';
-    fill.style.width = '2%';
-    const started = Date.now();
-    const EST_MS = 42000;   // typical build time; the bar eases toward 92% then completes
-    function tick() {
-      const el = Date.now() - started;
-      const pct = Math.min(92, Math.round(92 * (1 - Math.exp(-el / (EST_MS * 0.55)))));
-      fill.style.width = pct + '%';
-      statusIdx = Math.min(Math.floor(el / 6000), statusLines.length - 1);
-      loadStatus.innerHTML = statusLines[statusIdx] + '<span class="dots"></span><span class="load-pct">' + pct + '%</span>';
+    // A full lesson runs ~9000 characters of JSON; the bar tracks that.
+    const LESSON_CHARS = 9000;
+    const prog = driveBar(fill, null, LESSON_CHARS, 'lesson');
+    // Status line advances with real output, not a stopwatch.
+    let lastIdx = -1;
+    function setStatus(chars) {
+      const i = Math.min(statusLines.length - 1, Math.floor((chars / LESSON_CHARS) * statusLines.length));
+      if (i === lastIdx) return;
+      lastIdx = i; statusIdx = i;
+      loadStatus.innerHTML = '<span class="lbl"></span>';
+      applyShimmer(loadStatus.querySelector('.lbl'), statusLines[i] + '…');
     }
-    tick();
-    statusT = setInterval(tick, 500);
+    setStatus(0);
 
-    const system = 'You are Noura, an expert study tutor who builds structured interactive lessons. Reply with ONLY a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "items": [ {"type":"checkpoint","title":"Warm-up","questions":[QUESTION x4]} , {"type":"section","title":string,"pages":[string x2]} x3 , one mid "checkpoint" (title "Checkpoint") after the first 2 sections with 4 questions, and a final "checkpoint" (title "Final checkpoint") at the end with 4 questions ]. The FIRST item must be the Warm-up checkpoint testing intuition before teaching. Each page is GitHub-flavored Markdown, 90-130 words, starting with a ## heading, using **bold** key terms, short paragraphs or bullets, one concrete example; use $...$ or $$...$$ LaTeX for math. A QUESTION is one of these six shapes, each also carrying an \"explain\" of one sentence: {\"type\":\"short\",\"q\":string,\"ideal\":string} asks the student to explain an idea in their own words; {\"type\":\"scenario\",\"q\":string,\"ideal\":string} gives a short real situation where they apply the concept; {\"type\":\"mistake\",\"q\":string,\"ideal\":string} states a wrong claim or worked step and asks them to spot and correct the error; {\"type\":\"tf\",\"q\":string,\"options\":[\"True\",\"False\"],\"answer\":number} targets a common misconception; {\"type\":\"mc\",\"q\":string,\"options\":[string x4],\"answer\":number} is a quick understanding check; {\"type\":\"order\",\"q\":string,\"steps\":[string x3-5 listed in the CORRECT order]} is ONLY for process or sequence topics and must never be used otherwise. Prefer short, scenario and mistake questions over mc and tf; every checkpoint must mix at least three different types and must never be all multiple choice. Questions must be answerable from the lesson (warm-up = common-sense intuition). Keep the whole lesson tight and readable in 10-15 minutes. Be concise - no filler.';
+    const system = 'You are Noura, an expert study tutor who builds structured interactive lessons. Reply with ONLY a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "items": [ {"type":"checkpoint","title":"Warm-up","questions":[{"q":string,"options":[string,string,string,string],"answer":number (0-based index),"explain":string} x4]} , {"type":"section","title":string,"pages":[string x2]} x3 , one mid "checkpoint" (title "Checkpoint") after the first 2 sections with 4 questions, and a final "checkpoint" (title "Final checkpoint") at the end with 4 questions ]. The FIRST item must be the Warm-up checkpoint testing intuition before teaching. Each page is GitHub-flavored Markdown, 90-130 words, starting with a ## heading, using **bold** key terms, short paragraphs or bullets, one concrete example; write all maths in plain readable text (see the maths rule below). Questions must be answerable from the lesson (warm-up = common-sense intuition), each with exactly 4 options and a one-sentence explain. Keep the whole lesson tight and readable in 10-15 minutes. Be concise - no filler. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
     const user = 'Build the interactive lesson titled: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
 
     try {
-      const r = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 20000, system: system, messages: [{ role: 'user', content: user }] })
-      });
-      const data = await r.json();
-      if (!r.ok || data.error) throw new Error((data && data.error && (data.error.message || JSON.stringify(data.error))) || ('HTTP ' + r.status));
-      const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
+      const raw = (await streamChat(
+        { model: 'claude-sonnet-5', max_tokens: 20000, system: system, messages: [{ role: 'user', content: user }] },
+        n => { prog.report(n); setStatus(n); }
+      )).trim();
       const parsed = cleanLesson(readLessonJSON(raw));
       if (!parsed) throw new Error('Lesson structure incomplete.');
-      clearInterval(statusT);
-      document.getElementById('loadProgressFill').style.width = '100%';
-      lesson = parsed;
+      prog.done();
+      lesson = plainMathDeep(parsed);
       try { localStorage.setItem(DATA_KEY, JSON.stringify(parsed)); } catch (e) {}
       renderOverview();
     } catch (err) {
-      clearInterval(statusT);
+      prog.stop();
       document.getElementById('loadProgress').style.display = 'none';
       loadStatus.hidden = true;
       loadError.hidden = false;
@@ -1901,7 +2265,7 @@
   }
   retryBtn.addEventListener('click', () => generate(true));
 
-  generate(false);
+  openBrief();   // Study Brief comes first — the lesson builds when Learn is opened
 })();
 </script>
 </body>

@@ -520,12 +520,12 @@ body.light-mode .attach-img-remove:hover {
 .orchestrator:focus, .orchestrator:focus-visible { outline:none; }
 .orchestrator svg { width:14px; height:14px; opacity:0.9; }
 /* Shows which subject the student is currently in, beside the tier selector */
-.subject-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:999px; background:rgba(168,102,238,0.10); border:1px solid rgba(168,102,238,0.32); color:#c9b6ef; font-size:13px; font-weight:600; font-family:'Inter', sans-serif; white-space:nowrap; max-width:160px; }
+.subject-chip { display:inline-flex; align-items:center; gap:6px; margin-left:6px; padding:6px 11px; border-radius:999px; background:transparent; border:1px solid rgba(255,255,255,0.14); color:#a1a1aa; font-size:13px; font-weight:500; font-family:'Inter', sans-serif; white-space:nowrap; max-width:180px; cursor:pointer; }
 .subject-chip[hidden] { display:none; }
 .subject-chip svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; flex-shrink:0; }
 .subject-chip .subject-chip-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .subject-chip { cursor:pointer; position:relative; transition:background .12s ease, border-color .12s ease; }
-.subject-chip:hover { background:rgba(168,102,238,0.18); border-color:rgba(168,102,238,0.5); }
+.subject-chip:hover { background:rgba(168,102,238,0.10); border-color:rgba(168,102,238,0.45); color:#c9b6ef; }
 .subject-chip-caret { width:12px !important; height:12px !important; opacity:.7; flex-shrink:0; }
 /* Subject switcher popover */
 .subject-picker {
@@ -553,7 +553,8 @@ body.light-mode .subject-picker { background:#fff; border-color:#e6e6ea; box-sha
 body.light-mode .sp-item { color:#3a3a40; }
 body.light-mode .sp-item:hover { background:#f0f0f3; color:#16151c; }
 body.light-mode .sp-add { border-top-color:#ececef; }
-body.light-mode .subject-chip { background:rgba(168,85,247,0.10); border-color:rgba(168,85,247,0.30); color:#7c3aed; }
+body.light-mode .subject-chip { background:transparent; border-color:rgba(0,0,0,0.14); color:#52525b; }
+body.light-mode .subject-chip:hover { background:rgba(168,85,247,0.08); border-color:rgba(168,85,247,0.35); color:#7c3aed; }
 .orchestrator-wrap { position:relative; display:inline-flex; }
 .orchestrator .orch-caret { transition:transform 0.2s ease; }
 .orchestrator-wrap.open .orch-caret { transform:rotate(180deg); }
@@ -2268,6 +2269,31 @@ body.light-mode .waveform-btn:hover { color:#111827; background:rgba(0,0,0,0.04)
 .input-container .waveform-btn:hover { background:rgba(255,255,255,0.18); color:#ffffff; }
 .input-container .waveform-btn .icon-arrow { stroke:currentColor; }
 
+/* Faint purple glow around the typebar while it's focused */
+.input-container:focus-within {
+  border-color:rgba(168,102,238,0.55);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,0.6),
+             0 0 0 3px rgba(168,102,238,0.13),
+             0 0 22px rgba(168,102,238,0.28);
+}
+.chat-input-shell:focus-within {
+  border-color:rgba(168,102,238,0.55);
+  box-shadow:0 0 0 3px rgba(168,102,238,0.13), 0 0 24px rgba(168,102,238,0.28);
+}
+.input-container, .chat-input-shell { transition:border-color .15s, box-shadow .18s; }
+
+/* Send button goes purple as soon as there is something to send */
+.input-container .waveform-btn.is-typing,
+.chat-input-shell .chat-send-btn:not(:disabled) {
+  background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%);
+  color:#ffffff;
+  box-shadow:0 4px 14px rgba(123,92,250,0.38);
+}
+.input-container .waveform-btn.is-typing:hover,
+.chat-input-shell .chat-send-btn:not(:disabled):hover { filter:brightness(1.08); background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#ffffff; }
+.input-container .waveform-btn.is-typing .icon-arrow,
+.chat-input-shell .chat-send-btn:not(:disabled) .icon-arrow { stroke:#ffffff; }
+
 /* ===== Redesigned profile menu (bottom-left) ===== */
 .pm-menu { width: 288px !important; padding: 8px !important; border-radius:18px !important; }
 .pm-header { display:flex; align-items:center; gap:12px; padding:8px 10px 10px; }
@@ -2749,7 +2775,12 @@ body.light-mode .aset-member .nm { color:#16151c; }
           .chat-title .grad-logo.hero-pen { width:38px; height:38px; flex-shrink:0; }
           /* "Noura" wordmark in gradient + a small gradient logo snug to its right, pushed left */
           .brand-wrap { display:inline-flex; align-items:center; gap:6px; margin-right:auto; }
-          /* Gradient removed to make Noura white */
+          .brand-name {
+            background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
+            -webkit-background-clip:text; background-clip:text;
+            -webkit-text-fill-color:transparent; color:transparent;
+            margin-right:0;
+          }
           .brand-logo { width:20px; height:20px; flex-shrink:0; }
           .sidebar.collapsed .brand-logo { display:none; }
 
@@ -2863,6 +2894,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
                     <path d="M12 5v14M5 12h14"/>
                   </svg>
                 </button>
+                <button type="button" class="subject-chip" hidden aria-label="Switch subject" title="Switch subject"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="subject-chip-name"></span><svg class="subject-chip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
               </div>
 
               <div class="right">
@@ -2984,6 +3016,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
                   <button class="icon-btn" aria-label="Add attachment" title="Add attachment" onclick="document.getElementById('fileInput')?.click()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 5v14M5 12h14"/></svg>
                   </button>
+                  <button type="button" class="subject-chip" hidden aria-label="Switch subject" title="Switch subject"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="subject-chip-name"></span><svg class="subject-chip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
                 </div>
                 <div class="right">
                   <button class="hero-mic-btn" id="speakPill" aria-label="Speak" title="Voice input">
@@ -3340,6 +3373,52 @@ body.light-mode .aset-member .nm { color:#16151c; }
   });
 
   let chatContext = [];
+
+  // ── Per-subject chat memory ─────────────────────────────────────────
+  // Each subject keeps its own transcript and model context, so switching
+  // subjects (or coming back later) restores exactly where that subject was.
+  const CHAT_KEY = 'NOURA_CHAT_';
+  function activeSubject() {
+    try {
+      const r = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]');
+      return (Array.isArray(r) && r[0]) ? String(r[0]) : '';
+    } catch (e) { return ''; }
+  }
+  function saveSubjectChat(subject) {
+    subject = subject || activeSubject();
+    if (!subject || typeof messagesCol === 'undefined' || !messagesCol) return;
+    // Inline base64 attachments would blow the storage quota — drop their data.
+    const think = messagesCol.querySelector('#thinkingMsg');
+    if (think) think.remove();   // never persist an in-flight loading bubble
+    let html = messagesCol.innerHTML.replace(/src="data:[^"]*"/g, 'src="#"');
+    if (html.length > 400000) html = '';
+    const ctx = chatContext.filter(m => typeof m.content === 'string');
+    try {
+      localStorage.setItem(CHAT_KEY + subject, JSON.stringify({ html: html, ctx: ctx, at: Date.now() }));
+    } catch (e) {}   // quota exceeded → keep the in-memory chat, just don't persist
+  }
+  function restoreSubjectChat(subject) {
+    if (!subject) return false;
+    let p = null;
+    try { p = JSON.parse(localStorage.getItem(CHAT_KEY + subject) || 'null'); } catch (e) {}
+    const has = !!(p && typeof p === 'object' && (p.html || (p.ctx && p.ctx.length)));
+    chatContext = (has && Array.isArray(p.ctx)) ? p.ctx.slice() : [];
+    conversationHasHomework = false;
+    conversationHasImage = false;
+    if (messagesCol) messagesCol.innerHTML = has && p.html ? p.html : '';
+    if (has && typeof scrollToBottom === 'function') scrollToBottom();
+    return has;
+  }
+  // Bridge for the subjects module, which lives in its own scope.
+  window.NouraChatMemory = {
+    save: saveSubjectChat,
+    restore: restoreSubjectChat,
+    active: activeSubject,
+    has: function (subject) {
+      try { return !!localStorage.getItem(CHAT_KEY + subject); } catch (e) { return false; }
+    }
+  };
+
   let pendingAttachment = null;        // { name, kind:'image'|'text', dataUrl?, text? }
   let conversationHasHomework = false;
   let conversationHasImage = false;
@@ -3594,11 +3673,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
         + (subjName ? ' ("' + subjName + '")' : '')
         + '. You cannot change or switch the subject yourself. If the learner asks to study, learn about, or work on a topic that clearly belongs to a DIFFERENT subject than the current one (for example asking about business while inside a biology subject), do NOT teach that topic. Instead reply with one or two short sentences telling them that topic deserves its own subject folder, and ask whether they would like to create it themselves or have you set it up for them. Then end your message with a marker on its own final line exactly like: [[NEWSUBJECT: Business]] (a short title-cased name for the new subject). The app shows buttons that handle creating it - never mention the marker or the buttons themselves. For small tangents or genuinely related questions, just answer normally in the current subject.';
 
+      systemText += '\n\nMATHS MUST BE PLAIN READABLE TEXT: never write LaTeX and never use dollar-sign math delimiters or backslash commands (no $...$, no \\\\frac, \\\\int, \\\\infty, ^{} or _{}). Write every formula with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Say symbol names in words. The learner must never see raw notation they cannot read.';
+
       systemText += '\n\nSTYLE: This is a spoken, back-and-forth conversation, so write the way a warm, friendly person actually talks. Keep a friendly, encouraging, upbeat tone. Use plain, natural, everyday English. Do NOT use dashes of any kind (no em dashes "—", no en dashes, no hyphens joining clauses) and do NOT use the equals sign "=" or other math/symbol shorthand — write those out in words instead (for example, say "the amygdala means emotions and fear", not "amygdala = emotions and fear"). Prefer short sentences and commas over dashes. Avoid markdown symbols, bullet characters, and asterisks; just speak in normal sentences.';
 
       systemText += '\n\nFACT-CHECK THE LEARNER (IMPORTANT): You have a live web_search tool for full internet access. Whenever the learner teaches, states, or asserts a fact, judge whether it is actually true, and use web_search to verify it whenever you are not fully certain (especially names, dates, numbers, definitions, causes, and mechanisms). If what they said is incorrect, outdated, oversimplified into something false, or a common misconception, you must NOT accept it, agree with it, praise it, or act as though you "learned" it. Instead, kindly tell them that that part is mistaken, briefly say what is actually correct (and mention the source if you searched), and invite them to try explaining it again. Only acknowledge that you have learned or understood something, or that they taught it well, when the information is actually correct. Never confirm, repeat as true, or build on wrong information. Express all of this inside your normal response format.';
 
-      systemText += "\n\nLESSON FLOW (UI MARKERS): The app renders interactive elements from special markers placed on the FINAL line of your reply. (1) When the learner asks to learn or study a topic that is broad or ambiguous (for example 'I want to learn eco'), reply with ONE short clarifying question (a single sentence, nothing else) and end with a marker listing 3 to 5 short interpretations, exactly like: [[CHIPS: Ecology and ecosystems | Economics basics | Environmental science | A general overview]]. (2) Once the learner names or picks a specific topic they want to learn, reply with one short friendly sentence (for example inviting them to tap Generate Lesson, or asking if they want it focused on anything specific) and end with: [[LESSON: Short Lesson Title]] - the app then shows a Generate Lesson card that builds a full lesson page. Rules: the marker must be the very last line of the message; never put both markers in one message; never mention, explain, or read the markers aloud; only use them when the learner wants to learn a topic - not for ordinary questions, homework help, or mid-conversation tutoring. If the topic belongs to a different subject than the current one, do not use CHIPS or LESSON - follow the SUBJECT LOCK rules instead.";
+      systemText += "\n\nSTUDY PLAN (UI MARKER): The app turns a marker on the FINAL line of your reply into a Generate Lesson card that builds a full lesson workspace - a guided Learn path with readable sections, Checkpoints, a Study Brief, Recall practice and an Audio Recap. WHEN the learner says they want to learn, study, review, revise or get help with a topic (including exam prep), do ALL of this in ONE reply: (a) briefly acknowledge what they asked, (b) actually answer or orient them in two to four sentences of genuinely useful content about the topic, (c) say in the same message that you have put together a study plan covering the lesson, checkpoints, recall practice and an audio recap, then (d) end with the marker on its own final line, exactly like: [[LESSON: Short Lesson Title]]. DO NOT interrogate the learner first: ask NO clarifying questions before creating the plan - if the topic is broad, simply choose the most useful scope yourself, say what you picked in one clause, and generate the plan anyway. Never run quizzes, questions, flashcards or lesson content inside the chat - the lesson workspace handles all of that. Rules: the marker must be the very last line of the message; never mention or read the marker aloud; use it only when the learner wants to learn or review a topic, not for ordinary factual questions or mid-conversation tutoring. If the topic belongs to a different subject than the current one, do not use the marker - follow the SUBJECT LOCK rules instead.";
     }
 
     // Convert our chat context to Anthropic's message format (image_url -> base64 source block)
@@ -3666,6 +3747,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
       // Add AI response to context
       chatContext.push({ role: 'assistant', content: displayText });
+      saveSubjectChat();
       
       // Parse out <think> block (handles <think>, <theink>, etc.)
       let thoughtText = '';
@@ -6041,7 +6123,19 @@ body.light-mode .aset-member .nm { color:#16151c; }
           b.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + folder + '"/></svg><span></span>'
             + (n === current ? '<svg class="sp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>' : '');
           b.querySelector('span').textContent = n;
-          b.addEventListener('click', (e) => { e.stopPropagation(); closeSubjectPickers(); recordRecent(n); });
+          b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeSubjectPickers();
+            if (n === current) return;
+            // Park the current subject's conversation, then bring up the one
+            // belonging to the subject being switched to.
+            const mem = window.NouraChatMemory;
+            const inChat = document.getElementById('chatApp')
+              && getComputedStyle(document.getElementById('chatApp')).display !== 'none';
+            if (mem && inChat) mem.save(current);
+            recordRecent(n);
+            if (mem && inChat) mem.restore(n);
+          });
           menu.appendChild(b);
         });
       }

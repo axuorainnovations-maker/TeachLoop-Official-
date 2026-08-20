@@ -6,6 +6,8 @@ import http.server
 import socketserver
 import urllib.request
 import urllib.error
+import concurrent.futures
+import time
 
 # Read .env.local
 env_vars = {}
@@ -33,12 +35,48 @@ PORT = 3006
 NVIDIA_API_KEY = env_vars.get('NVIDIA_API_KEY', '')
 RIVA_URI = 'grpc.nvcf.nvidia.com:443'
 ASR_FUNCTION_ID = '71203149-d3b7-4460-8231-1be2543a1fca'
-# TTS model is env-driven and defaults to magpie-tts-multilingual.
-NVIDIA_TTS_MODEL = env_vars.get('NVIDIA_TTS_MODEL', '') or 'magpie-tts-multilingual'
-TTS_FUNCTION_IDS = {'magpie-tts-multilingual': '877104f7-e885-42b9-8de8-f6e4c6303969'}
-TTS_FUNCTION_ID = TTS_FUNCTION_IDS.get(NVIDIA_TTS_MODEL, TTS_FUNCTION_IDS['magpie-tts-multilingual'])
-TTS_VOICE = 'Magpie-Multilingual.EN-US.Mia'
-TTS_RATE = 44100
+# TTS model is env-driven and now defaults to chatterbox-multilingual-tts.
+NVIDIA_TTS_MODEL = env_vars.get('NVIDIA_TTS_MODEL', '') or 'chatterbox-multilingual-tts'
+# NVCF function IDs are per-model. Magpie's is known; Chatterbox's must come from
+# your own build.nvidia.com model page (set NVIDIA_TTS_FUNCTION_ID in .env.local)
+# because a wrong ID fails at call time rather than at startup.
+TTS_FUNCTION_IDS = {
+    'magpie-tts-multilingual': '877104f7-e885-42b9-8de8-f6e4c6303969',
+    'chatterbox-multilingual-tts': env_vars.get('NVIDIA_TTS_FUNCTION_ID', ''),
+}
+# Deliberately NOT falling back to another model's ID: pairing Magpie's function
+# ID with a Chatterbox voice would fail confusingly at request time.
+TTS_FUNCTION_ID = (env_vars.get('NVIDIA_TTS_FUNCTION_ID', '')
+                   or TTS_FUNCTION_IDS.get(NVIDIA_TTS_MODEL, ''))
+if not TTS_FUNCTION_ID:
+    print('TTS model "%s" has no NVCF function ID — set NVIDIA_TTS_FUNCTION_ID in '
+          '.env.local (find it on the model page at build.nvidia.com). '
+          'Audio Recap will report this until it is set.' % NVIDIA_TTS_MODEL)
+# Voice naming differs per model, so it is env-overridable too.
+# Voice names and native sample rate both differ per model — Chatterbox reports
+# 24 kHz and only ships Male subvoices; sending Magpie's 44.1 kHz here would
+# play the audio back at the wrong pitch.
+TTS_DEFAULT_VOICES = {
+    'magpie-tts-multilingual': 'Magpie-Multilingual.EN-US.Mia',
+    'chatterbox-multilingual-tts': 'Chatterbox-Multilingual.en-US.Male',
+}
+TTS_DEFAULT_RATES = {
+    'magpie-tts-multilingual': 44100,
+    'chatterbox-multilingual-tts': 24000,
+}
+TTS_VOICE = (env_vars.get('NVIDIA_TTS_VOICE', '')
+             or TTS_DEFAULT_VOICES.get(NVIDIA_TTS_MODEL)
+             or TTS_DEFAULT_VOICES['magpie-tts-multilingual'])
+TTS_RATE = int(env_vars.get('NVIDIA_TTS_RATE', '')
+               or TTS_DEFAULT_RATES.get(NVIDIA_TTS_MODEL, 44100))
+# Per-request input cap. Chatterbox rejects anything over 500 characters;
+# Magpie tolerates more. Chunks are synthesised separately and concatenated.
+TTS_DEFAULT_LIMITS = {
+    'magpie-tts-multilingual': 700,
+    'chatterbox-multilingual-tts': 200,
+}
+TTS_CHAR_LIMIT = int(env_vars.get('NVIDIA_TTS_CHAR_LIMIT', '')
+                     or TTS_DEFAULT_LIMITS.get(NVIDIA_TTS_MODEL, 420))
 
 try:
     import riva.client
@@ -76,8 +114,10 @@ def pcm_to_wav(pcm, rate, channels=1, bits=16):
               + b'data' + struct.pack('<I', data_len))
     return header + pcm
 
-def _split_for_tts(text, limit=700):
+def _split_for_tts(text, limit=None):
     """Split a long script into sentence-aligned chunks the TTS service accepts."""
+    if limit is None:
+        limit = TTS_CHAR_LIMIT
     text = ' '.join(str(text).split())
     if len(text) <= limit:
         return [text]
@@ -91,7 +131,22 @@ def _split_for_tts(text, limit=700):
             cur = (cur + ' ' + sentence).strip()
     if cur:
         parts.append(cur.strip())
-    return [p for p in parts if p]
+    # A single sentence can still exceed the cap — hard-split those on words so
+    # nothing is ever sent over the model's limit.
+    out = []
+    for p in parts:
+        p = p.strip()
+        if not p:
+            continue
+        while len(p) > limit:
+            cut = p.rfind(' ', 0, limit)
+            if cut <= 0:
+                cut = limit
+            out.append(p[:cut].strip())
+            p = p[cut:].strip()
+        if p:
+            out.append(p)
+    return out
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -156,8 +211,32 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     'Content-Type': 'application/json',
                 }
             )
+            # When the caller asks for a stream, pass the SSE bytes straight
+            # through so the browser can watch generation progress live.
+            try:
+                want_stream = bool(json.loads(body or b'{}').get('stream'))
+            except Exception:
+                want_stream = False
+
             try:
                 with urllib.request.urlopen(req) as resp:
+                    if want_stream:
+                        self.send_response(200)
+                        self.send_header('Content-Type', 'text/event-stream')
+                        self.send_header('Cache-Control', 'no-cache')
+                        self.send_header('X-Accel-Buffering', 'no')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        while True:
+                            chunk = resp.read1(2048) if hasattr(resp, 'read1') else resp.read(2048)
+                            if not chunk:
+                                break
+                            try:
+                                self.wfile.write(chunk)
+                                self.wfile.flush()
+                            except (BrokenPipeError, ConnectionResetError):
+                                return   # client navigated away mid-stream
+                        return
                     resp_body = resp.read()
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -177,6 +256,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not (RIVA_AVAILABLE and NVIDIA_API_KEY):
                 self._json(503, {"error": "voice not configured (need nvidia-riva-client + NVIDIA_API_KEY)"})
                 return
+            if not TTS_FUNCTION_ID:
+                self._json(503, {"error": 'TTS model "%s" has no function ID. Set '
+                                          'NVIDIA_TTS_FUNCTION_ID in .env.local (from the model page '
+                                          'on build.nvidia.com), then restart serve.py.' % NVIDIA_TTS_MODEL})
+                return
             try:
                 data = json.loads(body or b'{}')
             except Exception:
@@ -188,13 +272,29 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             voice = data.get('voice') or TTS_VOICE
             language = data.get('language') or 'en-US'
             try:
-                svc = get_tts_service()
-                pcm = b''
-                for chunk in _split_for_tts(text):
-                    r = svc.synthesize(
-                        text=chunk, voice_name=voice, language_code=language,
-                        sample_rate_hz=TTS_RATE, encoding=riva.client.AudioEncoding.LINEAR_PCM)
-                    pcm += r.audio
+                chunks = _split_for_tts(text)
+
+                def _say(part):
+                    # One service per call: the stub is not documented as
+                    # thread-safe, and construction is cheap next to inference.
+                    # NVCF rate-limits concurrent stateful requests, so back off
+                    # and retry rather than failing the whole recap.
+                    delay = 1.5
+                    for attempt in range(7):
+                        try:
+                            svc = riva.client.SpeechSynthesisService(_riva_auth(TTS_FUNCTION_ID))
+                            return svc.synthesize(
+                                text=part, voice_name=voice, language_code=language,
+                                sample_rate_hz=TTS_RATE,
+                                encoding=riva.client.AudioEncoding.LINEAR_PCM).audio
+                        except Exception as err:
+                            if 'exceeded rate limit' not in str(err) or attempt == 6:
+                                raise
+                            time.sleep(delay)
+                            delay *= 1.8
+                    raise RuntimeError('tts retries exhausted')
+
+                pcm = b''.join(_say(c) for c in chunks)
                 wav = pcm_to_wav(pcm, TTS_RATE, 1)
                 self.send_response(200)
                 self.send_header('Content-Type', 'audio/wav')
@@ -202,7 +302,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(wav)
             except Exception as e:
-                self._json(500, {"error": "tts failed", "detail": str(e)})
+                detail = str(e)
+                if 'exceeded rate limit' in detail:
+                    msg = 'NVIDIA rate limit hit while generating the recap. Wait a moment and press play again.'
+                elif 'maximum allowed length' in detail:
+                    msg = 'A line was too long for the voice model to speak. Regenerate the recap.'
+                else:
+                    msg = 'Audio generation failed: ' + detail.split('\n')[0][:200]
+                self._json(500, {"error": msg, "detail": detail})
         elif self.path == '/api/stt':
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length)

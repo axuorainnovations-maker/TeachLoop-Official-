@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noura — Note</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --grad: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%); }
+  * { box-sizing:border-box; }
+  html, body { min-height:100%; }
+  body {
+    margin:0; background:#191919; color:#fff;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+  ::selection { background:rgba(255,255,255,0.10); }
+  button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+  a { color:inherit; text-decoration:none; }
+  .grad-logo { display:inline-block; background:var(--grad); -webkit-mask:url('logo.png?v=3') center/contain no-repeat; mask:url('logo.png?v=3') center/contain no-repeat; }
+
+  /* ── Top bar ───────────────────────────────────────────────── */
+  .nb-head {
+    display:flex; align-items:center; justify-content:space-between;
+    height:45px; padding:0 12px; background:#191919;
+    border-bottom:1px solid rgba(42,42,42,0.8);
+    position:sticky; top:0; z-index:20;
+  }
+  .nb-left { display:flex; align-items:center; min-width:0; }
+  .nb-icon {
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:28px; height:28px; border-radius:4px; transition:background .12s;
+  }
+  .nb-icon:hover { background:#2A2A2A; }
+  .nb-menu { margin-right:12px; }
+  .nb-ws {
+    display:flex; align-items:center; min-width:0; border-radius:5px;
+    padding:3px 4px; margin-left:-4px; transition:background .12s;
+  }
+  .nb-ws:hover { background:#2A2A2A; }
+  .nb-ws-badge {
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:20px; height:20px; border-radius:4px; background:rgba(139,92,246,0.22);
+  }
+  .nb-ws-badge .grad-logo { width:13px; height:13px; }
+  .nb-ws-name {
+    margin-left:6px; max-width:180px; color:#fff; font-size:14px; font-weight:500;
+    letter-spacing:-.01em; line-height:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .nb-sep { color:#5A5A5A; font-size:14px; margin:0 8px; line-height:1; user-select:none; }
+  .nb-page {
+    color:#fff; font-size:14px; font-weight:400; letter-spacing:-.01em; line-height:20px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:42vw;
+  }
+  .nb-right { display:flex; align-items:center; flex-shrink:0; }
+  .nb-edited { color:#6B6B6B; font-size:13px; margin-right:16px; line-height:20px; letter-spacing:-.01em; }
+  .nb-share {
+    display:flex; align-items:center; gap:6px; height:28px; padding:0 8px; margin-right:4px;
+    border-radius:5px; transition:background .12s;
+  }
+  .nb-share:hover { background:#2A2A2A; }
+  .nb-share span { color:#fff; font-size:14px; line-height:20px; letter-spacing:-.01em; }
+  .nb-icon svg, .nb-share svg { display:block; }
+  @media (max-width:640px) { .nb-edited { display:none; } }
+
+  /* ── Page body ─────────────────────────────────────────────── */
+  .nb-main { max-width:900px; margin:0 auto; padding:96px 96px 160px; }
+  .nb-title {
+    font-size:40px; font-weight:700; color:#fff; letter-spacing:-.02em;
+    line-height:1.1; margin:0 0 6px; outline:none;
+  }
+  .nb-title:empty::before { content:'Untitled'; color:#3A3A3A; }
+  .nb-sub { color:#6B6B6B; font-size:14px; letter-spacing:-.01em; margin-bottom:38px; }
+  .nb-sub b { color:#a78bfa; font-weight:600; }
+
+  /* Notion-ish document blocks */
+  .nb-doc { outline:none; font-size:16px; line-height:1.75; color:#D4D4D4; letter-spacing:-.003em; }
+  .nb-doc:focus { outline:none; }
+  .nb-doc h2 {
+    font-size:24px; font-weight:700; color:#fff; letter-spacing:-.015em;
+    margin:34px 0 10px; line-height:1.3;
+  }
+  .nb-doc h2:first-child { margin-top:0; }
+  .nb-doc h3 { font-size:17px; font-weight:600; color:#fff; margin:22px 0 6px; }
+  .nb-doc p { margin:0 0 10px; }
+  .nb-doc ul { list-style:none; margin:0 0 12px; padding:0; }
+  .nb-doc li { position:relative; padding-left:26px; margin:0 0 7px; }
+  .nb-doc li::before {
+    content:''; position:absolute; left:9px; top:11px;
+    width:5px; height:5px; border-radius:50%; background:#8b5cf6;
+  }
+  .nb-doc b, .nb-doc strong { color:#fff; font-weight:600; }
+  .nb-doc .nb-callout {
+    display:flex; gap:12px; padding:16px 18px; margin:0 0 8px;
+    border-radius:10px; background:rgba(139,92,246,0.10); border:1px solid rgba(139,92,246,0.24);
+    color:#e7e2f7;
+  }
+  .nb-doc .nb-callout .ico { flex-shrink:0; font-size:17px; line-height:1.5; }
+  .nb-doc hr { border:none; border-top:1px solid #2A2A2A; margin:30px 0; }
+  .nb-doc [data-placeholder]:empty::before { content:attr(data-placeholder); color:#4A4A4A; }
+
+  .nb-empty { color:#8A8A8A; font-size:15.5px; line-height:1.7; }
+  .nb-empty a { color:#a78bfa; text-decoration:underline; text-underline-offset:3px; }
+
+  .nb-saved {
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+    padding:8px 14px; border-radius:99px; background:#252525; border:1px solid #2A2A2A;
+    color:#E0E0E0; font-size:13px; font-weight:500; opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .nb-saved.on { opacity:1; }
+
+  @media (max-width:768px) {
+    .nb-main { padding:64px 24px 140px; }
+    .nb-title { font-size:32px; }
+  }
+  @media (max-width:390px) { .nb-main { padding-left:16px; padding-right:16px; } }
+</style>
+</head>
+<body>
+
+<header class="nb-head">
+  <div class="nb-left">
+    <a class="nb-icon nb-menu" id="nbBack" href="#" aria-label="Back to lesson" title="Back to lesson">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M3 5H15" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M3 9H15" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M3 13H15" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </a>
+    <a class="nb-ws" id="nbWs" href="chatbot.html">
+      <span class="nb-ws-badge"><span class="grad-logo" role="img" aria-label="Noura"></span></span>
+      <span class="nb-ws-name" id="nbWsName">Noura</span>
+    </a>
+    <span class="nb-sep">/</span>
+    <span class="nb-page" id="nbCrumb">Note</span>
+  </div>
+
+  <div class="nb-right">
+    <span class="nb-edited" id="nbEdited">Edited just now</span>
+    <button class="nb-share" id="nbShare" type="button">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2.5 13.5V4.5L5.5 3V13.5" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5.5 4V13.5H10.5V6L13.5 7.5V13.5" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3.5 6.5H4.5" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M3.5 9H4.5" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M7 8H8" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M7 10.5H8" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span>Share</span>
+    </button>
+    <button class="nb-icon" id="nbCopy" type="button" aria-label="Copy note text" title="Copy note text">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M7.2 11.2L6 12.4C4.8 13.6 2.9 13.6 1.7 12.4C0.5 11.2 0.5 9.3 1.7 8.1L4.6 5.2C5.8 4 7.7 4 8.9 5.2C9 5.3 9.1 5.4 9.2 5.6" stroke="#8A8A8A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.8 6.8L12 5.6C13.2 4.4 15.1 4.4 16.3 5.6C17.5 6.8 17.5 8.7 16.3 9.9L13.4 12.8C12.2 14 10.3 14 9.1 12.8C9 12.7 8.9 12.6 8.8 12.4" stroke="#8A8A8A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="nb-icon" id="nbReset" type="button" aria-label="Reset to Study Brief" title="Reset to Study Brief">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M15 9a6 6 0 1 1-1.8-4.3" stroke="#8A8A8A" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M14.6 2.6v3h-3" stroke="#8A8A8A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main class="nb-main">
+  <h1 class="nb-title" id="nbTitle" contenteditable="true" spellcheck="false"></h1>
+  <div class="nb-sub" id="nbSub"></div>
+  <div class="nb-doc" id="nbDoc" contenteditable="true" spellcheck="false"></div>
+</main>
+
+<div class="nb-saved" id="nbSaved">Saved</div>
+
+<script>
+(function () {
+  const qs = new URLSearchParams(location.search);
+  const title = (qs.get('title') || '').trim();
+  const subject = (qs.get('subject') || '').trim();
+  const slug = title.toLowerCase();
+
+  const BRIEF_KEY = 'NOURA_BRIEF_' + slug;
+  const NOTE_KEY  = 'NOURA_NOTE_'  + slug;
+
+  const elTitle = document.getElementById('nbTitle');
+  const elSub   = document.getElementById('nbSub');
+  const elDoc   = document.getElementById('nbDoc');
+  const elCrumb = document.getElementById('nbCrumb');
+  const elWs    = document.getElementById('nbWsName');
+  const elEdit  = document.getElementById('nbEdited');
+  const toast   = document.getElementById('nbSaved');
+
+  const lessonHref = 'lesson.html?title=' + encodeURIComponent(title) +
+                     (subject ? '&subject=' + encodeURIComponent(subject) : '');
+  document.getElementById('nbBack').href = lessonHref;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g,
+      c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function read(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; } }
+
+  // ── Header text ───────────────────────────────────────────
+  const noteTitle = title || 'Untitled note';
+  document.title = 'Noura — ' + noteTitle;
+  elTitle.textContent = noteTitle;
+  elCrumb.textContent = noteTitle;
+  elWs.textContent = subject ? subject : 'Noura';
+  elSub.innerHTML = 'Study Brief note' + (subject ? ' · <b>' + esc(subject) + '</b>' : '');
+
+  // ── Turn a Study Brief into a Notion-style document ───────
+  function briefToDoc(b) {
+    const li = arr => '<ul>' + arr.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+    return '' +
+      '<div class="nb-callout"><span class="ico">💡</span><div><b>Big idea</b><br>' + esc(b.bigIdea) + '</div></div>' +
+      '<h2>Key concepts</h2>' + li(b.keyConcepts) +
+      '<h2>Must-know terms</h2>' +
+        '<ul>' + b.terms.map(t =>
+          '<li><b>' + esc(t.term) + '</b> — ' + esc(t.definition) + '</li>').join('') + '</ul>' +
+      '<h2>Worked example</h2><p>' + esc(b.example) + '</p>' +
+      '<h2>Common mistakes</h2>' + li(b.mistakes) +
+      '<h2>You should be able to explain</h2>' + li(b.explainGoals) +
+      '<hr>' +
+      '<h2>My notes</h2>' +
+      '<p data-placeholder="Write anything you want to remember…"><br></p>';
+  }
+
+  function validBrief(b) {
+    return b && typeof b.bigIdea === 'string' && b.bigIdea.trim() &&
+      Array.isArray(b.keyConcepts) && b.keyConcepts.length &&
+      Array.isArray(b.terms) && b.terms.length &&
+      typeof b.example === 'string' && b.example.trim() &&
+      Array.isArray(b.mistakes) && b.mistakes.length &&
+      Array.isArray(b.explainGoals) && b.explainGoals.length;
+  }
+
+  function renderEmpty(msg) {
+    elDoc.innerHTML = '<div class="nb-empty">' + esc(msg) +
+      '<br><br><a href="' + lessonHref + '">Open the lesson and generate the Study Brief →</a></div>';
+    elDoc.contentEditable = 'false';
+  }
+
+  // Saved edits win; otherwise build the note from the Study Brief.
+  function load(force) {
+    const saved = force ? null : read(NOTE_KEY);
+    if (saved && saved.html) {
+      elDoc.innerHTML = saved.html;
+      if (saved.title) { elTitle.textContent = saved.title; elCrumb.textContent = saved.title; }
+      stampEdited(saved.at);
+      return;
+    }
+    if (!title) { renderEmpty('This note has no topic yet.'); return; }
+    const brief = read(BRIEF_KEY);
+    if (!validBrief(brief)) {
+      renderEmpty('No Study Brief has been generated for “' + title + '” yet.');
+      return;
+    }
+    elDoc.innerHTML = briefToDoc(brief);
+    save();
+  }
+
+  // ── Autosave ──────────────────────────────────────────────
+  let t = null, toastT = null;
+  function stampEdited(at) {
+    if (!at) { elEdit.textContent = 'Edited just now'; return; }
+    const mins = Math.floor((Date.now() - at) / 60000);
+    elEdit.textContent = mins < 1 ? 'Edited just now'
+      : mins < 60 ? 'Edited ' + mins + 'm ago'
+      : mins < 1440 ? 'Edited ' + Math.floor(mins / 60) + 'h ago'
+      : 'Edited ' + Math.floor(mins / 1440) + 'd ago';
+  }
+  function save() {
+    try {
+      localStorage.setItem(NOTE_KEY, JSON.stringify({
+        html: elDoc.innerHTML, title: elTitle.textContent.trim(), at: Date.now()
+      }));
+    } catch (e) {}
+    stampEdited();
+  }
+  function queueSave() {
+    clearTimeout(t);
+    t = setTimeout(() => {
+      save();
+      toast.classList.add('on');
+      clearTimeout(toastT);
+      toastT = setTimeout(() => toast.classList.remove('on'), 1100);
+    }, 600);
+  }
+  elDoc.addEventListener('input', queueSave);
+  elTitle.addEventListener('input', () => {
+    elCrumb.textContent = elTitle.textContent.trim() || 'Untitled';
+    queueSave();
+  });
+  // Keep pasted text plain so the note styling stays consistent.
+  [elDoc, elTitle].forEach(el => el.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+  }));
+
+  document.getElementById('nbReset').addEventListener('click', () => {
+    if (!confirm('Replace this note with a fresh copy of the Study Brief? Your edits will be lost.')) return;
+    elDoc.contentEditable = 'true';
+    load(true);
+  });
+  document.getElementById('nbCopy').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(elTitle.textContent.trim() + '\n\n' + elDoc.innerText.trim());
+      toast.textContent = 'Copied';
+      toast.classList.add('on');
+      setTimeout(() => { toast.classList.remove('on'); toast.textContent = 'Saved'; }, 1100);
+    } catch (e) {}
+  });
+  document.getElementById('nbShare').addEventListener('click', () => {
+    toast.textContent = 'Sharing is not set up yet';
+    toast.classList.add('on');
+    setTimeout(() => { toast.classList.remove('on'); toast.textContent = 'Saved'; }, 1500);
+  });
+
+  load(false);
+})();
+</script>
+</body>
+</html>
