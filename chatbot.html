@@ -3388,9 +3388,10 @@ body.light-mode .aset-member .nm { color:#16151c; }
     subject = subject || activeSubject();
     if (!subject || typeof messagesCol === 'undefined' || !messagesCol) return;
     // Inline base64 attachments would blow the storage quota — drop their data.
-    const think = messagesCol.querySelector('#thinkingMsg');
-    if (think) think.remove();   // never persist an in-flight loading bubble
+    // Strip the in-flight loading bubble from the SAVED COPY only. It must stay
+    // in the DOM: the reply reuses that node as its container.
     let html = messagesCol.innerHTML.replace(/src="data:[^"]*"/g, 'src="#"');
+    html = html.replace(/<div[^>]*id="thinkingMsg"[\s\S]*?<\/div>\s*$/, '');
     if (html.length > 400000) html = '';
     const ctx = chatContext.filter(m => typeof m.content === 'string');
     try {
@@ -3705,7 +3706,22 @@ body.light-mode .aset-member .nm { color:#16151c; }
         body: JSON.stringify({
           model: model,
           max_tokens: isLearnerTier() ? 8000 : 4096,
-          system: systemText,
+          system: (function () {
+            // Appended last on purpose: earlier instructions tell the tutor to ask
+            // what the learner wants, which was beating a mid-prompt version.
+            if (chatContext.filter(m => m.role === 'assistant').length) return systemText;
+            return systemText + "\n\n=== HIGHEST PRIORITY, OVERRIDES EVERYTHING ABOVE ===\n"
+              + "This is your FIRST reply of the conversation. You MUST end it with a study-plan marker "
+              + "on its own final line, in exactly this form: [[LESSON: Short Lesson Title]]\n"
+              + "This is mandatory for EVERY first reply - greetings, vague messages like 'help me', "
+              + "single words, and ordinary questions all included. There is no exception.\n"
+              + "Shape the reply like this: answer or greet them in two to four useful sentences, then one "
+              + "clause saying you have put together a study plan with a brief, lesson, checkpoints, recall "
+              + "practice and an audio recap, then the marker alone on the last line.\n"
+              + "Pick the topic yourself from whatever they said. If nothing specific was named, use the "
+              + "current subject, and if there is none, pick the most likely topic and say which in one clause. "
+              + "Do NOT ask what they want to work on before the marker. Do NOT omit the marker.";
+          })(),
           messages: anthMessages,
           // Full internet access so the model can fact-check what the learner
           // teaches. It only searches when it needs to verify a claim.
