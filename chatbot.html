@@ -114,12 +114,39 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 .yl-item .yl-ic-box { width:16px; height:16px; stroke:#9A9A9A; fill:none; stroke-width:1.5; }
 .yl-item > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
+.yl-recent-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.yl-recent-row:hover { background: #1A1A1A; }
+.yl-recent-row:hover .recent-delete-btn { opacity: 1 !important; }
+.recent-delete-btn {
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #71717a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+.recent-delete-btn:hover { color: #ef4444 !important; background: rgba(239, 68, 68, 0.1); }
+
 .yl-recent {
-  width:100%; height:36px; display:flex; align-items:center; justify-content:space-between; gap:9px;
+  flex: 1; height:36px; display:flex; align-items:center; justify-content:space-between; gap:9px;
   padding:0 8px; border-radius:10px; background:transparent; border:none; cursor:pointer;
   transition:background 0.15s; text-align:left;
 }
-.yl-recent:hover { background:#1A1A1A; }
+.yl-recent:hover { background:transparent; }
 .yl-recent-left { display:flex; align-items:center; gap:9px; overflow:hidden; }
 .yl-recent-left svg { width:16px; height:16px; stroke:#9A9A9A; fill:none; stroke-width:1.6; flex-shrink:0; }
 .yl-recent-name { font-size:13px; font-weight:500; color:#D0D0D0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -520,12 +547,13 @@ body.light-mode .attach-img-remove:hover {
 .orchestrator:focus, .orchestrator:focus-visible { outline:none; }
 .orchestrator svg { width:14px; height:14px; opacity:0.9; }
 /* Shows which subject the student is currently in, beside the tier selector */
-.subject-chip { display:inline-flex; align-items:center; gap:6px; margin-left:6px; padding:6px 11px; border-radius:999px; background:transparent; border:1px solid rgba(255,255,255,0.14); color:#a1a1aa; font-size:13px; font-weight:500; font-family:'Inter', sans-serif; white-space:nowrap; max-width:180px; cursor:pointer; }
+.subject-chip { display:inline-flex; align-items:center; gap:6px; margin-left:6px; padding:6px 10px; border-radius:999px; background:transparent; border:none; outline:none; box-shadow:none; color:#a1a1aa; font-size:13px; font-weight:500; font-family:'Inter', sans-serif; white-space:nowrap; max-width:180px; cursor:pointer; }
 .subject-chip[hidden] { display:none; }
 .subject-chip svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; flex-shrink:0; }
 .subject-chip .subject-chip-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.subject-chip { cursor:pointer; position:relative; transition:background .12s ease, border-color .12s ease; }
-.subject-chip:hover { background:rgba(168,102,238,0.10); border-color:rgba(168,102,238,0.45); color:#c9b6ef; }
+.subject-chip { cursor:pointer; position:relative; transition:background .12s ease, color .12s ease; }
+.subject-chip:hover { background:rgba(255,255,255,0.06); color:#e4e4e7; border:none; box-shadow:none; }
+.subject-chip:focus, .subject-chip:focus-visible { outline:none; box-shadow:none; }
 .subject-chip-caret { width:12px !important; height:12px !important; opacity:.7; flex-shrink:0; }
 /* Subject switcher popover */
 .subject-picker {
@@ -553,8 +581,8 @@ body.light-mode .subject-picker { background:#fff; border-color:#e6e6ea; box-sha
 body.light-mode .sp-item { color:#3a3a40; }
 body.light-mode .sp-item:hover { background:#f0f0f3; color:#16151c; }
 body.light-mode .sp-add { border-top-color:#ececef; }
-body.light-mode .subject-chip { background:transparent; border-color:rgba(0,0,0,0.14); color:#52525b; }
-body.light-mode .subject-chip:hover { background:rgba(168,85,247,0.08); border-color:rgba(168,85,247,0.35); color:#7c3aed; }
+body.light-mode .subject-chip { background:transparent; border:none; color:#52525b; }
+body.light-mode .subject-chip:hover { background:rgba(0,0,0,0.05); border:none; box-shadow:none; color:#18181b; }
 .orchestrator-wrap { position:relative; display:inline-flex; }
 .orchestrator .orch-caret { transition:transform 0.2s ease; }
 .orchestrator-wrap.open .orch-caret { transform:rotate(180deg); }
@@ -2294,6 +2322,127 @@ body.light-mode .waveform-btn:hover { color:#111827; background:rgba(0,0,0,0.04)
 .input-container .waveform-btn.is-typing .icon-arrow,
 .chat-input-shell .chat-send-btn:not(:disabled) .icon-arrow { stroke:#ffffff; }
 
+/* ===== Voice Recording Bar Overlay Layout (Matching User Screenshot) ===== */
+.input-container.is-recording {
+  border: 1.5px solid #8b5cf6 !important;
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.3) !important;
+  background: #1d1b20 !important;
+  padding: 12px 18px !important;
+  border-radius: 20px !important;
+}
+
+.input-container.is-recording .ai-text-row,
+.input-container.is-recording .controls,
+.input-container.is-recording .attach-preview,
+.input-container.is-recording .rot-placeholder {
+  display: none !important;
+}
+
+.input-container .voice-recording-overlay {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 36px;
+}
+
+.input-container.is-recording .voice-recording-overlay {
+  display: flex !important;
+}
+
+.vrec-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.vrec-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+  animation: vrecPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes vrecPulse {
+  0% { transform: scale(0.88); opacity: 0.75; }
+  50% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(0.88); opacity: 0.75; }
+}
+
+.vrec-timer {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.vrec-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+.vrec-waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.vrec-bar {
+  width: 3px;
+  border-radius: 3px;
+  background: #ffffff;
+  opacity: 0.9;
+  height: 4px;
+  transition: height 0.08s ease;
+}
+
+.vrec-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.vrec-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.vrec-icon-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.08);
+}
+
+.vrec-cancel-btn:hover {
+  color: #f87171;
+}
+
+.vrec-done-btn:hover {
+  color: #c084fc;
+}
+
 /* ===== Redesigned profile menu (bottom-left) ===== */
 .pm-menu { width: 288px !important; padding: 8px !important; border-radius:18px !important; }
 .pm-header { display:flex; align-items:center; gap:12px; padding:8px 10px 10px; }
@@ -2538,7 +2687,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
         })();
       </script>
       <a class="nav-item active" id="chatNav">
-        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.4606 1.25H13.5394C15.1427 1.24999 16.3997 1.24999 17.4039 1.34547C18.4274 1.44279 19.2655 1.64457 20.0044 2.09732C20.7781 2.57144 21.4286 3.22194 21.9027 3.99563C22.3554 4.73445 22.5572 5.57256 22.6545 6.59611C22.75 7.60029 22.75 8.85725 22.75 10.4606V11.5278C22.75 12.6691 22.75 13.564 22.7007 14.2868C22.6505 15.0223 22.5468 15.6344 22.3123 16.2004C21.7287 17.6093 20.6093 18.7287 19.2004 19.3123C18.3955 19.6457 17.4786 19.7197 16.2233 19.7413C15.7842 19.7489 15.5061 19.7545 15.2941 19.7779C15.096 19.7999 15.0192 19.832 14.9742 19.8582C14.9268 19.8857 14.8622 19.936 14.7501 20.0898C14.6287 20.2564 14.4916 20.4865 14.2742 20.8539L13.7321 21.7697C12.9585 23.0767 11.0415 23.0767 10.2679 21.7697L9.72579 20.8539C9.50835 20.4865 9.37122 20.2564 9.24985 20.0898C9.13772 19.936 9.07313 19.8857 9.02572 19.8582C8.98078 19.832 8.90399 19.7999 8.70588 19.7779C8.49387 19.7545 8.21575 19.7489 7.77666 19.7413C6.52138 19.7197 5.60454 19.6457 4.79957 19.3123C3.39066 18.7287 2.27128 17.6093 1.68769 16.2004C1.45323 15.6344 1.3495 15.0223 1.29932 14.2868C1.24999 13.564 1.25 12.6691 1.25 11.5278L1.25 10.4606C1.24999 8.85726 1.24999 7.60029 1.34547 6.59611C1.44279 5.57256 1.64457 4.73445 2.09732 3.99563C2.57144 3.22194 3.22194 2.57144 3.99563 2.09732C4.73445 1.64457 5.57256 1.44279 6.59611 1.34547C7.60029 1.24999 8.85726 1.24999 10.4606 1.25ZM6.73809 2.83873C5.82434 2.92561 5.24291 3.09223 4.77938 3.37628C4.20752 3.72672 3.72672 4.20752 3.37628 4.77938C3.09223 5.24291 2.92561 5.82434 2.83873 6.73809C2.75079 7.663 2.75 8.84876 2.75 10.5V11.5C2.75 12.6751 2.75041 13.5189 2.79584 14.1847C2.84081 14.8438 2.92737 15.2736 3.07351 15.6264C3.50486 16.6678 4.33223 17.4951 5.3736 17.9265C5.88923 18.1401 6.54706 18.2199 7.8025 18.2416L7.83432 18.2421C8.23232 18.249 8.58109 18.2549 8.87097 18.287C9.18246 18.3215 9.4871 18.3912 9.77986 18.5615C10.0702 18.7304 10.2795 18.9559 10.4621 19.2063C10.6307 19.4378 10.804 19.7306 11.0004 20.0623L11.5587 21.0057C11.7515 21.3313 12.2485 21.3313 12.4412 21.0057L12.9996 20.0623C13.1959 19.7306 13.3692 19.4378 13.5379 19.2063C13.7204 18.9559 13.9298 18.7304 14.2201 18.5615C14.5129 18.3912 14.8175 18.3215 15.129 18.287C15.4189 18.2549 15.7676 18.249 16.1656 18.2421L16.1975 18.2416C17.4529 18.2199 18.1108 18.1401 18.6264 17.9265C19.6678 17.4951 20.4951 16.6678 20.9265 15.6264C21.0726 15.2736 21.1592 14.8438 21.2042 14.1847C21.2496 13.5189 21.25 12.6751 21.25 11.5V10.5C21.25 8.84876 21.2492 7.663 21.1613 6.73809C21.0744 5.82434 20.9078 5.24291 20.6237 4.77938C20.2733 4.20752 19.7925 3.72672 19.2206 3.37628C18.7571 3.09223 18.1757 2.92561 17.2619 2.83873C16.337 2.75079 15.1512 2.75 13.5 2.75H10.5C8.84876 2.75 7.663 2.75079 6.73809 2.83873ZM7.25 9C7.25 8.58579 7.58579 8.25 8 8.25H16C16.4142 8.25 16.75 8.58579 16.75 9C16.75 9.41421 16.4142 9.75 16 9.75H8C7.58579 9.75 7.25 9.41421 7.25 9ZM7.25 12.5C7.25 12.0858 7.58579 11.75 8 11.75H13.5C13.9142 11.75 14.25 12.0858 14.25 12.5C14.25 12.9142 13.9142 13.25 13.5 13.25H8C7.58579 13.25 7.25 12.9142 7.25 12.5Z" fill="currentColor"></path></svg>
         <span>Study</span>
       </a>
       <a class="nav-item" id="aiStudentsNav" href="teachstudio.html">
@@ -2806,8 +2955,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
             color: transparent !important;
           }
 
-          /* Recents section removed from the sidebar. */
-          #historySection { display:none !important; }
+          /* Recents / Chat history section in sidebar */
+          #historySection { display:block; margin-top:16px; }
 
           /* "View all" toggle under the subjects list */
           .hsub-viewall {
@@ -2825,19 +2974,129 @@ body.light-mode .aset-member .nm { color:#16151c; }
           .lesson-chip:hover { background:#242420; border-color:#3A3A38; }
           .lesson-chips.used .lesson-chip { opacity:.45; pointer-events:none; }
           .lesson-chips.used .lesson-chip.picked { opacity:1; border-color:#7A6EF0; color:#c9b6ef; }
-          .lesson-card { margin:38px auto 0; background:#1E1E1C; border:1px solid #2C2C2A; border-radius:16px; padding:18px; max-width:560px; width:100%; }
+          .lesson-card { margin:38px auto 0; background:#1E1E1C; border:1px solid #2C2C2A; border-radius:20px; padding:22px 24px; max-width:820px; width:100%; }
           .lesson-card-head { display:flex; align-items:flex-start; gap:12px; }
-          .lesson-card-logo { width:26px; height:26px; flex-shrink:0; margin-top:2px; }
+          .lesson-card-logo { width:26px; height:26px; flex-shrink:0; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; }
+          .lesson-card-logo.topic-emoji { font-size:24px; line-height:1; }
           .lesson-card-label { font-size:11px; font-weight:700; letter-spacing:.12em; color:#8A8A86; text-transform:uppercase; }
           .lesson-card-title { margin-top:4px; font-size:18px; font-weight:700; line-height:22px; color:#fff; letter-spacing:-.01em; }
-          .lesson-card-btn { margin-top:16px; width:100%; height:46px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:600; letter-spacing:-.01em; cursor:pointer; font-family:'Inter',sans-serif; box-shadow:0 8px 20px rgba(123,92,250,0.25), inset 0 1px 0 rgba(255,255,255,0.15); transition:filter .15s, transform .1s; }
-          .lesson-card-btn:hover { filter:brightness(1.07); }
-          .lesson-card-btn:active { transform:scale(.99); }
+          .lesson-card-btn { margin-top:16px; width:100%; height:48px; border:2px solid #3f3f46; border-bottom:5px solid #18181b; border-radius:14px; background:#27272a; color:#f4f4f5; font-size:15px; font-weight:700; letter-spacing:-.01em; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.25); transition:all .1s ease; transform-origin:bottom; }
+          .lesson-card-btn:hover { background:#3f3f46; border-color:#52525b; color:#fff; }
+          .lesson-card-btn:active { border-bottom-width:2px; transform:translateY(3px) scaleY(.98); }
           .subject-offer-btns { display:flex; gap:10px; margin-top:16px; }
           .lesson-card-btn.half { flex:1; margin-top:0; height:44px; }
           .lesson-card-btn.ghost { background:transparent; border:1px solid #2e2e34; color:#c7c7cc; box-shadow:none; }
           .lesson-card-btn.ghost:hover { background:#242428; color:#fff; filter:none; }
           .lesson-card-note { margin-top:16px; font-size:14px; line-height:1.5; color:#c9b6ef; background:rgba(168,102,238,0.10); border:1px solid rgba(168,102,238,0.30); border-radius:11px; padding:11px 14px; }
+          .page-created-card {
+            margin: 28px auto 0;
+            background: #141416;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px 24px;
+            max-width: 820px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+          }
+          .page-created-main {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+          }
+          .page-created-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+          }
+          .page-created-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 18px;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s ease, border-color 0.15s ease;
+          }
+          .page-created-btn:hover {
+            background: #3f3f46;
+            border-color: #52525b;
+          }
+          .page-created-btn:active {
+            transform: scale(0.98);
+          }
+          .page-created-stack-wrapper {
+            position: relative;
+            width: 136px;
+            height: 84px;
+            flex-shrink: 0;
+          }
+          .page-created-stack-back {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 100%;
+            height: 100%;
+            background: rgba(167, 139, 250, 0.05);
+            border: 1.5px solid rgba(167, 139, 250, 0.4);
+            border-radius: 12px;
+            z-index: 1;
+          }
+          .page-created-stack-front {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            background: #1c1c1f;
+            border: 1.5px solid #8b5cf6;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.25);
+          }
+          .thumb-doc-icon {
+            color: #c084fc;
+            display: flex;
+            align-items: center;
+          }
+          .thumb-doc-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+          }
+          .thumb-skeleton {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 6px;
+          }
+          .thumb-skel-line {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 2px;
+          }
+          .thumb-skel-line.w-full { width: 100%; }
+          .thumb-skel-line.w-75 { width: 75%; }
+          .thumb-skel-line.w-50 { width: 50%; }
+
           body.light-mode .lesson-chip { background:#f0f0f2; border-color:#e2e2e6; color:#18181b; }
           body.light-mode .lesson-card { background:#fff; border-color:#e2e2e6; }
           body.light-mode .lesson-card-title { color:#18181b; }
@@ -3176,19 +3435,25 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
   function launchChat(firstMessage, attachment, opts) {
     opts = opts || {};
-    // Determine chat title/label
-    const titleWords = firstMessage.split(' ').slice(0, 5).join(' ');
-    const chatLabel = titleWords + (firstMessage.split(' ').length > 5 ? '…' : '');
-    // Header shows "<chat title> / <current subject>" (all chats & tiers).
-    let chatSubject = null;
-    try {
-      const r = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]');
-      if (Array.isArray(r) && r[0]) chatSubject = String(r[0]);
-    } catch (e) {}
-    if (chatSubject) {
-      chatTitleText.innerHTML = escapeHtml(chatLabel) + ' <span class="chat-title-subject">/ ' + escapeHtml(chatSubject) + '</span>';
-    } else {
-      chatTitleText.textContent = chatLabel;
+    const words = (firstMessage || '').trim().split(/\s+/).filter(Boolean);
+    const titleWords = words.slice(0, 4).join(' ');
+    const chatLabel = titleWords + (words.length > 4 ? '…' : '');
+    let chatSubject = activeSubject() || 'general';
+
+    const newChatId = 'chat_' + Date.now();
+    const chatItem = { id: newChatId, title: chatLabel || 'New Chat', subject: chatSubject };
+    activeChatKey = newChatId;
+
+    if (typeof recordRecent === 'function') {
+      recordRecent(chatItem);
+    }
+
+    if (chatTitleText) {
+      if (chatSubject) {
+        chatTitleText.innerHTML = escapeHtml(chatLabel) + ' <span class="chat-title-subject">/ ' + escapeHtml(chatSubject) + '</span>';
+      } else {
+        chatTitleText.textContent = chatLabel;
+      }
     }
 
     // Add this chat to the history in the ORIGINAL sidebar FIRST
@@ -3207,6 +3472,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
     // Clone sidebar content NOW that history is updated
     chatSidebar.innerHTML = origSidebar.innerHTML;
+    if (typeof renderRecents === 'function') renderRecents();
     // Preserve collapsed state
     if (origSidebar.classList.contains('collapsed')) {
       chatSidebar.classList.add('collapsed');
@@ -3373,35 +3639,84 @@ body.light-mode .aset-member .nm { color:#16151c; }
   });
 
   let chatContext = [];
+  let activeChatKey = 'cell_bio';
 
   // ── Per-subject chat memory ─────────────────────────────────────────
-  // Each subject keeps its own transcript and model context, so switching
-  // subjects (or coming back later) restores exactly where that subject was.
   const CHAT_KEY = 'NOURA_CHAT_';
   function activeSubject() {
     try {
       const r = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]');
-      return (Array.isArray(r) && r[0]) ? String(r[0]) : '';
+      if (Array.isArray(r) && r[0]) {
+        return typeof r[0] === 'object' ? (r[0].subject || r[0].title) : String(r[0]);
+      }
+      return '';
     } catch (e) { return ''; }
   }
-  function saveSubjectChat(subject) {
-    subject = subject || activeSubject();
-    if (!subject || typeof messagesCol === 'undefined' || !messagesCol) return;
-    // Inline base64 attachments would blow the storage quota — drop their data.
-    // Strip the in-flight loading bubble from the SAVED COPY only. It must stay
-    // in the DOM: the reply reuses that node as its container.
+  function saveSubjectChat(key) {
+    key = key || activeChatKey || activeSubject();
+    if (!key || typeof messagesCol === 'undefined' || !messagesCol) return;
     let html = messagesCol.innerHTML.replace(/src="data:[^"]*"/g, 'src="#"');
     html = html.replace(/<div[^>]*id="thinkingMsg"[\s\S]*?<\/div>\s*$/, '');
     if (html.length > 400000) html = '';
     const ctx = chatContext.filter(m => typeof m.content === 'string');
     try {
-      localStorage.setItem(CHAT_KEY + subject, JSON.stringify({ html: html, ctx: ctx, at: Date.now() }));
-    } catch (e) {}   // quota exceeded → keep the in-memory chat, just don't persist
+      localStorage.setItem(CHAT_KEY + key, JSON.stringify({ html: html, ctx: ctx, at: Date.now() }));
+    } catch (e) {}
   }
-  function restoreSubjectChat(subject) {
-    if (!subject) return false;
+  function restoreSubjectChat(target) {
+    if (!target) return false;
+    let key = '';
+    let title = '';
+    let subject = '';
+
+    if (typeof target === 'object' && target) {
+      key = target.id || target.title;
+      title = target.title || target.id;
+      subject = target.subject || 'biology';
+    } else if (typeof target === 'string') {
+      key = target;
+      title = target;
+      subject = activeSubject() || 'biology';
+    }
+
+    if (!key) return false;
+    activeChatKey = key;
+
+    const chatTitleText = document.getElementById('chatTitleText');
+    if (chatTitleText) {
+      if (subject) {
+        chatTitleText.innerHTML = escapeHtml(title) + ' <span class="chat-title-subject">/ ' + escapeHtml(subject) + '</span>';
+      } else {
+        chatTitleText.textContent = title;
+      }
+    }
+
     let p = null;
-    try { p = JSON.parse(localStorage.getItem(CHAT_KEY + subject) || 'null'); } catch (e) {}
+    try { p = JSON.parse(localStorage.getItem(CHAT_KEY + key) || 'null'); } catch (e) {}
+
+    // Seed default sample chat for 'teach me cell biology' if not saved yet
+    if (!p && (key === 'cell_bio' || title.toLowerCase().indexOf('teach me cell biology') !== -1)) {
+      p = {
+        ctx: [],
+        html: '<div class="msg user"><div class="msg-bubble">teach me cell biology</div></div>' +
+          '<div class="msg ai"><div class="msg-bubble"><p>Great! Cell biology is a huge topic. To help you most, which part interests you most?</p>' +
+          '<div class="lesson-chips">' +
+            '<button class="lesson-chip">Cell structure & organelles</button>' +
+            '<button class="lesson-chip">Cell membrane & transport</button>' +
+            '<button class="lesson-chip">Cell division (mitosis & meiosis)</button>' +
+            '<button class="lesson-chip">Cellular respiration & energy</button>' +
+            '<button class="lesson-chip">Cell signaling & communication</button>' +
+          '</div></div></div>' +
+          '<div class="msg user"><div class="msg-bubble">Cell structure & organelles</div></div>' +
+          '<div class="msg ai"><div class="msg-bubble"><p>Perfect! Let\'s dive into how cells are organized and what each part does.</p>' +
+          '<div class="lesson-card"><div class="lesson-card-head"><div>' +
+            '<h4 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 12px;">Cell Structure & Organelles</h4>' +
+            '<button class="start-btn" style="padding:8px 18px;font-size:13px;" onclick="window.location.href=\'lesson.html?subject=biology\'">Generate Lesson</button>' +
+          '</div></div></div></div></div>'
+      };
+      try { localStorage.setItem(CHAT_KEY + key, JSON.stringify(p)); } catch (e) {}
+    }
+
     const has = !!(p && typeof p === 'object' && (p.html || (p.ctx && p.ctx.length)));
     chatContext = (has && Array.isArray(p.ctx)) ? p.ctx.slice() : [];
     conversationHasHomework = false;
@@ -3680,7 +3995,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
       systemText += '\n\nFACT-CHECK THE LEARNER (IMPORTANT): You have a live web_search tool for full internet access. Whenever the learner teaches, states, or asserts a fact, judge whether it is actually true, and use web_search to verify it whenever you are not fully certain (especially names, dates, numbers, definitions, causes, and mechanisms). If what they said is incorrect, outdated, oversimplified into something false, or a common misconception, you must NOT accept it, agree with it, praise it, or act as though you "learned" it. Instead, kindly tell them that that part is mistaken, briefly say what is actually correct (and mention the source if you searched), and invite them to try explaining it again. Only acknowledge that you have learned or understood something, or that they taught it well, when the information is actually correct. Never confirm, repeat as true, or build on wrong information. Express all of this inside your normal response format.';
 
-      systemText += "\n\nSTUDY PLAN (UI MARKER): The app turns a marker on the FINAL line of your reply into a Generate Lesson card that builds a full lesson workspace - a guided Learn path with readable sections, Checkpoints, a Study Brief, Recall practice and an Audio Recap. WHEN the learner says they want to learn, study, review, revise or get help with a topic (including exam prep), do ALL of this in ONE reply: (a) briefly acknowledge what they asked, (b) actually answer or orient them in two to four sentences of genuinely useful content about the topic, (c) say in the same message that you have put together a study plan covering the lesson, checkpoints, recall practice and an audio recap, then (d) end with the marker on its own final line, exactly like: [[LESSON: Short Lesson Title]]. DO NOT interrogate the learner first: ask NO clarifying questions before creating the plan - if the topic is broad, simply choose the most useful scope yourself, say what you picked in one clause, and generate the plan anyway. Never run quizzes, questions, flashcards or lesson content inside the chat - the lesson workspace handles all of that. Rules: the marker must be the very last line of the message; never mention or read the marker aloud; use it only when the learner wants to learn or review a topic, not for ordinary factual questions or mid-conversation tutoring. If the topic belongs to a different subject than the current one, do not use the marker - follow the SUBJECT LOCK rules instead.";
+      systemText += "\n\nLESSON FLOW (UI MARKERS): The app renders interactive elements from special markers placed on the FINAL line of your reply.\n(1) When the learner asks to learn or study a broad topic (for example 'cell biology', 'maths', 'history', or 'I want to learn biology'), reply with ONE short friendly clarifying question asking which specific part they are interested in, and end with a marker listing 3 to 6 subtopic options as chips, exactly like: [[CHIPS: Cell structure & organelles | Cell membrane & transport | Cell division (mitosis & meiosis) | Cellular respiration & metabolism | Cell signaling | A general overview]].\n(2) Once the learner names or selects a specific topic they want to learn (or if they ask for a specific topic directly), reply with a short friendly sentence or two and end with: [[LESSON: Short Lesson Title]] - the app then shows a Generate Lesson card.\nRules: The marker must be the very last line of the message; never mention or read the marker syntax aloud; only use CHIPS or LESSON when the learner wants to learn a topic, not for ordinary factual questions or mid-conversation tutoring. If the topic belongs to a different subject than the current one, follow the SUBJECT LOCK rules instead.";
     }
 
     // Convert our chat context to Anthropic's message format (image_url -> base64 source block)
@@ -3706,22 +4021,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
         body: JSON.stringify({
           model: model,
           max_tokens: isLearnerTier() ? 8000 : 4096,
-          system: (function () {
-            // Appended last on purpose: earlier instructions tell the tutor to ask
-            // what the learner wants, which was beating a mid-prompt version.
-            if (chatContext.filter(m => m.role === 'assistant').length) return systemText;
-            return systemText + "\n\n=== HIGHEST PRIORITY, OVERRIDES EVERYTHING ABOVE ===\n"
-              + "This is your FIRST reply of the conversation. You MUST end it with a study-plan marker "
-              + "on its own final line, in exactly this form: [[LESSON: Short Lesson Title]]\n"
-              + "This is mandatory for EVERY first reply - greetings, vague messages like 'help me', "
-              + "single words, and ordinary questions all included. There is no exception.\n"
-              + "Shape the reply like this: answer or greet them in two to four useful sentences, then one "
-              + "clause saying you have put together a study plan with a brief, lesson, checkpoints, recall "
-              + "practice and an audio recap, then the marker alone on the last line.\n"
-              + "Pick the topic yourself from whatever they said. If nothing specific was named, use the "
-              + "current subject, and if there is none, pick the most likely topic and say which in one clause. "
-              + "Do NOT ask what they want to work on before the marker. Do NOT omit the marker.";
-          })(),
+          system: systemText,
           messages: anthMessages,
           // Full internet access so the model can fact-check what the learner
           // teaches. It only searches when it needs to verify a claim.
@@ -4661,15 +4961,31 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
     if (lessonTitle) {
       const card = document.createElement('div');
-      card.className = 'lesson-card';
+      card.className = 'page-created-card';
+      const truncTitle = lessonTitle.length > 18 ? lessonTitle.substring(0, 16) + '...' : lessonTitle;
       card.innerHTML =
-        '<div class="lesson-card-head">' +
-          '<span class="lesson-card-logo grad-logo" aria-hidden="true"></span>' +
-          '<div><div class="lesson-card-label">Ready to build</div><div class="lesson-card-title"></div></div>' +
+        '<div class="page-created-main">' +
+          '<div class="page-created-title">' + escapeHtml(lessonTitle) + '</div>' +
+          '<button type="button" class="page-created-btn">Generate Lesson</button>' +
         '</div>' +
-        '<button type="button" class="lesson-card-btn">Generate Lesson</button>';
-      card.querySelector('.lesson-card-title').textContent = lessonTitle;
-      card.querySelector('.lesson-card-btn').addEventListener('click', () => {
+        '<div class="page-created-stack-wrapper">' +
+          '<div class="page-created-stack-back"></div>' +
+          '<div class="page-created-stack-front">' +
+            '<div class="thumb-doc-icon">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>' +
+                '<polyline points="14 2 14 8 20 8"/>' +
+              '</svg>' +
+            '</div>' +
+            '<div class="thumb-doc-title">' + escapeHtml(truncTitle) + '</div>' +
+            '<div class="thumb-skeleton">' +
+              '<div class="thumb-skel-line w-full"></div>' +
+              '<div class="thumb-skel-line w-75"></div>' +
+              '<div class="thumb-skel-line w-50"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      card.querySelector('.page-created-btn').addEventListener('click', () => {
         const subj = currentSubjectName();
         window.location.href = 'lesson.html?title=' + encodeURIComponent(lessonTitle) + (subj ? '&subject=' + encodeURIComponent(subj) : '');
       });
@@ -4690,17 +5006,44 @@ body.light-mode .aset-member .nm { color:#16151c; }
       card.querySelector('.lesson-card-title').textContent = newSubjectName;
       card.addEventListener('click', (e) => {
         const b = e.target.closest('button'); if (!b) return;
-        const note = document.createElement('div');
-        note.className = 'lesson-card-note';
         if (b.dataset.act === 'auto') {
           const created = (typeof window.createSubject === 'function') && window.createSubject(newSubjectName);
-          note.textContent = created
-            ? ('"' + created + '" is ready and selected - ask your question again and we\'ll study it there.')
-            : 'Could not create the subject automatically - use "New Subject" in the sidebar instead.';
+          const subjName = created || newSubjectName;
+          const truncSubj = subjName.length > 14 ? subjName.substring(0, 12) + '...' : subjName;
+          const createdCard = document.createElement('div');
+          createdCard.className = 'page-created-card';
+          createdCard.innerHTML =
+            '<div class="page-created-main">' +
+              '<div class="page-created-title">' + escapeHtml(subjName) + '</div>' +
+              '<button type="button" class="page-created-btn">Generate Lesson</button>' +
+            '</div>' +
+            '<div class="page-created-stack-wrapper">' +
+              '<div class="page-created-stack-back"></div>' +
+              '<div class="page-created-stack-front">' +
+                '<div class="thumb-doc-icon">' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>' +
+                    '<polyline points="14 2 14 8 20 8"/>' +
+                  '</svg>' +
+                '</div>' +
+                '<div class="thumb-doc-title">' + escapeHtml(truncSubj) + '...</div>' +
+                '<div class="thumb-skeleton">' +
+                  '<div class="thumb-skel-line w-full"></div>' +
+                  '<div class="thumb-skel-line w-75"></div>' +
+                  '<div class="thumb-skel-line w-50"></div>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          createdCard.querySelector('.page-created-btn').addEventListener('click', () => {
+            window.location.href = 'new-subject.html?name=' + encodeURIComponent(subjName);
+          });
+          card.replaceWith(createdCard);
         } else {
+          const note = document.createElement('div');
+          note.className = 'lesson-card-note';
           note.textContent = 'No problem - tap "New Subject" in the sidebar (or the subject chip next to the paperclip) to create and switch to it.';
+          card.querySelector('.subject-offer-btns').replaceWith(note);
         }
-        card.querySelector('.subject-offer-btns').replaceWith(note);
       }, { once: true });
       host.appendChild(card);
     }
@@ -4712,9 +5055,6 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const text = chatInput.value.trim();
     const att = pendingAttachment;
     if (!text && !att) return;
-    // A message the user TYPED (not one voice mode is sending on their behalf)
-    // means they want plain text chat — fully exit voice mode so the orb, status,
-    // mic, and spoken replies never appear for a typed message.
     if (!window.__axVoiceSending && window.__axVoice && window.__axVoice.stop) {
       window.__axVoice.stop();
     }
@@ -4723,6 +5063,20 @@ body.light-mode .aset-member .nm { color:#16151c; }
     chatSendBtn.disabled = true;
     pendingAttachment = null; renderAttachPreview();
     const msg = text || 'Here is my homework — quiz me on it.';
+
+    if (!activeChatKey || messagesCol.children.length === 0) {
+      const words = msg.trim().split(/\s+/).filter(Boolean);
+      const titleWords = words.slice(0, 4).join(' ');
+      const chatLabel = titleWords + (words.length > 4 ? '…' : '');
+      const activeSubj = activeSubject() || 'general';
+      const chatItem = { id: 'chat_' + Date.now(), title: chatLabel || 'New Chat', subject: activeSubj };
+      activeChatKey = chatItem.id;
+      if (typeof recordRecent === 'function') recordRecent(chatItem);
+      if (chatTitleText) {
+        chatTitleText.innerHTML = escapeHtml(chatLabel) + ' <span class="chat-title-subject">/ ' + escapeHtml(activeSubj) + '</span>';
+      }
+    }
+
     appendUserMsg(msg, att);
     fetchAIResponse(msg, att);
   }
@@ -5743,12 +6097,23 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const RECENTS_KEY = 'TEACHLOOP_RECENTS';
     const recentsList = document.getElementById('recentsList');
 
-    function subjectNames() {
-      return [...list.querySelectorAll('.subject-name')].map(n => n.textContent.trim()).filter(Boolean);
-    }
     function loadRecents() {
-      try { const a = JSON.parse(localStorage.getItem(RECENTS_KEY) || '[]'); return Array.isArray(a) ? a : []; }
-      catch (e) { return []; }
+      try {
+        const raw = localStorage.getItem(RECENTS_KEY);
+        if (raw !== null) {
+          const a = JSON.parse(raw);
+          if (Array.isArray(a)) return a;
+        }
+      } catch (e) {}
+      const defaults = [
+        { id: 'cell_bio', title: 'teach me cell biology', subject: 'biology' },
+        { id: 'math_venn', title: 'Exploring Venn Diagrams', subject: 'Maths' },
+        { id: 'cell_div', title: 'Flashcards and Quiz', subject: 'biology' },
+        { id: 'mktg_strat', title: 'Marketing Strategies', subject: 'Marketing' },
+        { id: 'biz_model', title: 'Business Model Canvas', subject: 'business' }
+      ];
+      try { localStorage.setItem(RECENTS_KEY, JSON.stringify(defaults)); } catch (e) {}
+      return defaults;
     }
 
     // Per-subject "last opened" timestamps → drives the "Opened X ago" subtitle.
@@ -5778,16 +6143,18 @@ body.light-mode .aset-member .nm { color:#16151c; }
       return 'Opened ' + w + (w === 1 ? ' week ago' : ' weeks ago');
     }
 
-    // Record a subject as most-recently opened (dedup, newest first, cap 8).
-    function recordRecent(name) {
-      if (!name) return;
-      let a = loadRecents().filter(n => n !== name);
-      a.unshift(name);
+    // Record a chat history item as most-recently opened.
+    function recordRecent(item) {
+      if (!item) return;
+      const key = typeof item === 'object' ? (item.id || item.title) : item;
+      let a = loadRecents().filter(x => (typeof x === 'object' ? (x.id || x.title) : x) !== key);
+      a.unshift(item);
       a = a.slice(0, 8);
       try { localStorage.setItem(RECENTS_KEY, JSON.stringify(a)); } catch (e) {}
-      stampOpened(name);
+      stampOpened(typeof item === 'object' ? item.title : item);
       renderRecents();
-      updateSubjectChip(name);
+      const subj = typeof item === 'object' ? item.subject : item;
+      updateSubjectChip(subj);
       renderHeroCards();
     }
 
@@ -5799,37 +6166,75 @@ body.light-mode .aset-member .nm { color:#16151c; }
         else { chip.hidden = true; }
       });
     }
-    // Show recently opened subjects under the History label (existing ones only).
-    function renderRecents() {
-      if (!recentsList) return;
-      const existing = new Set(subjectNames());
-      const recents = loadRecents().filter(n => existing.has(n));
-      recentsList.innerHTML = '';
-      if (!recents.length) {
-        const e = document.createElement('div');
-        e.className = 'recents-empty';
-        e.setAttribute('data-i18n', 'no_recents');
-        e.textContent = 'No recent subjects yet.';
-        recentsList.appendChild(e);
-        return;
+    function deleteRecent(item) {
+      const key = typeof item === 'object' ? (item.id || item.title) : item;
+      let recents = loadRecents().filter(x => (typeof x === 'object' ? (x.id || x.title) : x) !== key);
+      try { localStorage.setItem(RECENTS_KEY, JSON.stringify(recents)); } catch (e) {}
+      try { localStorage.removeItem('NOURA_CHAT_' + key); } catch (e) {}
+      renderRecents();
+      if (recents[0]) {
+        restoreSubjectChat(recents[0]);
+      } else {
+        if (messagesCol) messagesCol.innerHTML = '';
+        const chatTitleText = document.getElementById('chatTitleText');
+        if (chatTitleText) chatTitleText.textContent = 'New Chat';
       }
-      recents.forEach(name => {
-        const a = document.createElement('button');
-        a.type = 'button';
-        a.className = 'yl-recent recent-item';
-        a.innerHTML =
-          '<div class="yl-recent-left">' +
-            '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>' +
-            '<span class="yl-recent-name"></span>' +
-          '</div>' +
-          '<svg class="yl-recent-right" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>';
-        a.querySelector('.yl-recent-name').textContent = name;
-        a.addEventListener('click', () => {
-          recordRecent(name);
-          const p = document.getElementById('prompt');
-          if (p) p.focus();
+    }
+
+    // Show recently opened chat histories under the Recents label.
+    function renderRecents() {
+      const lists = document.querySelectorAll('#recentsList');
+      if (!lists.length) return;
+      const recents = loadRecents();
+
+      lists.forEach(recentsList => {
+        recentsList.innerHTML = '';
+        if (!recents.length) {
+          const e = document.createElement('div');
+          e.className = 'recents-empty';
+          e.setAttribute('data-i18n', 'no_recents');
+          e.textContent = 'No recent chats yet.';
+          recentsList.appendChild(e);
+          return;
+        }
+        recents.forEach(item => {
+          const titleText = (typeof item === 'object' && item.title) ? item.title : String(item);
+
+          const row = document.createElement('div');
+          row.className = 'yl-recent-row';
+
+          const a = document.createElement('button');
+          a.type = 'button';
+          a.className = 'yl-recent recent-item';
+          a.innerHTML =
+            '<div class="yl-recent-left" style="display:flex;align-items:center;gap:10px;overflow:hidden;width:100%;">' +
+              '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" style="flex-shrink:0;"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.4606 1.25H13.5394C15.1427 1.24999 16.3997 1.24999 17.4039 1.34547C18.4274 1.44279 19.2655 1.64457 20.0044 2.09732C20.7781 2.57144 21.4286 3.22194 21.9027 3.99563C22.3554 4.73445 22.5572 5.57256 22.6545 6.59611C22.75 7.60029 22.75 8.85725 22.75 10.4606V11.5278C22.75 12.6691 22.75 13.564 22.7007 14.2868C22.6505 15.0223 22.5468 15.6344 22.3123 16.2004C21.7287 17.6093 20.6093 18.7287 19.2004 19.3123C18.3955 19.6457 17.4786 19.7197 16.2233 19.7413C15.7842 19.7489 15.5061 19.7545 15.2941 19.7779C15.096 19.7999 15.0192 19.832 14.9742 19.8582C14.9268 19.8857 14.8622 19.936 14.7501 20.0898C14.6287 20.2564 14.4916 20.4865 14.2742 20.8539L13.7321 21.7697C12.9585 23.0767 11.0415 23.0767 10.2679 21.7697L9.72579 20.8539C9.50835 20.4865 9.37122 20.2564 9.24985 20.0898C9.13772 19.936 9.07313 19.8857 9.02572 19.8582C8.98078 19.832 8.90399 19.7999 8.70588 19.7779C8.49387 19.7545 8.21575 19.7489 7.77666 19.7413C6.52138 19.7197 5.60454 19.6457 4.79957 19.3123C3.39066 18.7287 2.27128 17.6093 1.68769 16.2004C1.45323 15.6344 1.3495 15.0223 1.29932 14.2868C1.24999 13.564 1.25 12.6691 1.25 11.5278L1.25 10.4606C1.24999 8.85726 1.24999 7.60029 1.34547 6.59611C1.44279 5.57256 1.64457 4.73445 2.09732 3.99563C2.57144 3.22194 3.22194 2.57144 3.99563 2.09732C4.73445 1.64457 5.57256 1.44279 6.59611 1.34547C7.60029 1.24999 8.85726 1.24999 10.4606 1.25ZM6.73809 2.83873C5.82434 2.92561 5.24291 3.09223 4.77938 3.37628C4.20752 3.72672 3.72672 4.20752 3.37628 4.77938C3.09223 5.24291 2.92561 5.82434 2.83873 6.73809C2.75079 7.663 2.75 8.84876 2.75 10.5V11.5C2.75 12.6751 2.75041 13.5189 2.79584 14.1847C2.84081 14.8438 2.92737 15.2736 3.07351 15.6264C3.50486 16.6678 4.33223 17.4951 5.3736 17.9265C5.88923 18.1401 6.54706 18.2199 7.8025 18.2416L7.83432 18.2421C8.23232 18.249 8.58109 18.2549 8.87097 18.287C9.18246 18.3215 9.4871 18.3912 9.77986 18.5615C10.0702 18.7304 10.2795 18.9559 10.4621 19.2063C10.6307 19.4378 10.804 19.7306 11.0004 20.0623L11.5587 21.0057C11.7515 21.3313 12.2485 21.3313 12.4412 21.0057L12.9996 20.0623C13.1959 19.7306 13.3692 19.4378 13.5379 19.2063C13.7204 18.9559 13.9298 18.7304 14.2201 18.5615C14.5129 18.3912 14.8175 18.3215 15.129 18.287C15.4189 18.2549 15.7676 18.249 16.1656 18.2421L16.1975 18.2416C17.4529 18.2199 18.1108 18.1401 18.6264 17.9265C19.6678 17.4951 20.4951 16.6678 20.9265 15.6264C21.0726 15.2736 21.1592 14.8438 21.2042 14.1847C21.2496 13.5189 21.25 12.6751 21.25 11.5V10.5C21.25 8.84876 21.2492 7.663 21.1613 6.73809C21.0744 5.82434 20.9078 5.24291 20.6237 4.77938C20.2733 4.20752 19.7925 3.72672 19.2206 3.37628C18.7571 3.09223 18.1757 2.92561 17.2619 2.83873C16.337 2.75079 15.1512 2.75 13.5 2.75H10.5C8.84876 2.75 7.663 2.75079 6.73809 2.83873ZM7.25 9C7.25 8.58579 7.58579 8.25 8 8.25H16C16.4142 8.25 16.75 8.58579 16.75 9C16.75 9.41421 16.4142 9.75 16 9.75H8C7.58579 9.75 7.25 9.41421 7.25 9ZM7.25 12.5C7.25 12.0858 7.58579 11.75 8 11.75H13.5C13.9142 11.75 14.25 12.0858 14.25 12.5C14.25 12.9142 13.9142 13.25 13.5 13.25H8C7.58579 13.25 7.25 12.9142 7.25 12.5Z" fill="currentColor"></path></svg>' +
+              '<span class="yl-recent-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:500;"></span>' +
+            '</div>';
+          a.querySelector('.yl-recent-name').textContent = titleText;
+          a.addEventListener('click', () => {
+            saveSubjectChat(activeSubject());
+            recordRecent(item);
+            restoreSubjectChat(item);
+            const p = document.getElementById('chatInput') || document.getElementById('prompt');
+            if (p) p.focus();
+          });
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'recent-delete-btn';
+          delBtn.title = 'Delete chat history';
+          delBtn.ariaLabel = 'Delete chat history';
+          delBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+          delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteRecent(item);
+          });
+
+          row.appendChild(a);
+          row.appendChild(delBtn);
+          recentsList.appendChild(row);
         });
-        recentsList.appendChild(a);
       });
     }
 
@@ -6105,7 +6510,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
     } catch (e) {}
     renderHeroCards();   // paint the hero cards from restored subjects
     renderRecents();     // paint the History list from stored recents
-    updateSubjectChip(loadRecents()[0] || subjectNames()[0] || '');   // show current subject in composer
+    const firstRec = loadRecents()[0];
+    if (firstRec) { restoreSubjectChat(firstRec); }
 
     newSubjectBtn?.addEventListener('click', (e) => { e.preventDefault(); goToNewSubject(); });
     document.getElementById('heroNewSubject')?.addEventListener('click', (e) => { e.preventDefault(); goToNewSubject(); });
@@ -7208,7 +7614,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       try { if (audioCtx) { audioCtx.close(); audioCtx = null; } } catch (_) {}
     }
 
-    pill.addEventListener('click', () => { active ? stopVoice() : startVoice(); });
+    // pill.addEventListener('click', ...) disabled in favor of typebar recorder overlay
 
     // The orb belongs to speech-to-speech only. The instant the user clicks into
     // the text box to type (or presses a key there), fully exit voice mode so the
@@ -7305,11 +7711,295 @@ body.light-mode .aset-member .nm { color:#16151c; }
       try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e2) {}
       apply();
     });
-    if (document.readyState !== 'loading') apply();
-    else document.addEventListener('DOMContentLoaded', apply);
     setTimeout(apply, 400);  // re-apply after the sidebar clone is built
   })();
 </script>
+<script>
+  // ── Voice Typebar Recording Layout (Matching User Screenshot) ──
+  (function initVoiceTypebarRecorder() {
+    let isRecording = false;
+    let recTimerInterval = null;
+    let recSeconds = 0;
+    let recognition = null;
+    let activeContainer = null;
+    let activeInput = null;
+    let audioAnimInterval = null;
 
+    function buildVoiceOverlayHtml() {
+      let barsHtml = '';
+      for (let i = 0; i < 30; i++) {
+        barsHtml += '<span class="vrec-bar" style="height:' + Math.floor(4 + Math.random() * 16) + 'px;"></span>';
+      }
+      return `
+        <div class="voice-recording-overlay">
+          <div class="vrec-left">
+            <span class="vrec-dot"></span>
+            <span class="vrec-timer">00:00</span>
+          </div>
+          <div class="vrec-center">
+            <div class="vrec-waveform">
+              ${barsHtml}
+            </div>
+          </div>
+          <div class="vrec-right">
+            <button type="button" class="vrec-icon-btn vrec-cancel-btn" title="Cancel recording" aria-label="Cancel recording">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <button type="button" class="vrec-icon-btn vrec-done-btn" title="Done" aria-label="Done">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setupContainers() {
+      document.querySelectorAll('.input-container').forEach(container => {
+        if (!container.querySelector('.voice-recording-overlay')) {
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = buildVoiceOverlayHtml();
+          const overlay = wrapper.firstElementChild;
+          container.appendChild(overlay);
+
+          overlay.querySelector('.vrec-cancel-btn').addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation();
+            stopVoiceRecording(false);
+          });
+          overlay.querySelector('.vrec-done-btn').addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation();
+            stopVoiceRecording(true);
+          });
+        }
+      });
+    }
+
+    function attachMicButtons() {
+      document.querySelectorAll('.hero-mic-btn, #speakPill').forEach(btn => {
+        if (btn.getAttribute('data-vrec-wired') === 'true') return;
+        btn.setAttribute('data-vrec-wired', 'true');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          const container = btn.closest('.input-container') || document.querySelector('.input-container');
+          if (container) startVoiceRecording(container);
+        });
+      });
+    }
+
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let audioCtx = null;
+    let analyserNode = null;
+    let audioSourceNode = null;
+    let micStreamRef = null;
+
+    function startVoiceRecording(container) {
+      if (isRecording) return;
+      isRecording = true;
+      activeContainer = container;
+      activeInput = container.querySelector('.prompt-input') || container.querySelector('input') || container.querySelector('textarea');
+
+      container.classList.add('is-recording');
+      recSeconds = 0;
+      audioChunks = [];
+      updateTimerDisplay();
+
+      clearInterval(recTimerInterval);
+      recTimerInterval = setInterval(() => {
+        recSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+
+      // 1. Browser Speech Recognition (Live text preview)
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRec) {
+        try {
+          recognition = new SpeechRec();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+          recognition.onresult = (evt) => {
+            let current = '';
+            for (let i = evt.resultIndex; i < evt.results.length; i++) {
+              current += evt.results[i][0].transcript;
+            }
+            if (activeInput && current) {
+              activeInput.value = current;
+              const ph = document.getElementById('rotPlaceholder');
+              if (ph) { ph.style.opacity = '0'; ph.style.display = 'none'; }
+              activeInput.dispatchEvent(new Event('input'));
+              if (typeof updateHeroSendState === 'function') updateHeroSendState();
+            }
+          };
+          recognition.start();
+        } catch (e) { recognition = null; }
+      }
+
+      // 2. MediaRecorder & Web Audio API Analyser for real-time mic audio volume equalizer
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          micStreamRef = stream;
+          try {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = (e) => {
+              if (e.data && e.data.size > 0) audioChunks.push(e.data);
+            };
+            mediaRecorder.start(250);
+          } catch (err) { mediaRecorder = null; }
+
+          try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+              audioCtx = new AudioContext();
+              audioSourceNode = audioCtx.createMediaStreamSource(stream);
+              analyserNode = audioCtx.createAnalyser();
+              analyserNode.fftSize = 64;
+              audioSourceNode.connect(analyserNode);
+
+              const freqData = new Uint8Array(analyserNode.frequencyBinCount);
+              clearInterval(audioAnimInterval);
+              audioAnimInterval = setInterval(() => {
+                if (!analyserNode || !activeContainer) return;
+                analyserNode.getByteFrequencyData(freqData);
+
+                let sum = 0;
+                for (let i = 0; i < freqData.length; i++) sum += freqData[i];
+                let rawVol = sum / freqData.length; // 0 to 255
+
+                const bars = activeContainer.querySelectorAll('.vrec-bar');
+                const totalBars = bars.length;
+
+                if (rawVol < 6) {
+                  // SILENCE: ALL bars are uniform flat dots across the entire width
+                  bars.forEach((bar) => {
+                    bar.style.height = '3px';
+                    bar.style.opacity = '0.35';
+                  });
+                } else {
+                  // USER TALKING: ALL bars vibrate in smooth symmetrical harmony
+                  const normalizedVol = Math.min(1, Math.max(0.15, (rawVol - 4) / 40));
+                  const phase = Date.now() / 110;
+
+                  bars.forEach((bar, idx) => {
+                    const centerRatio = 1 - Math.pow(Math.abs((idx - (totalBars / 2)) / (totalBars / 2)), 1.6) * 0.35;
+                    const wave = Math.sin(phase + idx * 0.45) * 0.35 + 0.65;
+                    const calculatedH = Math.max(3, Math.floor(4 + (18 * normalizedVol * centerRatio * wave)));
+                    bar.style.height = calculatedH + 'px';
+                    bar.style.opacity = '0.95';
+                  });
+                }
+              }, 45);
+            }
+          } catch (e) {}
+        }).catch(() => { mediaRecorder = null; });
+      }
+
+      // Fallback idle state if mic is pending
+      if (!audioAnimInterval) {
+        audioAnimInterval = setInterval(() => {
+          if (!activeContainer) return;
+          const bars = activeContainer.querySelectorAll('.vrec-bar');
+          bars.forEach(bar => { bar.style.height = '3px'; bar.style.opacity = '0.4'; });
+        }, 200);
+      }
+    }
+
+    function updateTimerDisplay() {
+      if (!activeContainer) return;
+      const timerEl = activeContainer.querySelector('.vrec-timer');
+      if (!timerEl) return;
+      const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+      const s = String(recSeconds % 60).padStart(2, '0');
+      timerEl.textContent = m + ':' + s;
+    }
+
+    async function stopVoiceRecording(commit) {
+      if (!isRecording) return;
+      isRecording = false;
+
+      clearInterval(recTimerInterval);
+      clearInterval(audioAnimInterval);
+
+      if (recognition) {
+        try { recognition.stop(); } catch (e) {}
+        recognition = null;
+      }
+
+      if (audioCtx) {
+        try { audioCtx.close(); } catch (e) {}
+        audioCtx = null;
+      }
+      analyserNode = null;
+      audioSourceNode = null;
+
+      let recordedBlob = null;
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try { mediaRecorder.stop(); } catch (e) {}
+      }
+
+      if (micStreamRef) {
+        try { micStreamRef.getTracks().forEach(t => t.stop()); } catch (e) {}
+        micStreamRef = null;
+      }
+
+      if (audioChunks.length > 0) {
+        recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      }
+
+      if (activeContainer) {
+        activeContainer.classList.remove('is-recording');
+        activeContainer.querySelectorAll('.vrec-bar').forEach(b => {
+          b.style.height = '4px';
+          b.style.opacity = '0.9';
+        });
+      }
+
+      if (commit && activeInput) {
+        // If we captured audio, call NVIDIA Nemotron ASR Streaming (/api/stt)
+        if (recordedBlob && recordedBlob.size > 0) {
+          try {
+            const res = await fetch('/api/stt', {
+              method: 'POST',
+              headers: { 'Content-Type': 'audio/wav', 'X-Model': 'nvidia/nemotron-asr-streaming' },
+              body: recordedBlob
+            });
+            const data = await res.json();
+            if (data && data.transcript && data.transcript.trim()) {
+              activeInput.value = data.transcript.trim();
+              const ph = document.getElementById('rotPlaceholder');
+              if (ph) { ph.style.opacity = '0'; ph.style.display = 'none'; }
+              activeInput.dispatchEvent(new Event('input'));
+            }
+          } catch (err) {}
+        }
+
+        const txt = activeInput.value.trim();
+        if (txt) {
+          if (activeInput.id === 'chatInput' && typeof sendChatMessage === 'function') {
+            sendChatMessage();
+          } else if (typeof sendMessage === 'function') {
+            sendMessage();
+          }
+        }
+      }
+
+      activeContainer = null;
+      activeInput = null;
+      audioChunks = [];
+      mediaRecorder = null;
+    }
+
+    if (document.readyState !== 'loading') {
+      setupContainers(); attachMicButtons();
+    } else {
+      document.addEventListener('DOMContentLoaded', () => { setupContainers(); attachMicButtons(); });
+    }
+    setInterval(() => { setupContainers(); attachMicButtons(); }, 500);
+  })();
+</script>
 </body>
 </html>
