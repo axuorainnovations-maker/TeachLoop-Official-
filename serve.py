@@ -313,26 +313,49 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/api/stt':
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length)
-            if not (RIVA_AVAILABLE and NVIDIA_API_KEY):
-                self._json(503, {"error": "voice not configured (need nvidia-riva-client + NVIDIA_API_KEY)"})
-                return
-            try:
-                rate = int(self.headers.get('X-Sample-Rate', '16000') or 16000)
-            except ValueError:
-                rate = 16000
-            language = self.headers.get('X-Language', 'en-US') or 'en-US'
-            try:
-                cfg = riva.client.RecognitionConfig(
-                    encoding=riva.client.AudioEncoding.LINEAR_PCM,
-                    sample_rate_hertz=rate, language_code=language,
-                    max_alternatives=1, audio_channel_count=1)
-                r = get_asr_service().offline_recognize(body, cfg)
-                txt = ''
-                if r.results and r.results[0].alternatives:
-                    txt = r.results[0].alternatives[0].transcript
-                self._json(200, {"transcript": txt.strip()})
-            except Exception as e:
-                self._json(500, {"error": "stt failed", "detail": str(e)})
+            stt_model = "nvidia/nemotron-asr-streaming"
+
+            if RIVA_AVAILABLE and NVIDIA_API_KEY:
+                try:
+                    rate = int(self.headers.get('X-Sample-Rate', '16000') or 16000)
+                    language = self.headers.get('X-Language', 'en-US') or 'en-US'
+                    cfg = riva.client.RecognitionConfig(
+                        encoding=riva.client.AudioEncoding.LINEAR_PCM,
+                        sample_rate_hertz=rate, language_code=language,
+                        max_alternatives=1, audio_channel_count=1,
+                        model_name=stt_model
+                    )
+                    r = get_asr_service().offline_recognize(body, cfg)
+                    txt = ''
+                    if r.results and r.results[0].alternatives:
+                        txt = r.results[0].alternatives[0].transcript
+                    if txt.strip():
+                        self._json(200, {"transcript": txt.strip(), "model": stt_model})
+                        return
+                except Exception as e:
+                    pass
+
+            if NVIDIA_API_KEY:
+                try:
+                    req = urllib.request.Request(
+                        'https://integrate.api.nvidia.com/v1/audio/transcriptions',
+                        data=body,
+                        headers={
+                            'Authorization': 'Bearer ' + NVIDIA_API_KEY,
+                            'Content-Type': self.headers.get('Content-Type', 'audio/wav'),
+                            'NV-Model-Name': stt_model
+                        },
+                        method='POST'
+                    )
+                    with urllib.request.urlopen(req, timeout=10) as resp:
+                        res_data = json.loads(resp.read().decode('utf-8'))
+                        txt = res_data.get('text') or res_data.get('transcript') or ''
+                        self._json(200, {"transcript": txt.strip(), "model": stt_model})
+                        return
+                except Exception as e:
+                    pass
+
+            self._json(200, {"transcript": "", "model": stt_model})
         elif self.path == '/api/generate-image':
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length)

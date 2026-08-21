@@ -291,5 +291,47 @@
   nameInput.focus();
 })();
 </script>
+<script>
+  // ── Study Time Tracker for Dashboard ──
+  (function () {
+    const TIME_KEY = 'TEACHLOOP_STUDY_TIME';    // { subject: seconds }
+    const DAILY_KEY = 'TEACHLOOP_STUDY_DAILY';   // { 'YYYY-MM-DD': seconds }
+    const DAYS_KEY = 'TEACHLOOP_STUDY_DAYS';     // ['YYYY-MM-DD', ...]
+
+    function readObj(k) { try { const v = JSON.parse(localStorage.getItem(k)); return (v && typeof v === 'object') ? v : {}; } catch (e) { return {}; } }
+    function readArr(k) { try { const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+    function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
+    function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+    function currentSubject() {
+      const inp = document.getElementById('nameInput');
+      if (inp && inp.value.trim()) return inp.value.trim();
+      const rec = readArr('TEACHLOOP_RECENTS');
+      if (rec[0]) return rec[0];
+      const subs = readArr('TEACHLOOP_SUBJECTS');
+      return subs[0] || 'General Study';
+    }
+
+    let last = Date.now();
+    function tick() {
+      const now = Date.now();
+      const dt = (now - last) / 1000;
+      last = now;
+      if (document.visibilityState !== 'visible') return;
+      if (dt <= 0 || dt > 90) return;
+      const subj = currentSubject();
+      if (!subj) return;
+
+      const t = readObj(TIME_KEY); t[subj] = (t[subj] || 0) + dt; write(TIME_KEY, t);
+      const tk = todayKey();
+      const d = readObj(DAILY_KEY); d[tk] = (d[tk] || 0) + dt; write(DAILY_KEY, d);
+      const days = readArr(DAYS_KEY); if (days.indexOf(tk) < 0) { days.push(tk); write(DAYS_KEY, days); }
+    }
+
+    document.addEventListener('visibilitychange', () => { last = Date.now(); });
+    window.addEventListener('focus', () => { last = Date.now(); });
+    setInterval(tick, 3000);
+  })();
+</script>
 </body>
 </html>
