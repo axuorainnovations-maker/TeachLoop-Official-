@@ -34,7 +34,10 @@ PORT = 3006
 # STT: parakeet-1.1b-rnnt-multilingual-asr | TTS: magpie-tts-multilingual
 NVIDIA_API_KEY = env_vars.get('NVIDIA_API_KEY', '')
 RIVA_URI = 'grpc.nvcf.nvidia.com:443'
-ASR_FUNCTION_ID = '71203149-d3b7-4460-8231-1be2543a1fca'
+# ASR model is selected by NVCF function id, not by a request field. Override
+# both together to switch models (e.g. to Nemotron ASR) via .env.local.
+ASR_FUNCTION_ID = env_vars.get('NVIDIA_ASR_FUNCTION_ID', '') or '71203149-d3b7-4460-8231-1be2543a1fca'
+ASR_MODEL_NAME = env_vars.get('NVIDIA_STT_MODEL', '') or 'parakeet-1.1b-rnnt-multilingual-asr'
 # TTS model is env-driven and now defaults to chatterbox-multilingual-tts.
 NVIDIA_TTS_MODEL = env_vars.get('NVIDIA_TTS_MODEL', '') or 'chatterbox-multilingual-tts'
 # NVCF function IDs are per-model. Magpie's is known; Chatterbox's must come from
@@ -313,7 +316,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/api/stt':
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length)
-            stt_model = "nvidia/nemotron-asr-streaming"
+            # On NVCF the ASR model is chosen by function id (ASR_FUNCTION_ID),
+            # not by a RecognitionConfig field — the installed riva client has
+            # no model_name field and raises if one is passed.
+            stt_model = ASR_MODEL_NAME
 
             if RIVA_AVAILABLE and NVIDIA_API_KEY:
                 try:
@@ -322,8 +328,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     cfg = riva.client.RecognitionConfig(
                         encoding=riva.client.AudioEncoding.LINEAR_PCM,
                         sample_rate_hertz=rate, language_code=language,
-                        max_alternatives=1, audio_channel_count=1,
-                        model_name=stt_model
+                        max_alternatives=1, audio_channel_count=1
                     )
                     r = get_asr_service().offline_recognize(body, cfg)
                     txt = ''
@@ -333,7 +338,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         self._json(200, {"transcript": txt.strip(), "model": stt_model})
                         return
                 except Exception as e:
-                    pass
+                    print('[stt] riva path failed:', str(e).replace('\n', ' ')[:200])
 
             if NVIDIA_API_KEY:
                 try:
@@ -353,7 +358,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         self._json(200, {"transcript": txt.strip(), "model": stt_model})
                         return
                 except Exception as e:
-                    pass
+                    print('[stt] http fallback failed:', str(e).replace('\n', ' ')[:200])
 
             self._json(200, {"transcript": "", "model": stt_model})
         elif self.path == '/api/generate-image':
