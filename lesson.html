@@ -2242,7 +2242,7 @@
   function playSection(idx, item) {
     const plTop = document.querySelector('.pl-top');
     if (plTop) plTop.style.display = 'flex';
-    if (plScore) plScore.hidden = true;
+    plScore.hidden = true;
     if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
     let page = 0;
     function render() {
@@ -2428,7 +2428,7 @@
       const plTop = document.querySelector('.pl-top');
       if (plTop) plTop.style.display = 'none';
       if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'none';
-      if (plScore) plScore.hidden = true;
+      plScore.hidden = true;
       plBody.innerHTML = '';
       const wrap = document.createElement('div'); wrap.className = 'qz-done';
       const total = item.questions.length || 1;
