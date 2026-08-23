@@ -475,13 +475,11 @@
   /* Animated shimmer for loading labels — a highlight sweeps across the text. */
   .shimmer-text {
     display:inline-block; white-space:pre;
-    /* Tiled so the gradient always covers every letter — the text stays put and
-       only the bright band travels across it. */
-    background-image:linear-gradient(90deg,#6e6e78 0%,#6e6e78 42%,#ffffff 50%,#6e6e78 58%,#6e6e78 100%);
+    background-image:linear-gradient(90deg,#a1a1aa 0%,#a1a1aa 42%,#ffffff 50%,#a1a1aa 58%,#a1a1aa 100%);
     background-size:200% 100%;
     background-repeat:repeat-x;
     -webkit-background-clip:text; background-clip:text;
-    color:transparent; -webkit-text-fill-color:transparent;
+    color:#a1a1aa;
     animation:textShimmer 2.4s linear infinite;
   }
   @keyframes textShimmer {
@@ -499,16 +497,17 @@
   .loadwrap .load-progress { order:2; }
   /* While loading, pin the block to the content area so text + bar sit dead
      centre of the page regardless of each tab's own padding. */
-  .is-loading .tab-load, .loadwrap {
+  .is-loading .tab-load {
+    padding:60px 20px; margin:0 auto;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .loadwrap {
     position:fixed; top:58px; left:86px; right:0; bottom:0;
-    /* bottom padding offsets the 58px top bar, so the block reads as centred
-       on the page rather than 29px low within the content area */
     min-height:0; padding:0 20px 58px; margin:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
-  @media (max-width:720px) { .is-loading .tab-load, .loadwrap { left:0; } }
+  @media (max-width:720px) { .loadwrap { left:0; } }
   .tab-load .load-progress { margin-top:0; }
-  .is-loading .br-head { display:none !important; }
   .tab-load .tab-load-txt { order:1; margin:0 0 20px; }
   .tab-load .load-progress { order:2; }
 
@@ -518,44 +517,223 @@
   .tab-load-txt { margin-top:0; font-size:22px; letter-spacing:-.01em; color:#8a8a93; }
   .tab-load .load-progress { margin-top:18px; }
 
-  /* ── Recall (active recall practice) ── */
-  .recall { display:none; max-width:760px; margin:0 auto; padding:48px 28px 40px; }
-  .rc-meta { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; }
-  .rc-count { font-size:13.5px; font-weight:600; color:#8a8a93; }
-  .rc-tally { display:flex; gap:8px; }
-  .rc-tally span { font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; border:1px solid; }
-  .rc-tally .g { color:#3fb950; border-color:rgba(63,185,80,0.40); background:rgba(63,185,80,0.10); }
-  .rc-tally .a { color:#f0a500; border-color:rgba(233,118,4,0.40); background:rgba(233,118,4,0.10); }
-  .rc-tally .f { color:#f0857f; border-color:rgba(248,81,73,0.35); background:rgba(248,81,73,0.09); }
-  .rc-bar { height:5px; border-radius:99px; background:#1e1e22; overflow:hidden; margin-bottom:22px; }
-  .rc-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .3s ease; }
-  .rc-card { background:#161618; border:1px solid #2a2a2e; border-radius:18px; padding:24px; }
-  .rc-type { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#c9b6ef; background:rgba(139,92,246,0.14); border:1px solid rgba(139,92,246,0.30); padding:5px 11px; border-radius:999px; margin-bottom:16px; }
-  .rc-prompt { font-size:20px; font-weight:700; line-height:1.4; color:#fff; letter-spacing:-.01em; margin-bottom:18px; }
-  .rc-label { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#8a8a93; margin-bottom:8px; }
-  .rc-input { width:100%; min-height:96px; resize:vertical; background:#0f0f10; border:1px solid #2a2a2e; border-radius:12px; padding:13px 15px; color:#e8e8e6; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif; outline:none; }
-  .rc-input:focus { border-color:#7c3aed; }
-  .rc-input::placeholder { color:#6a6a72; }
-  .rc-reveal { margin-top:16px; width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.26); }
-  .rc-reveal:hover { filter:brightness(1.07); }
-  .rc-answer { margin-top:20px; border-top:1px solid #2a2a2e; padding-top:20px; }
-  .rc-ideal { font-size:15.5px; line-height:1.65; color:#cfc6ea; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.26); border-radius:13px; padding:14px 16px; }
-  .rc-why { margin-top:20px; }
-  .rc-why .rc-input { min-height:74px; }
-  .rc-conf { margin-top:22px; }
-  .rc-conf-btns { display:flex; gap:10px; }
-  .rc-conf-btn { flex:1; padding:12px 10px; border-radius:12px; border:1.5px solid #2e2e34; background:transparent; color:#c7c7cc; font-size:14.5px; font-weight:700; cursor:pointer; transition:border-color .12s, background .12s, color .12s; }
-  .rc-conf-btn:hover { background:#1c1c20; color:#fff; }
-  .rc-conf-btn.got.on { border-color:#3fb950; color:#3fb950; background:rgba(63,185,80,0.12); }
-  .rc-conf-btn.almost.on { border-color:#f0a500; color:#f0a500; background:rgba(233,118,4,0.12); }
-  .rc-conf-btn.forgot.on { border-color:#f85149; color:#f0857f; background:rgba(248,81,73,0.10); }
-  .rc-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
-  .rc-prev { padding:11px 24px; border:1px solid #2e2e34; border-radius:12px; background:transparent; color:#c7c7cc; font-size:14.5px; font-weight:600; cursor:pointer; }
-  .rc-prev:hover { background:#1c1c20; color:#fff; }
+  /* ── Recall Layout (Simplified & Clean) ── */
+  .recall { display:none; max-width:680px; margin:0 auto; padding:16px 20px 60px; }
+  .rc-meta { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+  .rc-count { font-size:13px; font-weight:600; color:#8e8e93; }
+  .rc-tally { display:flex; align-items:center; gap:14px; }
+  .rc-tally span { font-size:13.5px; font-weight:700; color:#ffffff; display:inline-flex; align-items:center; gap:5px; border:none; background:transparent; padding:0; }
+  .rc-tally .g, .rc-tally .a, .rc-tally .f { color:#ffffff; border:none; background:transparent; }
+
+  .rc-bar { height:4px; border-radius:99px; background:rgba(255,255,255,0.06); overflow:hidden; margin-bottom:20px; position:relative; }
+  .rc-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#8b5cf6); transition:width .35s cubic-bezier(0.16,1,0.3,1); }
+
+  /* Question Prompt Header matching Image 1 */
+  .rc-prompt-wrap { margin-bottom:24px; text-align:left; }
+  .rc-prompt {
+    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important;
+    font-size:25px !important;
+    font-weight:800 !important;
+    line-height:1.35 !important;
+    color:#ffffff !important;
+    letter-spacing:-0.02em !important;
+    margin-bottom:20px !important;
+    text-align:left !important;
+  }
+  .rc-divider {
+    width:100%;
+    height:1px;
+    border-bottom:1px dashed rgba(255, 255, 255, 0.14);
+    margin-bottom:24px;
+  }
+
+  /* Pill Answer Input with Circular Send Arrow (Image 1 Input) */
+  .rc-input-pill {
+    position:relative;
+    display:flex;
+    align-items:center;
+    background:#18181b;
+    border:1px solid rgba(255, 255, 255, 0.12);
+    border-radius:999px;
+    padding:6px 6px 6px 22px;
+    margin-bottom:24px;
+    transition:all 0.2s ease;
+    box-shadow:inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  .rc-input-pill:focus-within {
+    border-color:#8b5cf6;
+    background:#1c1c20;
+    box-shadow:0 0 0 3.5px rgba(139, 92, 246, 0.22);
+  }
+  .rc-pill-input {
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:#ffffff;
+    font-size:15.5px;
+    font-family:'Plus Jakarta Sans','Inter',sans-serif;
+  }
+  .rc-pill-input::placeholder { color:#61616c; }
+  .rc-submit-arrow {
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background:#e4e4e7;
+    color:#09090b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:all 0.15s ease;
+  }
+  .rc-submit-arrow:hover { background:#ffffff; transform:scale(1.05); }
+  .rc-submit-arrow:active { transform:scale(0.95); }
+
+  /* Active Recall Card (Unrevealed Hint Box - Image 2) */
+  .rc-card {
+    background:#18181b;
+    border:1px solid rgba(255, 255, 255, 0.10);
+    border-radius:22px;
+    overflow:hidden;
+    margin-bottom:24px;
+    box-shadow:0 12px 36px rgba(0, 0, 0, 0.45);
+  }
+  .rc-card-top {
+    padding:40px 24px 34px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+  .rc-hint-icon {
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    border:1.5px dashed rgba(255, 255, 255, 0.22);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#d4d4d8;
+    margin-bottom:16px;
+    background:rgba(255, 255, 255, 0.02);
+  }
+  .rc-hint-text {
+    font-size:15px;
+    font-weight:500;
+    color:#94a3b8;
+    margin:0;
+  }
+  .rc-card-ft {
+    background:#202024;
+    border-top:1px solid rgba(255, 255, 255, 0.08);
+    padding:16px 20px;
+  }
+  .rc-reveal {
+    width:100%;
+    height:48px;
+    border-radius:14px;
+    border:1px solid rgba(255, 255, 255, 0.12);
+    background:#27272a;
+    color:#ffffff;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.15s ease;
+  }
+  .rc-reveal:hover { background:#323236; border-color:rgba(255, 255, 255, 0.22); }
+  .rc-reveal:active { transform:translateY(1px); }
+
+  /* 3 Stacked Full-Width Rating Button Cards (Image 1) */
+  .rc-rating-stack {
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:20px;
+    width:100%;
+  }
+  .rc-rate-btn {
+    width:100%;
+    height:56px;
+    background:#1c1c20;
+    border:1px solid rgba(255, 255, 255, 0.10);
+    border-radius:18px;
+    color:#ffffff;
+    font-size:16px;
+    font-weight:700;
+    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    cursor:pointer;
+    transition:all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow:0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  .rc-rate-btn:hover {
+    background:#27272a;
+    border-color:rgba(255, 255, 255, 0.22);
+    transform:translateY(-1px);
+    box-shadow:0 6px 18px rgba(0, 0, 0, 0.35);
+  }
+  .rc-rate-btn:active {
+    transform:translateY(1px);
+    background:#161619;
+  }
+  .rc-rate-btn.got.on {
+    border-color:#2ec06a;
+    background:rgba(46, 192, 106, 0.15);
+    box-shadow:0 0 16px rgba(46, 192, 106, 0.25);
+  }
+  .rc-rate-btn.almost.on {
+    border-color:#f59e0b;
+    background:rgba(245, 158, 11, 0.15);
+    box-shadow:0 0 16px rgba(245, 158, 11, 0.25);
+  }
+  .rc-rate-btn.forgot.on {
+    border-color:#ef4444;
+    background:rgba(239, 68, 68, 0.15);
+    box-shadow:0 0 16px rgba(239, 68, 68, 0.25);
+  }
+
+  .rc-ideal { font-size:15px; line-height:1.65; color:#d4d4d8; background:rgba(255,255,255,0.03); border-left:3.5px solid #a78bfa; border-radius:0 12px 12px 0; padding:16px 20px; }
+
+  .rc-nav { display:flex; justify-content:space-between; align-items:center; margin-top:24px; }
+  .rc-prev { padding:12px 24px; height:48px; border:1px solid #2e2e34; border-bottom:3px solid #1c1c20; border-radius:14px; background:#161618; color:#d4d4d8; font-size:14.5px; font-weight:700; cursor:pointer; transition:all 0.1s ease; }
+  .rc-prev:hover { background:#222226; color:#ffffff; }
   .rc-prev[disabled] { opacity:.35; pointer-events:none; }
-  .rc-next { padding:11px 30px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:14.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.26); }
-  .rc-next:hover { filter:brightness(1.07); }
-  .rc-next[disabled] { opacity:.4; pointer-events:none; box-shadow:none; }
+
+  /* 3D PopButton style matching .start-btn for Next card */
+  .rc-next {
+    padding:12px 34px;
+    height:50px;
+    border:2px solid #a78bfa;
+    border-bottom:5px solid #4c1d95;
+    border-radius:14px;
+    background:#7c3aed;
+    color:#ffffff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 6px 18px rgba(124, 58, 237, 0.35);
+    transition:all 0.1s ease;
+    transform-origin:bottom;
+    user-select:none;
+  }
+  .rc-next:hover { background:#8b5cf6; border-color:#c4b5fd; color:#ffffff; box-shadow:0 8px 22px rgba(139, 92, 246, 0.45); }
+  .rc-next:active { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); }
+  .rc-next[disabled] { opacity:.4; pointer-events:none; box-shadow:none; transform:none; }
+  .rc-next[disabled] { opacity:.4; pointer-events:none; box-shadow:none; transform:none; }
   .rc-done { text-align:center; padding:52px 20px 26px; }
   .rc-done .grad-logo { width:64px; height:64px; }
   .rc-done h2 { font-size:26px; font-weight:800; color:#fff; margin:18px 0 8px; }
@@ -569,9 +747,30 @@
   /* The recap title already appears inside the player card, so the page-level
      kicker and heading are redundant here — keep only the Regenerate action. */
   #castView .br-kicker, #castView .br-title { display:none; }
-  #castView .br-head { margin-bottom:0; justify-content:flex-end; }
-  #castView { padding-top:24px; }
+  #castView .br-head { margin-bottom:12px; display:flex; align-items:center; justify-content:flex-end; gap:12px; }
+  #castView { padding-top:20px; }
   #castView .pc-card { margin-top:12px; }
+
+  .flow-btn-top {
+    height:36px;
+    padding:0 18px;
+    background:#27272a;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:10px;
+    color:#ffffff;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .2s ease;
+  }
+  .flow-btn-top:hover {
+    background:#3f3f46;
+    border-color:rgba(255,255,255,0.3);
+  }
   .pc-wrap { max-width:760px; margin:0 auto; padding-bottom:120px; }
   .pc-card { margin-top:14px; border:1px solid #252525; background:#171717; border-radius:20px; padding:20px; }
   .pc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
@@ -680,44 +879,202 @@
   .sc-drop-body { display:none; padding:0 20px 20px; }
   .sc-card.drop.open .sc-drop-body { display:block; }
 
-  /* ── Checkpoint (understanding check) ── */
-  .checkpoint { display:none; max-width:760px; margin:0 auto; padding:48px 28px 40px; }
-  .cp-meta { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:12px; }
-  .cp-count { font-size:13.5px; font-weight:600; color:#8a8a93; }
-  .cp-score { font-size:13.5px; font-weight:700; color:#c9b6ef; }
-  .cp-bar { height:5px; border-radius:99px; background:#1e1e22; overflow:hidden; margin-bottom:22px; }
-  .cp-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .3s ease; }
-  .cp-card { background:#161618; border:1px solid #2a2a2e; border-radius:18px; padding:24px; }
-  .cp-type { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#c9b6ef; background:rgba(139,92,246,0.14); border:1px solid rgba(139,92,246,0.30); padding:5px 11px; border-radius:999px; margin-bottom:16px; }
-  .cp-q { font-size:20px; font-weight:700; line-height:1.42; color:#fff; letter-spacing:-.01em; margin-bottom:18px; }
-  .cp-opts { display:flex; flex-direction:column; gap:10px; }
-  .cp-opt { display:flex; align-items:center; gap:14px; text-align:left; padding:15px 17px; background:#0f0f10; border:1.5px solid #2a2a2e; border-radius:13px; color:#e4e4e5; font-size:15.5px; line-height:1.45; cursor:pointer; transition:border-color .12s, background .12s; }
-  .cp-opt:hover { border-color:#3a3a40; }
-  .cp-opt .num { width:26px; height:26px; flex-shrink:0; border-radius:7px; border:1.5px solid #3a3a40; display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color:#9a9aa2; }
-  .cp-opt.sel { border-color:#8b5cf6; background:#1d1730; }
-  .cp-opt.sel .num { border-color:#8b5cf6; color:#c9b6ef; }
-  .cp-opt.correct { border-color:#3fb950; background:rgba(63,185,80,0.10); }
-  .cp-opt.correct .num { border-color:#3fb950; color:#3fb950; }
-  .cp-opt.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
-  .cp-opt.wrong .num { border-color:#f85149; color:#f85149; }
-  .cp-opt.locked { pointer-events:none; }
-  .cp-input { width:100%; min-height:92px; resize:vertical; background:#0f0f10; border:1px solid #2a2a2e; border-radius:12px; padding:13px 15px; color:#e8e8e6; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif; outline:none; }
-  .cp-input:focus { border-color:#7c3aed; }
-  .cp-input::placeholder { color:#6a6a72; }
-  .cp-input[readonly] { opacity:.75; }
-  .cp-submit { margin-top:16px; width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.26); }
-  .cp-submit:hover { filter:brightness(1.07); }
-  .cp-submit[disabled] { opacity:.4; pointer-events:none; box-shadow:none; }
-  .cp-fb { margin-top:18px; border-radius:13px; padding:14px 16px; font-size:15px; line-height:1.6; border:1px solid; }
-  .cp-fb.good { color:#a9e5b4; background:rgba(63,185,80,0.09); border-color:rgba(63,185,80,0.32); }
-  .cp-fb.bad { color:#f0b3ae; background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.30); }
-  .cp-fb b { display:block; margin-bottom:5px; color:#fff; font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
-  .cp-ideal { margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.09); color:#cfc6ea; }
-  .cp-follow { margin-top:16px; }
-  .cp-follow .cp-input { min-height:66px; }
-  .cp-label { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#8a8a93; margin-bottom:8px; }
-  .cp-next { margin-top:18px; width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.26); }
-  .cp-next:hover { filter:brightness(1.07); }
+  /* ── Checkpoint Quiz Container ── */
+  .checkpoint { display:none; width:100%; max-width:680px; margin:0 auto; padding:24px 20px 40px; position:relative; min-height:calc(100vh - 120px); flex-direction:column; box-sizing:border-box; }
+  #cpBody { display:flex; flex-direction:column; flex:1; }
+
+  /* Summary footer Continue button — same purple 3D pop */
+  .cps-btn-continue {
+    min-width:140px;
+    height:52px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    font-size:16px;
+    font-weight:700;
+    color:#f4f4f5;
+    background:#7c3aed;
+    border:2px solid #6d28d9;
+    border-bottom:5px solid #4c1d95;
+    border-radius:16px;
+    cursor:pointer;
+    user-select:none;
+    transition:all 0.1s ease;
+    transform-origin:bottom;
+    box-shadow:0 4px 20px rgba(109,40,217,0.45);
+    padding:0 32px;
+  }
+  .cps-btn-continue:hover { background:#6d28d9; border-color:#7c3aed; color:#fff; }
+  .cps-btn-continue:active { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); box-shadow:0 2px 8px rgba(109,40,217,0.3); }
+  .cp-card-wrap { flex:1; display:flex; flex-direction:column; justify-content:center; margin-top:0; }
+  .cp-card { background:transparent; border:none; padding:0; }
+  .cp-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; font-size:23px; font-weight:700; line-height:1.4; color:#ffffff; letter-spacing:-0.02em; margin-bottom:32px; text-align:left; }
+  .cp-opts { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+  
+  .cp-opt {
+    display:flex; align-items:center; justify-content:space-between; width:100%;
+    padding:17px 22px; background:#1b1b1f; border:1px solid #2c2c30; border-radius:16px;
+    color:#e4e4e7; font-size:15px; font-weight:500; line-height:1.45; text-align:left;
+    cursor:pointer; transition:all 0.18s cubic-bezier(0.16, 1, 0.3, 1); position:relative;
+    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  }
+  .cp-opt:hover:not(.locked) { border-color:#4a4a52; background:#232328; color:#ffffff; transform:translateY(-1px); }
+  .cp-opt .opt-left { display:flex; align-items:center; gap:14px; flex:1; }
+  .cp-opt .opt-radio {
+    width:20px; height:20px; border-radius:50%; border:2px solid #52525b;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.18s ease;
+  }
+  .cp-opt .opt-radio::after {
+    content:''; width:8px; height:8px; border-radius:50%; background:#ffffff; opacity:0; transition:opacity 0.15s ease;
+  }
+  
+  /* Selected State before submit */
+  .cp-opt.sel {
+    border: 2px solid #a78bfa !important;
+    background: #1b1728 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 18px rgba(167, 139, 250, 0.4), 0 4px 20px rgba(139, 92, 246, 0.25) !important;
+  }
+  .cp-opt.sel .opt-radio {
+    border-color: #a78bfa !important;
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%) !important;
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.5) !important;
+  }
+  .cp-opt.sel .opt-radio::after { opacity:1; background:#ffffff; }
+
+  /* Correct State ALWAYS overrides selected (GREEN) */
+  .cp-opt.correct, .cp-opt.sel.correct, .qz-opt.correct, .qz-opt.sel.correct {
+    border: 2px solid #2ec06a !important;
+    background: rgba(46, 192, 106, 0.12) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 20px rgba(46, 192, 106, 0.35) !important;
+  }
+  .cp-opt.correct .opt-radio, .cp-opt.sel.correct .opt-radio, .qz-opt.correct .opt-radio, .qz-opt.sel.correct .opt-radio {
+    border-color: #2ec06a !important;
+    background: #2ec06a !important;
+    box-shadow: 0 0 10px rgba(46, 192, 106, 0.5) !important;
+  }
+  .cp-opt.correct .opt-radio::after, .cp-opt.sel.correct .opt-radio::after, .qz-opt.correct .opt-radio::after, .qz-opt.sel.correct .opt-radio::after {
+    opacity: 1 !important;
+    background: #ffffff !important;
+  }
+
+  /* Wrong State ALWAYS overrides selected (RED) */
+  .cp-opt.wrong, .cp-opt.sel.wrong, .qz-opt.wrong, .qz-opt.sel.wrong {
+    border: 2px solid #ef4444 !important;
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.35) !important;
+  }
+  .cp-opt.wrong .opt-radio, .cp-opt.sel.wrong .opt-radio, .qz-opt.wrong .opt-radio, .qz-opt.sel.wrong .opt-radio {
+    border-color: #ef4444 !important;
+    background: #ef4444 !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+  }
+  .cp-opt.wrong .opt-radio::after, .cp-opt.sel.wrong .opt-radio::after, .qz-opt.wrong .opt-radio::after, .qz-opt.sel.wrong .opt-radio::after {
+    opacity: 1 !important;
+    background: #ffffff !important;
+  }
+
+  .cp-opt-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-left:12px; }
+  .cp-opt.correct .cp-opt-icon { color:#00e599; }
+  .cp-opt.wrong .cp-opt-icon { color:#ff3d3d; }
+
+  /* ── Modern Human-Centric Feedback Card ── */
+  .cp-fb {
+    background: #141417;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 24px 28px;
+    margin-top: 28px;
+    animation: fadeIn 0.25s ease;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  }
+  .cp-fb-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .cp-fb-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .cp-status-pill {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cp-status-pill.correct {
+    background: rgba(46, 192, 106, 0.14);
+    border: 1px solid rgba(46, 192, 106, 0.35);
+    color: #2ec06a;
+  }
+  .cp-status-pill.incorrect {
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #ef4444;
+  }
+  .cp-fb-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #d4d4d8;
+    margin: 0 0 16px;
+  }
+
+  /* Model Answer Callout Card */
+  .cp-ideal-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3.5px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  .cp-ideal-hd {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 8px;
+  }
+  .cp-ideal-text {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #e4e4e7;
+    margin: 0;
+  }
+  .cp-fb-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  /* Checkpoint Action Row — Right aligned Check button */
+  .cp-action-row {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  /* Input & Textarea Styling */
+  .cp-input {
+    width:100%; min-height:110px; resize:vertical; background:#1b1b1f;
+    border:1px solid #2c2c30; border-radius:16px; padding:16px 18px;
+    color:#ffffff; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif;
+    outline:none; transition:all 0.18s ease; box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .cp-input:focus { border-color:#8b5cf6; background:#1f1f25; box-shadow:0 0 0 3.5px rgba(139,92,246,0.22); }
+  .cp-input::placeholder { color:#6a6a78; }
+  .cp-input[readonly] { opacity:0.85; }
   /* Summary */
   .cp-sum-top { text-align:center; padding:34px 0 10px; }
   .cp-sum-top .grad-logo { width:60px; height:60px; }
@@ -920,6 +1277,168 @@
   .cp-retry:hover { background:#1c1c20; color:#fff; }
   @media (max-width:640px) { .cp-areas { grid-template-columns:1fr; } }
 
+  /* ── NEW Checkpoint Summary (Image 1 Style) ── */
+  .cps-wrap { max-width:700px; margin:0 auto; padding:32px 20px 120px; display:flex; flex-direction:column; gap:24px; }
+  .cps-header { text-align:center; }
+  .cps-emoji { font-size:44px; line-height:1; margin-bottom:12px; }
+  .cps-title { font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:26px; font-weight:800; color:#fff; letter-spacing:-.02em; margin:0 0 8px; }
+  .cps-subtitle { font-size:14px; color:#a1a1aa; line-height:1.6; max-width:440px; margin:0 auto; }
+
+  /* Stat Boxes Row */
+  .cps-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  @media (max-width:580px) { .cps-stats { grid-template-columns:1fr; } }
+  .cps-stat-box {
+    background: #161618; border: 1px solid #2a2a2e; border-radius: 18px;
+    padding: 24px 18px; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 155px; gap: 10px;
+    text-align: center;
+  }
+  .cps-stat-label { font-size:12px; font-weight:700; color:#71717a; text-transform:uppercase; letter-spacing:.09em; }
+  .cps-stat-value { font-size:28px; font-weight:800; line-height:1.2; color:#ffffff; letter-spacing:-.01em; text-shadow:none; }
+  .cps-stat-value.green { color:#ffffff; text-shadow:none; }
+  .cps-stat-value.red { color:#ffffff; text-shadow:none; }
+  .cps-stat-value.white { color:#ffffff; text-shadow:none; }
+  .cps-stat-sub { font-size:12px; color:#71717a; font-weight:500; }
+
+  /* Circular Ring in Accuracy box */
+  .cps-ring-wrap { position:relative; display:flex; align-items:center; justify-content:center; width:90px; height:90px; }
+  .cps-ring-pct { position:absolute; font-size:19px; font-weight:800; color:#ffffff; text-shadow:none; }
+
+  /* Areas grid */
+  .cps-areas { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:580px) { .cps-areas { grid-template-columns:1fr; } }
+  .cps-area-card {
+    background:#161618; border:1px solid #2a2a2e; border-radius:18px;
+    padding:18px 18px; display:flex; flex-direction:column; gap:14px;
+  }
+  .cps-area-card.green { border-color:rgba(46,192,106,0.22); background:linear-gradient(145deg,rgba(46,192,106,0.05),#161618); }
+  .cps-area-card.amber { border-color:rgba(245,158,11,0.22); background:linear-gradient(145deg,rgba(245,158,11,0.05),#161618); }
+  .cps-area-hd { display:flex; align-items:center; justify-content:space-between; }
+  .cps-area-hd-left { display:flex; align-items:center; gap:10px; }
+  .cps-area-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .cps-area-icon.green { background:rgba(46,192,106,0.16); color:#2ec06a; border:1px solid rgba(46,192,106,0.3); }
+  .cps-area-icon.amber { background:rgba(245,158,11,0.16); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); }
+  .cps-area-title { font-size:14px; font-weight:700; color:#fff; }
+  .cps-area-sub { font-size:11.5px; color:#71717a; }
+  .cps-area-count { font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px; flex-shrink:0; }
+  .cps-area-count.green { background:rgba(46,192,106,0.12); color:#6ee7b7; border:1px solid rgba(46,192,106,0.25); }
+  .cps-area-count.amber { background:rgba(245,158,11,0.12); color:#fde047; border:1px solid rgba(245,158,11,0.25); }
+
+  /* Rows inside areas */
+  .cps-rows { display:flex; flex-direction:column; gap:8px; }
+  .cps-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+  .cps-row-left { display:flex; align-items:center; gap:9px; }
+  .cps-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .cps-dot.green { background:#2ec06a; }
+  .cps-dot.amber { background:#f59e0b; }
+  .cps-row-name { font-size:13.5px; font-weight:600; color:#e4e4e7; }
+  .cps-tag { font-size:9.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 8px; border-radius:99px; flex-shrink:0; }
+  .cps-tag.green { background:rgba(46,192,106,0.12); color:#6ee7b7; border:1px solid rgba(46,192,106,0.25); }
+  .cps-tag.amber { background:rgba(245,158,11,0.12); color:#fde047; border:1px solid rgba(245,158,11,0.25); }
+  .cps-none { font-size:13.5px; color:#71717a; padding:6px 2px; }
+
+  /* Footer buttons */
+  /* Footer buttons row */
+  .cps-footer { display:flex; gap:16px; align-items:center; justify-content:center; width:100%; max-width:540px; margin:28px auto 8px; }
+
+  /* Retry: dark pill with ↺ icon */
+  .cps-btn-retry {
+    flex: 1;
+    min-width: 170px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #e4e4e7;
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    border-radius: 99px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.18s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .cps-btn-retry:hover { background: #27272a; border-color: #52525b; color: #ffffff; }
+  .cps-btn-retry:active { transform: translateY(1px); }
+
+  /* Continue button in summary footer */
+  .cps-btn-continue {
+    flex: 1;
+    min-width: 170px;
+    height: 48px;
+    padding: 0 32px;
+  }
+
+  /* ── Learning Zone Card ── */
+  .cps-zone-card {
+    background:#161618; border:1px solid rgba(255,255,255,0.1); border-radius:20px;
+    padding:24px 22px; display:flex; flex-direction:column; gap:18px;
+  }
+  .cps-zone-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .cps-zone-info { display:flex; flex-direction:column; gap:4px; }
+  .cps-zone-moved { font-size:12px; font-weight:600; color:#71717a; text-transform:uppercase; letter-spacing:.06em; }
+  .cps-zone-name { font-size:20px; font-weight:800; color:#fff; letter-spacing:-.02em; }
+  .cps-zone-desc { font-size:13.5px; color:#a1a1aa; line-height:1.55; max-width:360px; }
+  .cps-zone-what { flex-shrink:0; padding:7px 16px; border:1px solid rgba(255,255,255,0.18); border-radius:99px; background:rgba(255,255,255,0.04); color:#c7c7cc; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
+  .cps-zone-what:hover { background:rgba(255,255,255,0.09); color:#fff; }
+
+  /* Zone slider — single continuous track with dot + labels below */
+  .cps-zone-slider { position:relative; padding-bottom:22px; }
+  .cps-zone-track { position:relative; height:8px; border-radius:99px; background:#2a2a2e; }
+  .cps-zone-fill { position:absolute; left:0; top:0; height:100%; border-radius:99px; background:linear-gradient(90deg,#4f46e5,#6366f1); }
+  .cps-zone-dot {
+    position:absolute; top:50%; transform:translate(-50%,-50%);
+    width:18px; height:18px; border-radius:50%; background:#fff;
+    border:3px solid #6366f1; box-shadow:0 0 0 4px rgba(99,102,241,0.35);
+  }
+  .cps-zone-labels { display:flex; justify-content:space-between; margin-top:10px; }
+  .cps-zone-lbl { font-size:12px; font-weight:600; color:#52525b; }
+  .cps-zone-lbl.active { color:#e4e4e7; }
+
+  /* "Got it" text */
+  .cps-zone-gotit { font-size:13px; font-weight:600; color:#eab308; display:flex; align-items:center; gap:5px; }
+
+  /* ── Strength & Weakness Hero Tables (Image 2 style) ── */
+  .cps-htable-section { display:flex; flex-direction:column; gap:20px; }
+  .cps-htable-title {
+    font-size:16px; font-weight:800; color:#fff; letter-spacing:-.01em;
+    margin-bottom:10px;
+  }
+  .cps-htable-wrap { border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.07); }
+  .cps-htable { width:100%; border-collapse:collapse; }
+  /* Purple header — Strengths */
+  .cps-ht-head { background:linear-gradient(90deg,#3d2d6e 0%,#4a3580 100%); }
+  /* Amber header — Needs Work */
+  .cps-ht-head-amber { background:linear-gradient(90deg,#3d2a10 0%,#4a3218 100%); }
+  .cps-ht-th {
+    padding:14px 18px; text-align:left;
+    font-size:13px; font-weight:700; color:#d4c8f5;
+    letter-spacing:.01em;
+  }
+  .cps-ht-head-amber .cps-ht-th { color:#f5d8a0; }
+  .cps-ht-row { border-top:1px solid rgba(255,255,255,0.06); background:#111113; }
+  .cps-ht-row:hover { background:#18181b; }
+  .cps-ht-term {
+    padding:16px 18px; font-size:14px; font-weight:600; color:#e4e4e7;
+    width:38%; vertical-align:top;
+  }
+  .cps-ht-def {
+    padding:16px 18px; font-size:14px; color:#a1a1aa; line-height:1.55;
+    vertical-align:top;
+  }
+  .cps-ht-empty {
+    padding:18px; font-size:13.5px; color:#52525b; text-align:center;
+    background:#111113;
+  }
+
+
+
+
+
   /* ── Player (section reader + checkpoint quiz) ── */
   .player { display:none; max-width:820px; margin:0 auto; padding:34px 28px 60px; }
   .pl-top { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
@@ -975,11 +1494,13 @@
     display:inline-flex; align-items:center; justify-content:flex-start;
     font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
   }
-  /* Selected: purple glow behind the card instead of a drop shadow. */
+  /* Selected: vibrant progress bar purple outline & glow. */
   .qz-opt.sel, .cp-opt.sel {
-    background:#1f1a2b; border-color:#8b5cf6; box-shadow:none;
+    border: 2px solid #a78bfa !important;
+    background: #1b1728 !important;
+    box-shadow: 0 0 18px rgba(167, 139, 250, 0.4) !important;
   }
-  .qz-opt.sel .num, .cp-opt.sel .num { color:#c9b6ef; }
+  .qz-opt.sel .num, .cp-opt.sel .num { color: #a78bfa !important; }
   .qz-opt.correct, .cp-opt.correct {
     background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none;
   }
@@ -990,11 +1511,38 @@
   .qz-opt.wrong .num, .cp-opt.wrong .num { color:#ef4444; }
   /* Question + progress, matching the reference proportions */
   .qz-q, .cp-q {
-    font-size:17px; font-weight:400; line-height:1.6; letter-spacing:-.01em;
-    color:#e8e8e8; margin-bottom:22px;
+    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; font-size:23px; font-weight:700; line-height:1.4; letter-spacing:-.02em;
+    color:#ffffff; margin-bottom:32px; text-align:left;
   }
-  .cp-bar { height:8px; background:#242424; margin-bottom:26px; }
-  .cp-bar i { background:#2ec06a; }
+  /* Progress bars across quiz, recall & lesson: exact same Flux progress bar as generation */
+  .cp-bar, .rc-bar, .pl-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #1c1c20;
+    overflow: hidden;
+    box-shadow: inset 0 2px 3px rgba(0,0,0,0.45), inset 0 -1px 2px rgba(255,255,255,0.05);
+    margin-bottom: 24px;
+  }
+  .cp-bar i, .rc-bar i, .pl-bar i {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7c3aed 0%, #9d7bf5 35%, #c4b5fd 55%, #9d7bf5 78%, #7c3aed 100%);
+    box-shadow: 0 0 18px rgba(139,92,246,0.55), 0 0 32px rgba(196,181,253,0.35),
+               inset 0 1.5px 0 rgba(255,255,255,0.45), inset 0 -2px 3px rgba(60,20,120,0.35);
+    transition: width 0.3s ease;
+  }
+  .cp-bar i::after, .rc-bar i::after, .pl-bar i::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0; width: 50%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    mix-blend-mode: screen;
+    animation: fluxSheen 1.6s linear infinite;
+  }
   .cp-count, .cp-score { font-size:14px; font-weight:600; color:#7a7a7a; font-variant-numeric:tabular-nums; }
   .cp-card { background:transparent; border:none; padding:0; }
   .qz-q { font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-.015em; line-height:1.3; color:#fff; margin-bottom:30px; }
@@ -1031,13 +1579,46 @@
   .qz-opt.correct .num { color:#2ec06a; }
   .qz-opt.wrong { background:#1c1c1c; border:2px solid #ef4444; box-shadow:none; }
   .qz-opt.wrong .num { color:#ef4444; }
-  .qz-q { font-size:17px; font-weight:400; line-height:1.6; letter-spacing:-.01em; color:#e8e8e8; margin-bottom:22px; }
-  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#cfc6ea; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.28); border-radius:13px; padding:14px 17px; display:none; }
-  .qz-explain.bad { color:#f0b3ae; background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3); }
+  .qz-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important; font-size:23px !important; font-weight:700 !important; line-height:1.4 !important; letter-spacing:-.02em !important; color:#ffffff !important; margin-bottom:28px !important; text-align:left !important; }
+  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#6ee7b7; background:rgba(46,192,106,0.12); border:1px solid rgba(46,192,106,0.35); border-radius:14px; padding:16px 20px; display:none; }
   .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
-  .qz-check { padding:13px 40px; border:none; border-radius:13px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.28); }
-  .qz-check[disabled] { opacity:.4; pointer-events:none; }
-  .qz-check:hover { filter:brightness(1.07); }
+  /* Unified 3D PopButton style matching .start-btn ("Review lesson" / "Start lesson" button) */
+  .qz-check, .cp-submit-btn, .cps-btn-continue {
+    padding: 12px 34px;
+    height: 50px;
+    border: 2px solid #a78bfa;
+    border-bottom: 5px solid #4c1d95;
+    border-radius: 14px;
+    background: #7c3aed;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+    transition: all 0.1s ease;
+    transform-origin: bottom;
+    user-select: none;
+  }
+  .qz-check[disabled], .cp-submit-btn[disabled] {
+    opacity: 0.4;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
+  }
+  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover {
+    background: #8b5cf6;
+    border-color: #c4b5fd;
+    color: #ffffff;
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45);
+  }
+  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active {
+    border-bottom-width: 2px;
+    transform: translateY(3px) scaleY(0.98);
+  }
 
   /* Fill-in-the-blank Slot & Option Pill Styling */
   .fill-blank-slot {
@@ -1247,7 +1828,7 @@
 
 <div class="main">
   <!-- Generating -->
-  <div class="loadwrap" id="loadView">
+  <div class="loadwrap" id="loadView" style="display:none;">
     <div class="load-logo"><span class="grad-logo"></span></div>
     <div class="load-kicker">Writing your lesson</div>
     <h1 class="load-title" id="loadTitle">Your lesson</h1>
@@ -1289,11 +1870,8 @@
   <!-- Audio Recap -->
   <div class="studycast" id="castView">
     <div class="br-head">
-      <div>
-        <div class="br-kicker">Audio Recap</div>
-        <h1 class="br-title" id="scTitle"></h1>
-      </div>
       <button class="br-regen" id="scRegen" type="button" title="Regenerate">Regenerate</button>
+      <button class="flow-btn-top" id="castContinueBtn" type="button">Continue</button>
     </div>
     <div id="scBody"></div>
   </div>
@@ -1312,22 +1890,14 @@
 
   <!-- Recall -->
   <div class="recall" id="recallView">
-    <div class="br-head">
-      <div>
-        <div class="br-kicker">Recall</div>
-        <h1 class="br-title" id="rcTitle"></h1>
-      </div>
-      <button class="br-regen" id="rcRegen" type="button" title="Regenerate">Regenerate</button>
-    </div>
+    <button class="br-regen" id="rcRegen" type="button" title="Regenerate" style="display:none;">Regenerate</button>
     <div id="rcBody"></div>
   </div>
 
   <!-- Player -->
   <div class="player" id="player">
     <div class="pl-top">
-      <button class="pl-close" id="plClose" type="button" aria-label="Back to contents">✕</button>
       <div class="pl-label" id="plLabel"></div>
-      <div class="pl-score" id="plScore" hidden><span class="grad-logo score-logo"></span><span id="plScoreN">0</span></div>
     </div>
     <div class="pl-bar"><i id="plBarFill"></i></div>
     <div id="plBody"></div>
@@ -1481,7 +2051,7 @@
     player.style.display = view === 'player' ? 'block' : 'none';
     briefView.style.display = view === 'brief' ? 'block' : 'none';
     recallView.style.display = view === 'recall' ? 'block' : 'none';
-    checkView.style.display = view === 'check' ? 'block' : 'none';
+    checkView.style.display = view === 'check' ? 'flex' : 'none';
     castView.style.display = view === 'cast' ? 'block' : 'none';
     railBrief.classList.toggle('active', view === 'brief');
     railRecall.classList.toggle('active', view === 'recall');
@@ -1651,7 +2221,8 @@
     const cur = firstIncomplete();
     openItem(cur === -1 ? 0 : cur);
   });
-  document.getElementById('plClose').addEventListener('click', renderOverview);
+  const closeBtn = document.getElementById('plClose');
+  if (closeBtn) closeBtn.addEventListener('click', renderOverview);
 
   const plLabel = document.getElementById('plLabel');
   const plScore = document.getElementById('plScore');
@@ -1706,13 +2277,13 @@
   function playCheckpoint(idx, item) {
     const plTop = document.querySelector('.pl-top');
     if (plTop) plTop.style.display = 'flex';
-    plScore.hidden = false;
+    if (plScore) plScore.hidden = true;
     if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
 
     const isReview = isDone(idx);
     let q = 0, score = state.scores[idx] || 0, picked = -1, checked = false;
     const baseScore = totalScore() - (state.scores[idx] || 0);   // score from other checkpoints
-    plScoreN.textContent = String(baseScore + (isReview ? (state.scores[idx] || 0) : 0));
+    if (plScoreN) plScoreN.textContent = String(baseScore + (isReview ? (state.scores[idx] || 0) : 0));
 
     function render() {
       const question = item.questions[q];
@@ -1837,7 +2408,7 @@
                 }
               }
             }
-            if (right) { score++; plScoreN.textContent = String(baseScore + score); }
+            if (right) { score++; if (plScoreN) plScoreN.textContent = String(baseScore + score); }
             explain.style.display = 'block';
             explain.classList.toggle('bad', !right);
             explain.textContent = (right ? 'Correct! ' : 'Not quite. ') + (question.explain || '');
@@ -1922,14 +2493,9 @@
     }
   }
   function allCoreDone() { return CORE.every(k => flow[k]); }
-  // One button only: the next tab in the flow, or Teach Studio once everything is done.
+  // Continue button only appears at the top right of Audio Recap page
   function flowFooter(currentKey) {
-    if (allCoreDone() && currentKey === FLOW[FLOW.length - 1].key) {
-      return '<div class="flow-foot"><button class="flow-btn" data-flow="teach" type="button">Continue</button></div>';
-    }
-    const i = FLOW.findIndex(f => f.key === currentKey);
-    const next = FLOW[(i + 1) % FLOW.length];
-    return '<div class="flow-foot"><button class="flow-btn" data-flow="' + next.key + '" type="button">Continue</button></div>';
+    return '';
   }
   function wireFlow(host) {
     host.querySelectorAll('[data-flow]').forEach(b => b.addEventListener('click', () => {
@@ -2109,6 +2675,8 @@
     brLogoEl.innerHTML = '<span class="topic-emoji">' + getTopicEmoji(title, subject) + '</span>';
   }
 
+
+
   const ICON = {
     idea: '<svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>',
     key:  '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
@@ -2181,6 +2749,7 @@
         '<h2>What you must be able to explain</h2>' + li(brief.explainGoals) +
       '</div>';
     markFlow('brief');
+    refreshRailLocks();   // Always unlock Learn after brief renders (even if cached)
     brBody.insertAdjacentHTML('beforeend', flowFooter('brief'));
     wireFlow(brBody);
     // No Regenerate in the normal view — it only appears if generation failed.
@@ -2214,7 +2783,7 @@
     const user = 'Write the StudyBrief for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-sonnet-5', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
@@ -2243,7 +2812,7 @@
   try { const st = JSON.parse(localStorage.getItem(RECALL_STATE_KEY) || 'null'); if (st && st.conf) rcState = st; } catch (e) {}
   function saveRcState() { try { localStorage.setItem(RECALL_STATE_KEY, JSON.stringify(rcState)); } catch (e) {} }
   const rcBody = document.getElementById('rcBody');
-  document.getElementById('rcTitle').textContent = title;
+  if (document.getElementById('rcTitle')) document.getElementById('rcTitle').textContent = title;
 
   function validRecall(r) {
     return Array.isArray(r) && r.length && r.every(c => c && c.prompt && c.answer && RC_TYPES[c.type]);
@@ -2277,38 +2846,57 @@
     const card = recall[rcIndex];
     const t = rcTally();
     const conf = rcState.conf[rcIndex] || '';
-    let revealed = !!conf || !!rcState.why[rcIndex];
+    let revealed = !!conf;
 
     rcBody.innerHTML =
       '<div class="rc-meta">' +
         '<div class="rc-count">Card ' + (rcIndex + 1) + ' of ' + total + '</div>' +
-        '<div class="rc-tally"><span class="g">Got it ' + t.got + '</span><span class="a">Almost ' + t.almost + '</span><span class="f">Forgot ' + t.forgot + '</span></div>' +
+        '<div class="rc-tally"><span class="g">😁 ' + t.got + '</span><span class="a">😅 ' + t.almost + '</span><span class="f">😐 ' + t.forgot + '</span></div>' +
       '</div>' +
       '<div class="rc-bar"><i style="width:' + Math.round((t.rated / total) * 100) + '%"></i></div>' +
-      '<div class="rc-card">' +
-        '<div class="rc-type">' + esc(RC_TYPES[card.type]) + '</div>' +
+
+      '<div class="rc-prompt-wrap">' +
         '<div class="rc-prompt"></div>' +
-        '<div class="rc-label">Your answer — from memory</div>' +
-        '<textarea class="rc-input" id="rcAnswer" placeholder="Write what you remember, then reveal…" spellcheck="false"></textarea>' +
-        '<button class="rc-reveal" id="rcRevealBtn" type="button">Reveal answer</button>' +
-        '<div class="rc-answer" id="rcAnswerBlock" hidden>' +
-          '<div class="rc-label">Ideal answer</div>' +
-          '<div class="rc-ideal"></div>' +
-          '<div class="rc-why">' +
-            '<div class="rc-label">Explain why — in your own words</div>' +
-            '<textarea class="rc-input" id="rcWhy" placeholder="Why is this the answer? What is the reasoning?" spellcheck="false"></textarea>' +
+        '<div class="rc-divider"></div>' +
+      '</div>' +
+
+      '<div class="rc-input-pill">' +
+        '<input class="rc-pill-input" id="rcAnswer" placeholder="Type your answer…" spellcheck="false" />' +
+        '<button class="rc-submit-arrow" id="rcArrowBtn" type="button" title="Submit answer">' +
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>' +
+        '</button>' +
+      '</div>' +
+
+      '<!-- Unrevealed Active Recall Hint Card (Image 2) -->' +
+      '<div class="rc-card" id="rcHintCard">' +
+        '<div class="rc-card-top">' +
+          '<div class="rc-hint-icon">' +
+            '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>' +
           '</div>' +
-          '<div class="rc-conf">' +
-            '<div class="rc-label">How well did you know it?</div>' +
-            '<div class="rc-conf-btns">' +
-              '<button class="rc-conf-btn got" type="button" data-c="got">Got it</button>' +
-              '<button class="rc-conf-btn almost" type="button" data-c="almost">Almost</button>' +
-              '<button class="rc-conf-btn forgot" type="button" data-c="forgot">Forgot</button>' +
-            '</div>' +
-          '</div>' +
+          '<div class="rc-hint-text">Think of the answer first to do active recall</div>' +
+        '</div>' +
+        '<div class="rc-card-ft">' +
+          '<button class="rc-reveal" id="rcRevealBtn" type="button">Reveal</button>' +
         '</div>' +
       '</div>' +
-      '<div class="rc-nav">' +
+
+      '<!-- Revealed Block: Model Answer + 3 Stacked Rating Buttons (Image 1) -->' +
+      '<div id="rcRevealedBlock" style="display:none;">' +
+        '<div class="cp-ideal-card" style="margin-bottom:20px;">' +
+          '<div class="cp-ideal-hd">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' +
+            'Model Answer' +
+          '</div>' +
+          '<div class="rc-ideal"></div>' +
+        '</div>' +
+        '<div class="rc-rating-stack" id="rcRatingStack">' +
+          '<button class="rc-rate-btn got" type="button" data-c="got">😁 Got it</button>' +
+          '<button class="rc-rate-btn almost" type="button" data-c="almost">😅 Almost</button>' +
+          '<button class="rc-rate-btn forgot" type="button" data-c="forgot">😐 Forgot</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="rc-nav" style="margin-top:28px;">' +
         '<button class="rc-prev" id="rcPrev" type="button">Previous</button>' +
         '<button class="rc-next" id="rcNext" type="button">' + (rcIndex === total - 1 ? 'Finish' : 'Next card') + '</button>' +
       '</div>';
@@ -2317,39 +2905,49 @@
     rcBody.querySelector('.rc-ideal').textContent = card.answer;
 
     const answerEl = document.getElementById('rcAnswer');
-    const whyEl = document.getElementById('rcWhy');
-    const block = document.getElementById('rcAnswerBlock');
+    const hintCard = document.getElementById('rcHintCard');
+    const revealedBlock = document.getElementById('rcRevealedBlock');
     const revealBtn = document.getElementById('rcRevealBtn');
+    const arrowBtn = document.getElementById('rcArrowBtn');
     const nextBtn = document.getElementById('rcNext');
     const prevBtn = document.getElementById('rcPrev');
 
     answerEl.value = rcState.answers[rcIndex] || '';
-    whyEl.value = rcState.why[rcIndex] || '';
     answerEl.addEventListener('input', () => { rcState.answers[rcIndex] = answerEl.value; saveRcState(); });
-    whyEl.addEventListener('input', () => { rcState.why[rcIndex] = whyEl.value; saveRcState(); });
 
     function applyConf(c) {
-      rcBody.querySelectorAll('.rc-conf-btn').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+      rcBody.querySelectorAll('.rc-rate-btn').forEach(b => b.classList.toggle('on', b.dataset.c === c));
       nextBtn.disabled = !c;
     }
-    rcBody.querySelectorAll('.rc-conf-btn').forEach(b => b.addEventListener('click', () => {
+    rcBody.querySelectorAll('.rc-rate-btn').forEach(b => b.addEventListener('click', () => {
       rcState.conf[rcIndex] = b.dataset.c; saveRcState();
       applyConf(b.dataset.c);
       const t2 = rcTally();
-      rcBody.querySelector('.rc-tally').innerHTML = '<span class="g">Got it ' + t2.got + '</span><span class="a">Almost ' + t2.almost + '</span><span class="f">Forgot ' + t2.forgot + '</span>';
+      rcBody.querySelector('.rc-tally').innerHTML = '<span class="g">😁 ' + t2.got + '</span><span class="a">😅 ' + t2.almost + '</span><span class="f">😐 ' + t2.forgot + '</span>';
       rcBody.querySelector('.rc-bar i').style.width = Math.round((t2.rated / total) * 100) + '%';
     }));
 
     function doReveal() {
       revealed = true;
-      block.hidden = false;
-      revealBtn.hidden = true;
-      answerEl.readOnly = true;
+      hintCard.style.display = 'none';
+      revealedBlock.style.display = 'block';
     }
     revealBtn.addEventListener('click', doReveal);
-    if (revealed) doReveal();
+    arrowBtn.addEventListener('click', doReveal);
+    answerEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        doReveal();
+      }
+    });
 
-    // The answer stays hidden until revealed, and Next unlocks once rated.
+    if (revealed) {
+      doReveal();
+    } else {
+      hintCard.style.display = 'block';
+      revealedBlock.style.display = 'none';
+    }
+
     applyConf(conf);
     prevBtn.disabled = rcIndex === 0;
     prevBtn.addEventListener('click', () => { rcIndex--; renderRecallCard(); });
@@ -2391,7 +2989,7 @@
     const user = 'Write the Recall cards for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-sonnet-5', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
@@ -2415,7 +3013,7 @@
   const CHECK_KEY = 'NOURA_CHECK_' + slug;
   const CP_TYPES = { mc: 'Multiple choice', short: 'Short answer', reasoning: 'Why / how', misconception: 'Misconception check', scenario: 'Apply it' };
   let check = null, checkBusy = false;
-  let cpIndex = 0, cpResults = [];
+  let cpIndex = 0, cpResults = [], cpStartTime = null;
   const cpBody = document.getElementById('cpBody');
   document.getElementById('cpTitle').textContent = title;
 
@@ -2440,31 +3038,36 @@
 
   function renderCheckQuestion() {
     const brHead = document.querySelector('#checkView .br-head');
-    if (brHead) brHead.style.display = 'flex';
-    document.getElementById('cpRegen').hidden = false;
+    if (brHead) brHead.style.display = 'none';
+    document.getElementById('cpRegen').hidden = true;
+
+    if (cpIndex === 0) cpStartTime = Date.now();
+
     const total = check.length;
     if (cpIndex >= total) { renderCheckSummary(); return; }
     const item = check[cpIndex];
-    const correctSoFar = cpResults.filter(r => r.correct).length;
+    let picked = -1;
 
     cpBody.innerHTML =
-      '<div class="cp-meta">' +
-        '<div class="cp-count">Question ' + (cpIndex + 1) + ' of ' + total + '</div>' +
-        '<div class="cp-score">' + correctSoFar + ' correct</div>' +
+      '<div class="cp-meta" style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">' +
+        '<div class="cp-count" style="font-size:14px;font-weight:600;color:#8a8a9e;">' + (cpIndex + 1) + ' / ' + total + '</div>' +
       '</div>' +
-      '<div class="cp-bar"><i style="width:' + Math.round((cpIndex / total) * 100) + '%"></i></div>' +
-      '<div class="cp-card">' +
-        '<div class="cp-type">' + esc(CP_TYPES[item.type]) + '</div>' +
-        '<div class="cp-q"></div>' +
-        '<div id="cpAnswerArea"></div>' +
-        '<button class="cp-submit" id="cpSubmit" type="button" disabled>Submit answer</button>' +
-        '<div id="cpFeedback"></div>' +
+      '<div class="cp-bar"><i style="width:' + Math.round(((cpIndex + 1) / total) * 100) + '%;"></i></div>' +
+      '<div class="cp-card-wrap">' +
+        '<div class="cp-card">' +
+          '<div class="cp-q"></div>' +
+          '<div id="cpAnswerArea"></div>' +
+          '<div class="cp-action-row" id="cpActionRow">' +
+            '<button class="cp-submit-btn" id="cpSubmit" type="button" disabled>Check</button>' +
+          '</div>' +
+          '<div id="cpFeedback"></div>' +
+        '</div>' +
       '</div>';
+
     cpBody.querySelector('.cp-q').textContent = item.q;
 
     const area = document.getElementById('cpAnswerArea');
     const submit = document.getElementById('cpSubmit');
-    let picked = -1;
 
     if (item.type === 'mc') {
       const wrap = document.createElement('div');
@@ -2472,9 +3075,15 @@
       item.options.forEach((opt, oi) => {
         const b = document.createElement('button');
         b.type = 'button'; b.className = 'cp-opt';
-        b.innerHTML = '<span class="num">' + 'ABCDEFGH'[oi] + '.</span><span class="txt"></span>';
+        b.innerHTML =
+          '<div class="opt-left">' +
+            '<span class="opt-radio"></span>' +
+            '<span class="txt"></span>' +
+          '</div>' +
+          '<span class="cp-opt-icon"></span>';
         b.querySelector('.txt').textContent = opt;
         b.addEventListener('click', () => {
+          if (b.classList.contains('locked')) return;
           picked = oi;
           wrap.querySelectorAll('.cp-opt').forEach(o => o.classList.remove('sel'));
           b.classList.add('sel');
@@ -2500,8 +3109,16 @@
         feedback = correct ? item.why : (item.whyWrong || item.why);
         area.querySelectorAll('.cp-opt').forEach((o, oi) => {
           o.classList.add('locked');
-          if (oi === item.answer) o.classList.add('correct');
-          else if (oi === picked) o.classList.add('wrong');
+          const iconEl = o.querySelector('.cp-opt-icon');
+          if (oi === item.answer) {
+            o.classList.remove('sel');
+            o.classList.add('correct');
+            if (iconEl) iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          } else if (oi === picked) {
+            o.classList.remove('sel');
+            o.classList.add('wrong');
+            if (iconEl) iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+          }
         });
       } else {
         const ta = document.getElementById('cpText');
@@ -2512,7 +3129,7 @@
         feedback = graded.feedback;
       }
       cpResults[cpIndex] = { correct: correct, concept: item.concept, type: item.type };
-      submit.remove();
+      document.getElementById('cpActionRow').style.display = 'none';
       showFeedback(item, correct, feedback, total);
     });
     window.scrollTo(0, 0);
@@ -2526,7 +3143,7 @@
       const user = 'Question: ' + item.q + '\nIdeal answer: ' + item.ideal + '\nStudent answer: ' + answer;
       const r = await fetch('/api/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-5', max_tokens: 400, system: system, messages: [{ role: 'user', content: user }] })
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 400, system: system, messages: [{ role: 'user', content: user }] })
       });
       const data = await r.json();
       const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
@@ -2542,22 +3159,41 @@
   function showFeedback(item, correct, feedback, total) {
     const host = document.getElementById('cpFeedback');
     const good = correct === true;
-    const cls = correct === null ? 'bad' : (good ? 'good' : 'bad');
-    const head = correct === null ? 'Check it yourself' : (good ? 'Correct' : 'Not quite');
-    let html = '<div class="cp-fb ' + cls + '"><b>' + head + '</b>' + esc(feedback || item.why);
-    if (!good && item.type !== 'mc' && item.ideal) html += '<div class="cp-ideal"><b>Ideal answer</b>' + esc(item.ideal) + '</div>';
-    if (!good && item.type === 'mc') html += '<div class="cp-ideal"><b>Correct idea</b>' + esc(item.why) + '</div>';
-    html += '</div>';
-    // One short follow-up when they got it wrong.
-    if (!good) {
-      const fu = item.followUp || ('In your own words, why is that the right answer for ' + item.concept + '?');
-      html += '<div class="cp-follow"><div class="cp-label">Quick follow-up</div>' +
-        '<div style="font-size:15px;line-height:1.5;color:#e8e8e6;margin-bottom:9px;">' + esc(fu) + '</div>' +
-        '<textarea class="cp-input" id="cpFollow" placeholder="Answer in your own words…" spellcheck="false"></textarea></div>';
+
+    let html = '<div class="cp-fb">' +
+      '<div class="cp-fb-hd">' +
+        '<h4 class="cp-fb-title">Explanation</h4>' +
+        '<div class="cp-status-pill ' + (good ? 'correct' : 'incorrect') + '">' +
+          (good ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Correct'
+                 : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Incorrect') +
+        '</div>' +
+      '</div>' +
+      '<p class="cp-fb-text">' + esc(feedback || item.why) + '</p>';
+
+    if (!good && item.type !== 'mc' && item.ideal) {
+      html += '<div class="cp-ideal-card">' +
+        '<div class="cp-ideal-hd">' +
+          '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>' +
+          '<span>Model Answer</span>' +
+        '</div>' +
+        '<p class="cp-ideal-text">' + esc(item.ideal) + '</p>' +
+      '</div>';
     }
-    html += '<button class="cp-next" id="cpNext" type="button">' + (cpIndex === total - 1 ? 'See summary' : 'Next question') + '</button>';
+
+    html += '<div class="cp-fb-actions">' +
+      '<button class="cp-submit-btn" id="cpContinueBtn" type="button">Continue</button>' +
+    '</div></div>';
+
     host.innerHTML = html;
-    document.getElementById('cpNext').addEventListener('click', () => { cpIndex++; renderCheckQuestion(); });
+
+    const contBtn = document.getElementById('cpContinueBtn');
+    if (contBtn) {
+      contBtn.addEventListener('click', () => {
+        cpIndex++;
+        renderCheckQuestion();
+      });
+    }
+
     host.scrollIntoView({ block: 'nearest' });
   }
 
@@ -2569,12 +3205,51 @@
     const score = cpResults.filter(r => r && r.correct).length;
     const pct = score / total;
     const passed = pct >= 0.70;
-
     const progressPercentage = Math.round(pct * 100);
-    const circ = 2 * Math.PI * 80;
-    const offset = circ * (1 - progressPercentage / 100);
-    const progressColor = passed ? '#10b981' : '#f59e0b';
 
+    // time tracking
+    const elapsed = cpStartTime ? Math.round((Date.now() - cpStartTime) / 60000) : 1;
+    const timeStr = elapsed <= 1 ? '1 minute' : elapsed + ' minutes';
+
+    // emoji + title based on score
+    let emoji, resultTitle;
+    if (progressPercentage === 100) { emoji = '🏆'; resultTitle = 'Perfect score!'; }
+    else if (progressPercentage >= 80) { emoji = '🎉'; resultTitle = 'Great work!'; }
+    else if (progressPercentage >= 70) { emoji = '👍'; resultTitle = 'Good effort!'; }
+    else if (progressPercentage >= 40) { emoji = '😐'; resultTitle = 'Room for improvement!'; }
+    else { emoji = '😤'; resultTitle = 'Keep practising!'; }
+
+    // circular accuracy ring
+    const ringR = 42, circ = 2 * Math.PI * ringR;
+    const dash = circ * progressPercentage / 100;
+    const ringColor = passed ? '#2ec06a' : '#f59e0b';
+
+    // learning zone logic
+    let zoneName, zoneDesc, zoneSliderPos;
+    if (progressPercentage >= 85) {
+      zoneName = 'Challenge Zone'; zoneDesc = 'This topic is pushing your limits. Keep engaging with harder material.'; zoneSliderPos = 2;
+    } else if (progressPercentage >= 60) {
+      zoneName = 'Learning Zone'; zoneDesc = 'You\'re at the ideal difficulty. Keep it up and you\'ll master this soon.'; zoneSliderPos = 1;
+    } else {
+      zoneName = 'Comfort Zone'; zoneDesc = 'You may need more review time on this topic before moving on.'; zoneSliderPos = 0;
+    }
+
+    // single-track zone slider — fill% and dot position based on zone
+    // Comfort=~16%, Learning=~50%, Challenge=~84%
+    const zoneFillPct = [16, 50, 84][zoneSliderPos];
+    const zoneLabels = ['Comfort zone', 'Learning zone', 'Challenge zone'];
+    const sliderHtml =
+      '<div class="cps-zone-track">' +
+        '<div class="cps-zone-fill" style="width:' + zoneFillPct + '%"></div>' +
+        '<div class="cps-zone-dot" style="left:' + zoneFillPct + '%"></div>' +
+      '</div>' +
+      '<div class="cps-zone-labels">' +
+        zoneLabels.map((l, i) =>
+          '<span class="cps-zone-lbl' + (i === zoneSliderPos ? ' active' : '') + '">' + l + '</span>'
+        ).join('') +
+      '</div>';
+
+    // compute strong / weak concepts
     const strong = [], weak = [];
     cpResults.forEach(r => {
       if (!r) return;
@@ -2582,96 +3257,123 @@
       if (list.indexOf(r.concept) === -1) list.push(r.concept);
     });
     const weakSet = weak.filter(c => strong.indexOf(c) === -1);
-    const desc = passed
-      ? 'Great work! You scored ' + progressPercentage + '% and passed this checkpoint.'
-      : 'Score is below 70% (' + progressPercentage + '%). You must score at least 70% to unlock the next section.';
 
-    const strongRows = strong.length
-      ? '<div class="cp-topic-list">' + strong.map(c =>
-          '<div class="cp-topic-row strong">' +
-            '<div class="cp-topic-left">' +
-              '<span class="cp-topic-check"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' +
-              '<span class="cp-topic-name">' + escapeHtml(c) + '</span>' +
-            '</div>' +
-            '<span class="cp-status-tag strong">Mastered</span>' +
-          '</div>'
-        ).join('') + '</div>'
-      : '<div class="cp-none-text">Nothing mastered yet — review concepts and try again.</div>';
-
-    const weakRows = weakSet.length
-      ? '<div class="cp-topic-list">' + weakSet.map(c =>
-          '<div class="cp-topic-row weak">' +
-            '<div class="cp-topic-left">' +
-              '<span class="cp-topic-warn">!</span>' +
-              '<span class="cp-topic-name">' + escapeHtml(c) + '</span>' +
-            '</div>' +
-            '<span class="cp-status-tag weak">Needs Review</span>' +
-          '</div>'
-        ).join('') + '</div>'
-      : '<div class="cp-none-text">No weak areas identified! Outstanding work.</div>';
+    // hero table rows helper
+    function heroRows(arr, emptyMsg) {
+      if (!arr.length) return '<tr><td colspan="2" class="cps-ht-empty">' + emptyMsg + '</td></tr>';
+      return arr.map((c, i) =>
+        '<tr class="cps-ht-row">' +
+          '<td class="cps-ht-term">' + escapeHtml(c) + '</td>' +
+          '<td class="cps-ht-def">' + (i % 2 === 0 ? 'Understood core concept' : 'Applied concept correctly') + '</td>' +
+        '</tr>'
+      ).join('');
+    }
+    function heroWeakRows(arr, emptyMsg) {
+      if (!arr.length) return '<tr><td colspan="2" class="cps-ht-empty">' + emptyMsg + '</td></tr>';
+      return arr.map(() =>
+        '<tr class="cps-ht-row">' +
+          '<td class="cps-ht-term">' + escapeHtml(arr[heroWeakRows.i = (heroWeakRows.i || 0)]) + '</td>' +
+          '<td class="cps-ht-def">Review this concept before moving on</td>' +
+        '</tr>'
+      ).join('');
+    }
+    const strongTableRows = strong.length
+      ? strong.map(c => '<tr class="cps-ht-row"><td class="cps-ht-term">' + escapeHtml(c) + '</td><td class="cps-ht-def">Concept understood and applied correctly</td></tr>').join('')
+      : '<tr><td colspan="2" class="cps-ht-empty">No concepts mastered yet — review and retry.</td></tr>';
+    const weakTableRows = weakSet.length
+      ? weakSet.map(c => '<tr class="cps-ht-row"><td class="cps-ht-term">' + escapeHtml(c) + '</td><td class="cps-ht-def">Needs more review before you move on</td></tr>').join('')
+      : '<tr><td colspan="2" class="cps-ht-empty">No weak areas — outstanding work!</td></tr>';
 
     cpBody.innerHTML =
-      '<div class="circular-progress-card cp-summary-card">' +
-        '<div class="cp-card-header">' +
-          '<div class="cp-card-title">' + escapeHtml(title || 'Checkpoint') + ' Completed</div>' +
-          '<div class="cp-card-desc">' + desc + '</div>' +
+      '<div class="cps-wrap">' +
+
+        // ── Header ──
+        '<div class="cps-header">' +
+          '<div class="cps-emoji">' + emoji + '</div>' +
+          '<h2 class="cps-title">' + resultTitle + '</h2>' +
         '</div>' +
-        '<div class="cp-progress-wrap">' +
-          '<svg width="100%" height="100%" viewBox="0 0 200 200" role="img" aria-label="Progress: ' + progressPercentage + '%">' +
-            '<g transform="rotate(-90, 100, 100)">' +
-              '<circle cx="100" cy="100" r="80" fill="transparent" stroke="#27272a" stroke-width="16" />' +
-              '<circle id="cpSummaryRing" class="cp-progress-circle" cx="100" cy="100" r="80" fill="transparent" stroke="' + progressColor + '" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + circ + '" stroke-dashoffset="' + circ + '" />' +
-            '</g>' +
-          '</svg>' +
-          '<div class="cp-progress-text">' +
-            '<span class="cp-pct-val">' + progressPercentage + '%</span>' +
-            '<span class="cp-score-val">' + score + ' / ' + total + '</span>' +
+
+        // ── Three Stat Boxes ──
+        '<div class="cps-stats">' +
+          '<div class="cps-stat-box">' +
+            '<div class="cps-stat-label">Score</div>' +
+            '<div class="cps-stat-value white">' + score + ' / ' + total + '</div>' +
+            '<div class="cps-stat-sub">correct answers</div>' +
           '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="cp-areas-grid">' +
-        '<div class="cp-area-card strong">' +
-          '<div class="cp-area-header">' +
-            '<div class="cp-area-badge strong"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>' +
-            '<div class="cp-area-title-group">' +
-              '<span class="cp-area-title">Strong Areas</span>' +
-              '<span class="cp-area-sub">Concepts you mastered</span>' +
+          '<div class="cps-stat-box cps-stat-center">' +
+            '<div class="cps-stat-label">Accuracy</div>' +
+            '<div class="cps-ring-wrap">' +
+              '<svg width="96" height="96" viewBox="0 0 100 100">' +
+                '<circle cx="50" cy="50" r="' + ringR + '" fill="none" stroke="#2a2a2e" stroke-width="10"/>' +
+                '<circle id="cpSummaryRing" cx="50" cy="50" r="' + ringR + '" fill="none" stroke="' + ringColor + '" stroke-width="10" stroke-linecap="round"' +
+                  ' stroke-dasharray="' + circ.toFixed(2) + '" stroke-dashoffset="' + circ.toFixed(2) + '"' +
+                  ' style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);"' +
+                  ' transform="rotate(-90 50 50)"/>' +
+              '</svg>' +
+              '<span class="cps-ring-pct">' + progressPercentage + '%</span>' +
             '</div>' +
-            '<span class="cp-area-count strong">' + strong.length + ' Mastered</span>' +
           '</div>' +
-          strongRows +
+          '<div class="cps-stat-box">' +
+            '<div class="cps-stat-label">Time spent</div>' +
+            '<div class="cps-stat-value white">' + timeStr + '</div>' +
+          '</div>' +
         '</div>' +
-        '<div class="cp-area-card weak">' +
-          '<div class="cp-area-header">' +
-            '<div class="cp-area-badge weak"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>' +
-            '<div class="cp-area-title-group">' +
-              '<span class="cp-area-title">Focus & Review Areas</span>' +
-              '<span class="cp-area-sub">Concepts to review</span>' +
+
+        // ── Strength & Weakness Hero Tables ──
+        '<div class="cps-htable-section">' +
+
+          // Strengths
+          '<div class="cps-htable-block">' +
+            '<div class="cps-htable-title">Strengths</div>' +
+            '<div class="cps-htable-wrap">' +
+              '<table class="cps-htable">' +
+                '<thead><tr class="cps-ht-head"><th class="cps-ht-th">Concept</th><th class="cps-ht-th">Result</th></tr></thead>' +
+                '<tbody>' + strongTableRows + '</tbody>' +
+              '</table>' +
             '</div>' +
-            '<span class="cp-area-count weak">' + weakSet.length + ' Needs Review</span>' +
           '</div>' +
-          weakRows +
+
+          // Weaknesses
+          '<div class="cps-htable-block">' +
+            '<div class="cps-htable-title">Needs Work</div>' +
+            '<div class="cps-htable-wrap">' +
+              '<table class="cps-htable">' +
+                '<thead><tr class="cps-ht-head cps-ht-head-amber"><th class="cps-ht-th">Concept</th><th class="cps-ht-th">Action</th></tr></thead>' +
+                '<tbody>' + weakTableRows + '</tbody>' +
+              '</table>' +
+            '</div>' +
+          '</div>' +
+
         '</div>' +
+
+
+        // ── Footer Buttons — always show both ──
+        '<div class="cps-footer">' +
+          '<button class="cps-btn-retry" id="cpRetryBtn" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Retry</button>' +
+          '<button class="cps-btn-continue" id="cpContinueBtn" type="button">Continue</button>' +
+        '</div>' +
+
       '</div>';
 
-    if (passed) {
-      markFlow('check');
-      cpBody.insertAdjacentHTML('beforeend', flowFooter('check'));
-      wireFlow(cpBody);
-    } else {
-      cpBody.insertAdjacentHTML('beforeend',
-        '<div class="flow-foot" style="margin-top:20px;">' +
-          '<button class="flow-btn" id="retryCpBtn" type="button">Retry</button>' +
-        '</div>'
-      );
-      const retryBtn = document.getElementById('retryCpBtn');
-      if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
-          cpIndex = 0;
-          cpResults = [];
-          renderCheckQuestion();
-        });
-      }
+    // wire retry
+    const retryBtn = document.getElementById('cpRetryBtn');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', () => {
+        cpIndex = 0; cpResults = [];
+        renderCheckQuestion();
+      });
+    }
+
+    // wire continue — mark flow and navigate to Recall
+    markFlow('check');
+    const continueBtn = document.getElementById('cpContinueBtn');
+    if (continueBtn) {
+      continueBtn.addEventListener('click', () => {
+        markFlow('check');
+        const recallBtn = document.getElementById('railRecall');
+        if (recallBtn) recallBtn.click();
+        else openRecall();
+      });
     }
 
     window.scrollTo(0, 0);
@@ -2679,10 +3381,11 @@
     requestAnimationFrame(() => {
       setTimeout(() => {
         const ring = document.getElementById('cpSummaryRing');
-        if (ring) ring.style.strokeDashoffset = String(offset);
+        if (ring) ring.style.strokeDashoffset = String((circ - dash).toFixed(2));
       }, 60);
     });
   }
+
 
   async function openCheck(force) {
     show('check');
@@ -2698,7 +3401,7 @@
     const user = 'Write the Checkpoint questions for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-sonnet-5', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
@@ -2723,9 +3426,17 @@
   // A short audio-style recap. The script is generated here; the audio is
   // synthesised by the server (/api/tts → NVIDIA magpie-tts-multilingual).
   // The NVIDIA key stays server-side and is never sent to the browser.
+  const PC = {
+    caret: '<svg viewBox="0 0 12 12"><path d="M2.5 4.5L6 8L9.5 4.5"/></svg>',
+    clock: '<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M7 4V7L9 8"/></svg>',
+    eye: '<svg viewBox="0 0 16 16"><path d="M2 8C2 8 4.2 3.8 8 3.8C11.8 3.8 14 8 14 8C14 8 11.8 12.2 8 12.2C4.2 12.2 2 8 2 8Z"/><circle cx="8" cy="8" r="1.6" fill="#8A8A8A" stroke="none"/><path d="M1 1L15 15" stroke-width="1.2"/></svg>',
+    scroll: '<svg viewBox="0 0 12 12"><path d="M3 2.5L3 3.5M3 8.5L3 9.5M9 2.5L9 3.5M9 8.5L9 9.5"/><path d="M2 5L4 5M8 5L10 5M2 7L4 7M8 7L10 7"/></svg>',
+    mic: '<svg viewBox="0 0 16 16"><path d="M8 11.5C9.38 11.5 10.5 10.38 10.5 9V4.5C10.5 3.12 9.38 2 8 2C6.62 2 5.5 3.12 5.5 4.5V9C5.5 10.38 6.62 11.5 8 11.5Z"/><path d="M12.5 8.5C12.5 10.5 10.5 12.5 8 12.5C5.5 12.5 3.5 10.5 3.5 8.5"/><path d="M8 12.5V14"/></svg>'
+  };
   const CAST_KEY = 'NOURA_CAST_' + slug;
   let cast = null, castBusy = false;
   let castAudio = null, castUrl = null, castRate = 1;   // audio cached for the session
+  let answerAudio = null, answerUrl = null;
   let castGen = null;   // in-flight TTS request, so play can await it
   const scBody = document.getElementById('scBody');
   document.getElementById('scTitle').textContent = title;
@@ -2762,11 +3473,10 @@
     segs.push({ label: 'Common mistakes', text: 'A couple of common mistakes to watch for.' });
     c.mistakes.forEach((m, i) => segs.push({ label: 'Mistake ' + (i + 1), text: m }));
     segs.push({ label: 'Summary', text: c.summary });
-    segs.push({ label: 'Up next', text: CAST_CTA });
+    segs.push({ label: 'Up next', text: "When you're ready, prove it in Teach Studio." });
     return segs;
   }
   function castScript(c) { return castSegments(c).map(s => s.text).join(' '); }
-  const CAST_CTA = "When you're ready, prove it in Teach Studio.";
 
   function renderCastEmpty() {
     scBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>Add a topic or material to generate an Audio Recap.</p></div>';
@@ -2789,14 +3499,6 @@
     return '<div class="sc-card"><div class="sc-ct">' + SC_ICON[iconKey] + label + '</div>' + inner + '</div>';
   }
   function scList(arr, cls) { return '<ul class="sc-list ' + (cls || '') + '">' + arr.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'; }
-
-  const PC = {
-    caret: '<svg viewBox="0 0 12 12"><path d="M2.5 4.5L6 8L9.5 4.5"/></svg>',
-    clock: '<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M7 4V7L9 8"/></svg>',
-    eye: '<svg viewBox="0 0 16 16"><path d="M2 8C2 8 4.2 3.8 8 3.8C11.8 3.8 14 8 14 8C14 8 11.8 12.2 8 12.2C4.2 12.2 2 8 2 8Z"/><circle cx="8" cy="8" r="1.6" fill="#8A8A8A" stroke="none"/><path d="M1 1L15 15" stroke-width="1.2"/></svg>',
-    scroll: '<svg viewBox="0 0 12 12"><path d="M3 2.5L3 3.5M3 8.5L3 9.5M9 2.5L9 3.5M9 8.5L9 9.5"/><path d="M2 5L4 5M8 5L10 5M2 7L4 7M8 7L10 7"/></svg>',
-    mic: '<svg viewBox="0 0 16 16"><path d="M8 11.5C9.38 11.5 10.5 10.38 10.5 9V4.5C10.5 3.12 9.38 2 8 2C6.62 2 5.5 3.12 5.5 4.5V9C5.5 10.38 6.62 11.5 8 11.5Z"/><path d="M12.5 8.5C12.5 10.5 10.5 12.5 8 12.5C5.5 12.5 3.5 10.5 3.5 8.5"/><path d="M8 12.5V14"/></svg>'
-  };
 
   function renderCast() {
     document.getElementById('scRegen').hidden = false;
@@ -2845,8 +3547,6 @@
       '</div></div></div>';
 
     markFlow('cast');
-    document.getElementById('pcTr').insertAdjacentHTML('afterend', flowFooter('cast'));
-    wireFlow(scBody);
     wireCastPlayer(segs);
   }
 
@@ -2920,32 +3620,42 @@
       state.textContent = castAudio.paused ? (castAudio.currentTime ? 'Paused' : 'Ready to play') : 'Playing';
     }
 
-    // The voice takes a while to synthesise, so kick it off as soon as the
-    // recap exists rather than waiting for the learner to press play.
+    // Synthesize voice audio and await metadata load before completing loading screen
+    async function prepareCastAudio(prog) {
+      if (castAudio && castAudio.duration) return castAudio;
+      if (prog) prog.report(85);
+      const r = await fetch('/api/tts', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: castScript(cast) })
+      });
+      if (!r.ok) {
+        let msg = 'HTTP ' + r.status;
+        try { const j = await r.json(); msg = j.error || msg; } catch (e) {}
+        throw new Error(msg);
+      }
+      const blob = await r.blob();
+      castUrl = URL.createObjectURL(blob);
+      castAudio = new Audio(castUrl);
+      bindAudio();
+      await new Promise((resolve) => {
+        if (castAudio.readyState >= 1 && castAudio.duration) { resolve(); return; }
+        castAudio.onloadedmetadata = () => { computeStarts(castAudio.duration || 0); paint(); resolve(); };
+        castAudio.onerror = () => resolve();
+        setTimeout(resolve, 3500);
+      });
+      return castAudio;
+    }
+
     function generateAudio() {
+      if (castAudio && castAudio.duration) return Promise.resolve(castAudio);
       if (castGen) return castGen;
       state.textContent = 'Preparing audio…';
       note.innerHTML = '';
-      castGen = (async () => {
-        const r = await fetch('/api/tts', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: castScript(cast) })
-        });
-        if (!r.ok) {
-          let msg = 'HTTP ' + r.status;
-          try { const j = await r.json(); msg = j.error || msg; } catch (e) {}
-          throw new Error(msg);
-        }
-        const blob = await r.blob();
-        castUrl = URL.createObjectURL(blob);
-        castAudio = new Audio(castUrl);
-        bindAudio();
-        return castAudio;
-      })();
-      castGen.then(() => {
-        if (state.textContent === 'Preparing audio…') state.textContent = 'Ready to play';
+      castGen = prepareCastAudio().then(a => {
+        state.textContent = 'Ready to play';
+        return a;
       }).catch(err => {
-        castGen = null;   // let the learner retry by pressing play
+        castGen = null;
         state.textContent = 'Audio unavailable';
         note.innerHTML = '<div class="pc-note">' + esc(err.message) + '</div>';
       });
@@ -2953,6 +3663,8 @@
     }
 
     playBtn.addEventListener('click', async () => {
+      if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
+      if (answerAudio && !answerAudio.paused) { answerAudio.pause(); }
       if (castAudio) { if (castAudio.paused) castAudio.play(); else castAudio.pause(); return; }
       playBtn.disabled = true;
       try {
@@ -2992,16 +3704,62 @@
     async function ask() {
       const q = askIn.value.trim();
       if (!q) return;
+
+      // Immediately pause main recap audio & any previous speech if playing
+      if (castAudio && !castAudio.paused) {
+        castAudio.pause();
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      if (answerAudio) {
+        answerAudio.pause();
+        answerAudio = null;
+      }
+      if (answerUrl) {
+        URL.revokeObjectURL(answerUrl);
+        answerUrl = null;
+      }
+
       askBtn.disabled = true;
       answer.innerHTML = '<div class="pc-answer"><span class="shimmer-text">Thinking…</span></div>';
       try {
         const text = await streamChat({
-          model: 'claude-sonnet-5', max_tokens: 700,
+          model: 'claude-haiku-4-5-20251001', max_tokens: 700,
           system: 'You are Noura, answering a learner\'s question about an audio recap they just heard. Answer in 2-4 plain sentences using the recap below; if it does not cover the answer, say so briefly and then answer from your own knowledge. MATHS MUST BE PLAIN READABLE TEXT: no LaTeX, no dollar signs, no backslash commands.\n\nRECAP:\n' + castScript(cast),
           messages: [{ role: 'user', content: q }]
         });
-        answer.innerHTML = '<div class="pc-answer">' + md(text.trim()) + '</div>';
+        const ansText = text.trim();
+        answer.innerHTML = '<div class="pc-answer">' + md(ansText) + '</div>';
         askIn.value = '';
+
+        // Instant zero-delay voice response using native SpeechSynthesis!
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const cleanText = ansText.replace(/[*_#`~]/g, '');
+          const utter = new SpeechSynthesisUtterance(cleanText);
+          utter.rate = castRate || 1;
+          const voices = window.speechSynthesis.getVoices();
+          const preferred = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Karen') || v.name.includes('Siri'))) || voices.find(v => v.lang.startsWith('en'));
+          if (preferred) utter.voice = preferred;
+          window.speechSynthesis.speak(utter);
+        } else {
+          try {
+            const r = await fetch('/api/tts', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: ansText })
+            });
+            if (r.ok) {
+              const blob = await r.blob();
+              answerUrl = URL.createObjectURL(blob);
+              answerAudio = new Audio(answerUrl);
+              answerAudio.playbackRate = castRate;
+              answerAudio.play();
+            }
+          } catch (ttsErr) {
+            console.warn('Answer TTS playback error:', ttsErr);
+          }
+        }
       } catch (err) {
         answer.innerHTML = '<div class="pc-note">' + esc(err.message) + '</div>';
       } finally { askBtn.disabled = false; }
@@ -3015,10 +3773,21 @@
     if (!title || title === 'Your lesson') { renderCastEmpty(); return; }
     if (cast && !force) { renderCast(); return; }
     if (!force) {
-      try { const c = JSON.parse(localStorage.getItem(CAST_KEY) || 'null'); if (validCast(c)) { cast = c; renderCast(); return; } } catch (e) {}
+      try {
+        const c = JSON.parse(localStorage.getItem(CAST_KEY) || 'null');
+        if (validCast(c)) {
+          cast = c;
+          renderCast();
+          return;
+        }
+      } catch (e) {}
     } else {
+      cast = null;
+      try { localStorage.removeItem(CAST_KEY); } catch (e) {}
       if (castAudio) { castAudio.pause(); }
+      if (answerAudio) { answerAudio.pause(); answerAudio = null; }
       if (castUrl) { URL.revokeObjectURL(castUrl); }
+      if (answerUrl) { URL.revokeObjectURL(answerUrl); answerUrl = null; }
       castAudio = null; castUrl = null; castGen = null;
     }
     if (castBusy) return;
@@ -3028,23 +3797,33 @@
     const user = 'Write the Audio Recap for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-sonnet-5', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
-      const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+      let clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const a = clean.indexOf('{'), b = clean.lastIndexOf('}');
       if (a === -1 || b === -1) throw new Error('No JSON in response.');
-      const parsed = JSON.parse(raw.slice(a, b + 1));
+      const parsed = JSON.parse(clean.slice(a, b + 1));
       if (!validCast(parsed)) throw new Error('Script incomplete.');
-      prog.done();
       cast = parsed;
       try { localStorage.setItem(CAST_KEY, JSON.stringify(parsed)); } catch (e) {}
+
+      // Fast UI unlock: Finish progress bar as soon as script text is ready!
+      prog.done();
       renderCast();
     } catch (err) {
+      cast = null;
+      try { localStorage.removeItem(CAST_KEY); } catch (e) {}
       prog.stop();
       renderCastError('Could not build your Audio Recap (' + err.message + '). Tap Regenerate to try again.');
     } finally { castBusy = false; }
   }
   document.getElementById('scRegen').addEventListener('click', () => openCast(true));
+  if (document.getElementById('castContinueBtn')) {
+    document.getElementById('castContinueBtn').addEventListener('click', () => {
+      window.location.href = 'chatbot.html';
+    });
+  }
 
   // ── Generation ──
   const statusLines = ['Getting started', 'Planning the sections', 'Writing explanations and examples', 'Building your checkpoints', 'Polishing your lesson'];
@@ -3124,7 +3903,7 @@
 
     try {
       const raw = (await streamChat(
-        { model: 'claude-sonnet-5', max_tokens: 20000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 8000, system: system, messages: [{ role: 'user', content: user }] },
         n => { prog.report(n); setStatus(n); }
       )).trim();
       const parsed = cleanLesson(readLessonJSON(raw));
@@ -3144,6 +3923,7 @@
   }
   retryBtn.addEventListener('click', () => generate(true));
 
+  show('brief');   // Immediately show the Study Brief tab before content loads
   openBrief();   // Study Brief comes first — the lesson builds when Learn is opened
 })();
 </script>

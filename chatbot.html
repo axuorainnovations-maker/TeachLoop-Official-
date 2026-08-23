@@ -4013,7 +4013,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     });
 
     try {
-      const model = (conversationHasImage || isLearnerTier()) ? 'claude-sonnet-5' : 'claude-haiku-4-5';
+      const model = 'claude-haiku-4-5-20251001';
 
       const response = await fetch('/api/chat', {
         method: 'POST',
