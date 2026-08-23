@@ -14,3 +14,9 @@ scratch/
 # Supabase keys (local only)
 supabase-config.js
 _fontpreview.html
+
+# Pitch deck and brand/marketing material (local only, not part of the app)
+noura-deck.html
+noura-deck.pdf
+NOURA_BRAND_CONTEXT.md
+brand-gradient-example.html
