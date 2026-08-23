@@ -2247,15 +2247,16 @@
   // ── Section reader ──
   function playSection(idx, item) {
     const plTop = document.querySelector('.pl-top');
-    if (plTop) plTop.style.display = 'flex';
-    plScore.hidden = true;
-    if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
+    if (plScore) plScore.hidden = true;
+    if (plBarFill && plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
     let page = 0;
     function render() {
-      plLabel.innerHTML = '<span></span><span class="dim">· page ' + (page + 1) + ' of ' + item.pages.length + '</span>';
-      plLabel.querySelector('span').textContent = item.title;
-      plBarFill.style.width = Math.round(((page + 1) / item.pages.length) * 100) + '%';
-      plBody.innerHTML = '';
+      if (plLabel) {
+        plLabel.innerHTML = '<span></span><span class="dim">· page ' + (page + 1) + ' of ' + item.pages.length + '</span>';
+        plLabel.querySelector('span').textContent = item.title;
+      }
+      if (plBarFill) plBarFill.style.width = Math.round(((page + 1) / item.pages.length) * 100) + '%';
+      if (plBody) plBody.innerHTML = '';
       const art = document.createElement('div');
       art.className = 'reader';
       art.innerHTML = md(item.pages[page]);
@@ -2293,9 +2294,9 @@
 
     function render() {
       const question = item.questions[q];
-      plLabel.innerHTML = '<span class="star">★</span><span>' + (isReview ? 'Reviewing Checkpoint' : 'Checkpoint') + '</span><span class="dim">· ' + escapeHtml(item.title) + ' · ' + (q + 1) + ' of ' + item.questions.length + '</span>';
-      plBarFill.style.width = Math.round(((q + 1) / item.questions.length) * 100) + '%';
-      plBody.innerHTML = '';
+      if (plLabel) plLabel.innerHTML = '<span class="star">★</span><span>' + (isReview ? 'Reviewing Checkpoint' : 'Checkpoint') + '</span><span class="dim">· ' + escapeHtml(item.title) + ' · ' + (q + 1) + ' of ' + item.questions.length + '</span>';
+      if (plBarFill) plBarFill.style.width = Math.round(((q + 1) / item.questions.length) * 100) + '%';
+      if (plBody) plBody.innerHTML = '';
       picked = -1; checked = isReview;
 
       // Detect Fill-in-the-blank questions
@@ -2433,8 +2434,8 @@
     function renderDone() {
       const plTop = document.querySelector('.pl-top');
       if (plTop) plTop.style.display = 'none';
-      if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'none';
-      plScore.hidden = true;
+      if (plBarFill && plBarFill.parentElement) plBarFill.parentElement.style.display = 'none';
+      if (plScore) plScore.hidden = true;
       plBody.innerHTML = '';
       const wrap = document.createElement('div'); wrap.className = 'qz-done';
       const total = item.questions.length || 1;
