@@ -1447,6 +1447,7 @@
   .qz-opt.wrong .num { color:#ef4444; }
   .qz-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important; font-size:23px !important; font-weight:700 !important; line-height:1.4 !important; letter-spacing:-.02em !important; color:#ffffff !important; margin-bottom:28px !important; text-align:left !important; }
   .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#6ee7b7; background:rgba(46,192,106,0.12); border:1px solid rgba(46,192,106,0.35); border-radius:14px; padding:16px 20px; display:none; }
+  .qz-wrap { max-width:680px; margin:0 auto; width:100%; box-sizing:border-box; }
   .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
   /* Unified 3D PopButton style matching .start-btn ("Review lesson" / "Start lesson" button) */
   .qz-check, .cp-submit-btn, .cps-btn-continue {
@@ -2350,10 +2351,10 @@
         }
         opts.appendChild(b);
       });
-      plBody.appendChild(opts);
 
       const explain = document.createElement('div'); explain.className = 'qz-explain';
-      plBody.appendChild(explain);
+
+      const actions = document.createElement('div'); actions.className = 'qz-actions';
 
       if (isReview) {
         const right = savedPick === question.answer;
@@ -2372,7 +2373,7 @@
         explain.classList.toggle('bad', !right);
         explain.textContent = (savedPick !== undefined ? (right ? 'Correct! ' : 'You selected an incorrect option. ') : '') + (question.explain || '');
 
-        const actions = document.createElement('div'); actions.className = 'qz-actions'; actions.style.justifyContent = 'space-between';
+        actions.style.justifyContent = 'space-between';
         const prevBtn = document.createElement('button'); prevBtn.type = 'button'; prevBtn.className = 'tl-review'; prevBtn.textContent = '← Previous';
         if (q === 0) prevBtn.disabled = true;
         prevBtn.addEventListener('click', () => { if (q > 0) { q--; render(); } });
@@ -2385,11 +2386,8 @@
 
         actions.appendChild(prevBtn);
         actions.appendChild(nextBtn);
-        plBody.appendChild(actions);
       } else {
-        const actions = document.createElement('div'); actions.className = 'qz-actions';
         actions.appendChild(checkBtn);
-        plBody.appendChild(actions);
 
         checkBtn.addEventListener('click', () => {
           if (!checked) {
@@ -2425,10 +2423,20 @@
               state.scores[idx] = score; saveState();
               markDone(idx);
               renderDone();
+              return;
             } else { q++; render(); }
           }
         });
       }
+
+      const wrap = document.createElement('div');
+      wrap.className = 'qz-wrap';
+      wrap.appendChild(h);
+      wrap.appendChild(opts);
+      wrap.appendChild(explain);
+      wrap.appendChild(actions);
+      plBody.appendChild(wrap);
+
       window.scrollTo(0, 0);
     }
     function renderDone() {
