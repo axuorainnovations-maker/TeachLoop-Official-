@@ -366,12 +366,14 @@
   /* While loading, pin the block to the content area so text + bar sit dead
      centre of the page regardless of each tab's own padding. */
   .is-loading .tab-load {
-    padding:60px 20px; margin:0 auto;
+    position:fixed; top:58px; left:86px; right:0; bottom:0;
+    padding:0 20px; margin:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
+  @media (max-width:720px) { .is-loading .tab-load { left:0; } }
   .loadwrap {
     position:fixed; top:58px; left:86px; right:0; bottom:0;
-    min-height:0; padding:0 20px 58px; margin:0;
+    min-height:0; padding:0 20px; margin:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
   @media (max-width:720px) { .loadwrap { left:0; } }
@@ -805,30 +807,38 @@
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%) !important;
     box-shadow: 0 0 10px rgba(167, 139, 250, 0.5) !important;
   }
-  .cp-opt.sel .opt-radio::after { opacity:1; background:#ffffff; }/* Correct State ALWAYS overrides selected (GREEN) */
-  .cp-opt.correct, .cp-opt.sel.correct {
+  .cp-opt.sel .opt-radio::after { opacity:1; background:#ffffff; }
+
+  /* Correct State ALWAYS overrides selected (GREEN) */
+  .cp-opt.correct, .cp-opt.sel.correct, .qz-opt.correct, .qz-opt.sel.correct {
     border: 2px solid #2ec06a !important;
     background: rgba(46, 192, 106, 0.12) !important;
     color: #ffffff !important;
     box-shadow: 0 0 20px rgba(46, 192, 106, 0.35) !important;
-  }.cp-opt.correct .opt-radio, .cp-opt.sel.correct .opt-radio {
+  }
+  .cp-opt.correct .opt-radio, .cp-opt.sel.correct .opt-radio, .qz-opt.correct .opt-radio, .qz-opt.sel.correct .opt-radio {
     border-color: #2ec06a !important;
     background: #2ec06a !important;
     box-shadow: 0 0 10px rgba(46, 192, 106, 0.5) !important;
-  }.cp-opt.correct .opt-radio::after, .cp-opt.sel.correct .opt-radio::after {
+  }
+  .cp-opt.correct .opt-radio::after, .cp-opt.sel.correct .opt-radio::after, .qz-opt.correct .opt-radio::after, .qz-opt.sel.correct .opt-radio::after {
     opacity: 1 !important;
     background: #ffffff !important;
-  }/* Wrong State ALWAYS overrides selected (RED) */
-  .cp-opt.wrong, .cp-opt.sel.wrong {
+  }
+
+  /* Wrong State ALWAYS overrides selected (RED) */
+  .cp-opt.wrong, .cp-opt.sel.wrong, .qz-opt.wrong, .qz-opt.sel.wrong {
     border: 2px solid #ef4444 !important;
     background: rgba(239, 68, 68, 0.12) !important;
     color: #ffffff !important;
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.35) !important;
-  }.cp-opt.wrong .opt-radio, .cp-opt.sel.wrong .opt-radio {
+  }
+  .cp-opt.wrong .opt-radio, .cp-opt.sel.wrong .opt-radio, .qz-opt.wrong .opt-radio, .qz-opt.sel.wrong .opt-radio {
     border-color: #ef4444 !important;
     background: #ef4444 !important;
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
-  }.cp-opt.wrong .opt-radio::after, .cp-opt.sel.wrong .opt-radio::after {
+  }
+  .cp-opt.wrong .opt-radio::after, .cp-opt.sel.wrong .opt-radio::after, .qz-opt.wrong .opt-radio::after, .qz-opt.sel.wrong .opt-radio::after {
     opacity: 1 !important;
     background: #ffffff !important;
   }
@@ -1297,6 +1307,16 @@
 
   /* ── Player (section reader + checkpoint quiz) ── */
   .player { display:none; max-width:820px; margin:0 auto; padding:34px 28px 60px; }
+  .pl-top { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+  .pl-close { width:34px; height:34px; border:none; border-radius:9px; background:transparent; color:#8a8a93; font-size:20px; cursor:pointer; flex-shrink:0; }
+  .pl-close:hover { background:#1c1c20; color:#fff; }
+  .pl-label { font-size:14px; color:#d4d4d8; font-weight:600; display:flex; align-items:center; gap:7px; min-width:0; }
+  .pl-label .star { color:#f0a500; }
+  .pl-label .dim { color:#8a8a93; font-weight:500; }
+  .pl-score { margin-left:auto; display:flex; align-items:center; gap:7px; font-size:15px; font-weight:700; color:#c9b6ef; }
+  .pl-score .score-logo { width:17px; height:17px; }
+  .pl-bar { height:5px; border-radius:99px; background:#1e1e22; overflow:hidden; margin-bottom:40px; }
+  .pl-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .3s ease; }
 
   /* Section reader */
   .reader { font-size:16.5px; line-height:1.75; color:#d6d6d4; }
@@ -1310,38 +1330,66 @@
   .reader code { background:#1c1c20; border:1px solid #2a2a2e; border-radius:6px; padding:2px 6px; font-size:14px; }
   .reader table { width:100%; border-collapse:collapse; margin:0 0 18px; font-size:14.5px; }
   .reader th, .reader td { border:1px solid #2a2a2e; padding:9px 12px; text-align:left; }
-  .reader th { background:#161619; color:#fff; }.cp-opt {
+  .reader th { background:#161619; color:#fff; }
+  .pl-nav { display:flex; justify-content:space-between; align-items:center; margin-top:44px; }
+  .pl-back { padding:12px 26px; border:1px solid #2e2e34; border-radius:12px; background:transparent; color:#c7c7cc; font-size:14.5px; font-weight:600; cursor:pointer; }
+  .pl-back:hover { background:#1c1c20; color:#fff; }
+  .pl-back[disabled] { opacity:.35; pointer-events:none; }
+  .pl-next { padding:12px 34px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.28); }
+  .pl-next:hover { filter:brightness(1.07); }
+
+  /* Checkpoint quiz */
+  /* ── Quiz / Checkpoint layout (raised-key option cards) ────── */
+  .qz-opt, .cp-opt {
     display:flex; align-items:center; gap:12px; text-align:left; width:100%;
     background:#1c1c1c; border:1px solid #2e2e2e;
     border-radius:18px; padding:14px 18px; color:#d0d0d0;
     font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em; cursor:pointer;
     box-shadow:none;
     transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
-  }.cp-opts { gap:14px; }/* The browser's default focus ring rendered white/blue outside the card.
-     Keep keyboard focus visible, .cp-opt:focus { outline:none; }.cp-opt:focus-visible { outline:none; border-color:#8b5cf6; }.cp-opt:hover { border-color:#3a3a3a; }.cp-opt .num {
+  }
+  .qz-opts, .cp-opts { gap:14px; }
+  /* The browser's default focus ring rendered white/blue outside the card.
+     Keep keyboard focus visible, but in the same purple outline. */
+  .qz-opt:focus, .cp-opt:focus { outline:none; }
+  .qz-opt:focus-visible, .cp-opt:focus-visible { outline:none; border-color:#8b5cf6; }
+  .qz-opt:hover, .cp-opt:hover { border-color:#3a3a3a; }
+  /* Letter marker replaces the boxed number */
+  .qz-opt .num, .cp-opt .num {
     width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
     display:inline-flex; align-items:center; justify-content:flex-start;
     font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
-  }.cp-opt.sel {
+  }
+  /* Selected: vibrant progress bar purple outline & glow. */
+  .qz-opt.sel, .cp-opt.sel {
     border: 2px solid #a78bfa !important;
     background: #1b1728 !important;
     box-shadow: 0 0 18px rgba(167, 139, 250, 0.4) !important;
-  }.cp-opt.sel .num { color: #a78bfa !important; }.cp-opt.correct {
+  }
+  .qz-opt.sel .num, .cp-opt.sel .num { color: #a78bfa !important; }
+  .qz-opt.correct, .cp-opt.correct {
     background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none;
-  }.cp-opt.correct .num { color:#2ec06a; }.cp-opt.wrong {
+  }
+  .qz-opt.correct .num, .cp-opt.correct .num { color:#2ec06a; }
+  .qz-opt.wrong, .cp-opt.wrong {
     background:#1c1c1c; border:2px solid #ef4444; box-shadow:none;
-  }.cp-opt.wrong .num { color:#ef4444; }/* Question + progress, .cp-q {
+  }
+  .qz-opt.wrong .num, .cp-opt.wrong .num { color:#ef4444; }
+  /* Question + progress, matching the reference proportions */
+  .qz-q, .cp-q {
     font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; font-size:23px; font-weight:700; line-height:1.4; letter-spacing:-.02em;
     color:#ffffff; margin-bottom:32px; text-align:left;
-  }/* Progress bars across quiz, recall & lesson: exact same Flux progress bar as generation */
-  .cp-bar, .rc-bar {
+  }
+  /* Progress bars across quiz, recall & lesson: exact same Flux progress bar as generation */
+  .cp-bar, .rc-bar, .pl-bar {
     height: 6px;
     border-radius: 999px;
     background: #1c1c20;
     overflow: hidden;
     box-shadow: inset 0 2px 3px rgba(0,0,0,0.45), inset 0 -1px 2px rgba(255,255,255,0.05);
     margin-bottom: 24px;
-  }.cp-bar i, .rc-bar i {
+  }
+  .cp-bar i, .rc-bar i, .pl-bar i {
     display: block;
     position: relative;
     overflow: hidden;
@@ -1351,7 +1399,8 @@
     box-shadow: 0 0 18px rgba(139,92,246,0.55), 0 0 32px rgba(196,181,253,0.35),
                inset 0 1.5px 0 rgba(255,255,255,0.45), inset 0 -2px 3px rgba(60,20,120,0.35);
     transition: width 0.3s ease;
-  }.cp-bar i::after, .rc-bar i::after {
+  }
+  .cp-bar i::after, .rc-bar i::after, .pl-bar i::after {
     content: '';
     position: absolute;
     top: 0; bottom: 0; left: 0; width: 50%;
@@ -1361,7 +1410,46 @@
     animation: fluxSheen 1.6s linear infinite;
   }
   .cp-count, .cp-score { font-size:14px; font-weight:600; color:#7a7a7a; font-variant-numeric:tabular-nums; }
-  .cp-card { background:transparent; border:none; padding:0; }.cp-submit-btn, .cps-btn-continue {
+  .cp-card { background:transparent; border:none; padding:0; }
+  .qz-q { font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-.015em; line-height:1.3; color:#fff; margin-bottom:30px; }
+  .qz-opts { display:flex; flex-direction:column; gap:14px; }
+  .qz-opt { display:flex; align-items:center; gap:16px; text-align:left; padding:20px 22px; background:#161618; border:1.5px solid #2a2a2e; border-radius:16px; color:#e4e4e5; font-size:16.5px; line-height:1.45; cursor:pointer; transition:border-color .12s, background .12s; }
+  .qz-opt:hover { border-color:#3a3a40; }
+  .qz-opt .num { width:30px; height:30px; flex-shrink:0; border-radius:8px; border:1.5px solid #3a3a40; display:flex; align-items:center; justify-content:center; font-size:13.5px; font-weight:700; color:#9a9aa2; }
+  .qz-opt.sel { border-color:#8b5cf6; background:#1d1730; }
+  .qz-opt.sel .num { border-color:#8b5cf6; color:#c9b6ef; }
+  .qz-opt.correct { border-color:#3fb950; background:rgba(63,185,80,0.10); }
+  .qz-opt.correct .num { border-color:#3fb950; color:#3fb950; }
+  .qz-opt.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
+  .qz-opt.wrong .num { border-color:#f85149; color:#f85149; }
+  .qz-opt.disabled { pointer-events:none; }
+  /* Same raised-key treatment as the Checkpoint tab. Declared after the
+     original .qz-* rules so it actually wins the cascade. */
+  .qz-opt {
+    gap:12px; padding:14px 18px; background:#1c1c1c;
+    border:1px solid #2e2e2e; border-radius:18px;
+    color:#d0d0d0; font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em;
+    box-shadow:none;
+    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .qz-opts { gap:14px; }
+  .qz-opt:hover { border-color:#3a3a3a; }
+  .qz-opt .num {
+    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
+    display:inline-flex; align-items:center; justify-content:flex-start;
+    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
+  }
+  .qz-opt.sel { background:#1f1a2b; border-color:#8b5cf6; box-shadow:none; }
+  .qz-opt.sel .num { color:#c9b6ef; }
+  .qz-opt.correct { background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none; }
+  .qz-opt.correct .num { color:#2ec06a; }
+  .qz-opt.wrong { background:#1c1c1c; border:2px solid #ef4444; box-shadow:none; }
+  .qz-opt.wrong .num { color:#ef4444; }
+  .qz-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important; font-size:23px !important; font-weight:700 !important; line-height:1.4 !important; letter-spacing:-.02em !important; color:#ffffff !important; margin-bottom:28px !important; text-align:left !important; }
+  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#6ee7b7; background:rgba(46,192,106,0.12); border:1px solid rgba(46,192,106,0.35); border-radius:14px; padding:16px 20px; display:none; }
+  .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
+  /* Unified 3D PopButton style matching .start-btn ("Review lesson" / "Start lesson" button) */
+  .qz-check, .cp-submit-btn, .cps-btn-continue {
     padding: 12px 34px;
     height: 50px;
     border: 2px solid #a78bfa;
@@ -1380,17 +1468,20 @@
     transition: all 0.1s ease;
     transform-origin: bottom;
     user-select: none;
-  }.cp-submit-btn[disabled] {
+  }
+  .qz-check[disabled], .cp-submit-btn[disabled] {
     opacity: 0.4;
     pointer-events: none;
     box-shadow: none;
     transform: none;
-  }.cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover {
+  }
+  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover {
     background: #8b5cf6;
     border-color: #c4b5fd;
     color: #ffffff;
     box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45);
-  }.cp-submit-btn:active, .cps-btn-continue:active {
+  }
+  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active {
     border-bottom-width: 2px;
     transform: translateY(3px) scaleY(0.98);
   }
@@ -1431,12 +1522,15 @@
     color: #ffffff;
     border-bottom-color: #ef4444;
     background: rgba(239, 68, 68, 0.25);
-  }.cp-opts.horizontal {
+  }
+
+  .qz-opts.horizontal, .cp-opts.horizontal {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
     gap: 12px !important;
-  }.cp-opt.pill {
+  }
+  .qz-opt.pill, .cp-opt.pill {
     display: inline-flex !important;
     align-items: center !important;
     gap: 10px !important;
@@ -1449,10 +1543,12 @@
     font-weight: 600 !important;
     cursor: pointer !important;
     transition: all 0.12s ease !important;
-  }.cp-opt.pill:hover {
+  }
+  .qz-opt.pill:hover, .cp-opt.pill:hover {
     border-color: #3f3f46 !important;
     background: #27272a !important;
-  }.cp-opt.pill .opt-num-badge {
+  }
+  .qz-opt.pill .opt-num-badge, .cp-opt.pill .opt-num-badge {
     width: 24px;
     height: 24px;
     border-radius: 6px;
@@ -1465,32 +1561,41 @@
     font-weight: 700;
     color: #a1a1aa;
     flex-shrink: 0;
-  }.cp-opt.pill.sel {
+  }
+  .qz-opt.pill.sel, .cp-opt.pill.sel {
     background: #221a38 !important;
     border-color: #8b5cf6 !important;
     color: #ffffff !important;
     box-shadow: 0 0 12px rgba(139, 92, 246, 0.25) !important;
-  }.cp-opt.pill.sel .opt-num-badge {
+  }
+  .qz-opt.pill.sel .opt-num-badge, .cp-opt.pill.sel .opt-num-badge {
     background: #7c3aed !important;
     border-color: #a78bfa !important;
     color: #ffffff !important;
-  }.cp-opt.pill.correct {
+  }
+  .qz-opt.pill.correct, .cp-opt.pill.correct {
     background: rgba(16, 185, 129, 0.15) !important;
     border-color: #10b981 !important;
     color: #ffffff !important;
-  }.cp-opt.pill.correct .opt-num-badge {
+  }
+  .qz-opt.pill.correct .opt-num-badge, .cp-opt.pill.correct .opt-num-badge {
     background: #10b981 !important;
     border-color: #10b981 !important;
     color: #ffffff !important;
-  }.cp-opt.pill.wrong {
+  }
+  .qz-opt.pill.wrong, .cp-opt.pill.wrong {
     background: rgba(239, 68, 68, 0.15) !important;
     border-color: #ef4444 !important;
     color: #ffffff !important;
-  }.cp-opt.pill.wrong .opt-num-badge {
+  }
+  .qz-opt.pill.wrong .opt-num-badge, .cp-opt.pill.wrong .opt-num-badge {
     background: #ef4444 !important;
     border-color: #ef4444 !important;
     color: #ffffff !important;
   }
+
+  /* Circular Progress Card (Replaces Purple Orbit Result Screen) */
+  .qz-done { text-align:center; padding:110px 0 60px; }
   .circular-progress-card {
     max-width: 380px;
     margin: 0 auto;
@@ -1551,7 +1656,7 @@
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 
-  /* ── Study Brief + Learn: restored to previous version ── */
+  /* ── Study Brief: kept on the previous design ── */
   /* ── Study Brief document layout (mirrors the note page) ──── */
   /* ── Notion 100% Exact Match Layout & Typography ── */
   .br-doc {
@@ -1689,174 +1794,6 @@
      kicker and heading are redundant here — keep only the Regenerate action. */
   #castView .br-kicker, #castView .br-title { display:none; }
   #castView .br-head { margin-bottom:0; justify-content:flex-end; }
-  .pl-top { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
-  .pl-close { width:34px; height:34px; border:none; border-radius:9px; background:transparent; color:#8a8a93; font-size:20px; cursor:pointer; flex-shrink:0; }
-  .pl-close:hover { background:#1c1c20; color:#fff; }
-  .pl-label { font-size:14px; color:#d4d4d8; font-weight:600; display:flex; align-items:center; gap:7px; min-width:0; }
-  .pl-label .star { color:#f0a500; }
-  .pl-label .dim { color:#8a8a93; font-weight:500; }
-  .pl-score { margin-left:auto; display:flex; align-items:center; gap:7px; font-size:15px; font-weight:700; color:#c9b6ef; }
-  .pl-score .score-logo { width:17px; height:17px; }
-  .pl-bar { height:5px; border-radius:99px; background:#1e1e22; overflow:hidden; margin-bottom:40px; }
-  .pl-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .3s ease; }
-  .pl-nav { display:flex; justify-content:space-between; align-items:center; margin-top:44px; }
-  .pl-back { padding:12px 26px; border:1px solid #2e2e34; border-radius:12px; background:transparent; color:#c7c7cc; font-size:14.5px; font-weight:600; cursor:pointer; }
-  .pl-back:hover { background:#1c1c20; color:#fff; }
-  .pl-back[disabled] { opacity:.35; pointer-events:none; }
-  .pl-next { padding:12px 34px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.28); }
-  .pl-next:hover { filter:brightness(1.07); }
-  /* Checkpoint quiz */
-  /* ── Quiz / Checkpoint layout (raised-key option cards) ────── */
-  .qz-opt, .cp-opt {
-    display:flex; align-items:center; gap:12px; text-align:left; width:100%;
-    background:#1c1c1c; border:1px solid #2e2e2e;
-    border-radius:18px; padding:14px 18px; color:#d0d0d0;
-    font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em; cursor:pointer;
-    box-shadow:none;
-    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
-  }
-  .qz-opts, .cp-opts { gap:14px; }
-  /* The browser's default focus ring rendered white/blue outside the card.
-     Keep keyboard focus visible, but in the same purple outline. */
-  .qz-opt:focus, .cp-opt:focus { outline:none; }
-  .qz-opt:focus-visible, .cp-opt:focus-visible { outline:none; border-color:#8b5cf6; }
-  .qz-opt:hover, .cp-opt:hover { border-color:#3a3a3a; }
-  /* Letter marker replaces the boxed number */
-  .qz-opt .num, .cp-opt .num {
-    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
-    display:inline-flex; align-items:center; justify-content:flex-start;
-    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
-  }
-  /* Selected: purple glow behind the card instead of a drop shadow. */
-  .qz-opt.sel, .cp-opt.sel {
-    background:#1f1a2b; border-color:#8b5cf6; box-shadow:none;
-  }
-  .qz-opt.sel .num, .cp-opt.sel .num { color:#c9b6ef; }
-  .qz-opt.correct, .cp-opt.correct {
-    background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none;
-  }
-  .qz-opt.correct .num, .cp-opt.correct .num { color:#2ec06a; }
-  .qz-opt.wrong, .cp-opt.wrong {
-    background:#1c1c1c; border:2px solid #ef4444; box-shadow:none;
-  }
-  .qz-opt.wrong .num, .cp-opt.wrong .num { color:#ef4444; }
-  /* Question + progress, matching the reference proportions */
-  .qz-q, .cp-q {
-    font-size:17px; font-weight:400; line-height:1.6; letter-spacing:-.01em;
-    color:#e8e8e8; margin-bottom:22px;
-  }
-  .qz-q { font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-.015em; line-height:1.3; color:#fff; margin-bottom:30px; }
-  .qz-opts { display:flex; flex-direction:column; gap:14px; }
-  .qz-opt { display:flex; align-items:center; gap:16px; text-align:left; padding:20px 22px; background:#161618; border:1.5px solid #2a2a2e; border-radius:16px; color:#e4e4e5; font-size:16.5px; line-height:1.45; cursor:pointer; transition:border-color .12s, background .12s; }
-  .qz-opt:hover { border-color:#3a3a40; }
-  .qz-opt .num { width:30px; height:30px; flex-shrink:0; border-radius:8px; border:1.5px solid #3a3a40; display:flex; align-items:center; justify-content:center; font-size:13.5px; font-weight:700; color:#9a9aa2; }
-  .qz-opt.sel { border-color:#8b5cf6; background:#1d1730; }
-  .qz-opt.sel .num { border-color:#8b5cf6; color:#c9b6ef; }
-  .qz-opt.correct { border-color:#3fb950; background:rgba(63,185,80,0.10); }
-  .qz-opt.correct .num { border-color:#3fb950; color:#3fb950; }
-  .qz-opt.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
-  .qz-opt.wrong .num { border-color:#f85149; color:#f85149; }
-  .qz-opt.disabled { pointer-events:none; }
-  /* Same raised-key treatment as the Checkpoint tab. Declared after the
-     original .qz-* rules so it actually wins the cascade. */
-  .qz-opt {
-    gap:12px; padding:14px 18px; background:#1c1c1c;
-    border:1px solid #2e2e2e; border-radius:18px;
-    color:#d0d0d0; font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em;
-    box-shadow:none;
-    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
-  }
-  .qz-opts { gap:14px; }
-  .qz-opt:hover { border-color:#3a3a3a; }
-  .qz-opt .num {
-    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
-    display:inline-flex; align-items:center; justify-content:flex-start;
-    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
-  }
-  .qz-opt.sel { background:#1f1a2b; border-color:#8b5cf6; box-shadow:none; }
-  .qz-opt.sel .num { color:#c9b6ef; }
-  .qz-opt.correct { background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none; }
-  .qz-opt.correct .num { color:#2ec06a; }
-  .qz-opt.wrong { background:#1c1c1c; border:2px solid #ef4444; box-shadow:none; }
-  .qz-opt.wrong .num { color:#ef4444; }
-  .qz-q { font-size:17px; font-weight:400; line-height:1.6; letter-spacing:-.01em; color:#e8e8e8; margin-bottom:22px; }
-  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#cfc6ea; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.28); border-radius:13px; padding:14px 17px; display:none; }
-  .qz-explain.bad { color:#f0b3ae; background:rgba(248,81,73,0.07); border-color:rgba(248,81,73,0.3); }
-  .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
-  .qz-check { padding:13px 40px; border:none; border-radius:13px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.28); }
-  .qz-check[disabled] { opacity:.4; pointer-events:none; }
-  .qz-check:hover { filter:brightness(1.07); }
-  .qz-opts.horizontal, .cp-opts.horizontal {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    gap: 12px !important;
-  }
-  .qz-opt.pill, .cp-opt.pill {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 10px 18px !important;
-    border-radius: 12px !important;
-    background: #18181c !important;
-    border: 1.5px solid #27272a !important;
-    color: #f4f4f5 !important;
-    font-size: 15px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all 0.12s ease !important;
-  }
-  .qz-opt.pill:hover, .cp-opt.pill:hover {
-    border-color: #3f3f46 !important;
-    background: #27272a !important;
-  }
-  .qz-opt.pill .opt-num-badge, .cp-opt.pill .opt-num-badge {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    color: #a1a1aa;
-    flex-shrink: 0;
-  }
-  .qz-opt.pill.sel, .cp-opt.pill.sel {
-    background: #221a38 !important;
-    border-color: #8b5cf6 !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 12px rgba(139, 92, 246, 0.25) !important;
-  }
-  .qz-opt.pill.sel .opt-num-badge, .cp-opt.pill.sel .opt-num-badge {
-    background: #7c3aed !important;
-    border-color: #a78bfa !important;
-    color: #ffffff !important;
-  }
-  .qz-opt.pill.correct, .cp-opt.pill.correct {
-    background: rgba(16, 185, 129, 0.15) !important;
-    border-color: #10b981 !important;
-    color: #ffffff !important;
-  }
-  .qz-opt.pill.correct .opt-num-badge, .cp-opt.pill.correct .opt-num-badge {
-    background: #10b981 !important;
-    border-color: #10b981 !important;
-    color: #ffffff !important;
-  }
-  .qz-opt.pill.wrong, .cp-opt.pill.wrong {
-    background: rgba(239, 68, 68, 0.15) !important;
-    border-color: #ef4444 !important;
-    color: #ffffff !important;
-  }
-  .qz-opt.pill.wrong .opt-num-badge, .cp-opt.pill.wrong .opt-num-badge {
-    background: #ef4444 !important;
-    border-color: #ef4444 !important;
-    color: #ffffff !important;
-  }
-  /* Circular Progress Card (Replaces Purple Orbit Result Screen) */
-  .qz-done { text-align:center; padding:110px 0 60px; }
 </style>
 </head>
 <body>
@@ -1966,9 +1903,7 @@
   <!-- Player -->
   <div class="player" id="player">
     <div class="pl-top">
-      <button class="pl-close" id="plClose" type="button" aria-label="Back to contents">&#10005;</button>
       <div class="pl-label" id="plLabel"></div>
-      <div class="pl-score" id="plScore" hidden><span class="grad-logo score-logo"></span><span id="plScoreN">0</span></div>
     </div>
     <div class="pl-bar"><i id="plBarFill"></i></div>
     <div id="plBody"></div>
@@ -2348,13 +2283,13 @@
   function playCheckpoint(idx, item) {
     const plTop = document.querySelector('.pl-top');
     if (plTop) plTop.style.display = 'flex';
-    plScore.hidden = false;
+    if (plScore) plScore.hidden = true;
     if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
 
     const isReview = isDone(idx);
     let q = 0, score = state.scores[idx] || 0, picked = -1, checked = false;
     const baseScore = totalScore() - (state.scores[idx] || 0);   // score from other checkpoints
-    plScoreN.textContent = String(baseScore + (isReview ? (state.scores[idx] || 0) : 0));
+    if (plScoreN) plScoreN.textContent = String(baseScore + (isReview ? (state.scores[idx] || 0) : 0));
 
     function render() {
       const question = item.questions[q];
@@ -2479,7 +2414,7 @@
                 }
               }
             }
-            if (right) { score++; plScoreN.textContent = String(baseScore + score); }
+            if (right) { score++; if (plScoreN) plScoreN.textContent = String(baseScore + score); }
             explain.style.display = 'block';
             explain.classList.toggle('bad', !right);
             explain.textContent = (right ? 'Correct! ' : 'Not quite. ') + (question.explain || '');
@@ -2566,8 +2501,9 @@
   function allCoreDone() { return CORE.every(k => flow[k]); }
   // Continue button only appears at the top right of Audio Recap page
   function flowFooter(currentKey) {
-    // Checkpoint, Recall and Audio Recap now ship their own actions.
-    if (currentKey === 'recall') return '';
+    // Only Study Brief still uses this footer; the redesigned tabs
+    // (Learn, Checkpoint, Recall, Audio Recap) ship their own actions.
+    if (currentKey !== 'brief') return '';
     if (allCoreDone() && currentKey === FLOW[FLOW.length - 1].key) {
       return '<div class="flow-foot"><button class="flow-btn" data-flow="teach" type="button">Continue</button></div>';
     }
