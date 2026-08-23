@@ -1966,7 +1966,9 @@
   <!-- Player -->
   <div class="player" id="player">
     <div class="pl-top">
+      <button class="pl-close" id="plClose" type="button" aria-label="Back to contents">&#10005;</button>
       <div class="pl-label" id="plLabel"></div>
+      <div class="pl-score" id="plScore" hidden><span class="grad-logo score-logo"></span><span id="plScoreN">0</span></div>
     </div>
     <div class="pl-bar"><i id="plBarFill"></i></div>
     <div id="plBody"></div>
@@ -3514,7 +3516,7 @@
   let answerAudio = null, answerUrl = null;
   let castGen = null;   // in-flight TTS request, so play can await it
   const scBody = document.getElementById('scBody');
-  document.getElementById('scTitle').textContent = title;
+  { const _sc = document.getElementById('scTitle'); if (_sc) _sc.textContent = title; }
 
   const SC_ICON = {
     intro: '<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
