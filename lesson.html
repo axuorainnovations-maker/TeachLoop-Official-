@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 <style>
   :root { --grad: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%); --purple:#8b5cf6; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -85,9 +86,11 @@
   /* ── Premium Learn Overview (Contents) View ── */
   .overview { display:none; max-width:820px; margin:0 auto; padding:48px 24px 60px; }
   .ov-head { margin-bottom:32px; }
-  .ov-logo { width:120px; height:120px; flex-shrink:0; position:relative; display:flex; align-items:center; justify-content:center; }
+  .ov-logo { width:130px; height:130px; flex-shrink:0; position:relative; display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
   .ov-logo .grad-logo { width:100%; height:100%; }
   .ov-logo .topic-emoji { font-size:90px; line-height:1; user-select:none; filter:drop-shadow(0 8px 24px rgba(139,92,246,0.35)); }
+  .ov-logo lottie-player { width:130px !important; height:130px !important; filter:drop-shadow(0 8px 28px rgba(167,139,250,0.45)); transition:transform .3s ease; }
+  .ov-logo lottie-player:hover { transform:scale(1.08); }
   .ov-title { font-size:clamp(30px,3.8vw,42px); font-weight:800; letter-spacing:-.02em; line-height:1.2; color:#ffffff; }
   .ov-start-row { display:flex; align-items:center; gap:24px; margin-bottom:44px; flex-wrap:wrap; }
 
@@ -2117,7 +2120,7 @@
     const cur = firstIncomplete();
     const ovLogoEl = document.getElementById('ovLogo');
     if (ovLogoEl) {
-      ovLogoEl.innerHTML = '<span class="topic-emoji">' + getTopicEmoji(title, subject) + '</span>';
+      renderTopicIllustration(ovLogoEl, title, subject);
     }
     document.getElementById('upNext').textContent = cur === -1 ? 'All complete' : lesson.items[cur].title;
     document.getElementById('startLessonBtn').textContent = cur === -1 ? 'Review lesson' : (state.done.length ? 'Continue lesson' : 'Start lesson');
@@ -2672,21 +2675,43 @@
   // ── Study Brief ─────────────────────────────────────────────
   // A focused pre-study brief for the current lesson topic. Six fixed
   // sections, generated once and cached alongside the lesson.
-  function getTopicEmoji(topic, subj) {
+  function getTopicLottie(topic, subj) {
     const t = ((topic || '') + ' ' + (subj || '')).toLowerCase();
-    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || t.includes('gene') || t.includes('genetics') || t.includes('protein')) return '🧬';
-    if (t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('element') || t.includes('acid') || t.includes('base') || t.includes('bond')) return '🧪';
-    if (t.includes('physic') || t.includes('force') || t.includes('motion') || t.includes('energy') || t.includes('gravity') || t.includes('quantum') || t.includes('light') || t.includes('wave') || t.includes('electr') || t.includes('magnet')) return '⚡';
-    if (t.includes('math') || t.includes('algebra') || t.includes('calculus') || t.includes('geometry') || t.includes('equation') || t.includes('number') || t.includes('stat') || t.includes('trig')) return '📐';
-    if (t.includes('hist') || t.includes('war') || t.includes('century') || t.includes('revolution') || t.includes('empire') || t.includes('ancient') || t.includes('king') || t.includes('civil')) return '📜';
-    if (t.includes('geo') || t.includes('earth') || t.includes('climate') || t.includes('map') || t.includes('rock') || t.includes('ocean') || t.includes('planet') || t.includes('volcano')) return '🌍';
-    if (t.includes('code') || t.includes('programm') || t.includes('python') || t.includes('java') || t.includes('script') || t.includes('data') || t.includes('tech') || t.includes('comp') || t.includes('algor')) return '💻';
-    if (t.includes('econ') || t.includes('business') || t.includes('finance') || t.includes('market') || t.includes('money') || t.includes('trade') || t.includes('stock')) return '📊';
-    if (t.includes('art') || t.includes('paint') || t.includes('music') || t.includes('design') || t.includes('photo') || t.includes('sculpt')) return '🎨';
-    if (t.includes('lang') || t.includes('english') || t.includes('read') || t.includes('write') || t.includes('literat') || t.includes('gramm') || t.includes('book') || t.includes('poetry')) return '📚';
-    if (t.includes('psych') || t.includes('brain') || t.includes('mind') || t.includes('behavior') || t.includes('cognit') || t.includes('neuro')) return '🧠';
-    if (t.includes('astro') || t.includes('space') || t.includes('star') || t.includes('galaxy') || t.includes('solar') || t.includes('universe') || t.includes('orbit')) return '🌌';
-    return '📖';
+    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || t.includes('gene') || t.includes('genetics') || t.includes('protein'))
+      return { url: 'https://assets5.lottiefiles.com/packages/lf20_dna.json', emoji: '🧬' };
+    if (t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('element') || t.includes('acid') || t.includes('base') || t.includes('bond'))
+      return { url: 'https://assets9.lottiefiles.com/packages/lf20_atom.json', emoji: '🧪' };
+    if (t.includes('physic') || t.includes('force') || t.includes('motion') || t.includes('energy') || t.includes('gravity') || t.includes('quantum') || t.includes('light') || t.includes('wave') || t.includes('electr') || t.includes('magnet'))
+      return { url: 'https://assets10.lottiefiles.com/packages/lf20_physics.json', emoji: '⚛️' };
+    if (t.includes('math') || t.includes('algebra') || t.includes('calculus') || t.includes('geometry') || t.includes('equation') || t.includes('number') || t.includes('stat') || t.includes('trig'))
+      return { url: 'https://assets8.lottiefiles.com/packages/lf20_math.json', emoji: '📐' };
+    if (t.includes('hist') || t.includes('war') || t.includes('century') || t.includes('revolution') || t.includes('empire') || t.includes('ancient') || t.includes('king') || t.includes('civil'))
+      return { url: 'https://assets7.lottiefiles.com/packages/lf20_history.json', emoji: '🏛️' };
+    if (t.includes('geo') || t.includes('earth') || t.includes('climate') || t.includes('map') || t.includes('rock') || t.includes('ocean') || t.includes('planet') || t.includes('volcano'))
+      return { url: 'https://assets1.lottiefiles.com/packages/lf20_earth.json', emoji: '🌎' };
+    if (t.includes('code') || t.includes('programm') || t.includes('python') || t.includes('java') || t.includes('script') || t.includes('data') || t.includes('tech') || t.includes('comp') || t.includes('algor'))
+      return { url: 'https://assets10.lottiefiles.com/packages/lf20_code.json', emoji: '💻' };
+    if (t.includes('econ') || t.includes('business') || t.includes('finance') || t.includes('market') || t.includes('money') || t.includes('trade') || t.includes('stock'))
+      return { url: 'https://assets3.lottiefiles.com/packages/lf20_chart.json', emoji: '📊' };
+    if (t.includes('art') || t.includes('paint') || t.includes('music') || t.includes('design') || t.includes('photo') || t.includes('sculpt'))
+      return { url: 'https://assets6.lottiefiles.com/packages/lf20_art.json', emoji: '🎨' };
+    if (t.includes('lang') || t.includes('english') || t.includes('read') || t.includes('write') || t.includes('literat') || t.includes('gramm') || t.includes('book') || t.includes('poetry'))
+      return { url: 'https://assets5.lottiefiles.com/packages/lf20_book.json', emoji: '📚' };
+    if (t.includes('psych') || t.includes('brain') || t.includes('mind') || t.includes('behavior') || t.includes('cognit') || t.includes('neuro'))
+      return { url: 'https://assets4.lottiefiles.com/packages/lf20_brain.json', emoji: '🧠' };
+    if (t.includes('astro') || t.includes('space') || t.includes('star') || t.includes('galaxy') || t.includes('solar') || t.includes('universe') || t.includes('orbit'))
+      return { url: 'https://assets2.lottiefiles.com/packages/lf20_space.json', emoji: '🌌' };
+    return { url: 'https://assets1.lottiefiles.com/packages/lf20_education.json', emoji: '📖' };
+  }
+
+  function renderTopicIllustration(targetEl, topic, subj) {
+    if (!targetEl) return;
+    const item = getTopicLottie(topic, subj);
+    targetEl.innerHTML = '<lottie-player src="' + item.url + '" background="transparent" speed="1" style="width:130px; height:130px; margin:0 auto;" loop autoplay></lottie-player>';
+  }
+
+  function getTopicEmoji(topic, subj) {
+    return getTopicLottie(topic, subj).emoji;
   }
 
   const BRIEF_KEY = 'NOURA_BRIEF_' + slug;
@@ -2695,7 +2720,7 @@
   document.getElementById('brTitle').textContent = title;
   const brLogoEl = document.getElementById('brLogo');
   if (brLogoEl) {
-    brLogoEl.innerHTML = '<span class="topic-emoji">' + getTopicEmoji(title, subject) + '</span>';
+    renderTopicIllustration(brLogoEl, title, subject);
   }
 
 
