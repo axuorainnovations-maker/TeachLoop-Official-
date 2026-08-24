@@ -1154,7 +1154,11 @@
   /* ── NEW Checkpoint Summary (Image 1 Style) ── */
   .cps-wrap { max-width:700px; margin:0 auto; padding:32px 20px 120px; display:flex; flex-direction:column; gap:24px; }
   .cps-header { text-align:center; }
-  .cps-emoji { font-size:44px; line-height:1; margin-bottom:12px; }
+  /* Brand mark in place of an emoji: the logo shape masks the gradient. */
+  .cps-emoji { width:46px; height:46px; margin:0 auto 14px;
+    background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
+    -webkit-mask:url('logo.png?v=3') center/contain no-repeat;
+    mask:url('logo.png?v=3') center/contain no-repeat; }
   .cps-title { font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:26px; font-weight:800; color:#fff; letter-spacing:-.02em; margin:0 0 8px; }
   .cps-subtitle { font-size:14px; color:#a1a1aa; line-height:1.6; max-width:440px; margin:0 auto; }
 
@@ -2460,7 +2464,10 @@
       const progressPercentage = Math.round(pct * 100);
       const circ = 2 * Math.PI * 80;
       const offset = circ * (1 - progressPercentage / 100);
-      const progressColor = '#10b981'; // Green color
+      // Ring matches the percentage colour used in the timeline rows,
+      // so a yellow 50% never sits inside a green ring.
+      const progressColor = progressPercentage >= 80 ? '#419b67'
+                          : progressPercentage >= 50 ? '#facc15' : '#f97316';
       const desc = pct === 1 ? 'Perfect score! You mastered this checkpoint.' : (pct >= 0.6 ? 'Nice work — keep going.' : 'Good effort — review the sections and try the next one.');
 
       wrap.innerHTML = '<div class="circular-progress-card">' +
@@ -2519,15 +2526,22 @@
   function allCoreDone() { return CORE.every(k => flow[k]); }
   // Continue button only appears at the top right of Audio Recap page
   function flowFooter(currentKey) {
-    // Only Study Brief still uses this footer; the redesigned tabs
-    // (Learn, Checkpoint, Recall, Audio Recap) ship their own actions.
-    if (currentKey !== 'brief') return '';
+    // Checkpoint and Audio Recap ship their own actions, so they get nothing.
+    if (currentKey !== 'brief' && currentKey !== 'learn') return '';
+    // On Learn the button only appears once every section is finished, and it
+    // names where it goes so the next step is obvious.
+    if (currentKey === 'learn') {
+      const ready = lesson && Array.isArray(lesson.items) && lesson.items.length
+                    && firstIncomplete() === -1;
+      if (!ready) return '';
+    }
     if (allCoreDone() && currentKey === FLOW[FLOW.length - 1].key) {
-      return '<div class="flow-foot"><button class="flow-btn" data-flow="teach" type="button">Continue</button></div>';
+      return '<div class="flow-foot"><button class="flow-btn" data-flow="teach" type="button">Continue to Teach Studio</button></div>';
     }
     const i = FLOW.findIndex(f => f.key === currentKey);
     const next = FLOW[(i + 1) % FLOW.length];
-    return '<div class="flow-foot"><button class="flow-btn" data-flow="' + next.key + '" type="button">Continue</button></div>';
+    const label = currentKey === 'learn' ? 'Continue to ' + next.label : 'Continue';
+    return '<div class="flow-foot"><button class="flow-btn" data-flow="' + next.key + '" type="button">' + label + '</button></div>';
   }
   function wireFlow(host) {
     host.querySelectorAll('[data-flow]').forEach(b => b.addEventListener('click', () => {
@@ -2915,9 +2929,6 @@
           '</div>' +
           '<div class="rc-hint-text">Think of the answer first to do active recall</div>' +
         '</div>' +
-        '<div class="rc-card-ft">' +
-          '<button class="rc-reveal" id="rcRevealBtn" type="button">Reveal</button>' +
-        '</div>' +
       '</div>' +
 
       '<!-- Revealed Block: Model Answer + 3 Stacked Rating Buttons (Image 1) -->' +
@@ -2972,7 +2983,8 @@
       hintCard.style.display = 'none';
       revealedBlock.style.display = 'block';
     }
-    revealBtn.addEventListener('click', doReveal);
+    // The Reveal button is gone; submitting the answer reveals instead.
+    if (revealBtn) revealBtn.addEventListener('click', doReveal);
     arrowBtn.addEventListener('click', doReveal);
     answerEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -3262,7 +3274,8 @@
     // circular accuracy ring
     const ringR = 42, circ = 2 * Math.PI * ringR;
     const dash = circ * progressPercentage / 100;
-    const ringColor = passed ? '#2ec06a' : '#f59e0b';
+    const ringColor = progressPercentage >= 80 ? '#419b67'
+                    : progressPercentage >= 50 ? '#facc15' : '#f97316';
 
     // learning zone logic
     let zoneName, zoneDesc, zoneSliderPos;
@@ -3329,7 +3342,7 @@
 
         // ── Header ──
         '<div class="cps-header">' +
-          '<div class="cps-emoji">' + emoji + '</div>' +
+          '<div class="cps-emoji" role="img" aria-label="Noura"></div>' +
           '<h2 class="cps-title">' + resultTitle + '</h2>' +
         '</div>' +
 
