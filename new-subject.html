@@ -239,9 +239,18 @@
     if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
   });
 
+  function isUnsupportedSubject(s) {
+    var t = (s || '').toLowerCase();
+    return t.includes('math') || t.includes('calculus') || t.includes('algebra') || t.includes('trigonometry') || t.includes('geometry') || t.includes('arithmetic') || t.includes('spanish') || t.includes('french') || t.includes('german') || t.includes('mandarin') || t.includes('chinese') || t.includes('japanese') || t.includes('korean');
+  }
+
   function openFileModal() {
     var name = (nameInput.value || '').trim();
     if (!name) { nameInput.focus(); return; }
+    if (isUnsupportedSubject(name)) {
+      alert("I don't do math, calculation-heavy subjects, or language learning. I do conceptual subjects like Biology, History, Conceptual Economics, Geography, Literature, Psychology, and Business!");
+      return;
+    }
     fileSubjName.textContent = cap(name);
     pickedFiles = []; renderFileList();
     fileOverlay.classList.add('open');

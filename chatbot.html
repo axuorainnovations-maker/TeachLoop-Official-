@@ -53,19 +53,9 @@ body {
   position:relative;
   z-index:60;
 }
-.sidebar-top { display:flex; align-items:center; justify-content:flex-start; gap:7px; padding:14px 12px 10px 16px; }
-.brand-name { font-family:'Necosmic', Inter, sans-serif; font-size:17px; font-weight:600; letter-spacing:0.5px; color:#E4E4E5; white-space:nowrap; user-select:none; cursor:pointer; margin-right:auto; }
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; padding:14px 12px 10px 16px; }
+.brand-name { font-family:'Necosmic', Inter, sans-serif; font-size:17px; font-weight:600; letter-spacing:0.5px; color:#E4E4E5; white-space:nowrap; user-select:none; cursor:pointer; }
 body.light-mode .brand-name { color:#1c1c1e; }
-.logo-area { transition: none; }
-.logo-area { position:relative; width:33px; height:33px; flex-shrink:0; cursor:pointer; }
-.logo-pencil, .logo-sidebar {
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  transition: opacity 0.22s ease, transform 0.22s ease;
-}
-.logo-pencil { opacity:1; transform:scale(1); color:#ffffff; }
-.logo-pencil svg { width:22px; height:22px; display:block; pointer-events:none; }
-body.light-mode .logo-pencil { color:#1c1c1e; }
-.logo-sidebar { opacity:0; transform:scale(0.85); }
 .sidebar.collapsed { width:56px; }
 .sidebar.collapsed .nav-item { justify-content:center; padding:10px 0; gap:0; font-size:0; }
 .sidebar.collapsed .nav-item svg { margin:0; }
@@ -75,22 +65,12 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 .sidebar.collapsed .section,
 .sidebar.collapsed .history,
 .sidebar.collapsed .user-info,
-.sidebar.collapsed .collapse,
 .sidebar.collapsed .section-header { display:none !important; }
+.sidebar.collapsed .collapse { display:inline-flex !important; margin:0 auto; }
 .sidebar.collapsed .sidebar-top { justify-content:center; padding:14px 0 10px; }
 .sidebar.collapsed .user { justify-content:center; padding:12px 0; }
 .sidebar.collapsed .nav { padding:0 8px; }
 .sidebar.collapsed .nav-item.active { background:#1a1a1d; }
-.sidebar.collapsed .logo-pencil { opacity:1; transform:scale(1); }
-.sidebar.collapsed .logo-sidebar { opacity:0; transform:scale(0.85); }
-/* On hover, keep the pencil but flip it from pointing down-left to down-right (open OR collapsed) */
-.logo-area:hover .logo-pencil { transform:scaleX(-1); }
-.sidebar.collapsed .logo-area:hover .logo-pencil { opacity:1; transform:scaleX(-1); }
-.sidebar.collapsed .logo-area:hover .logo-sidebar { opacity:0; transform:scale(0.85); }
-.si-container { transform-origin:center; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-.si-divider { transform-origin:center; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-.sidebar.collapsed .logo-area:hover .si-container { transform: scale(1.02); }
-.sidebar.collapsed .logo-area:hover .si-divider { transform: translateX(2px) scaleX(1.1); }
 .grok-mark { width:20px; height:20px; color:#e5e5e5; stroke-width:2; }
 
 /* ===== Sidebar template (Spaces / Recents / download / profile) ===== */
@@ -169,27 +149,28 @@ body.light-mode .logo-pencil { color:#1c1c1e; }
 body.light-mode .yl-reminder { background:#f6f6f7; border-color:#e2e2e6; }
 .yl-profile-wrap { position:relative; }
 .yl-profile {
-  width:100%; min-height:56px; background:#161616; border:1px solid #2A2A2A; border-radius:16px;
-  display:flex; align-items:center; gap:10px; padding:8px 11px; cursor:pointer;
-  transition:background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  width:100%; min-height:42px; background:#141414; border:1px solid #262626; border-radius:14px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 11px; cursor:pointer;
+  transition:background 0.18s ease, border-color 0.18s ease;
 }
-.yl-profile:hover { background:#1C1C1C; border-color:#3a3a3a; box-shadow:0 1px 3px rgba(0,0,0,0.35); }
-.yl-profile-id { display:flex; flex-direction:column; min-width:0; flex:1; text-align:left; }
-.yl-name { font-size:13px; font-weight:600; color:#fff; line-height:16px; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.yl-email { font-size:11px; color:#8A8A8A; line-height:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.yl-avatar-ring { width:36px; height:36px; border-radius:50%; padding:2px; flex-shrink:0; display:flex; background:linear-gradient(135deg,#a855f7 0%,#ec4899 55%,#fb923c 100%); }
-.yl-avatar { width:100%; height:100%; border-radius:50%; background:#161616; border:none; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#fff; text-transform:uppercase; }
-.yl-bend { flex-shrink:0; color:#6b6b73; transition:color 0.2s ease, transform 0.2s ease; }
-.yl-profile:hover .yl-bend { color:#a1a1aa; }
-.yl-profile-wrap:has(.settings-menu.open) .yl-bend { color:#8b5cf6; transform:scaleX(1.15); }
+.yl-profile:hover { background:#1C1C1C; border-color:#363636; }
+.yl-avatar-box {
+  width:28px; height:28px; border-radius:50%; background:#1f1f1f; border:1px solid #333333;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.yl-avatar { font-size:11px; font-weight:600; color:#ffffff; letter-spacing:0.3px; text-transform:uppercase; }
+.yl-name { font-size:13.5px; font-weight:600; color:#ffffff; line-height:18px; margin-right:auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; }
+.yl-chevron { width:14px; height:14px; color:#a1a1aa; stroke-width:2; flex-shrink:0; transition:transform 0.2s ease, color 0.2s ease; }
+.yl-profile:hover .yl-chevron { color:#ffffff; }
+.yl-profile-wrap:has(.settings-menu.open) .yl-chevron { transform:rotate(180deg); color:#ffffff; }
 
 .sidebar.collapsed .yl-section,
 .sidebar.collapsed .yl-download,
 .sidebar.collapsed .yl-reminder,
-.sidebar.collapsed .yl-profile-id,
-.sidebar.collapsed .yl-bend { display:none !important; }
+.sidebar.collapsed .yl-name,
+.sidebar.collapsed .yl-chevron { display:none !important; }
 .sidebar.collapsed .yl-bottom { padding:0 8px 12px; }
-.sidebar.collapsed .yl-profile { justify-content:center; gap:0; padding:8px 0; }
+.sidebar.collapsed .yl-profile { justify-content:center; gap:0; padding:6px 0; border-radius:12px; min-height:38px; }
 
 body.light-mode .yl-item { color:#48484a; }
 body.light-mode .yl-item:hover { background:#e6e6ea; }
@@ -202,7 +183,7 @@ body.light-mode .yl-profile:hover { background:#e6e6ea; border-color:#d4d4d8; }
 body.light-mode .yl-avatar { background:#f0f0f2; border:none; color:#18181b; }
 body.light-mode .yl-name { color:#18181b; }
 body.light-mode .yl-email { color:#8a8a8f; }
-.collapse { --background:#0a0a0a; background:none; border:none; color:#6b6b73; cursor:pointer; padding:4px; border-radius:6px; display:none; transition: color 0.15s; }
+.collapse { --background:#0a0a0a; background:none; border:none; color:#6b6b73; cursor:pointer; padding:4px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; transition: color 0.15s; }
 .collapse:hover { background:#141414; color:#b0b0ba; }
 .collapse:focus, .collapse:focus-visible { outline:none; }
 .collapse-icon { display:block; overflow:visible; }
@@ -2632,18 +2613,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
         <span class="brand-logo grad-logo" role="img" aria-label="Noura"></span>
         <span class="brand-name">Noura</span>
       </span>
-      <div class="logo-area" id="logoArea">
-        <span class="logo-pencil">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M11.4001 18.1612L11.4001 18.1612L18.796 10.7653C17.7894 10.3464 16.5972 9.6582 15.4697 8.53068C14.342 7.40298 13.6537 6.21058 13.2348 5.2039L5.83882 12.5999L5.83879 12.5999C5.26166 13.1771 4.97307 13.4657 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L7.47918 20.5844C8.25351 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5343 19.0269 10.823 18.7383 11.4001 18.1612Z" fill="currentColor"></path><path d="M20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178L14.3999 4.03882C14.4121 4.0755 14.4246 4.11268 14.4377 4.15035C14.7628 5.0875 15.3763 6.31601 16.5303 7.47002C17.6843 8.62403 18.9128 9.23749 19.85 9.56262C19.8875 9.57563 19.9245 9.58817 19.961 9.60026L20.8482 8.71306Z" fill="currentColor"></path></svg>
-        </span>
-        <span class="logo-sidebar">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path class="si-container" d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/>
-            <path class="si-divider" d="M15 4l0 16"/>
-          </svg>
-        </span>
-      </div>
+
 
       <button class="collapse" id="collapseBtn" title="Collapse sidebar">
         <svg
@@ -2733,18 +2703,21 @@ body.light-mode .aset-member .nm { color:#16151c; }
       </div>
       <div class="yl-profile-wrap" id="userProfile">
         <button class="yl-profile" type="button">
-          <div class="yl-profile-id">
-            <span class="yl-name">Your account</span>
-            <span class="yl-email" id="ylEmail">Signed in</span>
-          </div>
-          <span class="yl-avatar-ring"><span class="yl-avatar">A</span></span>
-          <svg class="yl-bend" width="12" height="24" viewBox="0 0 12 24" fill="none" aria-hidden="true"><path d="M2 4C6 8 6 16 2 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+          <span class="yl-avatar-box">
+            <span class="yl-avatar" id="ylAvatarText">JA</span>
+          </span>
+          <span class="yl-name" id="ylName">Jayden Liew</span>
+          <svg class="yl-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
         </button>
         <div class="settings-menu pm-menu" id="settingsMenu">
           <div class="pm-header">
-            <div class="pm-avatar" id="pmAvatar">A</div>
+            <div class="pm-avatar" id="pmAvatar">
+              <img src="jayden.jpg" class="yl-avatar-img" alt="jayden" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" onerror="this.style.display='none';">
+            </div>
             <div class="pm-id">
-              <span class="pm-name" id="pmName">Your account</span>
+              <span class="pm-name" id="pmName">jayden</span>
               <span class="pm-email" id="pmEmail">Signed in</span>
             </div>
           </div>
@@ -3126,13 +3099,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
           </div>
           <div class="suggested-pills" id="suggestedPills">
             <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
-              Quiz me on a topic to test my understanding
+              Generate a lesson on Cell Biology & organelles
             </button>
             <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
-              Create a practice test with step-by-step solutions
+              Teach me a lesson on Microeconomics fundamentals
             </button>
             <button class="suggested-pill" onclick="pickHeroSuggestion(this)">
-              Explain a complex concept using simple analogies
+              Create a lesson on World War II key events
             </button>
           </div>
         </div>
@@ -3192,19 +3165,19 @@ body.light-mode .aset-member .nm { color:#16151c; }
           function refreshHeroSuggestions() {
             const sets = [
               [
-                'Quiz me on a topic to test my understanding',
-                'Create a practice test with step-by-step solutions',
-                'Explain a complex concept using simple analogies'
+                'Generate a lesson on Cell Biology & organelles',
+                'Teach me a lesson on Microeconomics fundamentals',
+                'Create a lesson on World War II key events'
               ],
               [
-                'Create a structured study guide for my exam',
-                'Break down my topic into key revision points',
-                'Help me generate active recall practice questions'
+                'Generate a lesson on Ecosystems & biodiversity',
+                'Teach me a lesson on Brain structure & neuroscience',
+                'Create a lesson on Plate tectonics & Earth science'
               ],
               [
-                'Summarize my notes into clear bullet points',
-                'Explain why a problem solution works step by step',
-                'Build a personalized 5-day study plan'
+                'Generate a lesson on Market supply & demand',
+                'Teach me a lesson on Ancient Civilizations & empires',
+                'Create a lesson on Psychology & cognitive behavior'
               ]
             ];
             window._sugIdx = ((window._sugIdx || 0) + 1) % sets.length;
@@ -3362,15 +3335,23 @@ body.light-mode .aset-member .nm { color:#16151c; }
   // Morphing sidebar-toggle icon (open <-> closed panel width)
   const PANEL_OPEN = 'M14 6 C14 5.057 14 4.586 13.707 4.293 C13.414 4 12.943 4 12 4 H10 C7.172 4 5.757 4 4.879 4.879 C4 5.757 4 7.172 4 10 V14 C4 16.828 4 18.243 4.879 19.121 C5.757 20 7.172 20 10 20 H12 C12.943 20 13.414 20 13.707 19.707 C14 19.414 14 18.943 14 18 V6 Z';
   const PANEL_CLOSED = 'M10 5.5 C10 4.793 10 4.439 9.780 4.220 C9.560 4 9.207 4 8.5 4 H8.5 C6.379 4 5.318 4 4.659 4.659 C4 5.318 4 6.379 4 8.5 V15.5 C4 17.621 4 18.682 4.659 19.341 C5.318 20 6.379 20 8.5 20 H8.5 C9.207 20 9.561 20 9.780 19.780 C10 19.561 10 19.207 10 18.5 V5.5 Z';
-  const innerPanel = document.querySelector('.collapse-icon .inner-panel');
-  function setSidebarIcon(isOpen) {
-    if (innerPanel) innerPanel.setAttribute('d', isOpen ? PANEL_OPEN : PANEL_CLOSED);
+
+  function updateSidebarIconState() {
+    const isOpen = !sidebar.classList.contains('collapsed');
+    document.querySelectorAll('.collapse-icon .inner-panel').forEach(panel => {
+      panel.setAttribute('d', isOpen ? PANEL_OPEN : PANEL_CLOSED);
+    });
   }
 
-  collapseBtn?.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); });
+  collapseBtn?.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    updateSidebarIconState();
+  });
 
-  // The pencil is now the sidebar toggle (open ↔ collapse)
-  logoArea?.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); });
+  logoArea?.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    updateSidebarIconState();
+  });
 
   newChatNav?.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -3954,6 +3935,31 @@ body.light-mode .aset-member .nm { color:#16151c; }
   }
 
   async function fetchAIResponse(userText, attachment) {
+    // Client-side Math, Calculation & Language Interception Guard
+    const isUnsupportedQuery = (function(text) {
+      const t = (text || '').toLowerCase().trim();
+      const unsupportedKeywords = [
+        'math', 'maths', 'mathematics', 'fraction', 'fractions', 'calculus', 'algebra',
+        'geometry', 'trigonometry', 'derivative', 'integrals', 'integral', 'equation',
+        'equations', 'arithmetic', 'multiplication', 'division', 'addition',
+        'subtraction', 'percentage', 'percentages', 'decimal', 'decimals',
+        'pythagorean', 'quadratic', 'matrix', 'matrices', 'polynomial',
+        'logarithm', 'square root', 'calculate', 'solve', 'spanish', 'french', 'german',
+        'mandarin', 'chinese', 'japanese', 'korean', 'russian', 'italian',
+        'language learning', 'learn spanish', 'learn french', 'learn german'
+      ];
+      return unsupportedKeywords.some(k => t.includes(k));
+    })(userText);
+
+    if (isUnsupportedQuery) {
+      const msg = "I don't do math, calculation-heavy subjects, or language learning. I do conceptual subjects like Biology, History, Conceptual Economics, Geography, Literature, Psychology, and Business! Please pick one of these subjects instead.";
+      chatContext.push({ role: 'user', content: userText });
+      chatContext.push({ role: 'assistant', content: msg });
+      appendBotMsg(msg);
+      scrollToBottom();
+      return;
+    }
+
     appendThinking();
 
     // Add user msg to context (with optional homework attachment)
@@ -3995,7 +4001,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
       systemText += '\n\nFACT-CHECK THE LEARNER (IMPORTANT): You have a live web_search tool for full internet access. Whenever the learner teaches, states, or asserts a fact, judge whether it is actually true, and use web_search to verify it whenever you are not fully certain (especially names, dates, numbers, definitions, causes, and mechanisms). If what they said is incorrect, outdated, oversimplified into something false, or a common misconception, you must NOT accept it, agree with it, praise it, or act as though you "learned" it. Instead, kindly tell them that that part is mistaken, briefly say what is actually correct (and mention the source if you searched), and invite them to try explaining it again. Only acknowledge that you have learned or understood something, or that they taught it well, when the information is actually correct. Never confirm, repeat as true, or build on wrong information. Express all of this inside your normal response format.';
 
-      systemText += "\n\nLESSON FLOW (UI MARKERS): The app renders interactive elements from special markers placed on the FINAL line of your reply.\n(1) When the learner asks to learn or study a broad topic (for example 'cell biology', 'maths', 'history', or 'I want to learn biology'), reply with ONE short friendly clarifying question asking which specific part they are interested in, and end with a marker listing 3 to 6 subtopic options as chips, exactly like: [[CHIPS: Cell structure & organelles | Cell membrane & transport | Cell division (mitosis & meiosis) | Cellular respiration & metabolism | Cell signaling | A general overview]].\n(2) Once the learner names or selects a specific topic they want to learn (or if they ask for a specific topic directly), reply with a short friendly sentence or two and end with: [[LESSON: Short Lesson Title]] - the app then shows a Generate Lesson card.\nRules: The marker must be the very last line of the message; never mention or read the marker syntax aloud; only use CHIPS or LESSON when the learner wants to learn a topic, not for ordinary factual questions or mid-conversation tutoring. If the topic belongs to a different subject than the current one, follow the SUBJECT LOCK rules instead.";
+      systemText += '\n\nSUPPORTED SUBJECTS & LESSON GENERATION BOUNDARY (CRITICAL LAW):'
+        + '\n(1) CAPABILITY: You are an AI study tutor whose sole interactive flow is GENERATING LESSONS. You ONLY generate structured lessons for conceptual subjects.'
+        + '\n(2) UNSUPPORTED SUBJECTS: We DO NOT do Mathematics, Calculus, Algebra, Geometry, Trigonometry, Quantitative Physics calculations, Accounting calculations, or Languages / Language Learning.'
+        + '\n(3) SUPPORTED SUBJECTS: We do conceptual subjects such as Biology, History, Conceptual Economics (Microeconomics / Macroeconomics concepts), Geography, Literature, Psychology, Business Concepts, Philosophy, Sociology, Political Science, Art & Music theory, and General Conceptual Science.'
+        + '\n(4) IF A LEARNER ASKS FOR AN UNSUPPORTED SUBJECT (e.g. Math, Calculus, Algebra, Languages): Do NOT generate a lesson, do NOT output lesson markers ([[LESSON:...]] or [[CHIPS:...]]), and do NOT solve math or language exercises. Reply directly: "I don\'t do math, calculation-heavy subjects, or language learning. I do conceptual subjects like Biology, History, Conceptual Economics, Geography, Literature, Psychology, and Business! Please pick one of these subjects instead."';
+
+      systemText += "\n\nLESSON FLOW (UI MARKERS): The app renders interactive elements from special markers placed on the FINAL line of your reply.\n(1) When the learner asks to learn or study a broad conceptual topic (for example 'cell biology', 'history', or 'microeconomics'), reply with ONE short friendly clarifying question asking which specific part they are interested in, and end with a marker listing 3 to 6 subtopic options as chips, exactly like: [[CHIPS: Cell structure & organelles | Cell membrane & transport | Cell division (mitosis & meiosis) | Cellular respiration & metabolism | Cell signaling | A general overview]].\n(2) Once the learner names or selects a specific conceptual topic they want to learn (or if they ask for a specific conceptual topic directly), reply with a short friendly sentence or two and end with: [[LESSON: Short Lesson Title]] - the app then shows a Generate Lesson card.\nRules: The marker must be the very last line of the message; never mention or read the marker syntax aloud; only use CHIPS or LESSON when the learner wants to learn a supported conceptual topic, not for unsupported math subjects, languages, or ordinary factual questions. If the topic belongs to a different subject than the current one, follow the SUBJECT LOCK rules instead.";
     }
 
     // Convert our chat context to Anthropic's message format (image_url -> base64 source block)
@@ -5331,15 +5343,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
     // Fill the avatar / name / email from the saved account.
     let acc = {};
     try { acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null') || {}; } catch (e) { }
-    const nm = (acc.name || localStorage.getItem('TEACHLOOP_NAME') || 'Your account').trim();
+    const nm = (acc.name || localStorage.getItem('TEACHLOOP_NAME') || 'Jayden Liew').trim();
     const em = (acc.email || localStorage.getItem('NOURA_EMAIL') || '').trim();
-    const initials = (nm.split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'A').toUpperCase();
+    const initials = (nm.split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'JA').toUpperCase();
     const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
     set('pmName', nm); set('pmEmail', em || 'Signed in');
-    const pmAv = document.getElementById('pmAvatar'); if (pmAv) pmAv.textContent = initials.charAt(0);
-    const bAv = document.querySelector('.yl-profile .yl-avatar'); if (bAv) bAv.textContent = initials;
-    const bNm = document.querySelector('.yl-profile .yl-name'); if (bNm) bNm.textContent = nm;
-    const bEm = document.getElementById('ylEmail'); if (bEm) bEm.textContent = em || 'Signed in';
+    const pmAv = document.getElementById('pmAvatar'); if (pmAv) pmAv.textContent = initials;
+    const bAv = document.getElementById('ylAvatarText'); if (bAv) bAv.textContent = initials;
+    const bNm = document.getElementById('ylName'); if (bNm) bNm.textContent = nm;
 
     // Model badge → single Study Assistant tutor.
     try {

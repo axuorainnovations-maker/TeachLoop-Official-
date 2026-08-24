@@ -251,6 +251,136 @@
   .ts-recall-btn:hover { border-color:var(--ts-accent); color:#fff; }
   .ts-recall-btn.set { border-color:var(--ts-good); color:#7ee2a8; pointer-events:none; }
 
+  /* ── Multi-Step Checkpoint Onboarding Flow ───────────────────────── */
+  .ts-checkpoint-wrap { max-width:620px; margin:0 auto; padding:20px 20px 80px; }
+  .ts-progress-bar { display:flex; gap:8px; width:100%; max-width:580px; margin:0 auto 28px; }
+  .ts-progress-segment { flex:1; height:3.5px; border-radius:99px; background:#232324; transition:background 0.3s ease; }
+  .ts-progress-segment.active { background:#ffffff; }
+  .ts-progress-segment.done { background:#8b5cf6; }
+
+  .ts-checkpoint-meta { font-size:12.5px; font-weight:600; color:#8A8A8E; text-align:center; margin-bottom:12px; }
+  .ts-checkpoint-title { font-size:clamp(24px, 3.5vw, 32px); font-weight:700; color:#FFFFFF; text-align:center; margin:0 0 8px; letter-spacing:-0.02em; }
+  .ts-checkpoint-desc { font-size:14.5px; color:#9A9A9E; text-align:center; margin:0 0 32px; line-height:1.5; }
+
+  .ts-subj-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; margin-bottom:32px; }
+  @media (max-width: 580px) { .ts-subj-grid { grid-template-columns:1fr; } }
+  
+  .ts-subj-opt {
+    display:flex; align-items:center; justify-content:space-between; padding:13px 16px;
+    background:#141416; border:1px solid #232324; border-radius:14px; cursor:pointer;
+    color:#E5E5E7; font-size:14px; font-weight:600; transition:all 0.15s ease; user-select:none;
+  }
+  .ts-subj-opt:hover { background:#1A1A1E; border-color:#3A3A3E; color:#FFFFFF; }
+  .ts-subj-opt.selected {
+    background:#17122a; border-color:#8b5cf6; color:#FFFFFF; box-shadow:0 0 0 1px #8b5cf6, 0 4px 16px rgba(139,92,246,0.15);
+  }
+  .ts-subj-left { display:flex; align-items:center; gap:12px; }
+  .ts-radio-ring {
+    width:18px; height:18px; border-radius:50%; border:1.5px solid #4A4A4E; display:flex; align-items:center; justify-content:center; transition:all 0.15s ease; flex-shrink:0;
+  }
+  .ts-subj-opt.selected .ts-radio-ring { border-color:#8b5cf6; background:#8b5cf6; }
+  .ts-radio-inner { width:6px; height:6px; border-radius:50%; background:#FFFFFF; display:none; }
+  .ts-subj-opt.selected .ts-radio-inner { display:block; }
+  .ts-subj-num { font-size:12px; font-weight:600; color:#5A5A5E; transition:color 0.15s ease; }
+  .ts-subj-opt.selected .ts-subj-num { color:#b79df5; }
+
+  .ts-topic-card { background:#141416; border:1px solid #232324; border-radius:20px; padding:24px; margin-bottom:28px; }
+  .ts-topic-input {
+    width:100%; background:#0D0D0E; border:1px solid #2A2A2E; border-radius:12px; padding:14px 16px;
+    color:#FFFFFF; font-size:15px; font-weight:500; outline:none; transition:border-color 0.15s ease;
+  }
+  .ts-topic-input:focus { border-color:#8b5cf6; }
+  .ts-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .ts-chip {
+    padding:6px 12px; background:#1C1C1E; border:1px solid #28282C; border-radius:99px; color:#C7C7CC;
+    font-size:12.5px; font-weight:500; cursor:pointer; transition:all 0.15s ease;
+  }
+  .ts-chip:hover { background:#28282C; border-color:#3A3A3E; color:#FFFFFF; }
+
+  .ts-material-card { background:#141416; border:1px solid #232324; border-radius:20px; padding:20px; margin-bottom:28px; }
+  .ts-dropzone {
+    border:1px dashed #3A3A3E; border-radius:16px; background:#0D0D0E; padding:32px 20px; text-align:center;
+    cursor:pointer; transition:all 0.15s ease; display:flex; flex-direction:column; align-items:center;
+  }
+  .ts-dropzone:hover { border-color:#8b5cf6; background:#12101B; }
+  .ts-dropzone-illustration { margin-bottom:14px; width:72px; height:56px; position:relative; }
+  .ts-dropzone-title { font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-size:22px; color:#E5E5E7; margin-bottom:4px; }
+  .ts-dropzone-subtitle { font-size:12.5px; color:#7A7A7E; margin-bottom:12px; }
+  .ts-dropzone-btn { font-size:13.5px; font-weight:600; color:#FFFFFF; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .ts-dropzone-btn:hover { color:#b79df5; }
+  
+  .ts-paste-trigger-btn {
+    width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 16px;
+    background:#1C1C1E; border:1px solid #262628; border-radius:12px; color:#E5E5E7; font-size:13.5px;
+    font-weight:600; margin-top:12px; cursor:pointer; transition:background 0.15s ease;
+  }
+  .ts-paste-trigger-btn:hover { background:#242428; border-color:#3A3A3E; }
+
+  /* ── Study Material Popup Modal (Screenshot 2!) ──────────────────── */
+  .ts-modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.82); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .ts-modal-box {
+    width:100%; max-width:480px; background:#0E0E0F; border:1px solid #232324; border-radius:24px;
+    padding:28px 24px; position:relative; box-shadow:0 16px 48px rgba(0,0,0,0.6);
+  }
+  .ts-modal-close {
+    position:absolute; top:16px; right:18px; width:30px; height:30px; border-radius:50%;
+    background:#1C1C1E; border:1px solid #28282C; color:#7A7A7E; font-size:18px; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s ease;
+  }
+  .ts-modal-close:hover { color:#FFFFFF; background:#28282C; }
+  .ts-modal-title { font-size:22px; font-weight:700; color:#FFFFFF; text-align:center; margin:0 0 6px; letter-spacing:-0.02em; }
+  .ts-modal-desc { font-size:13.5px; color:#7A7A7E; text-align:center; margin:0 0 20px; line-height:1.4; }
+  .ts-modal-continue-btn {
+    width:100%; margin-top:20px; padding:13px 20px; border-radius:99px; background:#2a2a2e; color:#7a7e85;
+    font-size:14px; font-weight:600; border:none; cursor:pointer; transition:all 0.15s ease; text-align:center;
+  }
+  .ts-modal-continue-btn.active {
+    background:#FFFFFF; color:#000000; cursor:pointer; box-shadow:0 4px 18px rgba(255,255,255,0.2);
+  }
+  .ts-modal-continue-btn.active:hover { background:#E5E5E7; }
+  .ts-student-card {
+    display:flex; align-items:flex-start; gap:14px; padding:16px; background:#141416; border:1px solid #232324;
+    border-radius:16px; cursor:pointer; text-align:left; transition:all 0.15s ease; position:relative; width:100%;
+  }
+  .ts-student-card:hover { border-color:#3A3A3E; background:#18181B; }
+  .ts-student-card.selected {
+    background:#17122A; border-color:#8b5cf6; box-shadow:0 0 0 1px #8b5cf6, 0 4px 18px rgba(139,92,246,0.15);
+  }
+  .ts-student-avatar {
+    width:42px; height:42px; border-radius:50%; background:#1C1C1E; border:1.5px solid #2A2A2E;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#FFFFFF;
+  }
+  .ts-student-card.selected .ts-student-avatar { border-color:#8b5cf6; }
+  .ts-student-info { flex:1; min-width:0; }
+  .ts-student-name-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .ts-student-name { font-size:15px; font-weight:700; color:#FFFFFF; }
+  .ts-student-badge {
+    font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    padding:2px 8px; border-radius:99px; background:#24242A; color:#9A9A9E;
+  }
+  .ts-student-card.selected .ts-student-badge { background:rgba(139,92,246,0.2); color:#b79df5; border:1px solid rgba(139,92,246,0.3); }
+  .ts-student-quote { font-size:13px; font-style:italic; color:#D0D0D5; margin-bottom:4px; }
+  .ts-student-desc { font-size:12px; color:#7A7A7E; line-height:1.4; }
+  .ts-student-check { position:absolute; top:16px; right:16px; color:#8b5cf6; font-size:16px; font-weight:800; display:none; }
+  .ts-student-card.selected .ts-student-check { display:block; }
+
+  .ts-nav-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; margin-top:20px; }
+  .ts-footer-status { font-size:13px; font-weight:600; color:#9A9A9E; }
+  .ts-next-btn {
+    padding:10px 24px; border:none; border-radius:99px; background:#FFFFFF; color:#000000;
+    font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s ease, opacity 0.15s ease;
+  }
+  .ts-next-btn:hover { opacity:0.92; transform:translateY(-1px); }
+  .ts-next-btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+  .ts-back-btn {
+    padding:10px 18px; border:1px solid #2A2A2E; border-radius:99px; background:transparent;
+    color:#C7C7CC; font-size:13.5px; font-weight:600; cursor:pointer; transition:all 0.15s ease;
+  }
+  .ts-back-btn:hover { background:#1C1C1E; color:#FFFFFF; }
+
   /* Generic */
   .ts-load { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:40vh; text-align:center; }
   .ts-load .bar { width:min(380px,70vw); height:6px; border-radius:99px; background:#1c1c20; overflow:hidden; margin-top:20px; }
@@ -292,72 +422,219 @@
 
 <main id="tsRoot">
 
-  <!-- ══ SETUP ══ -->
+  <!-- ══ SETUP (3-Checkpoint Onboarding Flow) ══ -->
   <section class="ts-view on" id="tsSetup">
-    <div class="ts-wrap">
-      <div class="ts-eyebrow">Teach Studio</div>
-      <h1 class="ts-h1">What will you teach today?</h1>
-      <p class="ts-sub">Upload your material, choose an AI student, and teach it out loud.</p>
+    <div class="ts-checkpoint-wrap">
+      <!-- 3-Segment Progress Bar -->
+      <div class="ts-progress-bar">
+        <div class="ts-progress-segment active" id="tsSeg1"></div>
+        <div class="ts-progress-segment" id="tsSeg2"></div>
+        <div class="ts-progress-segment" id="tsSeg3"></div>
+      </div>
 
-      <div class="ts-setup-grid">
-        <div>
-          <div class="ts-card">
-            <div class="ts-field">
-              <label class="ts-label" for="tsSubject">Subject</label>
-              <select class="ts-select" id="tsSubject"></select>
+      <!-- STEP 1: Subject Selection (Checkpoint 1 of 3) -->
+      <div class="ts-cp-step" id="tsCpStep1">
+        <div class="ts-checkpoint-meta">Checkpoint 1 of 3</div>
+        <h1 class="ts-checkpoint-title">What are you teaching today?</h1>
+        <p class="ts-checkpoint-desc">Pick the subject closest to what you teach.</p>
+
+        <div class="ts-subj-grid" id="tsSubjGrid">
+          <div class="ts-subj-opt" data-subject="Physics">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Physics</span>
             </div>
-            <div class="ts-field">
-              <label class="ts-label" for="tsTopic">What are you teaching?</label>
-              <input class="ts-input" id="tsTopic" type="text" maxlength="140"
-                placeholder="e.g. Why chlorophyll matters in photosynthesis" autocomplete="off">
-            </div>
+            <span class="ts-subj-num">1</span>
           </div>
-
-          <div class="ts-card">
-            <span class="ts-label">Teaching material</span>
-            <div class="ts-src-actions">
-              <button class="ts-src-btn" id="tsUploadBtn" type="button">
-                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                Upload file (.txt, .md)
-              </button>
-              <button class="ts-src-btn" id="tsPasteBtn" type="button">
-                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-                Paste text
-              </button>
+          <div class="ts-subj-opt" data-subject="Chemistry">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Chemistry</span>
             </div>
-            <input type="file" id="tsFileInput" accept=".txt,.md,.text,text/plain,text/markdown" hidden>
-            <div id="tsPasteWrap" hidden>
-              <textarea class="ts-textarea" id="tsPasteArea" placeholder="Paste your notes, a chapter, a summary — anything you want to teach from."></textarea>
-              <button class="ts-ghost" id="tsPasteSave" type="button" style="margin-top:10px;">Use this text</button>
+            <span class="ts-subj-num">2</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="Computer Science">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Computer Science</span>
             </div>
-            <div id="tsSrcList"></div>
-            <p class="ts-help">Your AI student will learn from what you explain. We'll use this material to check accuracy silently.</p>
-            <div class="ts-error-box" id="tsSrcError" hidden></div>
+            <span class="ts-subj-num">3</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="Biology">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Biology</span>
+            </div>
+            <span class="ts-subj-num">4</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="Geography">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Geography</span>
+            </div>
+            <span class="ts-subj-num">5</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="History">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>History</span>
+            </div>
+            <span class="ts-subj-num">6</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="Economics">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Economics</span>
+            </div>
+            <span class="ts-subj-num">7</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="Philosophy">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Philosophy</span>
+            </div>
+            <span class="ts-subj-num">8</span>
+          </div>
+          <div class="ts-subj-opt" data-subject="Psychology">
+            <div class="ts-subj-left">
+              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
+              <span>Psychology</span>
+            </div>
+            <span class="ts-subj-num">9</span>
           </div>
         </div>
 
-        <div>
-          <div class="ts-card">
-            <span class="ts-label">Choose your AI student</span>
-            <div class="ts-students" role="group" aria-label="AI Student Level" id="tsStudents"></div>
-            <p class="ts-help">The level changes what your AI student already understands and the questions it asks.</p>
+        <div class="ts-nav-footer">
+          <span class="ts-footer-status" id="tsSubjStatus">Select a subject</span>
+          <button class="ts-next-btn" id="tsNextStep1" type="button" disabled style="opacity:0.5; cursor:not-allowed;">Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Topic Name (Checkpoint 2 of 3) -->
+      <div class="ts-cp-step" id="tsCpStep2" style="display:none;">
+        <div class="ts-checkpoint-meta">Checkpoint 2 of 3</div>
+        <h1 class="ts-checkpoint-title">What are you teaching?</h1>
+        <p class="ts-checkpoint-desc">Give a brief name or topic for what you're teaching today.</p>
+
+        <div class="ts-topic-card">
+          <input class="ts-topic-input" id="tsTopic" type="text" maxlength="140"
+            placeholder="e.g. Newton's Laws of Motion, Photosynthesis, Supply & Demand..." autocomplete="off">
+          <div class="ts-chips" id="tsTopicChips">
+            <span class="ts-chip">Newton's Laws of Motion</span>
+            <span class="ts-chip">Photosynthesis</span>
+            <span class="ts-chip">Cell Structure & Function</span>
+            <span class="ts-chip">Supply & Demand</span>
+            <span class="ts-chip">French Revolution</span>
+          </div>
+        </div>
+
+        <div class="ts-nav-footer">
+          <button class="ts-back-btn" id="tsBackStep2" type="button">Back</button>
+          <button class="ts-next-btn" id="tsNextStep2" type="button">Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Choose AI Student (Checkpoint 3 of 3) -->
+      <div class="ts-cp-step" id="tsCpStep3" style="display:none;">
+        <div class="ts-checkpoint-meta">Checkpoint 3 of 3</div>
+        <h1 class="ts-checkpoint-title">Choose your AI student</h1>
+        <p class="ts-checkpoint-desc">Select the level of AI student you want to teach today.</p>
+
+        <div class="ts-student-list" id="tsStudentList">
+          <div class="ts-student-card" data-level="BEGINNER">
+            <div class="ts-student-avatar">S</div>
+            <div class="ts-student-info">
+              <div class="ts-student-name-row">
+                <span class="ts-student-name">Sam</span>
+                <span class="ts-student-badge">BEGINNER</span>
+              </div>
+              <div class="ts-student-quote">“Teach me from the foundations.”</div>
+              <div class="ts-student-desc">Best for checking whether you can explain clearly from first principles.</div>
+            </div>
+            <span class="ts-student-check">✓</span>
           </div>
 
-          <div class="ts-card">
-            <span class="ts-label">Session</span>
-            <div class="ts-sum-line"><b>Subject</b><span id="tsSumSubject">—</span></div>
-            <div class="ts-sum-line"><b>Topic</b><span id="tsSumTopic">—</span></div>
-            <div class="ts-sum-line"><b>Material</b><span id="tsSumSource">None yet</span></div>
-            <div class="ts-sum-line"><b>AI student</b><span id="tsSumStudent">—</span></div>
-            <div class="ts-sum-line"><b>Length</b><span>About 5–10 minutes</span></div>
-            <div class="ts-sum-line"><b>Voice</b><span>Microphone required</span></div>
-            <button class="ts-cta" id="tsContinueBtn" type="button" disabled>Continue</button>
-            <div class="ts-cta-why" id="tsCtaWhy"></div>
+          <div class="ts-student-card selected" data-level="INTERMEDIATE">
+            <div class="ts-student-avatar">R</div>
+            <div class="ts-student-info">
+              <div class="ts-student-name-row">
+                <span class="ts-student-name">Riley</span>
+                <span class="ts-student-badge">INTERMEDIATE</span>
+              </div>
+              <div class="ts-student-quote">“I know the basics—help me connect the ideas.”</div>
+              <div class="ts-student-desc">Best for checking connected understanding: mechanisms, comparisons, applications.</div>
+            </div>
+            <span class="ts-student-check">✓</span>
           </div>
+
+          <div class="ts-student-card" data-level="ADVANCED">
+            <div class="ts-student-avatar">M</div>
+            <div class="ts-student-info">
+              <div class="ts-student-name-row">
+                <span class="ts-student-name">Morgan</span>
+                <span class="ts-student-badge">ADVANCED</span>
+              </div>
+              <div class="ts-student-quote">“I understand the argument—convince me.”</div>
+              <div class="ts-student-desc">Best for testing whether your knowledge holds up under pressure.</div>
+            </div>
+            <span class="ts-student-check">✓</span>
+          </div>
+        </div>
+
+        <div class="ts-nav-footer">
+          <button class="ts-back-btn" id="tsBackStep3" type="button">Back</button>
+          <button class="ts-next-btn" id="tsNextStep3" type="button">Next</button>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- ══ STUDY MATERIAL POPUP MODAL (Screenshot 2!) ══ -->
+  <div id="tsMaterialModal" class="ts-modal-overlay" style="display:none;">
+    <div class="ts-modal-box">
+      <button class="ts-modal-close" id="tsCloseModal" type="button" aria-label="Close">&times;</button>
+      <h2 class="ts-modal-title">Add your study material</h2>
+      <p class="ts-modal-desc">Add content from your notes, textbooks, and past exams.</p>
+
+      <!-- Dropzone -->
+      <div class="ts-dropzone" id="tsDropzone">
+        <div class="ts-dropzone-illustration">
+          <svg width="72" height="56" viewBox="0 0 72 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="8" width="34" height="42" rx="4" fill="#6366F1" transform="rotate(-10 8 8)"/>
+            <rect x="30" y="8" width="34" height="42" rx="4" fill="#8B5CF6" transform="rotate(10 30 8)"/>
+            <rect x="19" y="6" width="34" height="44" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+            <rect x="25" y="16" width="14" height="12" rx="2" fill="#EF4444"/>
+            <text x="32" y="24" font-size="7" font-weight="bold" fill="#FFFFFF" text-anchor="middle">PDF</text>
+            <line x1="25" y1="33" x2="47" y2="33" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="25" y1="38" x2="41" y2="38" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ts-dropzone-title">Drop your files</div>
+        <div class="ts-dropzone-subtitle">PDF, PPTX, DOC, TXT, images</div>
+        <div class="ts-dropzone-btn" id="tsUploadBtn">Select from your device</div>
+        <input type="file" id="tsFileInput" accept=".txt,.md,.text,.pdf,.doc,.docx,text/plain,text/markdown" hidden>
+      </div>
+
+      <!-- Paste Option -->
+      <button class="ts-paste-trigger-btn" id="tsPasteBtn" type="button">
+        <span style="display:flex; align-items:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          Paste copied text
+        </span>
+        <span style="font-size:12px; color:#9A9A9E;">Paste &rsaquo;</span>
+      </button>
+
+      <div id="tsPasteWrap" hidden style="margin-top:12px;">
+        <textarea class="ts-textarea" id="tsPasteArea" placeholder="Paste your notes, a chapter, a summary — anything you want to teach from."></textarea>
+        <button class="ts-ghost" id="tsPasteSave" type="button" style="margin-top:8px;">Use this text</button>
+      </div>
+
+      <div id="tsSrcList" style="margin-top:14px;"></div>
+      <div class="ts-error-box" id="tsSrcError" hidden></div>
+
+      <button class="ts-modal-continue-btn" id="tsModalContinueBtn" type="button">Continue</button>
+    </div>
+  </div>
 
   <!-- ══ PROCESSING SOURCE ══ -->
   <section class="ts-view" id="tsProcessing">
@@ -718,6 +995,7 @@
     const txt = typeof lbl === 'function' ? lbl(name) : (lbl || '');
     $('tsStateLabel').textContent = txt;
     $('tsSrLive').textContent = txt;
+    if (next === 'readiness_choice') renderReadyContext();
     window.scrollTo(0, 0);
   }
 
@@ -727,94 +1005,223 @@
     clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), 2400);
   }
 
-  /* ── Setup ─────────────────────────────────────────────────────────── */
-  function subjects() {
-    try { const a = JSON.parse(localStorage.getItem('TEACHLOOP_SUBJECTS') || '[]'); return Array.isArray(a) ? a : []; }
-    catch (e) { return []; }
-  }
-  function renderSubjects() {
-    const sel = $('tsSubject');
-    const subs = subjects();
-    sel.innerHTML = '<option value="">General</option>' +
-      subs.map(n => '<option' + (n === S.subject ? ' selected' : '') + '>' + esc(n) + '</option>').join('');
-  }
-  function renderStudents() {
-    const wrap = $('tsStudents');
-    wrap.innerHTML = Object.entries(STUDENTS).map(([key, st]) =>
-      '<button type="button" class="ts-student" data-level="' + key + '" aria-pressed="' + (S.level === key) + '">' +
-        '<span class="ts-stu-pfp" aria-hidden="true"></span>' +
-        '<span style="min-width:0;">' +
-          '<span class="ts-stu-name">' + esc(st.name) + ' <span class="ts-stu-level">' + key + '</span></span>' +
-          '<div class="ts-stu-stance">“' + esc(st.stance) + '”</div>' +
-          '<div class="ts-stu-best">' + esc(st.best) + '</div>' +
-        '</span>' +
-        '<span class="ts-stu-check" aria-hidden="true">✓</span>' +
-      '</button>').join('');
-    wrap.querySelectorAll('.ts-student').forEach(b => b.addEventListener('click', () => {
-      S.level = b.dataset.level;
-      renderStudents(); refreshSummary(); saveDraft();
-      track('ai_student_level_selected', { level: S.level });
-    }));
-  }
-  function renderSource() {
-    const list = $('tsSrcList');
-    if (!S.sourceText) { list.innerHTML = ''; return; }
-    const words = S.sourceText.split(/\s+/).filter(Boolean).length;
-    const weak = words < 60;
-    list.innerHTML =
-      '<div class="ts-src-item">' +
-        '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>' +
-        '<div style="min-width:0;"><div class="ts-src-name">' + esc(S.sourceName || 'Pasted text') + '</div>' +
-        '<div class="ts-src-meta">' + words + ' words · text</div></div>' +
-        '<span class="ts-src-state ' + (weak ? 'warn' : 'ready') + '">' + (weak ? 'Very short' : 'Ready') + '</span>' +
-        '<button class="ts-src-remove" type="button" aria-label="Remove source" id="tsSrcRemove">×</button>' +
-      '</div>' +
-      (weak ? '<p class="ts-help" style="color:var(--ts-warn);">This material is very short — the session will only be lightly grounded. Add more if you can.</p>' : '');
-    const rm = $('tsSrcRemove');
-    if (rm) rm.addEventListener('click', () => {
-      S.sourceText = ''; S.sourceName = ''; S.sourceCard = null;
-      renderSource(); refreshSummary(); saveDraft();
+  /* ── Setup (3-Checkpoint Onboarding Logic) ────────────────────────── */
+  let currentStep = 1;
+  const SUPPORTED_SUBJECTS = [
+    'Physics', 'Chemistry', 'Computer Science', 'Biology',
+    'Geography', 'History', 'Economics', 'Philosophy', 'Psychology'
+  ];
+
+  S.subject = ''; // Do NOT pre-select Physics on landing
+  if (!S.level) S.level = 'INTERMEDIATE';
+
+  function updateCheckpoints(step) {
+    currentStep = step;
+    [1, 2, 3].forEach(i => {
+      const el = $('tsCpStep' + i);
+      if (el) el.style.display = i === step ? 'block' : 'none';
+      const seg = $('tsSeg' + i);
+      if (seg) {
+        seg.classList.toggle('active', i === step);
+        seg.classList.toggle('done', i < step);
+      }
     });
-  }
-  function refreshSummary() {
-    $('tsSumSubject').textContent = S.subject || 'General';
-    $('tsSumTopic').textContent = S.topic || '—';
-    $('tsSumSource').textContent = S.sourceText ? (S.sourceName || 'Pasted text') : 'None yet';
-    $('tsSumStudent').textContent = S.level ? STUDENTS[S.level].name + ' · ' + S.level : '—';
-    const missing = [];
-    if (!S.topic.trim()) missing.push('add a topic');
-    if (!S.sourceText) missing.push('add teaching material');
-    if (!S.level) missing.push('choose an AI student');
-    $('tsContinueBtn').disabled = missing.length > 0;
-    $('tsCtaWhy').textContent = missing.length ? 'To continue, ' + missing.join(', ') + '.' : '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  $('tsSubject').addEventListener('change', e => { S.subject = e.target.value; refreshSummary(); saveDraft(); });
-  $('tsTopic').addEventListener('input', e => { S.topic = e.target.value; refreshSummary(); saveDraft(); });
-  $('tsUploadBtn').addEventListener('click', () => $('tsFileInput').click());
-  $('tsFileInput').addEventListener('change', async e => {
+  function selectSubject(subj) {
+    if (!subj) return;
+    S.subject = subj;
+    const grid = $('tsSubjGrid');
+    if (grid) {
+      grid.querySelectorAll('.ts-subj-opt').forEach(o => {
+        o.classList.toggle('selected', o.dataset.subject === subj);
+      });
+    }
+    const statusEl = $('tsSubjStatus');
+    if (statusEl) statusEl.textContent = subj + ' selected';
+    const nextBtn = $('tsNextStep1');
+    if (nextBtn) {
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+      nextBtn.style.cursor = 'pointer';
+    }
+    saveDraft();
+  }
+
+  function renderSubjGrid() {
+    const grid = $('tsSubjGrid');
+    if (!grid) return;
+    grid.querySelectorAll('.ts-subj-opt').forEach(opt => {
+      const subj = opt.dataset.subject;
+      opt.classList.toggle('selected', S.subject === subj);
+    });
+    if ($('tsSubjStatus')) $('tsSubjStatus').textContent = S.subject ? S.subject + ' selected' : 'Select a subject';
+    const nextBtn = $('tsNextStep1');
+    if (nextBtn) {
+      nextBtn.disabled = !S.subject;
+      nextBtn.style.opacity = S.subject ? '1' : '0.5';
+      nextBtn.style.cursor = S.subject ? 'pointer' : 'not-allowed';
+    }
+  }
+
+  function renderStudentList() {
+    const wrap = $('tsStudentList');
+    if (!wrap) return;
+    wrap.querySelectorAll('.ts-student-card').forEach(card => {
+      const lvl = (card.dataset.level || '').toLowerCase();
+      card.classList.toggle('selected', (S.level || 'intermediate').toLowerCase() === lvl);
+    });
+  }
+
+  // Global document click delegation for 100% reliable subject & student selection
+  document.addEventListener('click', e => {
+    const subjOpt = e.target.closest('.ts-subj-opt');
+    if (subjOpt) {
+      const subj = subjOpt.dataset.subject;
+      selectSubject(subj);
+      return;
+    }
+    const stuCard = e.target.closest('.ts-student-card');
+    if (stuCard) {
+      const lvl = (stuCard.dataset.level || '').toLowerCase();
+      if (lvl) {
+        S.level = lvl;
+        document.querySelectorAll('#tsStudentList .ts-student-card').forEach(c => {
+          c.classList.toggle('selected', (c.dataset.level || '').toLowerCase() === lvl);
+        });
+        saveDraft();
+        track('ai_student_level_selected', { level: S.level });
+      }
+    }
+  });
+
+  function renderSubjects() { renderSubjGrid(); }
+  function renderStudents() { renderStudentList(); }
+
+  function renderSource() { saveDraft(); }
+  function refreshSummary() { saveDraft(); }
+
+  document.addEventListener('keydown', e => {
+    if (state === 'setup' && currentStep === 1) {
+      const num = parseInt(e.key, 10);
+      if (!isNaN(num) && num >= 1 && num <= SUPPORTED_SUBJECTS.length) {
+        const chosen = SUPPORTED_SUBJECTS[num - 1];
+        S.subject = chosen;
+        const grid = $('tsSubjGrid');
+        if (grid) {
+          grid.querySelectorAll('.ts-subj-opt').forEach(o => {
+            o.classList.toggle('selected', o.dataset.subject === chosen);
+          });
+        }
+        if ($('tsSubjStatus')) $('tsSubjStatus').textContent = S.subject + ' selected';
+        const nextBtn = $('tsNextStep1');
+        if (nextBtn) { nextBtn.disabled = false; nextBtn.style.opacity = '1'; nextBtn.style.cursor = 'pointer'; }
+        saveDraft();
+      }
+    }
+  });
+
+  function openMaterialModal() {
+    const modal = $('tsMaterialModal');
+    if (modal) modal.style.display = 'flex';
+  }
+  function closeMaterialModal() {
+    const modal = $('tsMaterialModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  $('tsCloseModal')?.addEventListener('click', closeMaterialModal);
+  $('tsModalContinueBtn')?.addEventListener('click', () => {
+    closeMaterialModal();
+    updateCheckpoints(3);
+  });
+
+  $('tsNextStep1')?.addEventListener('click', () => updateCheckpoints(2));
+  $('tsBackStep2')?.addEventListener('click', () => updateCheckpoints(1));
+  $('tsNextStep2')?.addEventListener('click', () => {
+    if (!S.topic.trim()) { toast('Please enter what you are teaching today.'); return; }
+    openMaterialModal();
+  });
+  $('tsBackStep3')?.addEventListener('click', () => updateCheckpoints(2));
+  $('tsNextStep3')?.addEventListener('click', () => {
+    if (!S.topic.trim()) { toast('Please add a topic in Step 2.'); updateCheckpoints(2); return; }
+    if (!S.level) S.level = 'intermediate';
+    if (!S.sourceText) {
+      S.sourceText = 'Teaching topic: ' + S.topic + ' in subject: ' + (S.subject || 'Physics') + '.';
+      S.sourceName = 'Topic Overview';
+    }
+    saveDraft();
+    setState('readiness_choice');
+  });
+
+  document.querySelectorAll('#tsTopicChips .ts-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const input = $('tsTopic');
+      if (input) input.value = chip.textContent;
+      S.topic = chip.textContent;
+      saveDraft();
+    });
+  });
+
+  $('tsTopic')?.addEventListener('input', e => { S.topic = e.target.value; saveDraft(); });
+  $('tsUploadBtn')?.addEventListener('click', e => { e.stopPropagation(); $('tsFileInput')?.click(); });
+  $('tsFileInput')?.addEventListener('change', async e => {
     const f = e.target.files && e.target.files[0];
     e.target.value = '';
     if (!f) return;
-    const err = $('tsSrcError'); err.hidden = true;
-    if (!/\.(txt|md|text)$/i.test(f.name) && !/^text\//.test(f.type)) {
-      err.textContent = 'That format isn’t supported yet. Upload a .txt or .md file, or paste your notes as text.';
-      err.hidden = false; return;
+    const err = $('tsSrcError'); if (err) err.hidden = true;
+    if (f.size > 2 * 1024 * 1024) { if (err) { err.textContent = 'File is over 2 MB. Paste text instead.'; err.hidden = false; } return; }
+    try {
+      S.sourceText = (await f.text()).trim();
+      S.sourceName = f.name; S.sourceCard = null;
+      renderSource(); saveDraft();
+      track('teach_source_added', { kind: 'file' });
+      toast('File uploaded successfully!');
+    } catch (ex) {
+      if (err) { err.textContent = 'Could not read file text.'; err.hidden = false; }
     }
-    if (f.size > 1024 * 1024) { err.textContent = 'That file is over 1 MB. Paste the most relevant part instead.'; err.hidden = false; return; }
-    S.sourceText = (await f.text()).trim();
-    S.sourceName = f.name; S.sourceCard = null;
-    renderSource(); refreshSummary(); saveDraft();
-    track('teach_source_added', { kind: 'file' });
   });
-  $('tsPasteBtn').addEventListener('click', () => { $('tsPasteWrap').hidden = !$('tsPasteWrap').hidden; });
-  $('tsPasteSave').addEventListener('click', () => {
-    const txt = $('tsPasteArea').value.trim();
+
+  const dropzone = $('tsDropzone');
+  if (dropzone) {
+    dropzone.addEventListener('click', e => {
+      if (e.target.id !== 'tsUploadBtn') $('tsFileInput')?.click();
+    });
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#8b5cf6'; });
+    dropzone.addEventListener('dragleave', e => { e.preventDefault(); dropzone.style.borderColor = '#3A3A3E'; });
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#3A3A3E';
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const file = e.dataTransfer.files[0];
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        const fi = $('tsFileInput');
+        if (fi) {
+          fi.files = dt.files;
+          fi.dispatchEvent(new Event('change'));
+        }
+      }
+    });
+  }
+
+  $('tsPasteBtn')?.addEventListener('click', () => { const pw = $('tsPasteWrap'); if (pw) pw.hidden = !pw.hidden; });
+  $('tsPasteSave')?.addEventListener('click', () => {
+    const txt = ($('tsPasteArea')?.value || '').trim();
     if (!txt) { toast('Paste some text first.'); return; }
     S.sourceText = txt; S.sourceName = 'Pasted text'; S.sourceCard = null;
-    $('tsPasteWrap').hidden = true;
-    renderSource(); refreshSummary(); saveDraft();
+    const pw = $('tsPasteWrap'); if (pw) pw.hidden = true;
+    renderSource(); saveDraft();
     track('teach_source_added', { kind: 'paste' });
+    toast('Text added!');
+  });
+
+  $('tsStartSessionBtn')?.addEventListener('click', () => {
+    if (!S.topic.trim()) { toast('Please add a topic in Step 2.'); updateCheckpoints(2); return; }
+    if (!S.level) S.level = 'INTERMEDIATE';
+    saveDraft();
+    startSessionFlow();
   });
 
   /* ── Source Card ───────────────────────────────────────────────────── */
@@ -848,11 +1255,15 @@
 
   /* ── Readiness ─────────────────────────────────────────────────────── */
   function renderReadyContext() {
-    $('tsReadyContext').innerHTML =
-      '<span class="ts-chip"><b>Subject</b><span>' + esc(S.subject || 'General') + '</span></span>' +
-      '<span class="ts-chip"><b>Topic</b><span>' + esc(S.topic) + '</span></span>' +
-      '<span class="ts-chip"><b>AI student</b><span>' + esc(STUDENTS[S.level].name + ' · ' + S.level) + '</span></span>' +
-      '<span class="ts-chip"><b>Material</b><span>1 source ready</span></span>';
+    const key = (S.level || 'intermediate').toLowerCase();
+    const st = STUDENTS[key] || STUDENTS['intermediate'];
+    const rc = $('tsReadyContext');
+    if (rc) {
+      rc.innerHTML =
+        '<span class="ts-chip"><b>Subject</b><span>' + esc(S.subject || 'Physics') + '</span></span>' +
+        '<span class="ts-chip"><b>Topic</b><span>' + esc(S.topic || 'General') + '</span></span>' +
+        '<span class="ts-chip"><b>AI student</b><span>' + esc(st.name + ' · ' + key.toUpperCase()) + '</span></span>';
+    }
   }
   $('tsEditSetupBtn').addEventListener('click', () => setState('setup'));
   $('tsTeachNowBtn').addEventListener('click', () => {
@@ -1563,13 +1974,14 @@
   (function boot() {
     try {
       const d = JSON.parse(localStorage.getItem(NS + 'DRAFT') || 'null');
-      if (d) { S.subject = d.subject || ''; S.topic = d.topic || ''; S.level = d.level || null; S.sourceName = d.sourceName || ''; S.sourceText = d.sourceText || ''; }
+      if (d) { S.topic = d.topic || ''; S.level = d.level || null; S.sourceName = d.sourceName || ''; S.sourceText = d.sourceText || ''; }
     } catch (e) {}
+    S.subject = ''; // Always start with no subject selected
     const params = new URLSearchParams(location.search);
     if (params.get('topic')) S.topic = params.get('topic');
     if (params.get('subject')) S.subject = params.get('subject');
     renderSubjects(); renderStudents(); renderSource();
-    $('tsTopic').value = S.topic;
+    if ($('tsTopic')) $('tsTopic').value = S.topic;
     refreshSummary();
     track('teach_studio_viewed', {});
     // Show any due spoken-recall sessions (no fake notifications — just a banner).
@@ -1584,7 +1996,8 @@
         bar.innerHTML = '<div style="flex:1;min-width:200px;"><b>Spoken recall due</b><div class="ts-help" style="margin-top:3px;">Teach “' + esc(r0.topic) + '” again from memory to prove it stuck.</div></div>' +
           '<button class="ts-cta" id="tsRecallGo" type="button" style="width:auto;margin:0;padding:11px 20px;">Start recall</button>' +
           '<button class="ts-quiet" id="tsRecallDismiss" type="button">Dismiss</button>';
-        $('tsSetup').querySelector('.ts-setup-grid').before(bar);
+        const target = $('tsSetup').querySelector('.ts-checkpoint-wrap') || $('tsSetup');
+        if (target) target.prepend(bar);
         $('tsRecallGo').addEventListener('click', () => {
           const done = JSON.parse(localStorage.getItem(NS + 'SESSIONS') || '[]').find(x => x.id === r0.sessionId);
           localStorage.setItem(NS + 'RECALL', JSON.stringify(rec.slice(1)));
@@ -1612,7 +2025,8 @@
         bar.innerHTML = '<div style="flex:1;min-width:200px;"><b>Resume your session?</b><div class="ts-help" style="margin-top:3px;">You were teaching “' + esc(live.topic) + '” and got interrupted.</div></div>' +
           '<button class="ts-cta" id="tsResumeBtn" type="button" style="width:auto;margin:0;padding:11px 20px;">Resume</button>' +
           '<button class="ts-quiet" id="tsDiscardBtn" type="button">Discard</button>';
-        $('tsSetup').querySelector('.ts-wrap').prepend(bar);
+        const target = $('tsSetup').querySelector('.ts-checkpoint-wrap') || $('tsSetup');
+        if (target) target.prepend(bar);
         $('tsResumeBtn').addEventListener('click', () => { S = live; bar.remove(); setState('mic_preflight'); });
         $('tsDiscardBtn').addEventListener('click', () => { clearLive(); bar.remove(); });
       }
