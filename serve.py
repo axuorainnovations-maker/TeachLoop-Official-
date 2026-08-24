@@ -685,6 +685,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == '/api/me':
             uid = self._identify()
             w = LEDGER.wallet(uid)
+            unlimited = noura_meter.is_unlimited(LEDGER.user(uid))
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -692,12 +693,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({
                 "user_id": uid,
-                "balance": w['balance'],
+                # Unlimited accounts report a null balance rather than a
+                # negative one; the UI renders that as an infinity symbol.
+                "unlimited": unlimited,
+                "balance": None if unlimited else w['balance'],
                 "granted": w['granted'],
                 "spent": w['spent'],
                 "cost_per_action": noura_meter.CREDIT_COST,
-                "actions_left": w['balance'] // noura_meter.CREDIT_COST
-                                if noura_meter.CREDIT_COST else 0,
+                "actions_left": None if unlimited else (
+                    w['balance'] // noura_meter.CREDIT_COST
+                    if noura_meter.CREDIT_COST else 0),
                 # Credits never expire, so there is no reset date.
                 "expires": None,
             }).encode('utf-8'))

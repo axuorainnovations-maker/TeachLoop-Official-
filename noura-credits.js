@@ -103,14 +103,22 @@
       'background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%)}' +
       '.noura-credit-pill.low{border-color:rgba(227,160,8,.55)}' +
       '.noura-credit-pill.out{border-color:rgba(239,68,68,.55);color:#ff9f9a}' +
-      '.noura-credit-pill .n{font-variant-numeric:tabular-nums}';
+      '.noura-credit-pill .n{font-variant-numeric:tabular-nums}' +
+      '.noura-credit-pill.unlimited{border-color:rgba(139,92,246,.55)}' +
+      '.noura-credit-pill.unlimited .n{font-size:17px;line-height:1}';
     document.head.appendChild(s);
   }
 
   function paint(el, d) {
     if (!el || !d) return;
-    var bal = d.balance || 0;
     var per = d.cost_per_action || 50;
+    if (d.unlimited) {
+      el.className = 'noura-credit-pill unlimited';
+      el.querySelector('.n').textContent = '\u221E';   // infinity
+      el.title = 'Unlimited credits on this account';
+      return;
+    }
+    var bal = d.balance || 0;
     el.className = 'noura-credit-pill' + (bal < per ? ' out' : bal < per * 3 ? ' low' : '');
     el.querySelector('.n').textContent = bal.toLocaleString();
     el.title = bal < per

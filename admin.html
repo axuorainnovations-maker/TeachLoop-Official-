@@ -229,9 +229,10 @@
       (rows.length ? rows.map(u => {
         const left = Math.floor(u.balance / perAction);
         return '<tr class="' + (u.low ? 'flag' : '') + '">' +
-          '<td>' + esc(u.email || u.id) + (u.email ? '' : ' <span class="muted">(anon)</span>') + '</td>' +
-          '<td><b>' + u.balance + '</b></td>' +
-          '<td>' + (left > 0 ? left : '<span class="muted">out</span>') + '</td>' +
+          '<td>' + esc(u.email || u.id) + (u.email ? '' : ' <span class="muted">(anon)</span>') +
+            (u.unlimited ? ' <span class="pill unlimited">unlimited</span>' : '') + '</td>' +
+          '<td><b>' + (u.unlimited ? '\u221E' : u.balance) + '</b></td>' +
+          '<td>' + (u.unlimited ? '\u221E' : (left > 0 ? left : '<span class="muted">out</span>')) + '</td>' +
           '<td class="muted">' + u.granted + '</td>' +
           '<td class="muted">' + u.spent + '</td>' +
           '<td>' + usd(u.usd) + '</td>' +
