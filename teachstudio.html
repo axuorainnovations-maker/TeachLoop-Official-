@@ -262,8 +262,7 @@
   .ts-checkpoint-title { font-size:clamp(24px, 3.5vw, 32px); font-weight:700; color:#FFFFFF; text-align:center; margin:0 0 8px; letter-spacing:-0.02em; }
   .ts-checkpoint-desc { font-size:14.5px; color:#9A9A9E; text-align:center; margin:0 0 32px; line-height:1.5; }
 
-  .ts-subj-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; margin-bottom:32px; }
-  @media (max-width: 580px) { .ts-subj-grid { grid-template-columns:1fr; } }
+  .ts-subj-grid { display:flex; flex-direction:column; gap:12px; width:100%; max-width:460px; margin:0 auto 32px; }
   
   .ts-subj-opt {
     display:flex; align-items:center; justify-content:space-between; padding:13px 16px;
@@ -370,11 +369,13 @@
   .ts-nav-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; margin-top:20px; }
   .ts-footer-status { font-size:13px; font-weight:600; color:#9A9A9E; }
   .ts-next-btn {
-    padding:10px 24px; border:none; border-radius:99px; background:#FFFFFF; color:#000000;
-    font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s ease, opacity 0.15s ease;
+    padding:10px 26px; border:none; border-radius:99px; background:#8b5cf6; color:#FFFFFF;
+    font-size:14px; font-weight:700; cursor:pointer;
+    box-shadow:0 0 0 1px #8b5cf6, 0 4px 16px rgba(139,92,246,0.35);
+    transition:transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
   }
-  .ts-next-btn:hover { opacity:0.92; transform:translateY(-1px); }
-  .ts-next-btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+  .ts-next-btn:hover { background:#7c3aed; transform:translateY(-1px); box-shadow:0 0 0 1px #8b5cf6, 0 6px 20px rgba(139,92,246,0.45); }
+  .ts-next-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; background:#3a3350; }
   .ts-back-btn {
     padding:10px 18px; border:1px solid #2A2A2E; border-radius:99px; background:transparent;
     color:#C7C7CC; font-size:13.5px; font-weight:600; cursor:pointer; transition:all 0.15s ease;
@@ -440,74 +441,38 @@
         <p class="ts-checkpoint-desc">Pick the subject closest to what you teach.</p>
 
         <div class="ts-subj-grid" id="tsSubjGrid">
-          <div class="ts-subj-opt" data-subject="Physics">
+          <div class="ts-subj-opt" data-subject="Math">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Physics</span>
+              <span>Math</span>
             </div>
             <span class="ts-subj-num">1</span>
           </div>
-          <div class="ts-subj-opt" data-subject="Chemistry">
+          <div class="ts-subj-opt" data-subject="Science">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Chemistry</span>
+              <span>Science</span>
             </div>
             <span class="ts-subj-num">2</span>
           </div>
-          <div class="ts-subj-opt" data-subject="Computer Science">
+          <div class="ts-subj-opt" data-subject="English">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Computer Science</span>
+              <span>English</span>
             </div>
             <span class="ts-subj-num">3</span>
           </div>
-          <div class="ts-subj-opt" data-subject="Biology">
+          <div class="ts-subj-opt" data-subject="Other">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Biology</span>
+              <span>Other</span>
             </div>
             <span class="ts-subj-num">4</span>
           </div>
-          <div class="ts-subj-opt" data-subject="Geography">
-            <div class="ts-subj-left">
-              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Geography</span>
-            </div>
-            <span class="ts-subj-num">5</span>
-          </div>
-          <div class="ts-subj-opt" data-subject="History">
-            <div class="ts-subj-left">
-              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>History</span>
-            </div>
-            <span class="ts-subj-num">6</span>
-          </div>
-          <div class="ts-subj-opt" data-subject="Economics">
-            <div class="ts-subj-left">
-              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Economics</span>
-            </div>
-            <span class="ts-subj-num">7</span>
-          </div>
-          <div class="ts-subj-opt" data-subject="Philosophy">
-            <div class="ts-subj-left">
-              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Philosophy</span>
-            </div>
-            <span class="ts-subj-num">8</span>
-          </div>
-          <div class="ts-subj-opt" data-subject="Psychology">
-            <div class="ts-subj-left">
-              <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
-              <span>Psychology</span>
-            </div>
-            <span class="ts-subj-num">9</span>
-          </div>
-        </div>
+        
 
-        <div class="ts-nav-footer">
-          <span class="ts-footer-status" id="tsSubjStatus">Select a subject</span>
-          <button class="ts-next-btn" id="tsNextStep1" type="button" disabled style="opacity:0.5; cursor:not-allowed;">Next</button>
+        <div class="ts-nav-footer" style="justify-content:flex-end;">
+          <button class="ts-next-btn" id="tsNextStep1" type="button" disabled>Next</button>
         </div>
       </div>
 
