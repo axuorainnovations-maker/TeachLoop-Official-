@@ -87,8 +87,118 @@
     });
   };
 
-  // Small helper for surfaces that want to show a live balance.
+  // ── credit pill ───────────────────────────────────────────────────────
+  function pillCSS() {
+    if (document.getElementById('nouraPillCSS')) return;
+    var s = document.createElement('style');
+    s.id = 'nouraPillCSS';
+    s.textContent =
+      '.noura-credit-pill{display:inline-flex;align-items:center;gap:7px;height:38px;' +
+      'padding:0 13px;border-radius:999px;background:#17171a;border:1px solid #2a2a2e;' +
+      "color:#e4e4e5;font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;" +
+      'font-size:13.5px;font-weight:700;cursor:default;user-select:none;line-height:1;' +
+      'transition:border-color .15s}' +
+      '.noura-credit-pill:hover{border-color:#3a3a40}' +
+      '.noura-credit-pill .dot{width:15px;height:15px;border-radius:50%;flex-shrink:0;' +
+      'background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%)}' +
+      '.noura-credit-pill.low{border-color:rgba(227,160,8,.55)}' +
+      '.noura-credit-pill.out{border-color:rgba(239,68,68,.55);color:#ff9f9a}' +
+      '.noura-credit-pill .n{font-variant-numeric:tabular-nums}';
+    document.head.appendChild(s);
+  }
+
+  function paint(el, d) {
+    if (!el || !d) return;
+    var bal = d.balance || 0;
+    var per = d.cost_per_action || 50;
+    el.className = 'noura-credit-pill' + (bal < per ? ' out' : bal < per * 3 ? ' low' : '');
+    el.querySelector('.n').textContent = bal.toLocaleString();
+    el.title = bal < per
+      ? 'Out of credits. Top up to keep studying.'
+      : Math.floor(bal / per) + ' study actions left (' + per + ' credits each)';
+  }
+
+  /**
+   * Mount the balance pill. `where` is a selector; the pill is inserted BEFORE
+   * that element so it sits to its left. Falls back to fixed top-right.
+   */
+  function mountPill(where) {
+    pillCSS();
+    if (document.getElementById('nouraCreditPill')) return;
+    var el = document.createElement('div');
+    el.id = 'nouraCreditPill';
+    el.className = 'noura-credit-pill';
+    el.innerHTML = '<span class="dot"></span><span class="n">--</span>' +
+                   '<span style="color:#8a8a93;font-weight:600">credits</span>';
+    var anchor = where && document.querySelector(where);
+    if (anchor && anchor.parentNode) {
+      anchor.parentNode.insertBefore(el, anchor);   // to the left of the anchor
+    } else {
+      el.style.cssText = 'position:fixed;top:18px;right:22px;z-index:50';
+      document.body.appendChild(el);
+    }
+    refresh();
+  }
+
+  function refresh() {
+    var el = document.getElementById('nouraCreditPill');
+    if (!el) return Promise.resolve(null);
+    return nativeFetch('/api/me').then(function (r) { return r.json(); })
+      .then(function (d) { paint(el, d); return d; })
+      .catch(function () { return null; });
+  }
+
+  // Spending changes the balance, so repaint after any /api call settles.
+  window.addEventListener('noura:credits-exhausted', refresh);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) refresh();
+  });
+  setInterval(refresh, 30000);
+
+  // ── welcome notification ──────────────────────────────────────────────
+  function welcomeToast(d) {
+    pillCSS();
+    var w = document.createElement('div');
+    w.id = 'nouraWelcome';
+    w.style.cssText =
+      'position:fixed;top:22px;right:22px;z-index:100000;max-width:min(360px,92vw);' +
+      'background:#141416;border:1px solid rgba(139,92,246,.5);border-radius:16px;' +
+      'padding:16px 18px;box-shadow:0 16px 48px rgba(0,0,0,.55);' +
+      "font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;color:#E8E8E6;" +
+      'opacity:0;transform:translateY(-8px);transition:opacity .25s,transform .25s';
+    w.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px">' +
+        '<span style="width:26px;height:26px;border-radius:50%;flex-shrink:0;' +
+        'background:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%)"></span>' +
+        '<div style="font-size:15px;font-weight:800;letter-spacing:-.01em">' +
+          d.credits.toLocaleString() + ' credits added</div></div>' +
+      '<div style="font-size:12.5px;color:#9a9aa2;margin-top:8px;line-height:1.55">' +
+        'Welcome to Noura. That is ' + (d.actions_left || 10) + ' study actions to get started. ' +
+        'Credits never expire, and each action costs ' + (d.cost_per_action || 50) + '.</div>';
+    document.body.appendChild(w);
+    requestAnimationFrame(function () { w.style.opacity = '1'; w.style.transform = 'none'; });
+    setTimeout(function () {
+      w.style.opacity = '0'; w.style.transform = 'translateY(-8px)';
+      setTimeout(function () { if (w.parentNode) w.remove(); }, 300);
+    }, 7000);
+  }
+
+  /** Called when onboarding finishes. Shows the toast only the first time. */
+  function claimWelcome() {
+    return nativeFetch('/api/welcome', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.first_time) welcomeToast(d);
+        refresh();
+        return d;
+      })
+      .catch(function () { return null; });
+  }
+
   window.NouraCredits = {
+    mountPill: mountPill,
+    refresh: refresh,
+    claimWelcome: claimWelcome,
     async status() {
       try { return await (await nativeFetch('/api/me')).json(); }
       catch (e) { return null; }

@@ -1225,6 +1225,7 @@
   </style>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="noura-credits.js"></script>
 </head>
 
 <body>
@@ -1740,6 +1741,7 @@
 
         const goDashboard = () => {
           try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+            try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
           document.body.style.transition = 'opacity .3s ease'; document.body.style.opacity = '0';
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
         };
@@ -1786,6 +1788,7 @@
             if (data && data.session) {
               // Email confirmations are OFF → signed in immediately.
               try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+            try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
               goDashboard();
             } else {
               // Confirmations ON → they must click the link in their inbox.
@@ -1808,6 +1811,7 @@
             // new account once Google redirects back.
             try { localStorage.setItem('NOURA_PENDING_PROFILE', JSON.stringify(profilePayload(null))); } catch (e) { }
             try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+            try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
             const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'dashboard.html');
             try {
               const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
@@ -1843,6 +1847,7 @@
       };
       try { localStorage.setItem('NOURA_PENDING_PROFILE', JSON.stringify(payload)); } catch (e) { }
       try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
+            try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
       if (payload.name) { try { localStorage.setItem('TEACHLOOP_NAME', payload.name); } catch (e) { } }
       // Add the chosen subject to the sidebar's subject + recents lists.
       const subj = (store.subject || '').trim();

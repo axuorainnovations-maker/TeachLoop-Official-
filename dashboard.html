@@ -53,6 +53,8 @@
 
     /* Learning-streak badge — top-right, mirrors the one in the chat header. */
     .streak-wrap { position: fixed; top: 18px; right: 22px; z-index: 50; }
+    /* Credit pill sits immediately left of the streak badge. */
+    #nouraCreditPill { position: fixed; top: 18px; right: 84px; z-index: 50; }
     .streak-badge {
       display: flex; align-items: center; gap: 6px;
       padding: 7px 14px 7px 11px; border-radius: 999px;
@@ -212,6 +214,7 @@
   </style>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="noura-credits.js"></script>
 </head>
 
 <body>
@@ -613,6 +616,16 @@
           '<div class="bar" style="height:' + pct + '%; animation-delay:' + (i * 70) + 'ms"></div>' +
           '<div class="bar-day">' + x.letter + '</div></div>';
       }).join('');
+    })();
+  </script>
+  <script>
+    // Credit balance sits to the left of the streak badge, top right.
+    (function () {
+      function go() {
+        if (window.NouraCredits) window.NouraCredits.mountPill('.streak-wrap');
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+      else go();
     })();
   </script>
 </body>

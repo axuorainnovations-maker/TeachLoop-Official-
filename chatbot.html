@@ -8002,5 +8002,16 @@ body.light-mode .aset-member .nm { color:#16151c; }
     setInterval(() => { setupContainers(); attachMicButtons(); }, 500);
   })();
 </script>
+  <script>
+    // .topbar-actions is a flex row; inserting before .streak-wrap puts the
+    // credit pill to the left of the streak badge.
+    (function () {
+      function go() {
+        if (window.NouraCredits) window.NouraCredits.mountPill('.topbar-actions .streak-wrap');
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+      else go();
+    })();
+  </script>
 </body>
 </html>

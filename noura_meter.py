@@ -296,6 +296,18 @@ class Ledger:
                          credits=credits, reason=reason, granted_by=by, note=note)
         return {'granted': credits, 'balance': self.balance(user_id), 'event': ev['id']}
 
+    def claim_welcome(self, user_id):
+        """Ensure the signup grant exists and report whether this is the first
+        time it has been surfaced. Returns True once per user, never again."""
+        self.ensure_user(user_id)      # issues the grant if it is missing
+        with self._lock:
+            u = self._users.get(user_id) or {}
+            if u.get('welcome_ack'):
+                return False
+            u['welcome_ack'] = True
+            self._save_users()
+            return True
+
     def balance(self, user_id):
         """Granted minus spent, over all time. Credits never expire."""
         granted = spent = 0

@@ -355,6 +355,32 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     self._json(500, {"error": {"message": f"Anthropic API Error: {e}"}})
             else:
                 self._json(500, {"error": {"message": "No valid API key available. Missing ANTHROPIC_API_KEY"}})
+        elif self.path == '/api/welcome':
+            # Called when onboarding completes. Idempotent: the signup grant is
+            # issued once per user id, and first_time is true only the first
+            # time it is claimed, so the notification cannot be farmed.
+            length = int(self.headers.get('Content-Length', 0))
+            raw = self.rfile.read(length)
+            try:
+                d = json.loads(raw or b'{}')
+            except Exception:
+                d = {}
+            uid = self._identify(d)
+            first = LEDGER.claim_welcome(uid)
+            w = LEDGER.wallet(uid)
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self._set_uid_cookie()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "first_time": first,
+                "credits": noura_meter.SIGNUP_GRANT,
+                "balance": w['balance'],
+                "actions_left": w['balance'] // noura_meter.CREDIT_COST
+                                if noura_meter.CREDIT_COST else 0,
+                "cost_per_action": noura_meter.CREDIT_COST,
+            }).encode('utf-8'))
         elif self.path == '/api/admin/grant':
             length = int(self.headers.get('Content-Length', 0))
             raw = self.rfile.read(length)
