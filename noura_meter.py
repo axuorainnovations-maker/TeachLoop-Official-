@@ -40,32 +40,39 @@ TTS_USD_PER_1K_CHARS = 0.015
 STT_USD_PER_MINUTE = 0.006
 
 # ── Credit model ─────────────────────────────────────────────────────────
-# One learning token = one completed AI action, weighted by how expensive the
-# surface actually is. A voice teaching turn costs far more than a recall card.
-CREDIT_WEIGHTS = {
-    'study_assistant':       1,
-    'lesson_brief':          2,
-    'lesson_learn':          3,
-    'lesson_check':          2,
-    'lesson_recall':         1,
-    'lesson_cast':           4,
-    'quick_review':          2,
-    'source_card':           1,
-    'teach_studio_student':  2,
-    'teach_studio_verifier': 1,
-    'teach_studio_report':   3,
-    'tts':                   1,
-    'stt':                   1,
-    'image':                 2,
-    'unknown':               1,
+# A wallet, not an allowance. Credits are GRANTED (signup gift, purchase,
+# promo, manual award), they accumulate, and they are spent down.
+# They never expire and they never reset.
+#
+#     balance = sum(grants) - sum(spends)
+#
+# Every user-initiated action costs a flat CREDIT_COST. Internal sub-calls
+# that serve the same action are free, so one "generate a study plan" is one
+# charge even though it fires several API calls underneath.
+CREDIT_COST = 50          # per billable action
+SIGNUP_GRANT = 500        # 10 actions to try the product before buying
+
+# Surfaces that are internal machinery, not something the user asked for.
+# Anything NOT listed here is billable. That is deliberate: a surface someone
+# forgets to label gets charged and shows up in the dashboard, rather than
+# silently becoming a free hole in the wallet.
+FREE_SURFACES = {
+    'source_card',            # prep step inside a Teach Studio session
+    'teach_studio_verifier',  # hidden fact check inside a turn
+    'teach_studio_student',   # individual turn; the session is charged once
+    'teach_studio_report',    # end-of-session summary
+    'stt',                    # speech in, part of the parent action
+    'tts',                    # speech out, part of the parent action
 }
-TIER_ALLOWANCE = {
-    'starter':   500,
-    'scholar':   1500,
-    'unlimited': None,          # no hard cap, still metered
-    'beta':      1500,          # closed-beta default
-}
-FAIR_USE_FLAG = 6000            # unlimited users above this get an admin flag
+
+# Reasons a grant can appear in the ledger. Kept as a set so the admin
+# endpoint cannot invent categories that break later reporting.
+GRANT_REASONS = {'signup', 'purchase', 'promo', 'referral', 'admin', 'refund'}
+
+
+def credit_cost(surface):
+    """Flat cost per user-initiated action; internal sub-calls are free."""
+    return 0 if surface in FREE_SURFACES else CREDIT_COST
 
 
 def _now_iso():
@@ -135,21 +142,37 @@ class Ledger:
     def ensure_user(self, user_id, email=None, tier=None):
         with self._lock:
             u = self._users.get(user_id)
+            new_user = False
             if not u:
-                u = {'id': user_id, 'email': None, 'tier': 'beta',
-                     'created': _now_iso(), 'last_seen': _now_iso()}
+                u = {'id': user_id, 'email': None, 'tier': 'free',
+                     'created': _now_iso(), 'last_seen': _now_iso(),
+                     'signup_granted': False}
                 self._users[user_id] = u
+                new_user = True
             if email and u.get('email') != email:
                 u['email'] = email
-            if tier and tier in TIER_ALLOWANCE:
+            if tier:
                 u['tier'] = tier
             u['last_seen'] = _now_iso()
             self._save_users()
-            return dict(u)
+            snapshot = dict(u)
+        # Outside the lock: grant() takes it again. The signup gift is issued
+        # once per user id and recorded in the ledger like any other grant.
+        if new_user and not snapshot.get('signup_granted'):
+            self._mark_signup(user_id)
+            self.grant(user_id, SIGNUP_GRANT, reason='signup',
+                       note='Welcome credits')
+        return snapshot
+
+    def _mark_signup(self, user_id):
+        with self._lock:
+            u = self._users.get(user_id)
+            if u:
+                u['signup_granted'] = True
+                self._save_users()
 
     def set_tier(self, user_id, tier):
-        if tier not in TIER_ALLOWANCE:
-            return None
+        # Label only. It does not affect spending; the wallet does.
         with self._lock:
             u = self._users.get(user_id)
             if not u:
@@ -238,27 +261,63 @@ class Ledger:
         return [{'date': d, 'usd': buckets[d]} for d in sorted(buckets)][-days:]
 
     def all_users(self, since=None):
-        since = since or period_start()
+        """Wallet balances plus lifetime spend. Credits never expire, so the
+        balance is all-time; usd is what the user has actually cost us."""
         rows = []
         for uid, u in self._users.items():
-            t = self.totals_for(uid, since)
-            tier = u.get('tier', 'beta')
-            allowance = TIER_ALLOWANCE.get(tier)
+            w = self.wallet(uid)
+            t = self.totals_for(uid, None)
             rows.append({
                 'id': uid,
                 'email': u.get('email'),
-                'tier': tier,
-                'allowance': allowance,
-                'credits_used': t['credits'],
-                'credits_left': (None if allowance is None
-                                 else max(0, allowance - t['credits'])),
+                'granted': w['granted'],
+                'spent': w['spent'],
+                'balance': w['balance'],
+                'actions': w['spent'] // CREDIT_COST if CREDIT_COST else 0,
                 'usd': t['usd'],
                 'calls': t['calls'],
+                'created': u.get('created'),
                 'last_seen': u.get('last_seen'),
-                'over_fair_use': allowance is None and t['credits'] > FAIR_USE_FLAG,
+                'low': w['balance'] < CREDIT_COST,
             })
         rows.sort(key=lambda r: r['usd'], reverse=True)
         return rows
+
+    # ── wallet ───────────────────────────────────────────────────────────
+    def grant(self, user_id, credits, reason='admin', by=None, note=None):
+        """Award credits. Recorded as a ledger event so every grant is auditable."""
+        credits = int(credits)
+        if credits <= 0 or reason not in GRANT_REASONS:
+            return None
+        self.ensure_user(user_id)
+        ev = self.append(user_id=user_id, kind='grant', surface='grant',
+                         provider='none', model=None, input_tokens=0, cache_read=0,
+                         cache_write=0, output_tokens=0, usd_cost=0.0,
+                         credits=credits, reason=reason, granted_by=by, note=note)
+        return {'granted': credits, 'balance': self.balance(user_id), 'event': ev['id']}
+
+    def balance(self, user_id):
+        """Granted minus spent, over all time. Credits never expire."""
+        granted = spent = 0
+        for e in self._events:
+            if e.get('user_id') != user_id:
+                continue
+            if e.get('kind') == 'grant':
+                granted += e.get('credits', 0)
+            elif e.get('ok', True):
+                spent += e.get('credits', 0)
+        return granted - spent
+
+    def wallet(self, user_id):
+        granted = spent = 0
+        for e in self._events:
+            if e.get('user_id') != user_id:
+                continue
+            if e.get('kind') == 'grant':
+                granted += e.get('credits', 0)
+            elif e.get('ok', True):
+                spent += e.get('credits', 0)
+        return {'granted': granted, 'spent': spent, 'balance': granted - spent}
 
     # ── enforcement ──────────────────────────────────────────────────────
     def check(self, user_id, surface, enforcement='on', org_ceiling=None):
@@ -266,17 +325,14 @@ class Ledger:
         Returns (allowed, info). Callers must honour `allowed` before spending.
         `log_only` always allows but reports what it would have done.
         """
-        need = CREDIT_WEIGHTS.get(surface, CREDIT_WEIGHTS['unknown'])
-        u = self._users.get(user_id) or {}
-        tier = u.get('tier', 'beta')
-        allowance = TIER_ALLOWANCE.get(tier)
-        used = self.totals_for(user_id, period_start())['credits']
-        left = None if allowance is None else max(0, allowance - used)
+        need = credit_cost(surface)
+        w = self.wallet(user_id)
+        info = {'credits_needed': need, 'credits_remaining': w['balance'],
+                'granted': w['granted'], 'spent': w['spent'],
+                'cost_per_action': CREDIT_COST}
 
-        info = {'credits_needed': need, 'credits_remaining': left, 'tier': tier,
-                'resets_at': period_end().isoformat(timespec='seconds').replace('+00:00', 'Z')}
-
-        # Org-level circuit breaker outranks the per-user check.
+        # Org circuit breaker outranks the wallet: if we are out of budget,
+        # nobody spends, regardless of what they hold.
         if org_ceiling:
             spend = self.org_totals(period_start())['usd']
             if spend >= org_ceiling:
@@ -284,7 +340,7 @@ class Ledger:
                 info['would_block'] = True
                 return (enforcement != 'on'), info
 
-        if allowance is not None and left is not None and left < need:
+        if need > 0 and w['balance'] < need:
             info['error'] = 'insufficient_credits'
             info['would_block'] = True
             return (enforcement != 'on'), info

@@ -193,7 +193,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         s = self.headers.get('X-Noura-Surface')
         if not s and isinstance(data, dict):
             s = data.get('_noura_surface')
-        return s if s in noura_meter.CREDIT_WEIGHTS else 'unknown'
+        return s or 'unknown'
 
     def _gate(self, uid, surface):
         """Returns (allowed, info). Logs a rejection event when it blocks."""
@@ -278,8 +278,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                               model=model, input_tokens=input_tokens,
                               cache_read=cache_read, cache_write=cache_write,
                               output_tokens=output_tokens, usd_cost=usd,
-                              credits=noura_meter.CREDIT_WEIGHTS.get(
-                                  surface, noura_meter.CREDIT_WEIGHTS['unknown']),
+                              credits=noura_meter.credit_cost(surface),
                               request_id=request_id)
 
             def send_via_anthropic():
@@ -356,6 +355,35 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     self._json(500, {"error": {"message": f"Anthropic API Error: {e}"}})
             else:
                 self._json(500, {"error": {"message": "No valid API key available. Missing ANTHROPIC_API_KEY"}})
+        elif self.path == '/api/admin/grant':
+            length = int(self.headers.get('Content-Length', 0))
+            raw = self.rfile.read(length)
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            try:
+                g = json.loads(raw or b'{}')
+            except Exception:
+                g = {}
+            uid = (g.get('user_id') or '').strip()
+            try:
+                amount = int(g.get('credits', 0))
+            except Exception:
+                amount = 0
+            reason = (g.get('reason') or 'admin').strip()
+            if not uid or amount <= 0:
+                self._json(400, {"error": "user_id and a positive credits amount are required"})
+                return
+            if reason not in noura_meter.GRANT_REASONS:
+                self._json(400, {"error": "unknown reason",
+                                 "allowed": sorted(noura_meter.GRANT_REASONS)})
+                return
+            res = LEDGER.grant(uid, amount, reason=reason, by='admin',
+                               note=(g.get('note') or None))
+            if not res:
+                self._json(400, {"error": "grant rejected"})
+                return
+            self._json(200, res)
         elif self.path == '/api/tts':
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length)
@@ -417,7 +445,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                               usd_cost=round(len(text) / 1000.0
                                              * noura_meter.TTS_USD_PER_1K_CHARS, 8),
                               usd_estimated=True,
-                              credits=noura_meter.CREDIT_WEIGHTS.get(tts_surface, 1))
+                              credits=noura_meter.credit_cost(tts_surface))
                 self.send_response(200)
                 self.send_header('Content-Type', 'audio/wav')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -579,8 +607,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     "period_start": since.isoformat(timespec='seconds').replace('+00:00', 'Z'),
                     "period_end": noura_meter.period_end().isoformat(
                         timespec='seconds').replace('+00:00', 'Z'),
-                    "tiers": noura_meter.TIER_ALLOWANCE,
-                    "weights": noura_meter.CREDIT_WEIGHTS,
+                    "cost_per_action": noura_meter.CREDIT_COST,
+                    "signup_grant": noura_meter.SIGNUP_GRANT,
+                    "free_surfaces": sorted(noura_meter.FREE_SURFACES),
+                    "grant_reasons": sorted(noura_meter.GRANT_REASONS),
                 },
             })
             return
@@ -626,22 +656,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         if path == '/api/me':
             uid = self._identify()
-            since = noura_meter.period_start()
-            t = LEDGER.totals_for(uid, since)
-            u = LEDGER.user(uid)
-            allowance = noura_meter.TIER_ALLOWANCE.get(u.get('tier', 'beta'))
+            w = LEDGER.wallet(uid)
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self._set_uid_cookie()
             self.end_headers()
             self.wfile.write(json.dumps({
-                "user_id": uid, "tier": u.get('tier', 'beta'),
-                "allowance": allowance, "credits_used": t['credits'],
-                "credits_left": (None if allowance is None
-                                 else max(0, allowance - t['credits'])),
-                "resets_at": noura_meter.period_end().isoformat(
-                    timespec='seconds').replace('+00:00', 'Z'),
+                "user_id": uid,
+                "balance": w['balance'],
+                "granted": w['granted'],
+                "spent": w['spent'],
+                "cost_per_action": noura_meter.CREDIT_COST,
+                "actions_left": w['balance'] // noura_meter.CREDIT_COST
+                                if noura_meter.CREDIT_COST else 0,
+                # Credits never expire, so there is no reset date.
+                "expires": None,
             }).encode('utf-8'))
             return
 

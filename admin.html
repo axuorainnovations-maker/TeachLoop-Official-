@@ -137,6 +137,10 @@
         card('Cache hit rate', (org.cache_hit_rate * 100).toFixed(1) + '%', 'Cached reads over billed input') +
         card('Rejected calls', String(org.rejected || 0), '402 responses this period',
              org.rejected ? 'warn' : '') +
+        card('Credits outstanding', String(DATA.users.reduce((a, u) => a + u.balance, 0)),
+             'Granted and not yet spent, across all users', 'hl') +
+        card('Cost per action', usd(org.calls ? org.usd / org.calls : 0),
+             'What one metered call costs us on average') +
       '</div>' +
       (budget.ceiling_usd
         ? '<div class="bar"><i class="' + cls + '" style="width:' + pct.toFixed(1) + '%"></i></div>' : '') +
@@ -160,8 +164,9 @@
       '<h2>Users (' + DATA.users.length + ')</h2>' +
       '<div class="toolbar">' +
         '<input type="search" id="q" placeholder="Search email or id">' +
-        '<select id="tierF"><option value="">All tiers</option>' +
-          Object.keys(config.tiers).map(t => '<option>' + t + '</option>').join('') + '</select>' +
+        '<select id="tierF"><option value="">All users</option>' +
+          '<option value="low">Out of credits</option>' +
+          '<option value="has">Has credits</option></select>' +
         '<button id="topBtn">Top 10 by cost</button>' +
         '<button id="csvBtn">Export CSV</button>' +
         '<span class="muted" style="font-size:12px" id="count"></span>' +
@@ -198,7 +203,7 @@
     const q = ($('q').value || '').toLowerCase();
     const tf = $('tierF').value;
     return DATA.users.filter(u =>
-      (!tf || u.tier === tf) &&
+      (!tf || (tf === 'low' ? u.low : !u.low)) &&
       (!q || (u.email || '').toLowerCase().includes(q) || u.id.toLowerCase().includes(q))
     );
   }
@@ -214,36 +219,48 @@
     if (limit) rows = rows.slice(0, limit);
     $('count').textContent = rows.length + ' shown';
 
-    const cols = [['email','User'],['tier','Tier'],['credits_used','Used'],
-                  ['credits_left','Left'],['credits_used','Usage'],['usd','Cost'],
+    const cols = [['email','User'],['balance','Balance'],['actions','Actions left'],
+                  ['granted','Granted'],['spent','Spent'],['usd','Cost to us'],
                   ['calls','Calls'],['last_seen','Active']];
+    const perAction = DATA.config.cost_per_action || 50;
     $('tableWrap').innerHTML = '<table><thead><tr>' +
-      cols.map((c,i) => '<th data-k="' + c[0] + '" data-i="' + i + '">' + c[1] + '</th>').join('') +
-      '</tr></thead><tbody>' +
+      cols.map(c => '<th data-k="' + c[0] + '">' + c[1] + '</th>').join('') +
+      '<th>Award</th></tr></thead><tbody>' +
       (rows.length ? rows.map(u => {
-        const price = TIER_PRICE[u.tier] || 0;
-        const overspend = price > 0 && u.usd > price;
-        const pct = u.allowance ? Math.min(100, u.credits_used / u.allowance * 100) : 0;
-        const bc = pct >= 100 ? 'bad' : pct >= 80 ? 'warn' : '';
-        return '<tr class="' + (overspend || u.over_fair_use ? 'flag' : '') + '">' +
+        const left = Math.floor(u.balance / perAction);
+        return '<tr class="' + (u.low ? 'flag' : '') + '">' +
           '<td>' + esc(u.email || u.id) + (u.email ? '' : ' <span class="muted">(anon)</span>') + '</td>' +
-          '<td><span class="pill ' + u.tier + '">' + u.tier + '</span></td>' +
-          '<td>' + u.credits_used + '</td>' +
-          '<td>' + (u.credits_left == null ? '<span class="muted">no cap</span>' : u.credits_left) + '</td>' +
-          '<td>' + (u.allowance
-              ? '<div class="mini"><i class="' + bc + '" style="width:' + pct.toFixed(0) + '%"></i></div>'
-              : '<span class="muted">—</span>') + '</td>' +
-          '<td>' + usd(u.usd) + (overspend
-              ? ' <span class="muted" title="Costs more than the subscription price">over</span>' : '') + '</td>' +
+          '<td><b>' + u.balance + '</b></td>' +
+          '<td>' + (left > 0 ? left : '<span class="muted">out</span>') + '</td>' +
+          '<td class="muted">' + u.granted + '</td>' +
+          '<td class="muted">' + u.spent + '</td>' +
+          '<td>' + usd(u.usd) + '</td>' +
           '<td>' + u.calls + '</td>' +
           '<td class="muted">' + ago(u.last_seen) + '</td>' +
+          '<td><button class="grantBtn" data-u="' + esc(u.id) + '">Award</button></td>' +
         '</tr>';
       }).join('')
-       : '<tr><td colspan="8" class="muted">No users recorded yet. Use the app once, then reload.</td></tr>') +
+       : '<tr><td colspan="9" class="muted">No users yet. Use the app once, then reload.</td></tr>') +
       '</tbody></table>' +
-      '<div class="note">Rows highlighted in red cost more than their subscription price, or exceed '
-      + 'the fair-use threshold on Unlimited. Speech costs are estimated from a configured per-unit '
-      + 'rate, not an invoiced figure.</div>';
+      '<div class="note">Credits never expire. Every billable action costs <b>' + perAction
+      + '</b>; internal sub-calls (' + (DATA.config.free_surfaces || []).join(', ')
+      + ') are free so one study action is charged once. Rows in red are out of credits. '
+      + 'Speech costs are estimated from a configured rate, not an invoiced figure.</div>';
+
+    $('tableWrap').querySelectorAll('.grantBtn').forEach(b => b.addEventListener('click', async () => {
+      const amount = prompt('Award how many credits to ' + b.dataset.u + '?', '2000');
+      if (!amount) return;
+      const reason = prompt('Reason (purchase, promo, referral, admin, refund)', 'purchase');
+      if (!reason) return;
+      const r = await fetch('/api/admin/grant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+        body: JSON.stringify({ user_id: b.dataset.u, credits: Number(amount), reason: reason.trim() })
+      });
+      const d = await r.json();
+      if (!r.ok) { alert(d.error || 'Grant failed'); return; }
+      load();
+    }));
 
     $('tableWrap').querySelectorAll('th').forEach(th => th.addEventListener('click', () => {
       const k = th.dataset.k;
@@ -254,7 +271,7 @@
   }
 
   function csv() {
-    const head = ['id','email','tier','credits_used','credits_left','usd','calls','last_seen'];
+    const head = ['id','email','balance','granted','spent','usd','calls','created','last_seen'];
     const body = filtered().map(u => head.map(h => JSON.stringify(u[h] == null ? '' : u[h])).join(','));
     const blob = new Blob([head.join(',') + '\n' + body.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
