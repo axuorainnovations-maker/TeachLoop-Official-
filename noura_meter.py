@@ -69,6 +69,18 @@ FREE_SURFACES = {
 # endpoint cannot invent categories that break later reporting.
 GRANT_REASONS = {'signup', 'purchase', 'promo', 'referral', 'admin', 'refund'}
 
+# Accounts that bypass the wallet entirely: founders, demo accounts, support.
+# Usage is still metered and still costs us money, so these show up in the
+# admin dashboard like everyone else. They simply are never blocked.
+UNLIMITED_EMAILS = {
+    'prorkrff@gmail.com',
+}
+
+
+def is_unlimited(user):
+    email = (user or {}).get('email') or ''
+    return email.strip().lower() in UNLIMITED_EMAILS
+
 
 def credit_cost(surface):
     """Flat cost per user-initiated action; internal sub-calls are free."""
@@ -278,7 +290,8 @@ class Ledger:
                 'calls': t['calls'],
                 'created': u.get('created'),
                 'last_seen': u.get('last_seen'),
-                'low': w['balance'] < CREDIT_COST,
+                'low': w['balance'] < CREDIT_COST and not is_unlimited(u),
+                'unlimited': is_unlimited(u),
             })
         rows.sort(key=lambda r: r['usd'], reverse=True)
         return rows
@@ -339,9 +352,14 @@ class Ledger:
         """
         need = credit_cost(surface)
         w = self.wallet(user_id)
+        u = self._users.get(user_id) or {}
+        unlimited = is_unlimited(u)
         info = {'credits_needed': need, 'credits_remaining': w['balance'],
                 'granted': w['granted'], 'spent': w['spent'],
-                'cost_per_action': CREDIT_COST}
+                'cost_per_action': CREDIT_COST, 'unlimited': unlimited}
+        if unlimited:
+            info['would_block'] = False
+            return True, info
 
         # Org circuit breaker outranks the wallet: if we are out of budget,
         # nobody spends, regardless of what they hold.

@@ -4916,7 +4916,16 @@ body.light-mode .aset-member .nm { color:#16151c; }
         renderFinalAnswer();
       }
     } catch (err) {
-      appendAIMsg('⚠️ Error talking to Claude (Anthropic): ' + err.message);
+      // Running out of credits is an expected state, not a provider fault:
+      // say what happened and what to do, never surface the raw error code.
+      const m = String(err && err.message || '');
+      if (/insufficient_credits/i.test(m)) {
+        appendAIMsg("You're out of credits. Purchase more to continue.");
+      } else if (/service_capacity/i.test(m)) {
+        appendAIMsg("Noura is at capacity right now. Please try again shortly.");
+      } else {
+        appendAIMsg('⚠️ Something went wrong. Please try again.');
+      }
     }
   }
 

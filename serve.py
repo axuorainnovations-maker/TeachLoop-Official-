@@ -178,6 +178,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         email = None
         if isinstance(data, dict):
             email = (data.get('_noura_email') or None)
+        if not email:
+            email = self.headers.get('X-Noura-Email') or None
         LEDGER.ensure_user(uid, email=email)
         self._pending_uid = uid if minted else None
         return uid
