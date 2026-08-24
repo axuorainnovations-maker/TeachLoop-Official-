@@ -119,19 +119,40 @@
   }
 
   /**
-   * Mount the balance pill. `where` is a selector; the pill is inserted BEFORE
-   * that element so it sits to its left. Falls back to fixed top-right.
+   * Mount the balance pill to the left of `where`.
+   *
+   * opts.group wraps the anchor and the pill in a fixed flex row. Use it when
+   * the anchor positions itself (the dashboard streak badge is position:fixed),
+   * so the gap stays constant instead of depending on a hardcoded offset that
+   * breaks the moment the balance grows a digit.
    */
-  function mountPill(where) {
+  function mountPill(where, opts) {
     pillCSS();
     if (document.getElementById('nouraCreditPill')) return;
+    opts = opts || {};
     var el = document.createElement('div');
     el.id = 'nouraCreditPill';
     el.className = 'noura-credit-pill';
     el.innerHTML = '<span class="dot"></span><span class="n">--</span>' +
                    '<span style="color:#8a8a93;font-weight:600">credits</span>';
     var anchor = where && document.querySelector(where);
-    if (anchor && anchor.parentNode) {
+
+    if (anchor && opts.group) {
+      var cs = getComputedStyle(anchor);
+      var row = document.createElement('div');
+      row.id = 'nouraTopRow';
+      row.style.cssText = 'position:fixed;top:' + (cs.top !== 'auto' ? cs.top : '18px') +
+        ';right:' + (cs.right !== 'auto' ? cs.right : '22px') +
+        ';z-index:' + (cs.zIndex !== 'auto' ? cs.zIndex : '50') +
+        ';display:flex;align-items:center;gap:' + (opts.gap || '12px');
+      anchor.parentNode.insertBefore(row, anchor);
+      // The anchor now flows inside the row, so drop its own fixed placement.
+      anchor.style.position = 'relative';
+      anchor.style.top = 'auto';
+      anchor.style.right = 'auto';
+      row.appendChild(el);
+      row.appendChild(anchor);
+    } else if (anchor && anchor.parentNode) {
       anchor.parentNode.insertBefore(el, anchor);   // to the left of the anchor
     } else {
       el.style.cssText = 'position:fixed;top:18px;right:22px;z-index:50';
