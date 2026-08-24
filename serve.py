@@ -7,7 +7,11 @@ import socketserver
 import urllib.request
 import urllib.error
 import concurrent.futures
+import secrets
 import time
+
+import noura_meter
+from noura_meter import LEDGER
 
 # Read .env.local
 env_vars = {}
@@ -29,6 +33,17 @@ with open('config.js', 'w') as f:
     f.write(f'const ENV = {repr(public_env)};\n')
 
 PORT = 3006
+
+# ── Metering and credits ───────────────────────────────────────────────
+# ANTHROPIC_ADMIN_KEY is optional and only enables org reconciliation.
+# There is no API that reports a remaining balance, so the ceiling below is
+# OUR OWN number and every figure derived from it is labelled as such.
+ANTHROPIC_ADMIN_KEY = env_vars.get('ANTHROPIC_ADMIN_KEY', '')
+MONTHLY_BUDGET_USD = float(env_vars.get('NOURA_MONTHLY_BUDGET_USD', '') or 0) or None
+BUDGET_WARN_PCT = float(env_vars.get('NOURA_BUDGET_WARN_PCT', '') or 80)
+ADMIN_TOKEN = env_vars.get('NOURA_ADMIN_TOKEN', '')
+# on | log_only | off. Ship as log_only, watch real numbers, then enforce.
+CREDIT_ENFORCEMENT = (env_vars.get('NOURA_CREDIT_ENFORCEMENT', '') or 'log_only').lower()
 
 # ── NVIDIA Riva speech (build.nvidia.com) ──────────────────────────────
 # STT: parakeet-1.1b-rnnt-multilingual-asr | TTS: magpie-tts-multilingual
@@ -150,6 +165,49 @@ def _split_for_tts(text, limit=None):
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+
+    # ── identity ────────────────────────────────────────────────────────
+    # Beta-grade only: a server-minted HttpOnly cookie the page cannot rewrite.
+    # It is NOT authentication - clearing cookies yields a fresh allowance.
+    def _identify(self, data=None):
+        uid = noura_meter.parse_cookie_uid(self.headers.get('Cookie'))
+        minted = False
+        if not uid:
+            uid = noura_meter.new_user_id()
+            minted = True
+        email = None
+        if isinstance(data, dict):
+            email = (data.get('_noura_email') or None)
+        LEDGER.ensure_user(uid, email=email)
+        self._pending_uid = uid if minted else None
+        return uid
+
+    def _set_uid_cookie(self):
+        if getattr(self, '_pending_uid', None):
+            self.send_header('Set-Cookie',
+                             'noura_uid=%s; Path=/; Max-Age=63072000; HttpOnly; SameSite=Lax'
+                             % self._pending_uid)
+            self._pending_uid = None
+
+    def _surface(self, data=None):
+        s = self.headers.get('X-Noura-Surface')
+        if not s and isinstance(data, dict):
+            s = data.get('_noura_surface')
+        return s if s in noura_meter.CREDIT_WEIGHTS else 'unknown'
+
+    def _gate(self, uid, surface):
+        """Returns (allowed, info). Logs a rejection event when it blocks."""
+        allowed, info = LEDGER.check(uid, surface,
+                                     enforcement=CREDIT_ENFORCEMENT,
+                                     org_ceiling=MONTHLY_BUDGET_USD)
+        if info.get('would_block'):
+            LEDGER.append(user_id=uid, surface=surface, provider='none',
+                          model=None, input_tokens=0, cache_read=0, cache_write=0,
+                          output_tokens=0, usd_cost=0.0, credits=0,
+                          ok=False, error=info.get('error'),
+                          enforced=(CREDIT_ENFORCEMENT == 'on'))
+        return allowed, info
+
     def do_POST(self):
         if self.path == '/api/generate-diagram':
             content_length = int(self.headers.get('Content-Length', 0))
@@ -200,6 +258,30 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             want_stream = bool(data.get('stream'))
 
+            # ── metering gate ──────────────────────────────────────────
+            uid = self._identify(data)
+            surface = self._surface(data)
+            allowed, gate = self._gate(uid, surface)
+            if not allowed:
+                self._json(402, gate)
+                return
+            # Strip our own metadata before forwarding to Anthropic.
+            data.pop('_noura_surface', None)
+            data.pop('_noura_email', None)
+            meter = {'model': data.get('model')}
+
+            def _record(input_tokens, cache_read, cache_write, output_tokens,
+                        model, request_id=None):
+                usd = noura_meter.token_cost(model, input_tokens, cache_read,
+                                             cache_write, output_tokens)
+                LEDGER.append(user_id=uid, surface=surface, provider='anthropic',
+                              model=model, input_tokens=input_tokens,
+                              cache_read=cache_read, cache_write=cache_write,
+                              output_tokens=output_tokens, usd_cost=usd,
+                              credits=noura_meter.CREDIT_WEIGHTS.get(
+                                  surface, noura_meter.CREDIT_WEIGHTS['unknown']),
+                              request_id=request_id)
+
             def send_via_anthropic():
                 req_data = json.dumps(data).encode('utf-8')
                 anth_req = urllib.request.Request(
@@ -219,19 +301,43 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         self.send_header('Cache-Control', 'no-cache')
                         self.send_header('X-Accel-Buffering', 'no')
                         self.send_header('Access-Control-Allow-Origin', '*')
+                        self._set_uid_cookie()
                         self.end_headers()
-                        while True:
-                            chunk = resp.read1(2048) if hasattr(resp, 'read1') else resp.read(2048)
-                            if not chunk:
-                                break
-                            self.wfile.write(chunk)
-                            self.wfile.flush()
+                        # Usage arrives inside the stream itself, so tee the
+                        # bytes through the accumulator on the way out.
+                        su = noura_meter.StreamUsage()
+                        try:
+                            while True:
+                                chunk = resp.read1(2048) if hasattr(resp, 'read1') else resp.read(2048)
+                                if not chunk:
+                                    break
+                                su.feed(chunk)
+                                self.wfile.write(chunk)
+                                self.wfile.flush()
+                        finally:
+                            # Record whatever was seen, even on a broken pipe:
+                            # those tokens were still generated and billed.
+                            _record(su.input_tokens, su.cache_read, su.cache_write,
+                                    su.output_tokens, su.model or meter['model'],
+                                    resp.headers.get('request-id'))
                         return
                     else:
                         resp_data = resp.read()
+                        try:
+                            j = json.loads(resp_data)
+                            u = j.get('usage') or {}
+                            _record(u.get('input_tokens', 0) or 0,
+                                    u.get('cache_read_input_tokens', 0) or 0,
+                                    u.get('cache_creation_input_tokens', 0) or 0,
+                                    u.get('output_tokens', 0) or 0,
+                                    j.get('model') or meter['model'],
+                                    resp.headers.get('request-id'))
+                        except Exception as e:
+                            print('[meter] could not read usage:', e)
                         self.send_response(200)
                         self.send_header('Content-Type', 'application/json')
                         self.send_header('Access-Control-Allow-Origin', '*')
+                        self._set_uid_cookie()
                         self.end_headers()
                         self.wfile.write(resp_data)
 
@@ -271,6 +377,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return
             voice = data.get('voice') or TTS_VOICE
             language = data.get('language') or 'en-US'
+            tts_uid = self._identify(data)
+            tts_surface = self._surface(data) if self._surface(data) != 'unknown' else 'tts'
+            tts_allowed, tts_gate = self._gate(tts_uid, tts_surface)
+            if not tts_allowed:
+                self._json(402, tts_gate)
+                return
             try:
                 chunks = _split_for_tts(text)
 
@@ -296,9 +408,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
                 pcm = b''.join(_say(c) for c in chunks)
                 wav = pcm_to_wav(pcm, TTS_RATE, 1)
+                # Speech has no token concept, so bill by characters at a
+                # configured rate. Estimated, not an invoiced figure.
+                LEDGER.append(user_id=tts_uid, surface=tts_surface, provider='nvidia',
+                              model=NVIDIA_TTS_MODEL, input_tokens=0, cache_read=0,
+                              cache_write=0, output_tokens=0,
+                              chars=len(text),
+                              usd_cost=round(len(text) / 1000.0
+                                             * noura_meter.TTS_USD_PER_1K_CHARS, 8),
+                              usd_estimated=True,
+                              credits=noura_meter.CREDIT_WEIGHTS.get(tts_surface, 1))
                 self.send_response(200)
                 self.send_header('Content-Type', 'audio/wav')
                 self.send_header('Access-Control-Allow-Origin', '*')
+                self._set_uid_cookie()
                 self.end_headers()
                 self.wfile.write(wav)
             except Exception as e:
@@ -415,6 +538,120 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_response(404)
             self.end_headers()
+
+    # ── admin surface ───────────────────────────────────────────────────
+    def _admin_ok(self):
+        """Token via header or ?key=. Absent token means admin is disabled."""
+        if not ADMIN_TOKEN:
+            return False
+        supplied = self.headers.get('X-Noura-Admin') or ''
+        if not supplied and '?' in self.path:
+            from urllib.parse import urlparse, parse_qs
+            supplied = (parse_qs(urlparse(self.path).query).get('key') or [''])[0]
+        return secrets.compare_digest(supplied, ADMIN_TOKEN)
+
+    def do_GET(self):
+        path = self.path.split('?')[0]
+
+        if path == '/api/admin/summary':
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            since = noura_meter.period_start()
+            org = LEDGER.org_totals(since)
+            spend = org['usd']
+            self._json(200, {
+                "users": LEDGER.all_users(since),
+                "org": org,
+                "daily": LEDGER.daily_usd(30),
+                "budget": {
+                    # No API reports a remaining balance. This is OUR ceiling.
+                    "ceiling_usd": MONTHLY_BUDGET_USD,
+                    "spend_usd": spend,
+                    "remaining_usd": (None if not MONTHLY_BUDGET_USD
+                                      else round(MONTHLY_BUDGET_USD - spend, 4)),
+                    "warn_pct": BUDGET_WARN_PCT,
+                    "source": "local_ledger_against_configured_ceiling",
+                },
+                "config": {
+                    "enforcement": CREDIT_ENFORCEMENT,
+                    "admin_api_configured": bool(ANTHROPIC_ADMIN_KEY),
+                    "period_start": since.isoformat(timespec='seconds').replace('+00:00', 'Z'),
+                    "period_end": noura_meter.period_end().isoformat(
+                        timespec='seconds').replace('+00:00', 'Z'),
+                    "tiers": noura_meter.TIER_ALLOWANCE,
+                    "weights": noura_meter.CREDIT_WEIGHTS,
+                },
+            })
+            return
+
+        if path == '/api/admin/reconcile':
+            # Optional: compare our ledger against Anthropic's own report.
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            if not ANTHROPIC_ADMIN_KEY:
+                self._json(200, {"configured": False,
+                                 "note": "Set ANTHROPIC_ADMIN_KEY to enable. "
+                                         "Requires an organization account; the "
+                                         "Admin API is unavailable for individual accounts."})
+                return
+            since = noura_meter.period_start()
+            url = ('https://api.anthropic.com/v1/organizations/cost_report'
+                   '?starting_at=%s&ending_at=%s'
+                   % (since.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                      noura_meter.period_end().strftime('%Y-%m-%dT%H:%M:%SZ')))
+            try:
+                req = urllib.request.Request(url, headers={
+                    'x-api-key': ANTHROPIC_ADMIN_KEY,
+                    'anthropic-version': '2023-06-01',
+                    'User-Agent': 'Noura/1.0 (usage-reconciliation)',
+                })
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    report = json.loads(r.read().decode('utf-8'))
+                reported = 0.0
+                for bucket in report.get('data', []):
+                    for item in bucket.get('results', []):
+                        try:
+                            reported += float(item.get('amount', 0)) / 100.0
+                        except Exception:
+                            pass
+                ours = LEDGER.org_totals(since)['usd']
+                self._json(200, {"configured": True, "anthropic_usd": round(reported, 4),
+                                 "ledger_usd": ours,
+                                 "delta_usd": round(reported - ours, 4)})
+            except Exception as e:
+                self._json(200, {"configured": True, "error": str(e)[:200]})
+            return
+
+        if path == '/api/me':
+            uid = self._identify()
+            since = noura_meter.period_start()
+            t = LEDGER.totals_for(uid, since)
+            u = LEDGER.user(uid)
+            allowance = noura_meter.TIER_ALLOWANCE.get(u.get('tier', 'beta'))
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self._set_uid_cookie()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "user_id": uid, "tier": u.get('tier', 'beta'),
+                "allowance": allowance, "credits_used": t['credits'],
+                "credits_left": (None if allowance is None
+                                 else max(0, allowance - t['credits'])),
+                "resets_at": noura_meter.period_end().isoformat(
+                    timespec='seconds').replace('+00:00', 'Z'),
+            }).encode('utf-8'))
+            return
+
+        # admin.html is only served with a valid token.
+        if path == '/admin.html' and not self._admin_ok():
+            self._json(403, {"error": "admin token required",
+                             "hint": "open /admin.html?key=YOUR_NOURA_ADMIN_TOKEN"})
+            return
+
+        return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
     def _json(self, code, obj):
         payload = json.dumps(obj).encode('utf-8')

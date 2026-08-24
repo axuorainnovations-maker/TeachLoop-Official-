@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Noura Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --grad:linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
+    --violet:#8b5cf6; --violet-2:#a855f7;
+    --bg:#0A0A0B; --panel:#141416; --panel2:#0f0f10; --line:#26262b;
+    --text:#E8E8E6; --dim:#9a9aa2; --faint:#6f6f76;
+    --ok:#3fb950; --warn:#e3a008; --bad:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+       -webkit-font-smoothing:antialiased;padding:28px 22px 60px}
+  .wrap{max-width:1240px;margin:0 auto}
+  h1{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:11px}
+  h1 .logo{width:26px;height:26px;background:var(--grad);
+    -webkit-mask:url('logo.png') center/contain no-repeat;mask:url('logo.png') center/contain no-repeat}
+  h2{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:30px 0 12px}
+  .sub{color:var(--faint);font-size:13px;margin-top:5px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+  .card .k{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+  .card .v{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:5px}
+  .card .n{font-size:11.5px;color:var(--faint);margin-top:3px;line-height:1.45}
+  .v.good{color:#7ee2a8} .v.warn{color:#ffd37a} .v.bad{color:#ff9f9a} .v.hl{color:#b79df5}
+  .bar{height:9px;border-radius:99px;background:#1c1c20;overflow:hidden;margin-top:9px}
+  .bar i{display:block;height:100%;border-radius:99px;background:var(--grad)}
+  .bar i.warn{background:linear-gradient(90deg,#e3a008,#f0b429)}
+  .bar i.bad{background:linear-gradient(90deg,#ef4444,#f87171)}
+  table{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13px;margin-top:4px}
+  th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+     color:var(--faint);padding:0 12px 6px;cursor:pointer;user-select:none;white-space:nowrap}
+  th:hover{color:var(--text)}
+  td{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:11px 12px}
+  td:first-child{border-left:1px solid var(--line);border-radius:11px 0 0 11px}
+  td:last-child{border-right:1px solid var(--line);border-radius:0 11px 11px 0}
+  tr.flag td{background:#1f1512;border-color:rgba(239,68,68,.35)}
+  .pill{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:99px}
+  .pill.starter{color:#c9c9ce;background:#26262b}
+  .pill.scholar{color:#b79df5;background:rgba(139,92,246,.16)}
+  .pill.unlimited{color:#7ee2a8;background:rgba(63,185,80,.14)}
+  .pill.beta{color:#ffd37a;background:rgba(227,160,8,.13)}
+  .mini{height:6px;border-radius:99px;background:#1c1c20;overflow:hidden;min-width:74px}
+  .mini i{display:block;height:100%;background:var(--violet)}
+  .mini i.warn{background:var(--warn)} .mini i.bad{background:var(--bad)}
+  .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  input,select,button{font-family:inherit}
+  input[type=search],select{background:var(--panel2);border:1px solid #2a2a2e;border-radius:9px;
+    padding:8px 11px;color:var(--text);font-size:13px;outline:none}
+  input[type=search]:focus,select:focus{border-color:var(--violet)}
+  button{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px;
+    color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer}
+  button:hover{border-color:var(--violet)}
+  .note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--violet);
+    border-radius:0 10px 10px 0;padding:11px 14px;font-size:12.5px;color:var(--dim);line-height:1.6;margin-top:10px}
+  .note.warn{border-left-color:var(--warn)}
+  .spark{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:10px}
+  .spark i{flex:1;background:var(--violet);border-radius:2px 2px 0 0;min-height:2px;opacity:.85}
+  .rows{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+  .row{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .row b{color:var(--dim);font-weight:600}
+  .err{color:#ff9f9a;font-size:13px;margin-top:14px}
+  .muted{color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="logo"></span>Noura Admin</h1>
+  <div class="sub" id="periodLine">Loading…</div>
+  <div id="stage"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const KEY = new URLSearchParams(location.search).get('key') || '';
+  const usd = n => (n == null ? '—' : '$' + Number(n).toFixed(Number(n) < 1 ? 4 : 2));
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const ago = ts => {
+    if (!ts) return '—';
+    const m = Math.floor((Date.now() - new Date(ts)) / 60000);
+    if (m < 1) return 'now';
+    if (m < 60) return m + 'm';
+    if (m < 1440) return Math.floor(m / 60) + 'h';
+    return Math.floor(m / 1440) + 'd';
+  };
+  // Subscription price per tier, so we can flag users who cost more than they pay.
+  const TIER_PRICE = { starter: 18, scholar: 30, unlimited: 120, beta: 0 };
+
+  let DATA = null, sortKey = 'usd', sortDir = -1;
+
+  async function load() {
+    const r = await fetch('/api/admin/summary?key=' + encodeURIComponent(KEY));
+    if (!r.ok) {
+      $('stage').innerHTML = '<div class="err">Admin token rejected. Open '
+        + '<code>/admin.html?key=YOUR_NOURA_ADMIN_TOKEN</code>, and make sure '
+        + 'NOURA_ADMIN_TOKEN is set in .env.local.</div>';
+      $('periodLine').textContent = '';
+      return;
+    }
+    DATA = await r.json();
+    render();
+    reconcile();
+  }
+
+  function render() {
+    const { org, budget, config, daily } = DATA;
+    const pct = budget.ceiling_usd ? Math.min(100, budget.spend_usd / budget.ceiling_usd * 100) : 0;
+    const cls = pct >= 100 ? 'bad' : pct >= budget.warn_pct ? 'warn' : '';
+    const now = new Date(), end = new Date(config.period_end);
+    const daysLeft = Math.max(0, Math.ceil((end - now) / 86400000));
+    const elapsed = Math.max(1, (now - new Date(config.period_start)) / 86400000);
+    const projected = budget.spend_usd / elapsed * (elapsed + daysLeft);
+
+    $('periodLine').textContent =
+      'Billing period ' + config.period_start.slice(0, 10) + ' to ' + config.period_end.slice(0, 10)
+      + '  ·  ' + daysLeft + ' days left  ·  enforcement: ' + config.enforcement;
+
+    $('stage').innerHTML =
+      '<h2>Organisation spend</h2>' +
+      '<div class="cards">' +
+        card('Spend this period', usd(org.usd), 'Across ' + org.calls + ' metered calls', 'hl') +
+        card('Budget ceiling', budget.ceiling_usd ? usd(budget.ceiling_usd) : 'not set',
+             budget.ceiling_usd ? 'Our own figure, not an API balance' : 'Set NOURA_MONTHLY_BUDGET_USD') +
+        card('Remaining', budget.remaining_usd == null ? '—' : usd(budget.remaining_usd),
+             'Ceiling minus spend to date', cls === 'bad' ? 'bad' : cls === 'warn' ? 'warn' : 'good') +
+        card('Projected', usd(projected), 'At the current burn rate',
+             budget.ceiling_usd && projected > budget.ceiling_usd ? 'bad' : '') +
+        card('Cache hit rate', (org.cache_hit_rate * 100).toFixed(1) + '%', 'Cached reads over billed input') +
+        card('Rejected calls', String(org.rejected || 0), '402 responses this period',
+             org.rejected ? 'warn' : '') +
+      '</div>' +
+      (budget.ceiling_usd
+        ? '<div class="bar"><i class="' + cls + '" style="width:' + pct.toFixed(1) + '%"></i></div>' : '') +
+      '<div class="note">There is no Anthropic endpoint that returns a remaining credit balance. '
+        + '<b>Remaining</b> above is our configured ceiling minus what this ledger has recorded, '
+        + 'not a figure reported by Anthropic.</div>' +
+      (config.enforcement === 'log_only'
+        ? '<div class="note warn">Enforcement is <b>log_only</b>. Usage is recorded and limits are '
+          + 'evaluated, but nothing is blocked. Set NOURA_CREDIT_ENFORCEMENT=on when the numbers look right.</div>'
+        : '') +
+      '<div id="recon"></div>' +
+
+      '<h2>Last 30 days</h2>' + spark(daily) +
+
+      '<h2>Where the money goes</h2>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">' +
+        '<div><div class="card"><div class="k">By surface</div>' + rows(org.by_surface) + '</div></div>' +
+        '<div><div class="card"><div class="k">By model</div>' + rows(org.by_model) + '</div></div>' +
+      '</div>' +
+
+      '<h2>Users (' + DATA.users.length + ')</h2>' +
+      '<div class="toolbar">' +
+        '<input type="search" id="q" placeholder="Search email or id">' +
+        '<select id="tierF"><option value="">All tiers</option>' +
+          Object.keys(config.tiers).map(t => '<option>' + t + '</option>').join('') + '</select>' +
+        '<button id="topBtn">Top 10 by cost</button>' +
+        '<button id="csvBtn">Export CSV</button>' +
+        '<span class="muted" style="font-size:12px" id="count"></span>' +
+      '</div>' +
+      '<div id="tableWrap"></div>';
+
+    $('q').addEventListener('input', table);
+    $('tierF').addEventListener('change', table);
+    $('topBtn').addEventListener('click', () => { sortKey = 'usd'; sortDir = -1; table(10); });
+    $('csvBtn').addEventListener('click', csv);
+    table();
+  }
+
+  function card(k, v, n, cls) {
+    return '<div class="card"><div class="k">' + k + '</div>'
+      + '<div class="v ' + (cls || '') + '">' + v + '</div>'
+      + '<div class="n">' + n + '</div></div>';
+  }
+  function rows(obj) {
+    const e = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]);
+    if (!e.length) return '<div class="n" style="margin-top:8px">No activity yet.</div>';
+    return '<div class="rows">' + e.map(([k, v]) =>
+      '<div class="row"><b>' + esc(k) + '</b><span>' + usd(v) + '</span></div>').join('') + '</div>';
+  }
+  function spark(daily) {
+    if (!daily || !daily.length) return '<div class="card"><div class="n">No usage recorded yet.</div></div>';
+    const max = Math.max.apply(null, daily.map(d => d.usd)) || 1;
+    return '<div class="card"><div class="spark">' + daily.map(d =>
+      '<i style="height:' + Math.max(2, d.usd / max * 100) + '%" title="' + d.date + ': ' + usd(d.usd) + '"></i>'
+    ).join('') + '</div><div class="n">' + daily[0].date + ' to ' + daily[daily.length - 1].date + '</div></div>';
+  }
+
+  function filtered() {
+    const q = ($('q').value || '').toLowerCase();
+    const tf = $('tierF').value;
+    return DATA.users.filter(u =>
+      (!tf || u.tier === tf) &&
+      (!q || (u.email || '').toLowerCase().includes(q) || u.id.toLowerCase().includes(q))
+    );
+  }
+
+  function table(limit) {
+    let rows = filtered().slice();
+    rows.sort((a, b) => {
+      const x = a[sortKey], y = b[sortKey];
+      if (x == null) return 1;
+      if (y == null) return -1;
+      return (x > y ? 1 : x < y ? -1 : 0) * sortDir;
+    });
+    if (limit) rows = rows.slice(0, limit);
+    $('count').textContent = rows.length + ' shown';
+
+    const cols = [['email','User'],['tier','Tier'],['credits_used','Used'],
+                  ['credits_left','Left'],['credits_used','Usage'],['usd','Cost'],
+                  ['calls','Calls'],['last_seen','Active']];
+    $('tableWrap').innerHTML = '<table><thead><tr>' +
+      cols.map((c,i) => '<th data-k="' + c[0] + '" data-i="' + i + '">' + c[1] + '</th>').join('') +
+      '</tr></thead><tbody>' +
+      (rows.length ? rows.map(u => {
+        const price = TIER_PRICE[u.tier] || 0;
+        const overspend = price > 0 && u.usd > price;
+        const pct = u.allowance ? Math.min(100, u.credits_used / u.allowance * 100) : 0;
+        const bc = pct >= 100 ? 'bad' : pct >= 80 ? 'warn' : '';
+        return '<tr class="' + (overspend || u.over_fair_use ? 'flag' : '') + '">' +
+          '<td>' + esc(u.email || u.id) + (u.email ? '' : ' <span class="muted">(anon)</span>') + '</td>' +
+          '<td><span class="pill ' + u.tier + '">' + u.tier + '</span></td>' +
+          '<td>' + u.credits_used + '</td>' +
+          '<td>' + (u.credits_left == null ? '<span class="muted">no cap</span>' : u.credits_left) + '</td>' +
+          '<td>' + (u.allowance
+              ? '<div class="mini"><i class="' + bc + '" style="width:' + pct.toFixed(0) + '%"></i></div>'
+              : '<span class="muted">—</span>') + '</td>' +
+          '<td>' + usd(u.usd) + (overspend
+              ? ' <span class="muted" title="Costs more than the subscription price">over</span>' : '') + '</td>' +
+          '<td>' + u.calls + '</td>' +
+          '<td class="muted">' + ago(u.last_seen) + '</td>' +
+        '</tr>';
+      }).join('')
+       : '<tr><td colspan="8" class="muted">No users recorded yet. Use the app once, then reload.</td></tr>') +
+      '</tbody></table>' +
+      '<div class="note">Rows highlighted in red cost more than their subscription price, or exceed '
+      + 'the fair-use threshold on Unlimited. Speech costs are estimated from a configured per-unit '
+      + 'rate, not an invoiced figure.</div>';
+
+    $('tableWrap').querySelectorAll('th').forEach(th => th.addEventListener('click', () => {
+      const k = th.dataset.k;
+      sortDir = (sortKey === k) ? -sortDir : -1;
+      sortKey = k;
+      table(limit);
+    }));
+  }
+
+  function csv() {
+    const head = ['id','email','tier','credits_used','credits_left','usd','calls','last_seen'];
+    const body = filtered().map(u => head.map(h => JSON.stringify(u[h] == null ? '' : u[h])).join(','));
+    const blob = new Blob([head.join(',') + '\n' + body.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'noura-usage.csv';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+
+  async function reconcile() {
+    try {
+      const r = await fetch('/api/admin/reconcile?key=' + encodeURIComponent(KEY));
+      const d = await r.json();
+      const el = document.getElementById('recon');
+      if (!el) return;
+      if (!d.configured) {
+        el.innerHTML = '<div class="note">Anthropic reconciliation not configured. '
+          + esc(d.note || '') + '</div>';
+      } else if (d.error) {
+        el.innerHTML = '<div class="note warn">Reconciliation failed: ' + esc(d.error) + '</div>';
+      } else {
+        const drift = Math.abs(d.delta_usd) > Math.max(0.05, d.anthropic_usd * 0.05);
+        el.innerHTML = '<div class="note' + (drift ? ' warn' : '') + '">Anthropic reports '
+          + usd(d.anthropic_usd) + ' this period; our ledger has ' + usd(d.ledger_usd)
+          + '. Delta ' + usd(d.delta_usd) + '.'
+          + (drift ? ' <b>That gap suggests a provider call is not being metered.</b>' : '') + '</div>';
+      }
+    } catch (e) { /* reconciliation is optional */ }
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
