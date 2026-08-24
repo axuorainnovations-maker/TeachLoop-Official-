@@ -73,7 +73,48 @@
   }
 
   var nativeFetch = window.fetch.bind(window);
+
+  /**
+   * The account email the app already knows about. The credit allowlist keys
+   * on this, so it has to travel with every API call; without it the server
+   * only ever sees an anonymous cookie id.
+   * A ?email= query parameter claims the account once and persists it.
+   */
+  function accountEmail() {
+    try {
+      var q = new URLSearchParams(location.search).get('email');
+      if (q && q.indexOf('@') !== -1) {
+        localStorage.setItem('NOURA_EMAIL', q.trim());
+      }
+      var e = localStorage.getItem('NOURA_EMAIL');
+      if (e && e.indexOf('@') !== -1) return e.trim();
+      var acct = localStorage.getItem('NOURA_ACCOUNT');
+      if (acct) {
+        try {
+          var o = JSON.parse(acct);
+          if (o && o.email) return String(o.email).trim();
+        } catch (e2) {
+          if (acct.indexOf('@') !== -1) return acct.trim();
+        }
+      }
+    } catch (e3) {}
+    return null;
+  }
+
   window.fetch = function (input, init) {
+    // Attach the account email to our own API calls so credit rules can apply.
+    try {
+      var u = (typeof input === 'string') ? input : (input && input.url) || '';
+      if (u.indexOf('/api/') !== -1) {
+        var em = accountEmail();
+        if (em) {
+          init = init || {};
+          var h = new Headers(init.headers || (typeof input === 'object' && input.headers) || {});
+          if (!h.has('X-Noura-Email')) h.set('X-Noura-Email', em);
+          init.headers = h;
+        }
+      }
+    } catch (e) { /* never let this break a request */ }
     return nativeFetch(input, init).then(function (res) {
       try {
         var url = (typeof input === 'string') ? input : (input && input.url) || '';
@@ -172,7 +213,7 @@
   function refresh() {
     var el = document.getElementById('nouraCreditPill');
     if (!el) return Promise.resolve(null);
-    return nativeFetch('/api/me').then(function (r) { return r.json(); })
+    return window.fetch('/api/me').then(function (r) { return r.json(); })
       .then(function (d) { paint(el, d); return d; })
       .catch(function () { return null; });
   }
@@ -214,7 +255,7 @@
 
   /** Called when onboarding finishes. Shows the toast only the first time. */
   function claimWelcome() {
-    return nativeFetch('/api/welcome', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    return window.fetch('/api/welcome', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (d && d.first_time) welcomeToast(d);
@@ -225,11 +266,12 @@
   }
 
   window.NouraCredits = {
+    accountEmail: accountEmail,
     mountPill: mountPill,
     refresh: refresh,
     claimWelcome: claimWelcome,
     async status() {
-      try { return await (await nativeFetch('/api/me')).json(); }
+      try { return await (await window.fetch('/api/me')).json(); }
       catch (e) { return null; }
     }
   };
