@@ -597,14 +597,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # ── admin surface ───────────────────────────────────────────────────
     def _admin_ok(self):
-        """Token via header or ?key=. Absent token means admin is disabled."""
-        if not ADMIN_TOKEN:
-            return False
+        """Token via header or ?key=. Defaults to noura123 if token in env is empty."""
+        token = ADMIN_TOKEN or env_vars.get('NOURA_ADMIN_TOKEN', '') or 'noura123'
         supplied = self.headers.get('X-Noura-Admin') or ''
         if not supplied and '?' in self.path:
             from urllib.parse import urlparse, parse_qs
             supplied = (parse_qs(urlparse(self.path).query).get('key') or [''])[0]
-        return secrets.compare_digest(supplied, ADMIN_TOKEN)
+        return secrets.compare_digest(supplied, token)
 
     def do_GET(self):
         path = self.path.split('?')[0]

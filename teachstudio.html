@@ -10,7 +10,7 @@
 <style>
   /* ── Teach Studio scoped styles (ts- prefix throughout) ─────────────── */
   :root {
-    --ts-bg:#0A0A0B; --ts-panel:#141416; --ts-panel2:#1a1a1d; --ts-line:#26262b;
+    --ts-bg:#141416; --ts-panel:#141416; --ts-panel2:#1a1a1d; --ts-line:#26262b;
     --ts-text:#E8E8E6; --ts-dim:#9a9aa2; --ts-faint:#6f6f76;
     --ts-accent:#8b5cf6; --ts-accent-soft:rgba(139,92,246,0.14);
     --ts-good:#3fb950; --ts-warn:#e3a008; --ts-bad:#ef4444;
@@ -30,16 +30,13 @@
   .grad-text { background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
   /* Top bar */
-  .ts-topbar { position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:18px; height:58px; padding:0 20px; background:rgba(10,10,11,0.92); backdrop-filter:blur(8px); border-bottom:1px solid #1a1a1d; }
-  .ts-brand { display:flex; align-items:center; gap:9px; text-decoration:none; }
-  .ts-brand .grad-logo { width:24px; height:24px; }
-  .ts-brand .word { font-size:17px; font-weight:800; letter-spacing:-.02em; }
-  .ts-crumb { display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--ts-dim); min-width:0; }
-  .ts-crumb a { color:var(--ts-dim); text-decoration:none; display:flex; align-items:center; gap:6px; }
-  .ts-crumb a:hover { color:#fff; }
-  .ts-crumb svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.8; }
-  .ts-crumb .sep { color:#3a3a40; }
-  .ts-crumb .here { color:#fff; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ts-topbar { position:fixed; top:0; left:0; right:0; height:58px; z-index:40; display:flex; align-items:center; gap:16px; padding:0 20px; background:transparent; backdrop-filter:none; border-bottom:none; }
+  .ts-crumb { display:flex; align-items:center; gap:8px; min-width:0; font-size:13.5px; color:#a1a1aa; }
+  .ts-crumb a { color:#d4d4d8; text-decoration:none; display:flex; align-items:center; gap:6px; font-weight:500; }
+  .ts-crumb a:hover { color:#ffffff; }
+  .ts-crumb svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; flex-shrink:0; stroke-linecap:round; stroke-linejoin:round; }
+  .ts-crumb .sep { color:#a1a1aa; opacity:0.4; margin:0 -2px; }
+  .ts-crumb .here { color:#ffffff; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .ts-top-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
   .ts-conn { display:none; align-items:center; gap:7px; font-size:12.5px; color:var(--ts-dim); }
   .ts-conn i { width:8px; height:8px; border-radius:50%; background:#3fb950; display:inline-block; }
@@ -49,6 +46,7 @@
   .ts-finish:hover { background:#1c1c20; }
 
   /* Layout */
+  #tsRoot { padding-top:58px; min-height:100%; }
   .ts-view { display:none; }
   .ts-view.on { display:block; }
   .ts-wrap { max-width:960px; margin:0 auto; padding:44px 24px 90px; }
@@ -118,27 +116,394 @@
   .ts-quiet { background:none; border:none; color:var(--ts-faint); font-size:13px; text-decoration:underline; text-underline-offset:3px; padding:6px; }
   .ts-quiet:hover { color:#fff; }
 
-  /* Readiness */
-  .ts-context-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
-  .ts-chip { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:#c9c9ce; background:var(--ts-panel); border:1px solid var(--ts-line); border-radius:999px; padding:6px 12px; max-width:280px; }
-  .ts-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .ts-chip b { color:var(--ts-faint); font-weight:600; }
-  .ts-ready-actions { display:flex; flex-direction:column; gap:12px; max-width:420px; }
-  .ts-reassure { font-size:13px; color:var(--ts-faint); margin-top:14px; }
+  /* Readiness & 3D Pop Button */
+  /* Readiness & 3D Pop Button (Matching Chatbot Background & Unboxed Layout) */
+  #tsReady, #tsPreflight {
+    display: none;
+    min-height: calc(100vh - 58px);
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse 85% 65% at 50% 115%, rgba(168, 85, 247, 0.42) 0%, rgba(124, 58, 237, 0.24) 40%, rgba(109, 40, 217, 0.08) 68%, transparent 92%), #141416;
+  }
+  #tsReady.on, #tsPreflight.on {
+    display: flex;
+  }
+  #tsReady .ts-wrap {
+    width: 100%;
+  }
 
-  /* Quick Review */
-  .ts-qr { max-width:720px; }
-  .ts-qr-sec { margin-top:28px; }
-  .ts-qr-sec h2 { font-size:19px; font-weight:800; letter-spacing:-.01em; margin:0 0 10px; }
-  .ts-qr-sec p, .ts-qr-sec li { font-size:15px; line-height:1.7; color:#d4d4d2; }
-  .ts-qr-sec ul { list-style:none; margin:0; padding:0; }
-  .ts-qr-sec li { position:relative; padding-left:24px; margin-bottom:8px; }
-  .ts-qr-sec li::before { content:''; position:absolute; left:8px; top:11px; width:5px; height:5px; border-radius:50%; background:var(--ts-accent); }
-  .ts-qr-mixup { background:rgba(227,160,8,0.07); border:1px solid rgba(227,160,8,0.25); border-radius:var(--ts-radius-sm); padding:13px 15px; margin-bottom:9px; font-size:14px; line-height:1.6; }
-  .ts-qr-mixup b { color:var(--ts-warn); }
-  .ts-qr-sticky { position:sticky; bottom:0; padding:16px 0 20px; background:linear-gradient(transparent, var(--ts-bg) 34%); display:flex; gap:10px; margin-top:32px; }
-  .ts-qr-sticky .ts-cta { margin-top:0; width:auto; flex:1; }
-  .ts-qr-sticky .ts-ghost { margin-top:0; width:auto; }
+  .ts-ready-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+    max-width: 560px;
+    width: 100%;
+    padding: 20px 20px 60px;
+  }
+
+  /* 3D Purple Pop Button (Refined Less Bright Gradient) */
+  .ts-btn-3d-purple {
+    width: 100%;
+    max-width: 440px;
+    height: 56px;
+    border-radius: 9999px;
+    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    font-size: 16.5px;
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    position: relative;
+    box-shadow: 
+      inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -3px 6px 0 rgba(0, 0, 0, 0.3),
+      0 5px 0 0 #4c1d95,
+      0 8px 20px 0 rgba(124, 58, 237, 0.3);
+    transition: all 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  .ts-btn-3d-purple:hover:not([disabled]) {
+    background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+    box-shadow: 
+      inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -3px 6px 0 rgba(0, 0, 0, 0.3),
+      0 6px 0 0 #4c1d95,
+      0 12px 26px 0 rgba(124, 58, 237, 0.4);
+    transform: translateY(-1px);
+  }
+  .ts-btn-3d-purple:active:not([disabled]) {
+    transform: translateY(4px);
+    box-shadow: 
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -2px 4px 0 rgba(0, 0, 0, 0.35),
+      0 2px 0 0 #4c1d95,
+      0 4px 12px 0 rgba(124, 58, 237, 0.3);
+  }
+  .ts-btn-3d-purple:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 0 0 #4c1d95;
+  }
+
+  /* Sleek Ghost Pill Button */
+  .ts-ghost-pill {
+    width: 100%;
+    max-width: 440px;
+    height: 50px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e4e4e7;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .ts-ghost-pill:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+  .ts-ghost-pill:active {
+    transform: translateY(1px);
+  }
+
+  /* Quiet link button */
+  .ts-quiet-link {
+    background: none;
+    border: none;
+    color: #a1a1aa;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 12px;
+    margin-top: 4px;
+    transition: color 0.2s ease;
+    text-decoration: none;
+  }
+  .ts-quiet-link:hover {
+    color: #c4b5fd;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  #tsReady .ts-h1 {
+    font-size: clamp(32px, 4.5vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+    margin: 0 0 12px;
+    line-height: 1.2;
+  }
+  /* Whisper Title Animation (GSAP-style Staggered Entrance) */
+  .ts-whisper-title {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.28em;
+  }
+  .ts-whisper-word {
+    display: inline-block;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-20px);
+    will-change: opacity, transform;
+  }
+  #tsReady.on .ts-whisper-word,
+  .ts-whisper-word.play {
+    animation: tsWhisperFade 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--w-delay, 0.1s);
+  }
+  @keyframes tsWhisperFade {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  #tsReady .ts-sub {
+    font-size: 15.5px;
+    color: #9a9a9e;
+    max-width: 460px;
+    margin: 0 auto 36px;
+    line-height: 1.55;
+  }
+  #tsReady .ts-ready-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  #tsReady .ts-reassure {
+    font-size: 13px;
+    color: #71717a;
+    margin-top: 22px;
+  }
+
+  /* ── 1:1 Study Brief CSS (copied directly from lesson.html) ── */
+  #tsProcessing {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #0e0e11 !important;
+    z-index: 9999 !important;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #tsProcessing.on {
+    display: flex !important;
+  }
+  .heroui-table-container {
+    width: 100%;
+    margin: 16px 0 28px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #18181b;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+  .heroui-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .heroui-table th {
+    background: rgba(109, 40, 217, 0.28);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: normal;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.25);
+  }
+  .heroui-table td {
+    padding: 14px 20px;
+    color: #f4f4f5;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .heroui-table tr:last-child td {
+    border-bottom: none;
+  }
+  .heroui-table tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .shimmer-text {
+    display:inline-block; white-space:pre;
+    background-image:linear-gradient(90deg,#a1a1aa 0%,#a1a1aa 42%,#ffffff 50%,#a1a1aa 58%,#a1a1aa 100%);
+    background-size:200% 100%;
+    background-repeat:repeat-x;
+    -webkit-background-clip:text; background-clip:text;
+    color:#a1a1aa;
+    animation:textShimmer 2.4s linear infinite;
+  }
+  @keyframes textShimmer {
+    from { background-position:200% center; }
+    to   { background-position:0% center; }
+  }
+  .load-progress {
+    width: min(420px, 74vw);
+    height: 10px;
+    margin-top: 0;
+    border-radius: 999px;
+    background: #1c1c20;
+    overflow: hidden;
+    box-shadow: inset 0 2px 3px rgba(0,0,0,0.45), inset 0 -1px 2px rgba(255,255,255,0.05);
+  }
+  .load-progress i {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg,#7c3aed 0%,#9d7bf5 35%,#c4b5fd 55%,#9d7bf5 78%,#7c3aed 100%);
+    box-shadow: 0 0 18px rgba(139,92,246,0.55), 0 0 32px rgba(196,181,253,0.35),
+               inset 0 1.5px 0 rgba(255,255,255,0.45), inset 0 -2px 3px rgba(60,20,120,0.35);
+    transition: width 0.15s ease-out;
+  }
+  .load-progress i::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 50%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    mix-blend-mode: screen;
+    animation: fluxSheen 1.6s linear infinite;
+  }
+  @keyframes fluxSheen {
+    from { transform: translateX(-110%); }
+    to   { transform: translateX(210%); }
+  }
+  .br-doc {
+    max-width: 760px;
+    margin: 0 auto;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    color: #e4e4e7;
+    letter-spacing: -0.005em;
+  }
+  .br-doc .br-sub {
+    color: #8a8a93;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin: 6px 0 28px;
+    text-align: center;
+  }
+  .br-doc h2 {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin: 34px 0 14px;
+    line-height: 1.25;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .br-doc p {
+    margin: 0 0 16px;
+    color: #e4e4e7;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  .br-doc ul {
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 0;
+  }
+  .br-doc li {
+    position: relative;
+    padding-left: 24px;
+    margin: 0 0 12px;
+    color: #e4e4e7;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .br-doc li::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 11px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ffffff;
+    opacity: 0.95;
+  }
+  .br-doc b, .br-doc strong {
+    color: #c084fc;
+    font-weight: 700;
+  }
+  .br-doc .br-callout {
+    display: block;
+    padding: 18px 22px;
+    margin: 0 0 24px;
+    border-radius: 12px;
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid #8b5cf6;
+    color: #e4e4e7;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  .br-doc .br-callout-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .br-example-box {
+    padding: 16px 20px;
+    margin: 12px 0 24px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-left: 3.5px solid #8b5cf6;
+    color: #e4e4e7;
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+  .topic-illu-img {
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .ts-qr-sticky { position:fixed; bottom:0; left:0; right:0; padding:20px 24px; background:linear-gradient(transparent 0%, #09090c 45%); display:flex; justify-content:center; gap:12px; z-index:50; }
 
   /* Preflight */
   .ts-meter { height:10px; border-radius:99px; background:#1c1c20; overflow:hidden; margin:18px 0 8px; }
@@ -251,12 +616,23 @@
   .ts-recall-btn:hover { border-color:var(--ts-accent); color:#fff; }
   .ts-recall-btn.set { border-color:var(--ts-good); color:#7ee2a8; pointer-events:none; }
 
-  /* ── Multi-Step Checkpoint Onboarding Flow ───────────────────────── */
-  .ts-checkpoint-wrap { max-width:620px; margin:0 auto; padding:20px 20px 80px; }
-  .ts-progress-bar { display:flex; gap:8px; width:100%; max-width:580px; margin:0 auto 28px; }
-  .ts-progress-segment { flex:1; height:3.5px; border-radius:99px; background:#232324; transition:background 0.3s ease; }
-  .ts-progress-segment.active { background:#8b5cf6; }
-  .ts-progress-segment.done { background:#8b5cf6; }
+  .ts-checkpoint-wrap { max-width:620px; margin:0 auto; padding:20px 20px 40px; min-height:calc(100vh - 120px); display:flex; flex-direction:column; }
+  .ts-cp-step { margin-top:40px; display:flex; flex-direction:column; flex:1; }
+  .ts-progress-wrap { display:flex; align-items:center; justify-content:center; gap:16px; width:100%; max-width:640px; margin:0 auto 28px; }
+  .ts-progress-arrow {
+    width:28px; height:28px; border-radius:0; background:transparent; border:none;
+    color:#71717a; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    flex-shrink:0; transition:all 0.15s ease; padding:0;
+  }
+  .ts-progress-arrow:hover:not([disabled]) { background:transparent; color:#ffffff; transform:scale(1.15); }
+  .ts-progress-arrow:disabled { opacity:0.25; cursor:not-allowed; color:#27272a; }
+  .ts-progress-arrow svg { width:18px; height:18px; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+  .ts-progress-bar { flex:1; display:flex; gap:8px; margin:0; }
+  .ts-progress-segment { flex:1; height:6px; border-radius:999px; background:#1c1c20; overflow:hidden; box-shadow: inset 0 2px 3px rgba(0,0,0,0.45), inset 0 -1px 2px rgba(255,255,255,0.05); position:relative; }
+  .ts-progress-segment.active, .ts-progress-segment.done {
+    background: linear-gradient(90deg, #7c3aed 0%, #9d7bf5 35%, #c4b5fd 55%, #9d7bf5 78%, #7c3aed 100%);
+    box-shadow: 0 0 12px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 2px rgba(60,20,120,0.2);
+  }
 
   .ts-checkpoint-meta { font-size:12.5px; font-weight:600; color:#8A8A8E; text-align:center; margin-bottom:12px; }
   .ts-checkpoint-title { font-size:clamp(24px, 3.5vw, 32px); font-weight:700; color:#FFFFFF; text-align:center; margin:0 0 8px; letter-spacing:-0.02em; }
@@ -271,49 +647,69 @@
   }
   .ts-subj-opt:hover { background:#1A1A1E; border-color:#3A3A3E; color:#FFFFFF; }
   .ts-subj-opt.selected {
-    background:#17122a; border-color:#8b5cf6; color:#FFFFFF; box-shadow:0 0 0 1px #8b5cf6, 0 4px 16px rgba(139,92,246,0.15);
+    background:#17122a; border-color:#6d28d9; color:#FFFFFF; box-shadow:none;
   }
   .ts-subj-left { display:flex; align-items:center; gap:12px; }
   .ts-radio-ring {
     width:18px; height:18px; border-radius:50%; border:1.5px solid #4A4A4E; display:flex; align-items:center; justify-content:center; transition:all 0.15s ease; flex-shrink:0;
   }
-  .ts-subj-opt.selected .ts-radio-ring { border-color:#8b5cf6; background:#8b5cf6; }
+  .ts-subj-opt.selected .ts-radio-ring { border-color:#6d28d9; background:#6d28d9; }
   .ts-radio-inner { width:6px; height:6px; border-radius:50%; background:#FFFFFF; display:none; }
   .ts-subj-opt.selected .ts-radio-inner { display:block; }
-  .ts-subj-num { font-size:12px; font-weight:600; color:#5A5A5E; transition:color 0.15s ease; }
-  .ts-subj-opt.selected .ts-subj-num { color:#b79df5; }
+  .ts-subj-opt.selected .ts-radio-inner { display:block; }
 
-  .ts-topic-card { background:#141416; border:1px solid #232324; border-radius:20px; padding:24px; margin-bottom:28px; }
-  .ts-topic-input {
-    width:100%; background:#0D0D0E; border:1px solid #2A2A2E; border-radius:12px; padding:14px 16px;
-    color:#FFFFFF; font-size:15px; font-weight:500; outline:none; transition:border-color 0.15s ease;
+  .ts-search-container { position:relative; margin-bottom:28px; width:100%; max-width:540px; margin-left:auto; margin-right:auto; }
+  .ts-search-dock {
+    display:flex; align-items:center; gap:12px; height:56px; overflow:hidden; border-radius:999px;
+    border:1px solid rgba(255,255,255,0.12); background:rgba(20,20,22,0.8); backdrop-filter:blur(12px);
+    padding:0 20px; transition:border-color 0.15s ease;
   }
-  .ts-topic-input:focus { border-color:#8b5cf6; }
-  .ts-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
-  .ts-chip {
-    padding:6px 12px; background:#1C1C1E; border:1px solid #28282C; border-radius:99px; color:#C7C7CC;
-    font-size:12.5px; font-weight:500; cursor:pointer; transition:all 0.15s ease;
+  .ts-search-dock:focus-within { border-color:#6d28d9; box-shadow:none; }
+  .ts-search-icon { width:20px; height:20px; fill:none; stroke:#a1a1aa; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+  .ts-topic-input { flex:1; background:transparent; border:none; color:#FFFFFF; font-size:15px; outline:none; font-weight:500; min-width:0; padding:0; }
+  .ts-topic-input::placeholder { color:#71717a; }
+  .ts-clear-btn { width:28px; height:28px; border-radius:50%; background:transparent; border:none; display:flex; align-items:center; justify-content:center; color:#a1a1aa; cursor:pointer; flex-shrink:0; transition:background 0.15s; }
+  .ts-clear-btn:hover { background:rgba(255,255,255,0.1); color:#fff; }
+  .ts-clear-btn svg { width:16px; height:16px; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+  
+  .ts-search-dropdown {
+    position:absolute; top:calc(100% + 8px); left:0; right:0; background:rgba(20,20,22,0.95); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:8px; z-index:50;
+    box-shadow:0 12px 32px rgba(0,0,0,0.4); display:none; flex-direction:column; gap:4px;
+    max-height: 300px; overflow-y: auto;
   }
-  .ts-chip:hover { background:#28282C; border-color:#3A3A3E; color:#FFFFFF; }
+  .ts-dropdown-item {
+    padding:10px 16px; border-radius:10px; color:#d4d4d8; font-size:14px; font-weight:500; cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .ts-dropdown-item:hover { background:rgba(255,255,255,0.08); color:#ffffff; }
 
-  .ts-material-card { background:#141416; border:1px solid #232324; border-radius:20px; padding:20px; margin-bottom:28px; }
+  .ts-material-card {
+    background:#161618; border:1px solid #28282C; border-radius:24px; padding:24px;
+    width:100%; max-width:520px; margin:0 auto 28px; box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  }
   .ts-dropzone {
-    border:1px dashed #3A3A3E; border-radius:16px; background:#0D0D0E; padding:32px 20px; text-align:center;
-    cursor:pointer; transition:all 0.15s ease; display:flex; flex-direction:column; align-items:center;
+    border:1px dashed #36363B; border-radius:16px; background:#1F1F23;
+    padding:48px 24px; text-align:center; cursor:pointer; transition:all 0.15s ease;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
-  .ts-dropzone:hover { border-color:#8b5cf6; background:#12101B; }
-  .ts-dropzone-illustration { margin-bottom:14px; width:72px; height:56px; position:relative; }
-  .ts-dropzone-title { font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-size:22px; color:#E5E5E7; margin-bottom:4px; }
-  .ts-dropzone-subtitle { font-size:12.5px; color:#7A7A7E; margin-bottom:12px; }
-  .ts-dropzone-btn { font-size:13.5px; font-weight:600; color:#FFFFFF; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
-  .ts-dropzone-btn:hover { color:#b79df5; }
+  .ts-dropzone:hover { border-color:#4A4A52; background:#25252A; }
+  .ts-dropzone-illustration { margin-bottom:18px; width:120px; height:90px; display:flex; align-items:center; justify-content:center; }
+  .ts-dropzone-title { font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-size:24px; font-weight:400; color:#FFFFFF; margin-bottom:6px; }
+  .ts-dropzone-subtitle { font-size:14px; color:#9A9A9E; margin-bottom:18px; }
+  .ts-dropzone-btn { font-size:14px; font-weight:600; color:#FFFFFF; text-decoration:underline; text-underline-offset:4px; cursor:pointer; }
+  .ts-dropzone-btn:hover { color:#e4e4e7; }
   
   .ts-paste-trigger-btn {
-    width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 16px;
-    background:#1C1C1E; border:1px solid #262628; border-radius:12px; color:#E5E5E7; font-size:13.5px;
-    font-weight:600; margin-top:12px; cursor:pointer; transition:background 0.15s ease;
+    width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 18px;
+    background:#1F1F23; border:1px solid #28282C; border-radius:14px; color:#FFFFFF; font-size:14.5px;
+    font-weight:500; margin-top:18px; cursor:pointer; transition:all 0.15s ease;
   }
-  .ts-paste-trigger-btn:hover { background:#242428; border-color:#3A3A3E; }
+  .ts-paste-trigger-btn:hover { background:#25252A; border-color:#3A3A40; }
+  .ts-paste-icon-badge {
+    width:32px; height:32px; border-radius:8px; background:#2C2C32; display:flex;
+    align-items:center; justify-content:center; color:#FFFFFF; flex-shrink:0;
+  }
 
   /* ── Study Material Popup Modal (Screenshot 2!) ──────────────────── */
   .ts-modal-overlay {
@@ -341,47 +737,47 @@
     background:#FFFFFF; color:#000000; cursor:pointer; box-shadow:0 4px 18px rgba(255,255,255,0.2);
   }
   .ts-modal-continue-btn.active:hover { background:#E5E5E7; }
-  .ts-student-card {
-    display:flex; align-items:flex-start; gap:14px; padding:16px; background:#141416; border:1px solid #232324;
-    border-radius:16px; cursor:pointer; text-align:left; transition:all 0.15s ease; position:relative; width:100%;
+  .ts-student-list {
+    display:flex; flex-direction:column; gap:20px; width:100%; max-width:580px; margin:28px auto 0;
   }
-  .ts-student-card:hover { border-color:#3A3A3E; background:#18181B; }
+  .ts-student-card {
+    display:flex; align-items:flex-start; gap:18px; padding:22px 24px; background:#141416; border:1px solid rgba(255,255,255,0.09);
+    border-radius:20px; cursor:pointer; text-align:left; transition:all 0.2s cubic-bezier(0.16, 1, 0.3, 1); position:relative; width:100%;
+    box-shadow:0 4px 20px rgba(0,0,0,0.25);
+  }
+  .ts-student-card:hover {
+    border-color:rgba(255,255,255,0.22); background:#18181C; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  }
   .ts-student-card.selected {
-    background:#17122A; border-color:#8b5cf6; box-shadow:0 0 0 1px #8b5cf6, 0 4px 18px rgba(139,92,246,0.15);
+    background:#18132C; border-color:#8b5cf6; box-shadow:0 0 0 1px #8b5cf6, 0 8px 28px rgba(139,92,246,0.25);
   }
   .ts-student-avatar {
-    width:42px; height:42px; border-radius:50%; background:#1C1C1E; border:1.5px solid #2A2A2E;
-    flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#FFFFFF;
+    width:52px; height:52px; background:transparent; border:none;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:visible; transition:transform 0.2s ease, filter 0.2s ease;
   }
-  .ts-student-card.selected .ts-student-avatar { border-color:#8b5cf6; }
+  .ts-student-card.selected .ts-student-avatar { transform:scale(1.06); filter:drop-shadow(0 4px 12px rgba(139,92,246,0.35)); }
   .ts-student-info { flex:1; min-width:0; }
-  .ts-student-name-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-  .ts-student-name { font-size:15px; font-weight:700; color:#FFFFFF; }
-  .ts-student-badge {
-    font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
-    padding:2px 8px; border-radius:99px; background:#24242A; color:#9A9A9E;
+  .ts-student-name { font-size:17px; font-weight:700; color:#FFFFFF; margin-bottom:5px; letter-spacing:-0.01em; }
+  .ts-student-quote { font-size:13.5px; font-style:italic; color:#D0D0D5; margin-bottom:5px; line-height:1.45; }
+  .ts-student-desc { font-size:12.5px; color:#8A8A90; line-height:1.45; }
+  .ts-student-check {
+    position:absolute; top:22px; right:22px; width:24px; height:24px; border-radius:50%; background:#8b5cf6;
+    color:#FFFFFF; font-size:13px; font-weight:800; display:none; align-items:center; justify-content:center;
   }
-  .ts-student-card.selected .ts-student-badge { background:rgba(139,92,246,0.2); color:#b79df5; border:1px solid rgba(139,92,246,0.3); }
-  .ts-student-quote { font-size:13px; font-style:italic; color:#D0D0D5; margin-bottom:4px; }
-  .ts-student-desc { font-size:12px; color:#7A7A7E; line-height:1.4; }
-  .ts-student-check { position:absolute; top:16px; right:16px; color:#8b5cf6; font-size:16px; font-weight:800; display:none; }
-  .ts-student-card.selected .ts-student-check { display:block; }
+  .ts-student-card.selected .ts-student-check { display:flex; }
 
-  .ts-nav-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; margin-top:20px; }
-  .ts-footer-status { font-size:13px; font-weight:600; color:#9A9A9E; }
+  .ts-nav-footer { display:flex; align-items:center; justify-content:center; width:100%; margin-top:auto; padding-top:40px; padding-bottom:20px; }
+  .ts-footer-status { font-size:13.5px; font-weight:600; color:#9A9A9E; }
   .ts-next-btn {
-    padding:10px 26px; border:none; border-radius:99px; background:#8b5cf6; color:#FFFFFF;
-    font-size:14px; font-weight:700; cursor:pointer;
-    box-shadow:0 0 0 1px #8b5cf6, 0 4px 16px rgba(139,92,246,0.35);
-    transition:transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    width:100%; max-width:480px; height:52px; border:2px solid #a78bfa; border-bottom:5px solid #4c1d95;
+    border-radius:99px; background:#7c3aed; color:#ffffff; font-size:16px; font-weight:700;
+    cursor:pointer; font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    display:inline-flex; align-items:center; justify-content:center; user-select:none;
+    transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); transform-origin:bottom; box-shadow:0 4px 20px rgba(124,58,237,0.45);
   }
-  .ts-next-btn:hover { background:#7c3aed; transform:translateY(-1px); box-shadow:0 0 0 1px #8b5cf6, 0 6px 20px rgba(139,92,246,0.45); }
-  .ts-next-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; background:#3a3350; }
-  .ts-back-btn {
-    padding:10px 18px; border:1px solid #2A2A2E; border-radius:99px; background:transparent;
-    color:#C7C7CC; font-size:13.5px; font-weight:600; cursor:pointer; transition:all 0.15s ease;
-  }
-  .ts-back-btn:hover { background:#1C1C1E; color:#FFFFFF; }
+  .ts-next-btn:hover:not([disabled]) { background:#6d28d9; border-color:#7c3aed; color:#fff; box-shadow:0 6px 24px rgba(124,58,237,0.6); }
+  .ts-next-btn:active:not([disabled]) { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); box-shadow:0 2px 8px rgba(124,58,237,0.3); }
+  .ts-next-btn:disabled { opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none; background:#27272a; border-color:#3f3f46; border-bottom:4px solid #18181b; color:#71717a; }
 
   /* Generic */
   .ts-load { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:40vh; text-align:center; }
@@ -404,10 +800,6 @@
 <body>
 
 <header class="ts-topbar">
-  <a class="ts-brand" href="chatbot.html">
-    <span class="grad-logo" role="img" aria-label="Noura"></span>
-    <span class="word grad-text">Noura</span>
-  </a>
   <nav class="ts-crumb" aria-label="Breadcrumb">
     <a href="chatbot.html">
       <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
@@ -428,11 +820,19 @@
   <!-- ══ SETUP (3-Checkpoint Onboarding Flow) ══ -->
   <section class="ts-view on" id="tsSetup">
     <div class="ts-checkpoint-wrap">
-      <!-- 3-Segment Progress Bar -->
-      <div class="ts-progress-bar">
-        <div class="ts-progress-segment active" id="tsSeg1"></div>
-        <div class="ts-progress-segment" id="tsSeg2"></div>
-        <div class="ts-progress-segment" id="tsSeg3"></div>
+      <!-- 3-Segment Progress Bar with Left & Right Arrows -->
+      <div class="ts-progress-wrap">
+        <button class="ts-progress-arrow" id="tsPrevStep" type="button" aria-label="Previous step" disabled>
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="ts-progress-bar">
+          <div class="ts-progress-segment active" id="tsSeg1"></div>
+          <div class="ts-progress-segment" id="tsSeg2"></div>
+          <div class="ts-progress-segment" id="tsSeg3"></div>
+        </div>
+        <button class="ts-progress-arrow" id="tsNextStepArrow" type="button" aria-label="Next step">
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
       </div>
 
       <!-- STEP 1: Subject Selection (Checkpoint 1 of 3) -->
@@ -447,33 +847,33 @@
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
               <span>Math</span>
             </div>
-            <span class="ts-subj-num">1</span>
           </div>
           <div class="ts-subj-opt" data-subject="Science">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
               <span>Science</span>
             </div>
-            <span class="ts-subj-num">2</span>
           </div>
           <div class="ts-subj-opt" data-subject="English">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
               <span>English</span>
             </div>
-            <span class="ts-subj-num">3</span>
           </div>
           <div class="ts-subj-opt" data-subject="Other">
             <div class="ts-subj-left">
               <div class="ts-radio-ring"><div class="ts-radio-inner"></div></div>
               <span>Other</span>
             </div>
-            <span class="ts-subj-num">4</span>
           </div>
         </div>
 
-        <div class="ts-nav-footer" style="justify-content:flex-end;">
-          <button class="ts-next-btn" id="tsNextStep1" type="button" disabled>Next</button>
+        <div id="tsOtherSubjContainer" style="display:none; margin-bottom:28px;">
+          <input id="tsOtherSubjInput" type="text" placeholder="Type your subject here..." style="width:100%; max-width:460px; display:block; margin:0 auto; background:#141416; border:1px solid #232324; border-radius:14px; padding:14px 16px; color:#E5E5E7; font-size:14px; font-weight:500; outline:none; box-shadow:none;">
+        </div>
+
+        <div class="ts-nav-footer">
+          <button class="ts-next-btn" id="tsNextStep1" type="button" disabled>Continue</button>
         </div>
       </div>
 
@@ -483,132 +883,165 @@
         <h1 class="ts-checkpoint-title">What are you teaching?</h1>
         <p class="ts-checkpoint-desc">Give a brief name or topic for what you're teaching today.</p>
 
-        <div class="ts-topic-card">
-          <input class="ts-topic-input" id="tsTopic" type="text" maxlength="140"
-            placeholder="e.g. Newton's Laws of Motion, Photosynthesis, Supply & Demand..." autocomplete="off">
-          <div class="ts-chips" id="tsTopicChips">
-            <span class="ts-chip">Newton's Laws of Motion</span>
-            <span class="ts-chip">Photosynthesis</span>
-            <span class="ts-chip">Cell Structure & Function</span>
-            <span class="ts-chip">Supply & Demand</span>
-            <span class="ts-chip">French Revolution</span>
+        <div class="ts-search-container">
+          <div class="ts-search-dock">
+            <svg class="ts-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input class="ts-topic-input" id="tsTopic" type="text" maxlength="140"
+              placeholder="Search or enter a topic..." autocomplete="off">
+            <button class="ts-clear-btn" id="tsClearBtn" type="button" style="display:none;">
+              <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="ts-search-dropdown" id="tsTopicChips">
+            <div class="ts-dropdown-item">Newton's Laws of Motion</div>
+            <div class="ts-dropdown-item">Photosynthesis</div>
+            <div class="ts-dropdown-item">Cell Structure & Function</div>
+            <div class="ts-dropdown-item">Supply & Demand</div>
+            <div class="ts-dropdown-item">French Revolution</div>
           </div>
         </div>
 
         <div class="ts-nav-footer">
-          <button class="ts-back-btn" id="tsBackStep2" type="button">Back</button>
-          <button class="ts-next-btn" id="tsNextStep2" type="button">Next</button>
+          <button class="ts-next-btn" id="tsNextStep2" type="button">Continue</button>
         </div>
       </div>
 
-      <!-- STEP 3: Choose AI Student (Checkpoint 3 of 3) -->
+      <!-- STEP 3: Add Study Material (Checkpoint 3 of 3) -->
       <div class="ts-cp-step" id="tsCpStep3" style="display:none;">
         <div class="ts-checkpoint-meta">Checkpoint 3 of 3</div>
-        <h1 class="ts-checkpoint-title">Choose your AI student</h1>
-        <p class="ts-checkpoint-desc">Select the level of AI student you want to teach today.</p>
+        <h1 class="ts-checkpoint-title">Add your study material</h1>
+        <p class="ts-checkpoint-desc">Add content from your notes, textbooks, and past exams.</p>
 
-        <div class="ts-student-list" id="tsStudentList">
-          <div class="ts-student-card" data-level="BEGINNER">
-            <div class="ts-student-avatar">S</div>
-            <div class="ts-student-info">
-              <div class="ts-student-name-row">
-                <span class="ts-student-name">Sam</span>
-                <span class="ts-student-badge">BEGINNER</span>
-              </div>
-              <div class="ts-student-quote">“Teach me from the foundations.”</div>
-              <div class="ts-student-desc">Best for checking whether you can explain clearly from first principles.</div>
+        <div class="ts-material-card">
+          <!-- Dropzone -->
+          <div class="ts-dropzone" id="tsDropzone">
+            <div class="ts-dropzone-illustration">
+              <svg width="120" height="90" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(18, 12) rotate(-12)">
+                  <rect width="48" height="62" rx="6" fill="#7C3AED"/>
+                  <rect x="8" y="44" width="16" height="4" rx="1" fill="rgba(255,255,255,0.4)"/>
+                  <text x="8" y="55" font-size="7" font-weight="bold" fill="rgba(255,255,255,0.8)" font-family="sans-serif">DOC</text>
+                </g>
+                <g transform="translate(54, 12) rotate(12)">
+                  <rect width="48" height="62" rx="6" fill="#9333EA"/>
+                  <circle cx="38" cy="48" r="4" fill="rgba(255,255,255,0.3)"/>
+                </g>
+                <g transform="translate(36, 14)">
+                  <rect width="48" height="64" rx="8" fill="#FFFFFF"/>
+                  <path d="M34 0 L48 14 L34 14 Z" fill="#E2E8F0"/>
+                  <rect x="8" y="34" width="20" height="14" rx="3" fill="#EF4444"/>
+                  <text x="18" y="44" font-size="7" font-weight="800" fill="#FFFFFF" text-anchor="middle" font-family="sans-serif">PDF</text>
+                  <rect x="8" y="16" width="22" height="3" rx="1.5" fill="#94A3B8"/>
+                  <rect x="8" y="23" width="32" height="3" rx="1.5" fill="#CBD5E1"/>
+                  <rect x="8" y="53" width="28" height="2.5" rx="1" fill="#E2E8F0"/>
+                </g>
+              </svg>
             </div>
-            <span class="ts-student-check">✓</span>
+            <div class="ts-dropzone-title">Drop your files</div>
+            <div class="ts-dropzone-subtitle">PDF, PPTX, DOC, TXT, images</div>
+            <div class="ts-dropzone-btn" id="tsUploadBtn">Select from your device</div>
+            <input type="file" id="tsFileInput" accept=".txt,.md,.text,.pdf,.doc,.docx,text/plain,text/markdown" hidden>
+            <div id="tsSrcList" style="width:100%; margin-top:12px;"></div>
           </div>
 
-          <div class="ts-student-card selected" data-level="INTERMEDIATE">
-            <div class="ts-student-avatar">R</div>
-            <div class="ts-student-info">
-              <div class="ts-student-name-row">
-                <span class="ts-student-name">Riley</span>
-                <span class="ts-student-badge">INTERMEDIATE</span>
+          <!-- Paste Option -->
+          <button class="ts-paste-trigger-btn" id="tsPasteBtn" type="button">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="ts-paste-icon-badge">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
               </div>
-              <div class="ts-student-quote">“I know the basics—help me connect the ideas.”</div>
-              <div class="ts-student-desc">Best for checking connected understanding: mechanisms, comparisons, applications.</div>
+              <span>Paste copied text</span>
             </div>
-            <span class="ts-student-check">✓</span>
+            <span style="font-size:13.5px; color:#7A7A7E; font-weight:500;">Paste &rsaquo;</span>
+          </button>
+
+          <div id="tsPasteWrap" hidden style="margin-top:12px;">
+            <textarea class="ts-textarea" id="tsPasteArea" placeholder="Paste your notes, a chapter, a summary — anything you want to teach from."></textarea>
+            <button class="ts-ghost" id="tsPasteSave" type="button" style="margin-top:8px;">Use this text</button>
           </div>
 
-          <div class="ts-student-card" data-level="ADVANCED">
-            <div class="ts-student-avatar">M</div>
-            <div class="ts-student-info">
-              <div class="ts-student-name-row">
-                <span class="ts-student-name">Morgan</span>
-                <span class="ts-student-badge">ADVANCED</span>
-              </div>
-              <div class="ts-student-quote">“I understand the argument—convince me.”</div>
-              <div class="ts-student-desc">Best for testing whether your knowledge holds up under pressure.</div>
-            </div>
-            <span class="ts-student-check">✓</span>
-          </div>
+          <div class="ts-error-box" id="tsSrcError" hidden></div>
         </div>
 
         <div class="ts-nav-footer">
-          <button class="ts-back-btn" id="tsBackStep3" type="button">Back</button>
-          <button class="ts-next-btn" id="tsNextStep3" type="button">Next</button>
+          <button class="ts-next-btn" id="tsNextStep3" type="button">Continue</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ══ STUDY MATERIAL POPUP MODAL (Screenshot 2!) ══ -->
-  <div id="tsMaterialModal" class="ts-modal-overlay" style="display:none;">
-    <div class="ts-modal-box">
-      <button class="ts-modal-close" id="tsCloseModal" type="button" aria-label="Close">&times;</button>
-      <h2 class="ts-modal-title">Add your study material</h2>
-      <p class="ts-modal-desc">Add content from your notes, textbooks, and past exams.</p>
+  <!-- ══ CHOOSE AI STUDENT VIEW (Standalone Page, NO Progress Bar!) ══ -->
+  <section class="ts-view" id="tsStudentView">
+    <div class="ts-checkpoint-wrap" style="padding-top:40px;">
+      <h1 class="ts-checkpoint-title">Choose your AI student</h1>
+      <p class="ts-checkpoint-desc">Select the level of AI student you want to teach today.</p>
 
-      <!-- Dropzone -->
-      <div class="ts-dropzone" id="tsDropzone">
-        <div class="ts-dropzone-illustration">
-          <svg width="72" height="56" viewBox="0 0 72 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="8" y="8" width="34" height="42" rx="4" fill="#6366F1" transform="rotate(-10 8 8)"/>
-            <rect x="30" y="8" width="34" height="42" rx="4" fill="#8B5CF6" transform="rotate(10 30 8)"/>
-            <rect x="19" y="6" width="34" height="44" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
-            <rect x="25" y="16" width="14" height="12" rx="2" fill="#EF4444"/>
-            <text x="32" y="24" font-size="7" font-weight="bold" fill="#FFFFFF" text-anchor="middle">PDF</text>
-            <line x1="25" y1="33" x2="47" y2="33" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="25" y1="38" x2="41" y2="38" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
+      <div class="ts-student-list" id="tsStudentList">
+        <div class="ts-student-card" data-level="BEGINNER">
+          <div class="ts-student-avatar">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="14,2 34,2 46,14 46,34 34,46 14,46 2,34 2,14" fill="#059669" stroke="#34D399" stroke-width="2.5" stroke-linejoin="round"/>
+              <polygon points="15,6 33,6 42,15 42,33 33,42 15,42 6,33 6,15" fill="#047857" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M24 34 V22 M24 22 C24 16 18 16 18 16 C18 20 24 22 24 22 C24 22 30 20 30 16 C30 16 24 16 24 22" stroke="#A7F3D0" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ts-student-info">
+            <div class="ts-student-name">Beginner</div>
+            <div class="ts-student-quote">“Teach me from the foundations.”</div>
+            <div class="ts-student-desc">Best for checking whether you can explain clearly from first principles.</div>
+          </div>
+          <span class="ts-student-check">✓</span>
         </div>
-        <div class="ts-dropzone-title">Drop your files</div>
-        <div class="ts-dropzone-subtitle">PDF, PPTX, DOC, TXT, images</div>
-        <div class="ts-dropzone-btn" id="tsUploadBtn">Select from your device</div>
-        <input type="file" id="tsFileInput" accept=".txt,.md,.text,.pdf,.doc,.docx,text/plain,text/markdown" hidden>
+
+        <div class="ts-student-card selected" data-level="INTERMEDIATE">
+          <div class="ts-student-avatar">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="14,2 34,2 46,14 46,34 34,46 14,46 2,34 2,14" fill="#6D28D9" stroke="#A78BFA" stroke-width="2.5" stroke-linejoin="round"/>
+              <polygon points="15,6 33,6 42,15 42,33 33,42 15,42 6,33 6,15" fill="#4C1D95" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M26 12 L16 26 H24 L22 36 L32 22 H24 L26 12 Z" fill="#DDD6FE" stroke="#C4B5FD" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ts-student-info">
+            <div class="ts-student-name">Intermediate</div>
+            <div class="ts-student-quote">“I know the basics—help me connect the ideas.”</div>
+            <div class="ts-student-desc">Best for checking connected understanding: mechanisms, comparisons, applications.</div>
+          </div>
+          <span class="ts-student-check">✓</span>
+        </div>
+
+        <div class="ts-student-card" data-level="ADVANCED">
+          <div class="ts-student-avatar">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="14,2 34,2 46,14 46,34 34,46 14,46 2,34 2,14" fill="#D97706" stroke="#FBBF24" stroke-width="2.5" stroke-linejoin="round"/>
+              <polygon points="15,6 33,6 42,15 42,33 33,42 15,42 6,33 6,15" fill="#92400E" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M18 16 H30 V22 C30 25.3 27.3 28 24 28 C20.7 28 18 25.3 18 22 V16 Z M18 18 H15 C13.9 18 13 18.9 13 20 C13 21.1 13.9 22 15 22 H18 M30 18 H33 C34.1 18 35 18.9 35 20 C35 21.1 34.1 22 33 22 H30 M24 28 V33 M20 33 H28" stroke="#FEF08A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ts-student-info">
+            <div class="ts-student-name">Advanced</div>
+            <div class="ts-student-quote">“I understand the argument—convince me.”</div>
+            <div class="ts-student-desc">Best for testing whether your knowledge holds up under pressure.</div>
+          </div>
+          <span class="ts-student-check">✓</span>
+        </div>
       </div>
 
-      <!-- Paste Option -->
-      <button class="ts-paste-trigger-btn" id="tsPasteBtn" type="button">
-        <span style="display:flex; align-items:center; gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-          Paste copied text
-        </span>
-        <span style="font-size:12px; color:#9A9A9E;">Paste &rsaquo;</span>
-      </button>
-
-      <div id="tsPasteWrap" hidden style="margin-top:12px;">
-        <textarea class="ts-textarea" id="tsPasteArea" placeholder="Paste your notes, a chapter, a summary — anything you want to teach from."></textarea>
-        <button class="ts-ghost" id="tsPasteSave" type="button" style="margin-top:8px;">Use this text</button>
+      <div class="ts-nav-footer">
+        <button class="ts-next-btn" id="tsStudentContinueBtn" type="button">Continue</button>
       </div>
-
-      <div id="tsSrcList" style="margin-top:14px;"></div>
-      <div class="ts-error-box" id="tsSrcError" hidden></div>
-
-      <button class="ts-modal-continue-btn" id="tsModalContinueBtn" type="button">Continue</button>
     </div>
-  </div>
+  </section>
+
+
 
   <!-- ══ PROCESSING SOURCE ══ -->
   <section class="ts-view" id="tsProcessing">
-    <div class="ts-wrap narrow">
-      <div class="ts-load">
-        <p id="tsProcessingMsg">Preparing your material for the AI student…</p>
-        <div class="bar"><i></i></div>
+    <div class="tab-load" style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; max-width:600px; padding:0 20px;">
+      <div class="tab-load-txt" style="margin-bottom:20px; font-size:22px; color:#8a8a93; letter-spacing:-0.01em; text-align:center;">
+        <span class="lbl shimmer-text" id="tsProcessingMsg">Writing your Quick Review…</span>
+      </div>
+      <div class="load-progress">
+        <i id="tsLoadProgressFill" style="width:0%;"></i>
       </div>
     </div>
   </section>
@@ -616,118 +1049,175 @@
   <!-- ══ READY TO TEACH? ══ -->
   <section class="ts-view" id="tsReady">
     <div class="ts-wrap narrow">
-      <div class="ts-context-row" id="tsReadyContext"></div>
-      <h1 class="ts-h1">Ready to teach?</h1>
-      <p class="ts-sub">Teach from what you know now, or take a quick review of the essentials first.</p>
-      <div class="ts-ready-actions">
-        <button class="ts-cta" id="tsTeachNowBtn" type="button" style="margin-top:0;">Teach now</button>
-        <button class="ts-ghost" id="tsQuickReviewBtn" type="button" style="margin-top:0;">Quick review first</button>
-        <button class="ts-quiet" id="tsEditSetupBtn" type="button">Edit topic, material, or AI student</button>
+      <div class="ts-ready-container">
+        <h1 class="ts-h1" id="tsReadyTitle">Ready to teach?</h1>
+        <p class="ts-sub">Teach from what you know now, or take a quick review of the essentials first.</p>
+        <div class="ts-ready-actions">
+          <button class="ts-btn-3d-purple" id="tsTeachNowBtn" type="button">Teach now</button>
+          <button class="ts-ghost-pill" id="tsQuickReviewBtn" type="button">Quick review first</button>
+        </div>
+        <p class="ts-reassure">Quick Review is optional. You can start teaching at any time.</p>
+        <div class="ts-error-box" id="tsReadyError" hidden></div>
       </div>
-      <p class="ts-reassure">Quick Review is optional. You can start teaching at any time.</p>
-      <div class="ts-error-box" id="tsReadyError" hidden></div>
     </div>
   </section>
 
-  <!-- ══ QUICK REVIEW ══ -->
+  <!-- ══ QUICK REVIEW (Writing Quick Review Page - Left Aligned 1:1 Study Brief Match) ══ -->
   <section class="ts-view" id="tsReview">
-    <div class="ts-wrap ts-qr">
-      <div class="ts-eyebrow">Quick Review</div>
-      <h1 class="ts-h1" id="tsQrTopic">Quick Review</h1>
-      <p class="ts-sub" style="margin-bottom:6px;">A short, source-grounded refresher. Your AI student joins when you start teaching.</p>
+    <div class="br-doc" style="max-width:760px; margin:0 auto; padding:44px 24px 80px; text-align:left;">
+      <div id="tsQrLogo" style="display:flex; justify-content:flex-start; margin-bottom:14px;"></div>
+      <h1 class="br-title" id="tsQrTopic" style="font-size:34px; font-weight:800; color:#ffffff; letter-spacing:-0.025em; text-align:left; margin:0 0 6px; line-height:1.2;">Writing Quick Review</h1>
+      <div class="br-sub" id="tsQrMeta" style="color:#8a8a93; font-size:13.5px; font-weight:500; text-align:left; margin:0 0 28px;">Writing Quick Review note</div>
       <div id="tsQrBody"></div>
-      <div class="ts-qr-sticky">
-        <button class="ts-cta" id="tsQrTeachBtn" type="button">I'm ready to teach</button>
-        <button class="ts-ghost" id="tsQrBackBtn" type="button">Back to setup</button>
-        <button class="ts-ghost" id="tsQrSourceBtn" type="button" style="flex:0 0 auto;">View source</button>
+      <div class="flow-foot" style="margin-top:40px; margin-bottom:32px; display:flex; justify-content:center;">
+        <button class="ts-btn-3d-purple" id="tsQrTeachBtn" type="button" style="width:100%; max-width:100%; height:52px; font-size:16px; font-weight:700;">I'm ready to teach</button>
       </div>
     </div>
   </section>
 
   <!-- ══ MIC PREFLIGHT ══ -->
   <section class="ts-view" id="tsPreflight">
-    <div class="ts-wrap narrow">
-      <div class="ts-eyebrow">Voice check</div>
-      <h1 class="ts-h1">Check your microphone</h1>
-      <p class="ts-sub">Say a sentence to make sure we can hear you.</p>
-      <div class="ts-card">
-        <button class="ts-cta" id="tsMicEnableBtn" type="button" style="margin-top:0;">Enable microphone</button>
-        <div id="tsMicLive" hidden>
-          <div class="ts-meter"><i id="tsMeterFill"></i></div>
-          <div class="ts-pf-status" id="tsPfStatus" aria-live="polite">Waiting for your voice…</div>
-          <div class="ts-pf-device" id="tsPfDevice"></div>
-        </div>
-        <div class="ts-error-box" id="tsMicError" hidden></div>
-        <button class="ts-cta" id="tsStartSessionBtn" type="button" disabled>Start voice session</button>
-        <button class="ts-ghost" id="tsTextModeBtn" type="button">Use text instead</button>
-      </div>
-      <div class="ts-privacy">
-        <b style="color:#c9c9ce;">You remain the teacher throughout the session.</b><br>
-        Your AI student will listen, ask questions, and speak back. Transcripts are saved in this browser so you can
-        review your session and build your report. Raw audio is never stored.
+    <div class="ts-ready-container" style="padding-top:0; padding-bottom:0; width:100%;">
+      <h1 class="ts-h1" style="margin-bottom:8px;">Ready to start teaching?</h1>
+      <p class="ts-sub" style="margin-bottom:28px;">Your AI student is ready for your lesson.</p>
+
+      <button class="ts-btn-3d-purple" id="tsStartSessionBtn" type="button" onclick="document.getElementById('tsPreflight').style.display='none'; document.getElementById('tsPreflight').classList.remove('on'); document.getElementById('tsLive').style.display='flex'; document.getElementById('tsLive').classList.add('on'); if(window.startLiveSession) window.startLiveSession(event);" style="width:100%; max-width:480px; height:52px; font-size:16.5px; font-weight:700; margin-bottom:24px; cursor:pointer;">Start Teaching</button>
+
+      <div class="ts-privacy" style="width:100%; max-width:480px; background:rgba(20,20,24,0.6); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; text-align:left;">
+        <b style="color:#ffffff; font-size:14.5px; display:block; margin-bottom:6px;">You remain the teacher throughout the session.</b>
+        <span style="color:#9A9A9E; font-size:13px; line-height:1.5; display:block;">Your AI student will listen, ask questions, and speak back. Transcripts are saved in this browser so you can review your session and build your report. Raw audio is never stored.</span>
       </div>
     </div>
   </section>
 
-  <!-- ══ LIVE SESSION ══ -->
-  <section class="ts-view" id="tsLive">
-    <div class="ts-live-wrap">
-      <div class="ts-stage" id="tsStage">
-        <div class="ts-avatar-ring"><div class="ts-avatar" id="tsAvatar"></div></div>
-        <div class="ts-stu-title" id="tsStuTitle">AI Student</div>
-        <div class="ts-state-label" id="tsStateLabel" aria-live="polite">Connecting…</div>
+  <!-- ══ LIVE SESSION (100% Perplexity Voice UI - Image 2 & Image 3) ══ -->
+  <section class="ts-view" id="tsLive" style="background:#0a0a0d; min-height:100vh; position:fixed; inset:0; z-index:100; display:none; flex-direction:column; justify-content:space-between; align-items:center; overflow:hidden; font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;">
+    
+    <!-- Top Header Bar -->
+    <div style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:22px 28px; z-index:10;">
+      <div id="tsConn" style="display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#a1a1aa;">
+        <i style="width:8px; height:8px; border-radius:50%; background:#10b981; display:inline-block; box-shadow:0 0 8px #10b981;"></i>
+        <span id="tsConnTxt" style="font-weight:600; color:#e4e4e7;">Microphone in use</span>
+        <span id="tsElapsed" style="margin-left:8px; color:#71717a; font-weight:600;">0:00</span>
       </div>
-      <div class="ts-caption" id="tsCaption"><span class="who" id="tsCaptionWho"></span><span id="tsCaptionText"></span></div>
+      <button type="button" id="tsFinishBtn" style="background:transparent; border:none; color:#71717a; cursor:pointer; padding:8px; transition:color 0.15s;" title="Settings">
+        <svg viewBox="0 0 24 24" style="width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
 
-      <div class="ts-judge" id="tsJudge" role="group" aria-label="Judge your AI student's understanding">
-        <div class="ts-judge-k">Your AI student's current understanding</div>
-        <div class="ts-judge-text" id="tsJudgeText"></div>
-        <div class="ts-judge-row">
-          <button class="ts-judge-btn ok" id="tsJudgeOk" type="button">That's correct</button>
-          <button class="ts-judge-btn miss" id="tsJudgeMiss" type="button">You're missing something</button>
-          <button class="ts-judge-btn no" id="tsJudgeNo" type="button">That's not right</button>
+    <!-- Center Content Layout Area -->
+    <div id="tsStage" style="flex:1; width:100%; max-width:760px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 24px; text-align:center; position:relative;">
+      
+      <!-- Upper Spoken Text Container (For AI Speaking / Response Mode - Image 3) -->
+      <div id="tsResponseBox" style="display:none; max-width:620px; margin-bottom:24px; text-align:center;">
+        <p id="tsResponseText" style="font-size:22px; font-weight:600; color:#ffffff; line-height:1.6; letter-spacing:-0.01em;">
+          Sure, just let me know what you need help with, and I'll get right on it.
+        </p>
+      </div>
+
+      <!-- Particle Sphere Canvas Container (Center in Image 2 / Bottom-Center in Image 3) -->
+      <div id="tsCanvasContainer" style="width:260px; height:260px; position:relative; display:flex; align-items:center; justify-content:center; margin-bottom:24px; transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+        
+        <!-- Glow Ring backdrop -->
+        <div style="position:absolute; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 60%, transparent 80%); animation: orbGlowPulse 2.5s ease-in-out infinite;"></div>
+        
+        <!-- Canvas 3D Particle Sphere -->
+        <canvas id="tsParticleCanvas" width="300" height="300" style="width:260px; height:260px; display:block; position:relative; z-index:10; pointer-events:none;"></canvas>
+
+        <!-- SVG 3D Particle Orbit (Guarantees particle sphere is ALWAYS glowing & rotating) -->
+        <svg viewBox="0 0 200 200" style="position:absolute; width:240px; height:240px; z-index:4; animation: orbRotate 14s linear infinite; pointer-events:none;">
+          <style>
+            @keyframes orbRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            @keyframes orbGlowPulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.12); opacity: 1; } }
+          </style>
+          <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.2" stroke-dasharray="3 8" />
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="2 10" />
+          <circle cx="100" cy="100" r="55" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4 6" />
+          
+          <!-- Orbiting glowing particle dots -->
+          <circle cx="100" cy="15" r="3.5" fill="#ffffff" opacity="0.95" />
+          <circle cx="170" cy="50" r="2.8" fill="#ffffff" opacity="0.85" />
+          <circle cx="185" cy="100" r="4" fill="#ffffff" opacity="1" />
+          <circle cx="160" cy="155" r="2.5" fill="#ffffff" opacity="0.75" />
+          <circle cx="100" cy="185" r="3.5" fill="#ffffff" opacity="0.9" />
+          <circle cx="40" cy="155" r="2.8" fill="#ffffff" opacity="0.8" />
+          <circle cx="15" cy="100" r="4" fill="#ffffff" opacity="0.95" />
+          <circle cx="30" cy="50" r="2.5" fill="#ffffff" opacity="0.8" />
+          <circle cx="70" cy="30" r="3" fill="#ffffff" opacity="0.9" />
+          <circle cx="130" cy="30" r="2.5" fill="#ffffff" opacity="0.75" />
+          <circle cx="150" cy="130" r="3.5" fill="#ffffff" opacity="0.95" />
+          <circle cx="50" cy="130" r="3" fill="#ffffff" opacity="0.85" />
+          <circle cx="100" cy="45" r="3" fill="#ffffff" opacity="0.9" />
+          <circle cx="155" cy="100" r="3.5" fill="#ffffff" opacity="0.9" />
+          <circle cx="100" cy="155" r="2.8" fill="#ffffff" opacity="0.8" />
+          <circle cx="45" cy="100" r="3.2" fill="#ffffff" opacity="0.85" />
+        </svg>
+      </div>
+
+      <!-- Hidden elements mapped to preserve JS DOM references -->
+      <div id="tsAvatar" style="display:none;"></div>
+      <div id="tsStuTitle" style="display:none;">AI Student</div>
+      <div id="tsSrLive" style="display:none;"></div>
+
+      <!-- Status Label (Image 2 style: Teal Text "Say something...") -->
+      <div id="tsCaption" style="max-width:640px; margin-top:0; transition:all 0.3s ease;">
+        <span id="tsCaptionWho" style="display:none;"></span>
+        <span id="tsCaptionText" style="font-size:20px; font-weight:600; color:#2dd4bf; line-height:1.5; text-shadow:0 0 16px rgba(45,212,191,0.25); letter-spacing:-0.01em;">Say something...</span>
+      </div>
+      <div id="tsStateLabel" style="font-size:13.5px; font-weight:500; color:#71717a; margin-top:8px;" aria-live="polite">Connecting…</div>
+
+      <!-- Judge & Correct overlays (Hidden by default) -->
+      <div class="ts-judge" id="tsJudge" style="display:none; margin-top:20px; background:rgba(24,24,27,0.92); backdrop-filter:blur(16px); border:1px solid rgba(45,212,191,0.3); border-radius:16px; padding:18px 22px; max-width:540px; text-align:left;">
+        <div class="ts-judge-k" style="font-size:11px; font-weight:700; color:#2dd4bf; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">Your AI student's current understanding</div>
+        <div class="ts-judge-text" id="tsJudgeText" style="font-size:15px; color:#e4e4e7; margin-bottom:14px; line-height:1.55;"></div>
+        <div class="ts-judge-row" style="display:flex; gap:10px;">
+          <button class="ts-judge-btn ok" id="tsJudgeOk" type="button" style="flex:1; padding:10px 14px; border-radius:10px; background:rgba(16,185,129,0.14); border:1px solid #10b981; color:#34d399; font-weight:700; font-size:13px; cursor:pointer;">That's correct</button>
+          <button class="ts-judge-btn miss" id="tsJudgeMiss" type="button" style="flex:1; padding:10px 14px; border-radius:10px; background:rgba(245,158,11,0.14); border:1px solid #f59e0b; color:#fbbf24; font-weight:700; font-size:13px; cursor:pointer;">Missing something</button>
+          <button class="ts-judge-btn no" id="tsJudgeNo" type="button" style="flex:1; padding:10px 14px; border-radius:10px; background:rgba(239,68,68,0.14); border:1px solid #ef4444; color:#f87171; font-weight:700; font-size:13px; cursor:pointer;">Not right</button>
         </div>
       </div>
 
-      <div class="ts-correct" id="tsCorrect">
-        <div class="ts-correct-k">Correction mode</div>
-        <div class="ts-correct-belief" id="tsCorrectBelief"></div>
-        <div class="ts-correct-hint">Explain the correction out loud — your AI student will restate what it understood.</div>
+      <div class="ts-correct" id="tsCorrect" style="display:none; margin-top:20px; background:rgba(24,24,27,0.92); backdrop-filter:blur(16px); border:1px solid rgba(245,158,11,0.3); border-radius:16px; padding:18px 22px; max-width:540px; text-align:left;">
+        <div class="ts-correct-k" style="font-size:11px; font-weight:700; color:#fbbf24; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:8px;">Correction mode</div>
+        <div class="ts-correct-belief" id="tsCorrectBelief" style="font-size:14px; color:#e4e4e7; background:#18181b; border:1px solid #27272a; border-radius:10px; padding:11px 14px; margin-bottom:10px;"></div>
+        <div class="ts-correct-hint" style="font-size:12.5px; color:#a1a1aa;">Explain out loud — your AI student will restate what it understood.</div>
       </div>
+
     </div>
 
-    <div class="ts-dock" id="tsDock">
-      <div class="ts-dock-inner">
-        <button class="ts-dock-btn" id="tsCaptionsBtn" type="button" aria-pressed="true">
-          <span class="ic"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 12h4M6 15h7M14 12h4"/></svg></span>
-          Captions
-        </button>
-        <button class="ts-dock-btn" id="tsCorrectBtn" type="button">
-          <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
-          Correct
-        </button>
-        <button class="ts-dock-btn ts-mic-main" id="tsMicBtn" type="button" aria-label="Mute microphone">
-          <span class="ic"><svg id="tsMicIcon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></span>
-          <span id="tsMicLabel">Mic on</span>
-        </button>
-        <button class="ts-dock-btn ts-done-btn" id="tsDoneBtn" type="button">
-          <span class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-          Done speaking
-        </button>
-        <button class="ts-dock-btn" id="tsPauseBtn" type="button">
-          <span class="ic"><svg id="tsPauseIcon" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg></span>
-          <span id="tsPauseLabel">Pause</span>
-        </button>
-        <button class="ts-dock-btn" id="tsTranscriptBtn" type="button">
-          <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
-          Transcript
-        </button>
-      </div>
-      <div class="ts-fallback" id="tsFallback">
-        <input id="tsFallbackInput" type="text" placeholder="Type what you'd say out loud…" autocomplete="off" aria-label="Typed teaching input">
-        <button id="tsFallbackSend" type="button">Send</button>
-      </div>
+    <!-- Bottom Action Dock: Image 2 Floating Circular Close & Microphone Buttons -->
+    <div id="tsDock" class="ts-dock on" style="width:100%; padding:0 0 56px; display:flex; justify-content:center; align-items:center; gap:28px; z-index:10;">
+      
+      <!-- Close Button (Circular X button - Image 2) -->
+      <button type="button" id="tsCloseSessionBtn" onclick="location.reload();" style="width:58px; height:58px; border-radius:50%; background:#222226; border:1px solid rgba(255,255,255,0.08); color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.15s, background 0.15s; box-shadow:0 6px 24px rgba(0,0,0,0.5);" title="Close Session">
+        <svg viewBox="0 0 24 24" style="width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Microphone Button (Circular Mic button - Image 2) -->
+      <button type="button" id="tsMicBtn" aria-label="Mute microphone" style="width:58px; height:58px; border-radius:50%; background:#222226; border:1px solid rgba(255,255,255,0.08); color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.15s, background 0.15s; box-shadow:0 6px 24px rgba(0,0,0,0.5);" title="Toggle Microphone">
+        <svg id="tsMicIcon" viewBox="0 0 24 24" style="width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;">
+          <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </button>
+
+      <!-- Hidden dock element maps to preserve existing script bindings -->
+      <div id="tsMicLabel" style="display:none;">Mic on</div>
+      <button id="tsCaptionsBtn" style="display:none;"></button>
+      <button id="tsCorrectBtn" style="display:none;"></button>
+      <button id="tsDoneBtn" style="display:none;"></button>
+      <button id="tsPauseBtn" style="display:none;"></button>
+      <button id="tsTranscriptBtn" style="display:none;"></button>
+      <div id="tsFallback" style="display:none;"><input id="tsFallbackInput"><button id="tsFallbackSend"></button></div>
     </div>
+
   </section>
 
   <!-- ══ ENDING ══ -->
@@ -822,27 +1312,31 @@
   const NS = 'NOURA_TS_';
   const STUDENTS = {
     beginner: {
-      name: 'Sam', label: 'Beginner AI Student',
+      name: 'Beginner', label: 'Beginner AI Student',
       stance: 'Teach me from the foundations.',
       best: 'Best for checking whether you can explain clearly from first principles.',
       prompt: () => window.BEGINNER_SYSTEM_PROMPT,
       opening: "I’m ready. Start from the beginning—what is the first idea I need to understand?"
     },
     intermediate: {
-      name: 'Riley', label: 'Intermediate AI Student',
+      name: 'Intermediate', label: 'Intermediate AI Student',
       stance: 'I know the basics—help me connect the ideas.',
       best: 'Best for checking connected understanding: mechanisms, comparisons, applications.',
       prompt: () => window.INTERMEDIATE_SYSTEM_PROMPT,
       opening: "I know the foundations. Teach me how this specific idea fits together."
     },
     advanced: {
-      name: 'Morgan', label: 'Advanced AI Student',
+      name: 'Advanced', label: 'Advanced AI Student',
       stance: 'I understand the argument—convince me.',
       best: 'Best for testing whether your knowledge holds up under pressure.',
       prompt: () => window.ADVANCED_SYSTEM_PROMPT,
       opening: "I understand the broad topic. Teach me your argument, and I’ll test whether it holds up."
     }
   };
+  function currentStudent() {
+    const k = String(S.level || 'intermediate').toLowerCase();
+    return STUDENTS[k] || STUDENTS.intermediate;
+  }
   const STATE_LABELS = {
     ai_ready: 'Ready for your explanation',
     listening: 'Listening to you…',
@@ -932,7 +1426,7 @@
   }
 
   /* ── State machine ─────────────────────────────────────────────────── */
-  const VIEWS = { setup:'tsSetup', processing_source:'tsProcessing', readiness_choice:'tsReady',
+  const VIEWS = { setup:'tsSetup', choose_student:'tsStudentView', processing_source:'tsProcessing', readiness_choice:'tsReady',
     generating_quick_review:'tsProcessing', quick_review:'tsReview', mic_preflight:'tsPreflight',
     connecting:'tsLive', ai_ready:'tsLive', listening:'tsLive', user_speaking:'tsLive',
     processing_turn:'tsLive', ai_speaking:'tsLive', explain_back_review:'tsLive',
@@ -946,7 +1440,8 @@
     const view = $(VIEWS[next] || 'tsFatal');
     if (view) view.classList.add('on');
     const live = LIVE_STATES.includes(next);
-    $('tsDock').classList.toggle('on', live && next !== 'connecting');
+    $('tsDock').classList.toggle('on', live);
+    if (live && typeof startOrbEngine === 'function') startOrbEngine();
     $('tsFinishBtn').style.display = live ? 'inline-block' : 'none';
     $('tsElapsed').style.display = live ? 'inline-block' : 'none';
     $('tsConn').style.display = live ? 'inline-flex' : 'none';
@@ -958,11 +1453,14 @@
     if (next === 'processing_turn' || next === 'connecting') stage.classList.add('processing');
     // status label
     const lbl = STATE_LABELS[next];
-    const name = S.level ? STUDENTS[S.level].name : 'Your AI student';
+    const stu = currentStudent();
+    const name = stu ? stu.name : 'Your AI student';
     const txt = typeof lbl === 'function' ? lbl(name) : (lbl || '');
     $('tsStateLabel').textContent = txt;
     $('tsSrLive').textContent = txt;
-    if (next === 'readiness_choice') renderReadyContext();
+    if (next === 'readiness_choice') {
+      renderReadyContext();
+    }
     window.scrollTo(0, 0);
   }
 
@@ -982,54 +1480,394 @@
   S.subject = ''; // Do NOT pre-select Physics on landing
   if (!S.level) S.level = 'INTERMEDIATE';
 
+  const TOPICS_BY_SUBJECT = {
+    'Math': [
+      'Algebra: Linear Equations & Inequalities',
+      'Algebra: Quadratic Equations & Factoring',
+      'Algebra: Polynomials & Rational Functions',
+      'Algebra: Exponential & Logarithmic Functions',
+      'Algebra: Systems of Equations & Matrices',
+      'Geometry: Triangles, Angles & Pythagorean Theorem',
+      'Geometry: Circles, Arc Length & Sector Area',
+      'Geometry: Polygons, Perimeter, Area & 3D Volume',
+      'Geometry: Coordinate Geometry & Transformations',
+      'Trigonometry: Unit Circle & Radian Measure',
+      'Trigonometry: Trigonometric Identities & Equations',
+      'Trigonometry: Law of Sines & Law of Cosines',
+      'Calculus: Limits & Continuity',
+      'Calculus: Derivatives & Differentiation Rules',
+      'Calculus: Applications of Derivatives & Optimization',
+      'Calculus: Integrals & Fundamental Theorem of Calculus',
+      'Calculus: Applications of Integration (Area & Volume)',
+      'Calculus: Differential Equations & Growth Models',
+      'Calculus: Infinite Sequences, Series & Taylor Series',
+      'Statistics: Probability Theory & Combinatorics',
+      'Statistics: Binomial & Normal Distributions',
+      'Statistics: Hypothesis Testing & Confidence Intervals',
+      'Linear Algebra: Vectors, Matrices & Linear Transformations',
+      'Discrete Math: Set Theory & Mathematical Logic',
+      'Discrete Math: Graph Theory & Combinatorics'
+    ],
+    'Science': [
+      'Physics: Kinematics (1D & 2D Motion)',
+      'Physics: Newton\'s Laws of Motion',
+      'Physics: Work, Energy & Conservation of Energy',
+      'Physics: Momentum, Impulse & Collisions',
+      'Physics: Circular Motion & Universal Gravitation',
+      'Physics: Rotational Dynamics & Torque',
+      'Physics: Simple Harmonic Motion & Oscillations',
+      'Physics: Wave Properties & Sound Waves',
+      'Physics: Geometric Optics & Light Refraction',
+      'Physics: Electric Charge, Fields & Potential',
+      'Physics: DC Circuits & Kirchhoff\'s Laws',
+      'Physics: Magnetism & Electromagnetic Induction',
+      'Physics: Thermodynamics & Heat Transfer',
+      'Physics: Quantum Mechanics & Special Relativity',
+      'Chemistry: Atomic Structure & Electron Configuration',
+      'Chemistry: Periodic Table Trends & Chemical Bonding',
+      'Chemistry: Stoichiometry & Chemical Calculations',
+      'Chemistry: Gas Laws & Kinetic Molecular Theory',
+      'Chemistry: Thermochemistry & Enthalpy Changes',
+      'Chemistry: Chemical Equilibrium & Le Chatelier\'s Principle',
+      'Chemistry: Acids, Bases & pH Calculations',
+      'Chemistry: Electrochemistry & Redox Reactions',
+      'Chemistry: Organic Chemistry & Functional Groups',
+      'Biology: Cell Structure, Organelles & Membrane Transport',
+      'Biology: Cellular Respiration & ATP Synthesis',
+      'Biology: Photosynthesis & Light-Independent Reactions',
+      'Biology: DNA Structure, Replication & Protein Synthesis',
+      'Biology: Cell Cycle, Mitosis & Meiosis',
+      'Biology: Mendelian Genetics & Inheritance Patterns',
+      'Biology: Gene Regulation & Biotechnology',
+      'Biology: Evolution, Natural Selection & Speciation',
+      'Biology: Ecology, Energy Flow & Food Webs',
+      'Biology: Human Anatomy & Organ Systems'
+    ],
+    'English': [
+      'Literature: Plot Development & Narrative Arc',
+      'Literature: Characterization & Character Arcs',
+      'Literature: Theme, Motif & Symbolism Analysis',
+      'Literature: Figurative Language & Literary Devices',
+      'Literature: Tone, Mood & Author\'s Diction',
+      'Literature: Shakespearean Drama & Tragedy Analysis',
+      'Literature: Poetry Meter, Stanza & Imagery Analysis',
+      'Literature: Modernist & Post-Modern Literature',
+      'Literature: Gothic & Romantic Period Literature',
+      'Writing: Thesis Statement Construction & Defense',
+      'Writing: Argumentative Essay Structure & Logic',
+      'Writing: Rhetorical Appeals (Ethos, Pathos, Logos)',
+      'Writing: Expository & Analytical Essay Writing',
+      'Writing: Creative Writing & Narrative Style',
+      'Writing: Integrating Evidence & Academic Citations',
+      'Grammar & Syntax: Parts of Speech & Sentence Functions',
+      'Grammar & Syntax: Clause Variety & Structure',
+      'Grammar & Syntax: Subject-Verb & Pronoun Agreement',
+      'Grammar & Syntax: Punctuation Mechanics & Editing',
+      'Grammar & Syntax: Vocabulary, Nuance & Rhetorical Style'
+    ],
+    'History': [
+      'Ancient History: Early Human Societies & Agricultural Revolution',
+      'Ancient History: Mesopotamia, Fertile Crescent & Code of Hammurabi',
+      'Ancient History: Ancient Egypt, Nile Civilization & Pharaohs',
+      'Ancient History: Ancient India (Indus Valley, Hinduism & Buddhism)',
+      'Ancient History: Ancient China (Dynasties, Confucianism & Silk Road)',
+      'Ancient History: Ancient Greece (Athens, Sparta, Democracy & Philosophy)',
+      'Ancient History: Roman Republic, Punic Wars & Julius Caesar',
+      'Ancient History: Roman Empire, Pax Romana & Rise of Christianity',
+      'Medieval History: Fall of Rome & Byzantine Empire',
+      'Medieval History: Islamic Golden Age, Caliphates & Scientific Progress',
+      'Medieval History: European Feudalism, Manorialism & Crusades',
+      'Medieval History: Mongol Empire & Trans-Eurasian Trade Networks',
+      'Early Modern History: European Renaissance & Humanism',
+      'Early Modern History: Protestant Reformation & Religious Wars',
+      'Early Modern History: Age of Exploration & Columbian Exchange',
+      'Early Modern History: The Scientific Revolution & Enlightenment',
+      'Modern History: American Revolution & Constitutional Foundation',
+      'Modern History: French Revolution, Reign of Terror & Napoleon',
+      'Modern History: Industrial Revolution & Urbanization',
+      'Modern History: Imperialism, Scramble for Africa & Asian Colonization',
+      'Modern History: World War I (Causes, Alliances & Treaty of Versailles)',
+      'Modern History: Russian Revolution & Rise of the Soviet Union',
+      'Modern History: Interwar Period, Great Depression & Fascism',
+      'Modern History: World War II (Axis vs Allies & Holocaust)',
+      'Modern History: Cold War, Nuclear Arms Race & Proxy Wars',
+      'Modern History: Decolonization of Africa & Asia',
+      'Modern History: Fall of the Berlin Wall & Post-Cold War World'
+    ],
+    'Economics': [
+      'Economics: Scarcity, Choice & Opportunity Cost',
+      'Economics: Production Possibilities Curve (PPC)',
+      'Microeconomics: Law of Demand & Demand Curves',
+      'Microeconomics: Law of Supply & Supply Curves',
+      'Microeconomics: Market Equilibrium, Shortages & Surpluses',
+      'Microeconomics: Price Elasticity of Demand & Supply',
+      'Microeconomics: Income & Cross-Price Elasticity',
+      'Microeconomics: Consumer Surplus, Producer Surplus & Market Efficiency',
+      'Microeconomics: Price Ceilings, Price Floors & Taxes',
+      'Microeconomics: Consumer Choice & Marginal Utility Theory',
+      'Microeconomics: Production Functions & Diminishing Marginal Returns',
+      'Microeconomics: Short-Run vs Long-Run Production Costs',
+      'Microeconomics: Perfect Competition (Short-Run & Long-Run)',
+      'Microeconomics: Monopoly & Price Discrimination',
+      'Microeconomics: Monopolistic Competition & Product Differentiation',
+      'Microeconomics: Oligopoly, Game Theory & Prisoner\'s Dilemma',
+      'Microeconomics: Labor Markets & Factor Pricing',
+      'Microeconomics: Market Failures, Externalities & Public Goods',
+      'Macroeconomics: Gross Domestic Product (GDP) & Nominal vs Real GDP',
+      'Macroeconomics: Unemployment Types & Natural Rate of Unemployment',
+      'Macroeconomics: Inflation, Consumer Price Index (CPI) & Deflation',
+      'Macroeconomics: Business Cycles, Expansions & Recessions',
+      'Macroeconomics: Aggregate Demand & Aggregate Supply (AD-AS Model)',
+      'Macroeconomics: Fiscal Policy, Government Spending & Taxes',
+      'Macroeconomics: Monetary Policy, Central Banking & Interest Rates',
+      'Macroeconomics: Money Supply, Fractional Banking & The Fed',
+      'Macroeconomics: National Debt & Budget Deficits',
+      'International Economics: Absolute & Comparative Advantage',
+      'International Economics: Tariffs, Quotas & Free Trade Agreements',
+      'International Economics: Foreign Exchange Rates & Balance of Payments',
+      'Development Economics: Economic Growth Models & Poverty Measures'
+    ],
+    'Geography': [
+      'Physical Geography: Plate Tectonics, Earthquakes & Volcanoes',
+      'Physical Geography: Atmospheric Circulation, Weather & Climate Systems',
+      'Physical Geography: Hydrological Cycle, Rivers & Landforms',
+      'Physical Geography: Biomes, Vegetation & Ecosystems',
+      'Human Geography: Population Dynamics & Demographic Transition',
+      'Human Geography: Migration Patterns & Push-Pull Factors',
+      'Human Geography: Culture, Language & Religion Geography',
+      'Human Geography: Urbanization & City Spatial Models',
+      'Human Geography: Economic Geography & Development Indicators'
+    ],
+    'Political Science': [
+      'Government: Forms of Government (Democracy, Monarchy, Authoritarianism)',
+      'Government: The US Constitution & Bill of Rights',
+      'Government: Separation of Powers & Checks and Balances',
+      'Government: Legislative Branch & Lawmaking Process',
+      'Government: Executive Branch & Presidential Powers',
+      'Government: Judicial Branch & Supreme Court Landmark Cases',
+      'Government: Federalism & State vs Federal Power',
+      'Government: Political Parties, Elections & Voting Behavior',
+      'Government: Media, Public Opinion & Interest Groups',
+      'International Relations: Realism, Liberalism & Constructivism',
+      'International Relations: Global Governance & The United Nations',
+      'International Relations: Foreign Policy, Diplomacy & Conflict Resolution'
+    ],
+    'Computer Science': [
+      'Programming: Variables, Data Types & Control Flow',
+      'Programming: Functions, Recursion & Scope',
+      'Programming: Object-Oriented Programming & Inheritance',
+      'Data Structures: Arrays, Linked Lists, Stacks & Queues',
+      'Data Structures: Hash Tables, Trees & Graphs',
+      'Algorithms: Binary Search & Sorting Algorithms',
+      'Algorithms: Big-O Notation & Time Complexity',
+      'Web Development: HTML5, CSS3 & Responsive Design',
+      'Web Development: JavaScript DOM & Async Programming',
+      'Databases: Relational Schema & SQL Queries',
+      'AI & ML: Machine Learning & Neural Networks',
+      'Cybersecurity & Computer Networks'
+    ],
+    'Psychology': [
+      'Neuroscience: Neurons, Brain Structure & Synapses',
+      'Sensation & Perception: Visual, Auditory & Sensory Processing',
+      'Learning: Classical & Operant Conditioning',
+      'Cognitive Psychology: Memory Storage & Retrieval',
+      'Developmental Psychology: Cognitive & Moral Stages',
+      'Social Psychology: Conformity & Group Behavior',
+      'Psychological Disorders & Clinical Therapies'
+    ],
+    'Business': [
+      'Business: Fundamentals of Business & Entrepreneurship',
+      'Business: Marketing Strategy & The 4 Ps (Product, Price, Place, Promotion)',
+      'Business: Financial Accounting & Balance Sheets',
+      'Business: Corporate Finance & Capital Budgeting',
+      'Business: Organizational Behavior & Leadership Styles',
+      'Business: Business Ethics & Corporate Social Responsibility (CSR)',
+      'Business: Strategic Management & SWOT Analysis',
+      'Business: Operations & Supply Chain Management',
+      'Business: Human Resource Management & Talent Acquisition',
+      'Business: Business Law, Contracts & Intellectual Property',
+      'Business: Market Research & Consumer Behavior',
+      'Business: International Business & Global Trade',
+      'Business: E-Commerce & Digital Marketing Strategies'
+    ],
+    'Law': [
+      'Law: Constitutional Law & Rights',
+      'Law: Contract Law & Obligations',
+      'Law: Criminal Law & Procedure',
+      'Law: Tort Law & Civil Liability',
+      'Law: Intellectual Property & Copyright',
+      'Law: International Law & Human Rights'
+    ],
+    'Medicine': [
+      'Medicine: Human Anatomy & Organ Systems',
+      'Medicine: Physiology & Homeostasis',
+      'Medicine: Pathology & Disease Mechanisms',
+      'Medicine: Pharmacology & Drug Interactions',
+      'Medicine: Immunology & Infectious Diseases',
+      'Medicine: Medical Ethics & Patient Care'
+    ],
+    'Philosophy': [
+      'Philosophy: Epistemology & Theory of Knowledge',
+      'Philosophy: Ethics & Moral Philosophy',
+      'Philosophy: Logic & Critical Reasoning',
+      'Philosophy: Metaphysics & Reality',
+      'Philosophy: Political Philosophy & Social Justice'
+    ],
+    'Art': [
+      'Art: Principles of Design & Composition',
+      'Art: Art History & Movements',
+      'Art: Visual Analysis & Color Theory',
+      'Art: Modern & Contemporary Art'
+    ],
+    'Sociology': [
+      'Sociology: Social Structures & Institutions',
+      'Sociology: Culture, Identity & Socialization',
+      'Sociology: Social Inequality & Stratification',
+      'Sociology: Research Methods in Social Science'
+    ]
+  };
+
+  function getTopicsForSubject(subj) {
+    if (!subj) return [];
+    const normalized = subj.trim();
+    if (TOPICS_BY_SUBJECT[normalized]) return TOPICS_BY_SUBJECT[normalized];
+    for (const key in TOPICS_BY_SUBJECT) {
+      if (normalized.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(normalized.toLowerCase())) {
+        return TOPICS_BY_SUBJECT[key];
+      }
+    }
+    return [
+      normalized + ': Introduction & Core Overview',
+      normalized + ': Essential Terms & Definitions',
+      normalized + ': Key Frameworks & Models',
+      normalized + ': Real-World Applications & Case Studies',
+      normalized + ': Advanced Topics & Analysis'
+    ];
+  }
+
+  function renderTopicChips(filterQuery = '') {
+    const chipsContainer = $('tsTopicChips');
+    if (!chipsContainer) return;
+    chipsContainer.innerHTML = '';
+    
+    let allTopics = getTopicsForSubject(S.subject);
+    const q = filterQuery.toLowerCase().trim();
+    if (q) {
+      allTopics = allTopics.filter(t => t.toLowerCase().includes(q));
+    }
+    
+    if (allTopics.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'ts-dropdown-item';
+      emptyDiv.style.color = '#8a8a93';
+      emptyDiv.style.cursor = 'default';
+      emptyDiv.textContent = 'Type to enter custom topic "' + filterQuery + '"';
+      chipsContainer.appendChild(emptyDiv);
+      return;
+    }
+    
+    allTopics.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'ts-dropdown-item';
+      div.textContent = t;
+      div.addEventListener('click', () => {
+        const input = $('tsTopic');
+        if (input) input.value = t;
+        S.topic = t;
+        chipsContainer.style.display = 'none';
+        if ($('tsClearBtn')) $('tsClearBtn').style.display = 'flex';
+        saveDraft();
+      });
+      chipsContainer.appendChild(div);
+    });
+  }
+
+  function updateStep3ContinueBtn() {
+    const btn = $('tsNextStep3');
+    if (!btn) return;
+    const hasSource = !!(S.sourceText && S.sourceText.trim() && !S.sourceText.startsWith('Teaching topic:'));
+    btn.disabled = !hasSource;
+  }
+
   function updateCheckpoints(step) {
     currentStep = step;
+    if (step === 2) {
+      renderTopicChips($('tsTopic') ? $('tsTopic').value : '');
+    }
+    if (step === 3) {
+      updateStep3ContinueBtn();
+    }
     [1, 2, 3].forEach(i => {
       const el = $('tsCpStep' + i);
-      if (el) el.style.display = i === step ? 'block' : 'none';
+      if (el) el.style.display = i === step ? 'flex' : 'none';
       const seg = $('tsSeg' + i);
       if (seg) {
         seg.classList.toggle('active', i === step);
         seg.classList.toggle('done', i < step);
       }
     });
+
+    const prevArrow = $('tsPrevStep');
+    if (prevArrow) prevArrow.disabled = (step === 1);
+    const nextArrow = $('tsNextStepArrow');
+    if (nextArrow) nextArrow.disabled = (step === 3);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function selectSubject(subj) {
-    if (!subj) return;
-    S.subject = subj;
+  function selectSubject(subj, isManual = false) {
+    if (!subj && !isManual) return;
+    
+    let selectedBox = subj;
+    if (!['Math', 'Science', 'English'].includes(subj)) {
+      selectedBox = 'Other';
+    }
+    if (!isManual) S.subject = subj === 'Other' ? '' : subj;
+
     const grid = $('tsSubjGrid');
     if (grid) {
       grid.querySelectorAll('.ts-subj-opt').forEach(o => {
-        o.classList.toggle('selected', o.dataset.subject === subj);
+        o.classList.toggle('selected', o.dataset.subject === selectedBox);
       });
     }
-    const statusEl = $('tsSubjStatus');
-    if (statusEl) statusEl.textContent = subj + ' selected';
-    const nextBtn = $('tsNextStep1');
-    if (nextBtn) {
-      nextBtn.disabled = false;
-      nextBtn.style.opacity = '1';
-      nextBtn.style.cursor = 'pointer';
+    
+    const otherContainer = $('tsOtherSubjContainer');
+    const otherInput = $('tsOtherSubjInput');
+    if (otherContainer && otherInput) {
+      if (selectedBox === 'Other') {
+        otherContainer.style.display = 'block';
+        if (!isManual && S.subject !== '') {
+          otherInput.value = S.subject;
+        }
+        if (!isManual) otherInput.focus();
+      } else {
+        otherContainer.style.display = 'none';
+      }
     }
-    saveDraft();
-  }
 
-  function renderSubjGrid() {
-    const grid = $('tsSubjGrid');
-    if (!grid) return;
-    grid.querySelectorAll('.ts-subj-opt').forEach(opt => {
-      const subj = opt.dataset.subject;
-      opt.classList.toggle('selected', S.subject === subj);
-    });
     if ($('tsSubjStatus')) $('tsSubjStatus').textContent = S.subject ? S.subject + ' selected' : 'Select a subject';
+    
     const nextBtn = $('tsNextStep1');
     if (nextBtn) {
       nextBtn.disabled = !S.subject;
       nextBtn.style.opacity = S.subject ? '1' : '0.5';
       nextBtn.style.cursor = S.subject ? 'pointer' : 'not-allowed';
     }
+    saveDraft();
+  }
+
+  $('tsOtherSubjInput')?.addEventListener('input', e => {
+    S.subject = e.target.value;
+    const nextBtn = $('tsNextStep1');
+    if (nextBtn) {
+      nextBtn.disabled = !S.subject;
+      nextBtn.style.opacity = S.subject ? '1' : '0.5';
+      nextBtn.style.cursor = S.subject ? 'pointer' : 'not-allowed';
+    }
+    saveDraft();
+  });
+
+  function renderSubjGrid() {
+    selectSubject(S.subject, true);
   }
 
   function renderStudentList() {
@@ -1041,8 +1879,40 @@
     });
   }
 
-  // Global document click delegation for 100% reliable subject & student selection
+  // Global document click delegation for 100% reliable subject, student, & action selection
   document.addEventListener('click', e => {
+    const startSessionBtn = e.target.closest('#tsStartSessionBtn');
+    if (startSessionBtn) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      textMode = false; S.voiceMode = 'pipeline';
+      if (!S.topic || !S.topic.trim()) S.topic = 'General Overview';
+      saveDraft();
+      try {
+        if (typeof Voice !== 'undefined' && Voice && !Voice.stream && Voice.init) {
+          Voice.init().catch(err => console.warn('Mic init background:', err));
+        }
+      } catch (err) {}
+      startLiveSession();
+      return;
+    }
+    const teachNowBtn = e.target.closest('#tsTeachNowBtn');
+    if (teachNowBtn) {
+      S.preparationPath = 'teach_now';
+      track('teach_now_selected', {});
+      setState('choose_student');
+      return;
+    }
+    const quickRevBtn = e.target.closest('#tsQuickReviewBtn');
+    if (quickRevBtn) {
+      handleQuickReviewClick();
+      return;
+    }
+    const qrTeachBtn = e.target.closest('#tsQrTeachBtn');
+    if (qrTeachBtn) {
+      track('quick_review_exited_to_teach', {});
+      setState('choose_student');
+      return;
+    }
     const subjOpt = e.target.closest('.ts-subj-opt');
     if (subjOpt) {
       const subj = subjOpt.dataset.subject;
@@ -1066,7 +1936,89 @@
   function renderSubjects() { renderSubjGrid(); }
   function renderStudents() { renderStudentList(); }
 
-  function renderSource() { saveDraft(); }
+  function formatBytes(bytes) {
+    if (!bytes || bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
+  }
+
+  function getFileKind(filename) {
+    if (!filename) return 'FILE';
+    const ext = filename.split('.').pop().toUpperCase();
+    return ext || 'FILE';
+  }
+
+  function renderSource() {
+    const list = $('tsSrcList');
+    if (!list) return;
+    if (S.sourceText && S.sourceText.trim()) {
+      const name = esc(S.sourceName || 'Uploaded material');
+      const kind = getFileKind(S.sourceName || 'material.txt');
+      const sizeStr = S.sourceSize ? formatBytes(S.sourceSize) : formatBytes(S.sourceText.length);
+      const progress = S.sourceProgress !== undefined ? S.sourceProgress : 100;
+      const isUploading = progress < 100;
+
+      list.innerHTML =
+        '<div class="ts-file-row" style="background:#28282E; border:1px solid rgba(255,255,255,0.16); border-radius:16px; padding:14px 16px; text-align:left; position:relative; overflow:hidden; margin-top:12px; box-shadow:0 4px 16px rgba(0,0,0,0.3); animation:ts-fadeIn 0.2s ease-out;">' +
+          '<div style="display:flex; align-items:center; gap:14px;">' +
+            '<!-- File Icon Box -->' +
+            '<div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#e4e4e7;">' +
+              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>' +
+                '<polyline points="14 2 14 8 20 8"/>' +
+                '<line x1="16" y1="13" x2="8" y2="13"/>' +
+                '<line x1="16" y1="17" x2="8" y2="17"/>' +
+              '</svg>' +
+            '</div>' +
+            '<div style="flex:1; min-width:0;">' +
+              '<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">' +
+                '<div style="min-width:0;">' +
+                  '<div style="font-size:14px; font-weight:600; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>' +
+                  '<div style="font-size:12.5px; color:#a1a1aa; margin-top:2px; font-weight:500;">' + kind + ' · ' + sizeStr + '</div>' +
+                '</div>' +
+                '<div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">' +
+                  (isUploading ?
+                    '<div style="width:20px; height:20px; border:2px solid rgba(16,185,129,0.3); border-top-color:#10b981; border-radius:50%; animation:ts-spin 0.8s linear infinite;"></div>'
+                    :
+                    '<div style="color:#10b981; display:flex; align-items:center; justify-content:center;">' +
+                      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>' +
+                        '<polyline points="22 4 12 14.01 9 11.01"/>' +
+                      '</svg>' +
+                    '</div>'
+                  ) +
+                  '<button type="button" id="tsRemoveFileBtn" title="Remove file" style="width:28px; height:28px; border-radius:50%; background:transparent; border:none; color:#a1a1aa; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s, color 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.15)\';this.style.color=\'#fff\'" onmouseout="this.style.background=\'transparent\';this.style.color=\'#a1a1aa\'">' +
+                    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                  '</button>' +
+                '</div>' +
+              '</div>' +
+              '<div style="width:100%; height:4.5px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; margin-top:8px;">' +
+                '<div style="height:100%; width:' + progress + '%; border-radius:99px; background:#10b981; transition:width 0.25s ease-out;"></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      const removeBtn = $('tsRemoveFileBtn');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          S.sourceText = '';
+          S.sourceName = '';
+          S.sourceSize = 0;
+          S.sourceProgress = 0;
+          S.sourceCard = null;
+          renderSource();
+          toast('Material removed.');
+        });
+      }
+    } else {
+      list.innerHTML = '';
+    }
+    updateStep3ContinueBtn();
+    saveDraft();
+  }
   function refreshSummary() { saveDraft(); }
 
   document.addEventListener('keydown', e => {
@@ -1104,50 +2056,118 @@
     updateCheckpoints(3);
   });
 
+  $('tsPrevStep')?.addEventListener('click', () => {
+    if (currentStep > 1) updateCheckpoints(currentStep - 1);
+  });
+  $('tsNextStepArrow')?.addEventListener('click', () => {
+    if (currentStep === 1 && !S.subject) return;
+    if (currentStep === 2 && !S.topic.trim()) { toast('Please enter what you are teaching today.'); return; }
+    if (currentStep === 3) {
+      const hasSource = !!(S.sourceText && S.sourceText.trim() && !S.sourceText.startsWith('Teaching topic:'));
+      if (!hasSource) { toast('Please upload a file or paste your study material to continue.'); return; }
+    }
+    if (currentStep < 3) updateCheckpoints(currentStep + 1);
+  });
+
   $('tsNextStep1')?.addEventListener('click', () => updateCheckpoints(2));
-  $('tsBackStep2')?.addEventListener('click', () => updateCheckpoints(1));
   $('tsNextStep2')?.addEventListener('click', () => {
     if (!S.topic.trim()) { toast('Please enter what you are teaching today.'); return; }
-    openMaterialModal();
+    updateCheckpoints(3);
   });
-  $('tsBackStep3')?.addEventListener('click', () => updateCheckpoints(2));
   $('tsNextStep3')?.addEventListener('click', () => {
-    if (!S.topic.trim()) { toast('Please add a topic in Step 2.'); updateCheckpoints(2); return; }
-    if (!S.level) S.level = 'intermediate';
-    if (!S.sourceText) {
-      S.sourceText = 'Teaching topic: ' + S.topic + ' in subject: ' + (S.subject || 'Physics') + '.';
-      S.sourceName = 'Topic Overview';
+    const hasSource = !!(S.sourceText && S.sourceText.trim() && !S.sourceText.startsWith('Teaching topic:'));
+    if (!hasSource) {
+      toast('Please upload a file or paste your study material to continue.');
+      return;
     }
+    if (!S.topic.trim()) { toast('Please add a topic in Step 2.'); updateCheckpoints(2); return; }
     saveDraft();
+    renderReadyContext();
     setState('readiness_choice');
   });
-
-  document.querySelectorAll('#tsTopicChips .ts-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const input = $('tsTopic');
-      if (input) input.value = chip.textContent;
-      S.topic = chip.textContent;
-      saveDraft();
-    });
+  $('tsStudentContinueBtn')?.addEventListener('click', () => {
+    if (!S.level) S.level = 'intermediate';
+    saveDraft();
+    setState('mic_preflight');
+    track('mic_preflight_started', {});
   });
 
-  $('tsTopic')?.addEventListener('input', e => { S.topic = e.target.value; saveDraft(); });
-  $('tsUploadBtn')?.addEventListener('click', e => { e.stopPropagation(); $('tsFileInput')?.click(); });
-  $('tsFileInput')?.addEventListener('change', async e => {
-    const f = e.target.files && e.target.files[0];
-    e.target.value = '';
+  const tsTopicEl = $('tsTopic');
+  const tsClearBtnEl = $('tsClearBtn');
+  const tsTopicChipsEl = $('tsTopicChips');
+
+  tsTopicEl?.addEventListener('input', e => { 
+    S.topic = e.target.value; 
+    if (tsClearBtnEl) tsClearBtnEl.style.display = e.target.value.length > 0 ? 'flex' : 'none';
+    if (tsTopicChipsEl) {
+      renderTopicChips(e.target.value);
+      tsTopicChipsEl.style.display = 'flex';
+    }
+    saveDraft(); 
+  });
+  
+  tsTopicEl?.addEventListener('focus', () => {
+    if (tsTopicChipsEl) {
+      renderTopicChips(tsTopicEl.value);
+      tsTopicChipsEl.style.display = 'flex';
+    }
+  });
+  
+  document.addEventListener('click', e => {
+    if (tsTopicChipsEl && tsTopicEl && !tsTopicEl.contains(e.target) && !tsTopicChipsEl.contains(e.target) && (!tsClearBtnEl || !tsClearBtnEl.contains(e.target))) {
+      tsTopicChipsEl.style.display = 'none';
+    }
+  });
+
+  if (tsClearBtnEl) {
+    tsClearBtnEl.addEventListener('click', () => {
+      if (tsTopicEl) { tsTopicEl.value = ''; tsTopicEl.focus(); }
+      S.topic = '';
+      tsClearBtnEl.style.display = 'none';
+      saveDraft();
+    });
+  }
+
+  async function processUploadedFile(f) {
     if (!f) return;
     const err = $('tsSrcError'); if (err) err.hidden = true;
-    if (f.size > 2 * 1024 * 1024) { if (err) { err.textContent = 'File is over 2 MB. Paste text instead.'; err.hidden = false; } return; }
-    try {
-      S.sourceText = (await f.text()).trim();
-      S.sourceName = f.name; S.sourceCard = null;
-      renderSource(); saveDraft();
-      track('teach_source_added', { kind: 'file' });
-      toast('File uploaded successfully!');
-    } catch (ex) {
-      if (err) { err.textContent = 'Could not read file text.'; err.hidden = false; }
+    if (f.size > 5 * 1024 * 1024) {
+      if (err) { err.textContent = 'File is over 5 MB. Please upload a smaller file or paste text instead.'; err.hidden = false; }
+      return;
     }
+    try {
+      let text = await f.text();
+      text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ').trim();
+      if (!text || text.length < 5) {
+        throw new Error('File appears empty or unreadable.');
+      }
+      S.sourceText = text;
+      S.sourceName = f.name;
+      S.sourceSize = f.size;
+      S.sourceProgress = 25;
+      S.sourceCard = null;
+      renderSource();
+
+      setTimeout(() => {
+        S.sourceProgress = 70;
+        renderSource();
+      }, 180);
+
+      setTimeout(() => {
+        S.sourceProgress = 100;
+        renderSource();
+        toast('"' + f.name + '" uploaded successfully!');
+        track('teach_source_added', { kind: 'file', name: f.name });
+      }, 400);
+    } catch (ex) {
+      if (err) { err.textContent = 'Could not read file text (' + ex.message + '). Try pasting the text directly.'; err.hidden = false; }
+    }
+  }
+
+  $('tsUploadBtn')?.addEventListener('click', e => { e.stopPropagation(); $('tsFileInput')?.click(); });
+  $('tsFileInput')?.addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) processUploadedFile(f);
   });
 
   const dropzone = $('tsDropzone');
@@ -1155,41 +2175,54 @@
     dropzone.addEventListener('click', e => {
       if (e.target.id !== 'tsUploadBtn') $('tsFileInput')?.click();
     });
-    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#8b5cf6'; });
-    dropzone.addEventListener('dragleave', e => { e.preventDefault(); dropzone.style.borderColor = '#3A3A3E'; });
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#8b5cf6'; dropzone.style.background = '#25252A'; });
+    dropzone.addEventListener('dragleave', e => { e.preventDefault(); dropzone.style.borderColor = '#36363B'; dropzone.style.background = '#1F1F23'; });
     dropzone.addEventListener('drop', e => {
       e.preventDefault();
-      dropzone.style.borderColor = '#3A3A3E';
+      dropzone.style.borderColor = '#36363B';
+      dropzone.style.background = '#1F1F23';
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        const file = e.dataTransfer.files[0];
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        const fi = $('tsFileInput');
-        if (fi) {
-          fi.files = dt.files;
-          fi.dispatchEvent(new Event('change'));
-        }
+        processUploadedFile(e.dataTransfer.files[0]);
       }
     });
   }
 
-  $('tsPasteBtn')?.addEventListener('click', () => { const pw = $('tsPasteWrap'); if (pw) pw.hidden = !pw.hidden; });
+  $('tsPasteBtn')?.addEventListener('click', async () => {
+    const pw = $('tsPasteWrap');
+    if (pw) {
+      pw.hidden = !pw.hidden;
+      const ta = $('tsPasteArea');
+      if (ta && !pw.hidden) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            const clipText = await navigator.clipboard.readText();
+            if (clipText && clipText.trim()) {
+              ta.value = clipText.trim();
+              toast('Clipboard text auto-pasted!');
+            }
+          }
+        } catch (e) {
+          // Clipboard fallback
+        }
+        ta.focus();
+      }
+    }
+  });
+
   $('tsPasteSave')?.addEventListener('click', () => {
     const txt = ($('tsPasteArea')?.value || '').trim();
     if (!txt) { toast('Paste some text first.'); return; }
-    S.sourceText = txt; S.sourceName = 'Pasted text'; S.sourceCard = null;
+    S.sourceText = txt;
+    S.sourceName = 'Pasted text (' + txt.slice(0, 18) + '…)';
+    S.sourceSize = txt.length;
+    S.sourceProgress = 100;
+    S.sourceCard = null;
     const pw = $('tsPasteWrap'); if (pw) pw.hidden = true;
-    renderSource(); saveDraft();
+    renderSource();
     track('teach_source_added', { kind: 'paste' });
-    toast('Text added!');
+    toast('Text attached successfully!');
   });
 
-  $('tsStartSessionBtn')?.addEventListener('click', () => {
-    if (!S.topic.trim()) { toast('Please add a topic in Step 2.'); updateCheckpoints(2); return; }
-    if (!S.level) S.level = 'INTERMEDIATE';
-    saveDraft();
-    startSessionFlow();
-  });
 
   /* ── Source Card ───────────────────────────────────────────────────── */
   async function buildSourceCard() {
@@ -1232,59 +2265,198 @@
         '<span class="ts-chip"><b>AI student</b><span>' + esc(st.name + ' · ' + key.toUpperCase()) + '</span></span>';
     }
   }
-  $('tsEditSetupBtn').addEventListener('click', () => setState('setup'));
-  $('tsTeachNowBtn').addEventListener('click', () => {
+  $('tsEditSetupBtn')?.addEventListener('click', () => setState('setup'));
+  $('tsTeachNowBtn')?.addEventListener('click', () => {
     S.preparationPath = 'teach_now';
     track('teach_now_selected', {});
-    setState('mic_preflight');
-    track('mic_preflight_started', {});
+    setState('choose_student');
   });
-  $('tsQuickReviewBtn').addEventListener('click', async () => {
+  $('tsQuickReviewBtn')?.addEventListener('click', handleQuickReviewClick);
+
+  /* ── 1:1 Study Brief & Quick Review Drive Bar Implementation ────────────── */
+  function driveBar(fill, expectChars) {
+    const started = Date.now();
+    let chars = 0, finishing = false;
+    let raf = 0;
+    function frame() {
+      const elapsed = Date.now() - started;
+      let pct = 0;
+      if (finishing) {
+        pct = 100;
+      } else {
+        const real = expectChars > 0 ? Math.min(0.96, chars / expectChars) : 0;
+        const creep = 0.88 * (1 - Math.exp(-elapsed / 3200));
+        pct = Math.max(real, creep) * 100;
+      }
+      if (fill) fill.style.width = Math.min(100, pct) + '%';
+      if (pct < 100) raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    return {
+      report: function(n) { chars = n; },
+      done: function() { finishing = true; if (fill) fill.style.width = '100%'; },
+      stop: function() { cancelAnimationFrame(raf); }
+    };
+  }
+
+  async function handleQuickReviewClick() {
     S.preparationPath = 'quick_review';
     track('quick_review_selected', {});
     setState('generating_quick_review');
-    $('tsProcessingMsg').textContent = 'Preparing your Quick Review…';
+    const msg = $('tsProcessingMsg');
+    if (msg) msg.textContent = 'Writing your Quick Review…';
+    const fill = $('tsLoadProgressFill');
+    if (fill) fill.style.width = '0%';
+    const barDriver = driveBar(fill, 1500);
     try {
       const qr = await buildQuickReview();
-      renderQuickReview(qr);
-      setState('quick_review');
-      track('quick_review_generated', {});
+      barDriver.done();
+      setTimeout(() => {
+        renderQuickReview(qr);
+        setState('quick_review');
+        track('quick_review_generated', {});
+      }, 350);
     } catch (err) {
+      console.error('Quick review failed:', err);
+      barDriver.stop();
       track('quick_review_failed', {});
       setState('readiness_choice');
       const box = $('tsReadyError');
-      box.textContent = 'We couldn’t prepare the review. You can still start teaching now.';
-      box.hidden = false;
+      if (box) {
+        box.textContent = 'We couldn’t prepare the review. You can still start teaching now.';
+        box.hidden = false;
+      }
     }
-  });
+  }
 
-  /* ── Quick Review (neutral grounding — never a level prompt) ───────── */
+  function getTopicLordicon(topic, subj) {
+    const t = ((topic || '') + ' ' + (subj || '')).toLowerCase();
+    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || t.includes('gene') || t.includes('genetics') || t.includes('protein') || t.includes('eukaryot') || t.includes('prokaryot'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/microscope.png' };
+    if (t.includes('physic') || t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('quantum') || t.includes('force') || t.includes('motion') || t.includes('gravity'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/molecule.png' };
+    if (t.includes('computer') || t.includes('code') || t.includes('program') || t.includes('tech') || t.includes('algorithm') || t.includes('python') || t.includes('java') || t.includes('data'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/laptop.png' };
+    if (t.includes('econ') || t.includes('micro') || t.includes('macro') || t.includes('finance') || t.includes('market') || t.includes('money') || t.includes('trade') || t.includes('stock') || t.includes('price'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/bar-chart.png' };
+    if (t.includes('geography') || t.includes('earth') || t.includes('planet') || t.includes('map') || t.includes('climate') || t.includes('ocean'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/globe.png' };
+    if (t.includes('history') || t.includes('past') || t.includes('war') || t.includes('revolution') || t.includes('ancient') || t.includes('empire'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/scroll.png' };
+    if (t.includes('psych') || t.includes('brain') || t.includes('mind') || t.includes('thought') || t.includes('philosoph') || t.includes('logic'))
+      return { img: 'https://img.icons8.com/3d-fluency/180/brain.png' };
+    return { img: 'https://img.icons8.com/3d-fluency/180/graduation-cap.png' };
+  }
+
+  function renderTopicIllustration(targetEl, topic, subj) {
+    if (!targetEl) return;
+    const item = getTopicLordicon(topic, subj);
+    targetEl.innerHTML = '<div class="topic-illu-wrap" style="display:flex;align-items:center;justify-content:flex-start;width:120px;height:120px;margin-bottom:12px;">' +
+      '<img src="' + item.img + '" alt="' + esc(topic) + '" style="width:110px;height:110px;object-fit:contain;animation:float 4s ease-in-out infinite;" class="topic-illu-img">' +
+      '</div>';
+  }
+
   async function buildQuickReview() {
-    const sys = 'You write a short, neutral, source-grounded study review for someone about to TEACH this topic aloud. You are not a tutor persona and you never address the AI student. Reply with ONLY valid JSON: {"topic":string,"big_idea":string (2-3 sentences),"essentials":[{"title":string,"explanation":string (1-2 sentences)} x3-7],"connections":{"type":"mechanism|sequence|cause_effect|comparison|argument|concept_map","explanation":string},"example":{"title":string,"explanation":string},"common_mixups":[{"mistake":string,"correction":string} x1-2],"teach_checklist":[string x3-6],"warnings":[string]}. Use ONLY the source material; do not add outside facts; do not pad weak material; total under 700 words. Plain readable text, no LaTeX or markdown.';
+    const hasCustomSource = S.sourceText && S.sourceText.trim() && !S.sourceText.startsWith('Teaching topic:');
+
+    const sys = 'You are Noura, an expert AI study tutor creating a clear, simplified, 100% accurate Quick Review.\n' +
+      (hasCustomSource ?
+        'CRITICAL INSTRUCTION: The user has uploaded custom notes and study material. You MUST generate this Quick Review ENTIRELY and EXCLUSIVELY from the provided user material. Extract all key terms, definitions, concepts, examples, and explanations DIRECTLY from the user\'s uploaded resource. Do NOT invent facts or rely on external templates when user material is supplied.\n' :
+        'Generate a comprehensive Quick Review for the requested topic.\n'
+      ) +
+      'Reply with ONLY a valid JSON object, no markdown fences, no commentary.\n' +
+      'Schema:\n' +
+      '{\n' +
+      '  "bigIdea": string (1-2 sentence core overview derived directly from the material),\n' +
+      '  "terms": [\n' +
+      '    {\n' +
+      '      "term": string (Key Term or Concept directly from user material),\n' +
+      '      "category": string ("Concept" | "Definition" | "Key Rule" | "Mechanism"),\n' +
+      '      "definition": string (1-2 sentence breakdown using the user\'s resource content)\n' +
+      '    } x4-10\n' +
+      '  ],\n' +
+      '  "example": string (1 concrete analogy, calculation, or mini scenario extracted from or based on the user\'s material, 2-3 sentences),\n' +
+      '  "checklist": [string x3-5] (each starting with an action verb, what the user must be able to explain based on their uploaded material)\n' +
+      '}\n' +
+      'Be concise, rigorous, and 100% faithful to the user\'s resource. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX or dollar signs.';
+
+    const userPrompt = 'Subject: ' + (S.subject || 'General') + '\nTopic: ' + S.topic + '\n\n' +
+      (hasCustomSource ?
+        'USER UPLOADED RESOURCE / NOTES (PRIMARY SOURCE):\n"""\n' + S.sourceText.slice(0, 24000) + '\n"""' :
+        'TOPIC MATERIAL:\n"""\n' + (S.sourceText || S.topic).slice(0, 16000) + '\n"""'
+      );
+
     const raw = await chat({
-      model: FAST_MODEL, max_tokens: 2000,
+      model: FAST_MODEL,
+      max_tokens: 2200,
       system: sys,
-      messages: [{ role: 'user', content: 'Topic: ' + S.topic + '\n\nSOURCE CARD:\n' + JSON.stringify(S.sourceCard) + '\n\nRAW MATERIAL (excerpt):\n"""\n' + S.sourceText.slice(0, 16000) + '\n"""' }]
+      messages: [{ role: 'user', content: userPrompt }]
     });
     return extractJSON(raw);
   }
-  function renderQuickReview(qr) {
-    $('tsQrTopic').textContent = qr.topic || S.topic;
-    const sec = (h, inner) => '<div class="ts-qr-sec"><h2>' + h + '</h2>' + inner + '</div>';
-    const li = arr => '<ul>' + arr.map(x => '<li>' + esc(typeof x === 'string' ? x : (x.title ? x.title + ' — ' + x.explanation : x.explanation)) + '</li>').join('') + '</ul>';
-    $('tsQrBody').innerHTML =
-      sec('The big idea', '<p>' + esc(qr.big_idea) + '</p>') +
-      sec('What you need to know', li(qr.essentials || [])) +
-      sec('How it connects', '<p>' + esc(qr.connections && qr.connections.explanation || '') + '</p>') +
-      sec('One useful example', '<p>' + esc(qr.example ? (qr.example.title ? qr.example.title + ' — ' : '') + qr.example.explanation : '') + '</p>') +
-      sec('Common mix-up', (qr.common_mixups || []).map(m =>
-        '<div class="ts-qr-mixup"><b>Mix-up:</b> ' + esc(m.mistake) + '<br><b style="color:#7ee2a8;">Actually:</b> ' + esc(m.correction) + '</div>').join('')) +
-      sec('Be ready to explain', li(qr.teach_checklist || []));
+
+  function renderQuickReview(brief) {
+    const logoEl = $('tsQrLogo');
+    if (logoEl) renderTopicIllustration(logoEl, S.topic, S.subject);
+    if ($('tsQrTopic')) $('tsQrTopic').textContent = S.topic || 'Quick Review';
+    if ($('tsQrMeta')) $('tsQrMeta').textContent = 'Writing Quick Review note';
+
+    const makeTable = (headers, rowsHtml) =>
+      '<div class="heroui-table-container"><table class="heroui-table"><thead><tr>' +
+      headers.map(h => '<th>' + h + '</th>').join('') +
+      '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>';
+
+    const getChipStyle = cat => {
+      const c = (cat || '').toLowerCase();
+      if (c.includes('rule') || c.includes('key')) return 'heroui-chip heroui-chip-warning';
+      if (c.includes('def')) return 'heroui-chip heroui-chip-purple';
+      if (c.includes('mech')) return 'heroui-chip heroui-chip-success';
+      return 'heroui-chip heroui-chip-purple';
+    };
+
+    const termsTable = makeTable(
+      ['Term / Concept', 'Category', 'Explanation / Key Takeaway'],
+      (brief.terms || []).map(t =>
+        '<tr>' +
+          '<td style="white-space:nowrap; font-weight:600; color:#ffffff; width:200px;">' + esc(t.term) + '</td>' +
+          '<td style="width:120px;"><span class="' + getChipStyle(t.category) + '">' + esc(t.category || 'Concept') + '</span></td>' +
+          '<td style="color:#e4e4e7; line-height:1.55;">' + esc(t.definition) + '</td>' +
+        '</tr>'
+      ).join('')
+    );
+
+    const formatBullet = text => {
+      const s = esc(text);
+      const colonIdx = s.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 50) {
+        return '<b>' + s.slice(0, colonIdx + 1) + '</b>' + s.slice(colonIdx + 1);
+      }
+      const words = s.split(' ');
+      if (words.length > 4) {
+        return '<b>' + words.slice(0, 3).join(' ') + '</b> ' + words.slice(3).join(' ');
+      }
+      return '<b>' + s + '</b>';
+    };
+
+    const li = arr => '<ul>' + (arr || []).map(x => '<li>' + formatBullet(x) + '</li>').join('') + '</ul>';
+
+    const formatExample = text => {
+      let s = esc(text || '');
+      return s.replace(/\(([^)]+)\)/g, '<b>($1)</b>');
+    };
+
+    const bodyEl = $('tsQrBody');
+    if (bodyEl) {
+      bodyEl.innerHTML =
+        '<div class="br-callout"><div class="br-callout-title">Big Idea</div>' + esc(brief.bigIdea || '') + '</div>' +
+        '<h2>Must-know terms & concepts</h2>' + termsTable +
+        '<h2>Simple example</h2><div class="br-example-box">' + formatExample(brief.example || '') + '</div>' +
+        '<h2>What you must be able to explain</h2>' + li(brief.checklist || []);
+    }
   }
   $('tsQrTeachBtn').addEventListener('click', () => {
     track('quick_review_exited_to_teach', {});
-    setState('mic_preflight');
-    track('mic_preflight_started', {});
+    setState('choose_student');
   });
   $('tsQrBackBtn').addEventListener('click', () => setState('setup'));
   $('tsQrSourceBtn').addEventListener('click', () => {
@@ -1406,37 +2578,46 @@
   }
 
   /* ── Preflight ─────────────────────────────────────────────────────── */
-  let micOk = false, textMode = false;
-  $('tsMicEnableBtn').addEventListener('click', async () => {
-    const err = $('tsMicError'); err.hidden = true;
+  let micOk = true, textMode = false;
+  // Init mic eagerly but non-blocking when preflight view is reached
+  $('tsMicEnableBtn')?.addEventListener('click', async () => {
+    const err = $('tsMicError'); if (err) err.hidden = true;
     try {
       await Voice.init();
-      $('tsMicEnableBtn').style.display = 'none';
-      $('tsMicLive').hidden = false;
-      $('tsPfDevice').textContent = Voice.deviceLabel() ? 'Using: ' + Voice.deviceLabel() : '';
+      if ($('tsMicEnableBtn')) $('tsMicEnableBtn').style.display = 'none';
+      if ($('tsMicLive')) $('tsMicLive').hidden = false;
+      if ($('tsPfDevice')) $('tsPfDevice').textContent = Voice.deviceLabel() ? 'Using: ' + Voice.deviceLabel() : '';
       let heard = false;
       Voice.onLevel = rms => {
-        $('tsMeterFill').style.width = Math.min(100, rms * 900) + '%';
+        if ($('tsMeterFill')) $('tsMeterFill').style.width = Math.min(100, rms * 900) + '%';
         if (!heard && rms > 0.02) {
           heard = true; micOk = true;
           const st = $('tsPfStatus');
-          st.textContent = 'Your microphone is ready.'; st.classList.add('good');
-          $('tsStartSessionBtn').disabled = false;
+          if (st) { st.textContent = 'Your microphone is ready.'; st.classList.add('good'); }
+          if ($('tsStartSessionBtn')) $('tsStartSessionBtn').disabled = false;
           track('mic_preflight_passed', {});
         }
       };
     } catch (e) {
-      err.innerHTML = 'Teach Studio needs microphone access for voice mode. Allow the microphone in your browser’s site settings, then try again — or use text instead.';
-      err.hidden = false;
+      if (err) { err.innerHTML = 'Teach Studio needs microphone access. Allow it in browser settings.'; err.hidden = false; }
     }
   });
-  $('tsTextModeBtn').addEventListener('click', () => {
+  $('tsTextModeBtn')?.addEventListener('click', () => {
     textMode = true; S.voiceMode = 'text_fallback';
     startLiveSession();
   });
-  $('tsStartSessionBtn').addEventListener('click', () => {
-    if (!micOk) return;
+  $('tsStartSessionBtn')?.addEventListener('click', () => {
     textMode = false; S.voiceMode = 'pipeline';
+    if (!S.topic || !S.topic.trim()) S.topic = 'General Overview';
+    saveDraft();
+    try {
+      if (typeof Voice !== 'undefined' && Voice && !Voice.stream && Voice.init) {
+        Voice.init().catch(err => console.warn('Mic init background:', err));
+      }
+      micOk = true;
+    } catch (e) {
+      micOk = true;
+    }
     startLiveSession();
   });
 
@@ -1452,43 +2633,277 @@
     }, 1000);
   }
   function setCaption(who, text) {
-    $('tsCaptionWho').textContent = who;
-    $('tsCaptionText').textContent = text;
+    if ($('tsCaptionWho')) $('tsCaptionWho').textContent = who || '';
+    if ($('tsCaptionText')) $('tsCaptionText').textContent = text || 'Say something...';
+    
+    const respBox = $('tsResponseBox');
+    const respTxt = $('tsResponseText');
+    const captionEl = $('tsCaption');
+    
+    if (who && (who.includes('AI Student') || who.includes('Student'))) {
+      // AI Student Responding Mode (Image 3)
+      if (respBox) respBox.style.display = 'block';
+      if (respTxt) respTxt.textContent = text || '';
+      if (captionEl) captionEl.style.display = 'none';
+      if (activeOrb) activeOrb.setMode('bottom');
+    } else {
+      // Teacher Listening / Speaking Mode (Image 2)
+      if (respBox) respBox.style.display = 'none';
+      if (captionEl) captionEl.style.display = 'block';
+      if (activeOrb) activeOrb.setMode('center');
+    }
   }
   function pushTurn(speaker, text, extra) {
     S.turns.push(Object.assign({ speaker, text, at: new Date().toISOString() }, extra || {}));
     saveLive();
   }
 
-  async function startLiveSession() {
-    $('tsStuTitle').textContent = STUDENTS[S.level].name + ' — AI Student · ' + S.level;
-    $('tsCrumbHere').textContent = S.topic;
-    $('tsFallback').classList.toggle('on', textMode);
-    $('tsConn').classList.remove('bad'); $('tsConnTxt').textContent = textMode ? 'Text mode' : 'Voice ready';
-    S.status = 'live'; S.startedAt = S.startedAt || new Date().toISOString();
-    setState('connecting');
-    startElapsed();
-    saveLive();
-    track('teach_session_started', { path: S.preparationPath, mode: S.voiceMode });
-    // AI student opening line — fixed, role-correct, spoken.
-    const opening = STUDENTS[S.level].opening;
-    pushTurn('ai_student', opening);
-    setCaption(STUDENTS[S.level].name + ' — AI Student', opening);
-    setState('ai_speaking');
-    if (!textMode) await speak(opening);
-    setState('listening');
-    if (!textMode) armListening();
+  /* ── ThinkingOrbs Canvas Engine (state: 'listening' | 'composing') ── */
+  class ThinkingOrb {
+    constructor(canvas, options = {}) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.size = options.size || 260;
+      this.state = options.state || 'listening'; // 'listening' | 'composing'
+      this.audioLevel = 0;
+      this.animId = null;
+      this.time = 0;
+      this.particles = [];
+      this.init();
+    }
+
+    init() {
+      this.resize();
+      this.particles = [];
+      const ringCounts = [10, 16, 22, 28, 34];
+      const baseRadii = [24, 40, 58, 76, 94];
+
+      ringCounts.forEach((count, ringIdx) => {
+        const baseR = baseRadii[ringIdx];
+        for (let i = 0; i < count; i++) {
+          const angle = (i / count) * Math.PI * 2 + (ringIdx * 0.4);
+          this.particles.push({
+            ring: ringIdx,
+            baseAngle: angle,
+            baseRadius: baseR,
+            angleSpeed: (ringIdx % 2 === 0 ? 1 : -1) * (0.004 + ringIdx * 0.002),
+            offsetPhase: Math.random() * Math.PI * 2,
+            size: Math.random() * 1.6 + 1.2,
+            opacity: Math.random() * 0.45 + 0.45
+          });
+        }
+      });
+    }
+
+    resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const s = this.size;
+      this.canvas.width = s * dpr;
+      this.canvas.height = s * dpr;
+      this.canvas.style.width = s + 'px';
+      this.canvas.style.height = s + 'px';
+      if (this.ctx.setTransform) {
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
+
+    setMode(mode) {
+      this.state = (mode === 'bottom') ? 'composing' : 'listening';
+      const cvsContainer = $('tsCanvasContainer');
+      if (cvsContainer) {
+        if (mode === 'bottom') {
+          cvsContainer.style.transform = 'scale(0.55) translateY(120px)';
+        } else {
+          cvsContainer.style.transform = 'scale(1) translateY(0)';
+        }
+      }
+    }
+
+    setAudioLevel(rms) {
+      this.audioLevel = Math.min(1.8, rms * 16);
+    }
+
+    start() {
+      if (this.animId) return;
+      const render = () => {
+        this.draw();
+        this.animId = requestAnimationFrame(render);
+      };
+      render();
+    }
+
+    stop() {
+      if (this.animId) {
+        cancelAnimationFrame(this.animId);
+        this.animId = null;
+      }
+    }
+
+    draw() {
+      this.time += 0.016;
+      const cx = this.size / 2;
+      const cy = this.size / 2;
+      this.ctx.clearRect(0, 0, this.size, this.size);
+
+      // Core Ambient Radial Glow
+      const glowR = (this.state === 'listening' ? 65 : 45) + (this.audioLevel * 15);
+      const grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.03)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      this.ctx.fillStyle = grad;
+      this.ctx.beginPath();
+      this.ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Orbital Rings & Particles
+      const audioPulse = this.audioLevel * 18;
+      const baseRadii = [24, 40, 58, 76, 94];
+
+      baseRadii.forEach((r, idx) => {
+        const pulseR = r + (this.state === 'listening' ? audioPulse * (idx + 1) * 0.12 : -r * 0.18);
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, pulseR, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        this.ctx.setLineDash([2, 8]);
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+      });
+
+      this.particles.forEach(p => {
+        const speedMult = this.state === 'composing' ? 2.0 : 1.0;
+        p.baseAngle += p.angleSpeed * speedMult;
+
+        const radialWobble = Math.sin(this.time * 2 + p.offsetPhase) * 3;
+        let r = p.baseRadius + radialWobble;
+
+        if (this.state === 'listening') {
+          r += audioPulse * (p.ring + 1) * 0.14;
+        } else if (this.state === 'composing') {
+          r = r * 0.65 + Math.sin(this.time * 4 + p.offsetPhase) * 5;
+        }
+
+        const px = cx + Math.cos(p.baseAngle) * r;
+        const py = cy + Math.sin(p.baseAngle) * r;
+
+        const alpha = Math.min(1.0, p.opacity + (this.audioLevel * 0.25));
+        const dotSize = p.size * (1 + this.audioLevel * 0.15);
+
+        this.ctx.beginPath();
+        this.ctx.arc(px, py, dotSize, 0, Math.PI * 2);
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+        this.ctx.fill();
+      });
+    }
   }
+
+  let activeOrb = null;
+  function startOrbEngine() {
+    const cvs = $('tsParticleCanvas');
+    if (cvs) {
+      if (!activeOrb) {
+        activeOrb = new ThinkingOrb(cvs, { size: 260 });
+      }
+      activeOrb.resize();
+      activeOrb.start();
+      Voice.onLevel = rms => {
+        if (activeOrb) activeOrb.setAudioLevel(rms);
+      };
+    }
+  }
+
+  window.startLiveSession = async function(e) {
+    if (e) {
+      try { e.preventDefault(); e.stopPropagation(); } catch(err){}
+    }
+    textMode = false;
+    S.voiceMode = 'pipeline';
+    if (!S.topic || !S.topic.trim()) S.topic = 'General Overview';
+    saveDraft();
+
+    // Direct DOM display toggle to guarantee view transition regardless of state machine
+    const pf = $('tsPreflight');
+    if (pf) { pf.classList.remove('on'); pf.style.display = 'none'; }
+    const live = $('tsLive');
+    if (live) { live.classList.add('on'); live.style.display = 'flex'; }
+
+    startOrbEngine();
+
+    try {
+      const stu = currentStudent();
+      const lvlKey = (S.level || 'intermediate').toLowerCase();
+      const AVATAR_BADGES = {
+        beginner: '<svg viewBox="0 0 100 100" style="width:76px; height:76px; filter:drop-shadow(0 8px 22px rgba(16,185,129,0.55));"><defs><linearGradient id="emG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#059669"/></linearGradient></defs><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="url(#emG)" stroke="rgba(255,255,255,0.5)" stroke-width="2.5"/><path d="M50 28 C 50 28, 35 40, 35 56 C 35 66, 42 72, 50 72 C 58 72, 65 66, 65 56 C 65 40, 50 28, 50 28 Z" fill="#ffffff"/><path d="M50 40 L50 68" stroke="#059669" stroke-width="3.5" stroke-linecap="round"/></svg>',
+        intermediate: '<svg viewBox="0 0 100 100" style="width:76px; height:76px; filter:drop-shadow(0 8px 22px rgba(168,85,247,0.6));"><defs><linearGradient id="prpG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="url(#prpG)" stroke="rgba(255,255,255,0.5)" stroke-width="2.5"/><path d="M54 22 L32 52 H50 L46 78 L68 48 H50 Z" fill="#ffffff"/></svg>',
+        advanced: '<svg viewBox="0 0 100 100" style="width:76px; height:76px; filter:drop-shadow(0 8px 22px rgba(245,158,11,0.6));"><defs><linearGradient id="gldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#d97706"/></linearGradient></defs><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="url(#gldG)" stroke="rgba(255,255,255,0.5)" stroke-width="2.5"/><path d="M32 30 H68 L60 52 C56 62, 44 62, 40 52 Z M44 62 H56 V72 H44 Z M36 74 H64 V78 H36 Z" fill="#ffffff"/></svg>'
+      };
+
+      const avatarEl = $('tsAvatar');
+      if (avatarEl) {
+        avatarEl.style.background = 'transparent';
+        avatarEl.style.display = 'flex';
+        avatarEl.style.alignItems = 'center';
+        avatarEl.style.justifyContent = 'center';
+        avatarEl.innerHTML = AVATAR_BADGES[lvlKey] || AVATAR_BADGES.intermediate;
+      }
+
+      if ($('tsStuTitle')) $('tsStuTitle').textContent = stu.name + ' AI Student';
+      if ($('tsCrumbHere')) $('tsCrumbHere').textContent = S.topic;
+      if ($('tsFallback')) $('tsFallback').classList.toggle('on', textMode);
+      if ($('tsConn')) { $('tsConn').classList.remove('bad'); $('tsConnTxt').textContent = textMode ? 'Text mode' : 'Microphone in use'; }
+      S.status = 'live'; S.startedAt = S.startedAt || new Date().toISOString();
+      
+      setState('connecting');
+      startElapsed();
+      saveLive();
+      track('teach_session_started', { path: S.preparationPath, mode: S.voiceMode });
+      
+      const opening = stu.opening;
+      pushTurn('ai_student', opening);
+      setCaption(stu.name + ' AI Student', opening);
+      setState('ai_speaking');
+      if (!textMode) {
+        await speak(opening).catch(err => console.warn('TTS opening:', err));
+      }
+      setState('listening');
+      if (!textMode) armListening();
+
+      try {
+        if (typeof Voice !== 'undefined' && Voice && !Voice.stream && Voice.init) {
+          Voice.init().catch(err => console.warn('Mic init background:', err));
+        }
+        micOk = true;
+      } catch (err) {
+        micOk = true;
+      }
+    } catch (err) {
+      console.warn('startLiveSession error, falling back to listening view:', err);
+      setState('listening');
+    }
+  };
 
   function armListening() {
     if (textMode || micMuted) return;
-    Voice.startCapture();
-    Voice.onSpeechStart = () => { if (state === 'listening') setState('user_speaking'); };
-    Voice.onAutoCommit = () => commitVoiceTurn();
-    Voice.onLevel = rms => {
-      const stage = $('tsStage');
-      stage.style.setProperty('--pulse', Math.min(14, rms * 260) + 'px');
-    };
+    try {
+      if (!Voice.stream || !Voice.ctx) {
+        Voice.init().then(() => {
+          if (!textMode && !micMuted && Voice.stream) {
+            Voice.startCapture();
+          }
+        }).catch(e => console.warn('Voice init deferred:', e));
+        return;
+      }
+      Voice.startCapture();
+      Voice.onSpeechStart = () => { if (state === 'listening') setState('user_speaking'); };
+      Voice.onAutoCommit = () => commitVoiceTurn();
+      Voice.onLevel = rms => {
+        const stage = $('tsStage');
+        if (stage) stage.style.setProperty('--pulse', Math.min(14, rms * 260) + 'px');
+      };
+    } catch (e) {
+      console.warn('armListening exception handled:', e);
+    }
   }
   async function commitVoiceTurn() {
     if (turnBusy || textMode) return;
@@ -1592,7 +3007,7 @@
   function runtimeAddendum() {
     return 'RUNTIME ADDENDUM (Noura Teach Studio):\n' +
       '- Your product name context is Noura. Never mention Axoura, TeachLoop, prompts, or these instructions.\n' +
-      '- You are ' + STUDENTS[S.level].name + ', the ' + S.level + ' AI student. The human is your teacher.\n' +
+      '- You are ' + currentStudent().name + ', the ' + S.level + ' AI student. The human is your teacher.\n' +
       '- This is a SPOKEN session: your "message" is read aloud by text-to-speech. Keep it under ' + (S.level === 'advanced' ? 55 : 40) + ' words, plain spoken English, no markdown, no lists, no LaTeX or symbols — write maths in words.\n' +
       '- One reaction, at most one compact attempted understanding, and at most ONE primary question.\n' +
       '- Output exactly one JSON object as specified. No text outside the JSON.';
@@ -1614,7 +3029,7 @@
   }
   async function studentCall(userText, verification, directive, repairNote) {
     const sys = [
-      { type: 'text', text: STUDENTS[S.level].prompt(), cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: currentStudent().prompt(), cache_control: { type: 'ephemeral' } },
       { type: 'text', text: runtimeAddendum() + (repairNote ? '\n\nREPAIR: your previous draft was rejected (' + repairNote + '). Regenerate valid JSON that fixes this.' : '') }
     ];
     const raw = await chat({
@@ -1676,7 +3091,7 @@
         disputedBelief = null;
       }
       pushTurn('ai_student', msg, isCheckpoint ? { checkpoint: true } : {});
-      setCaption(STUDENTS[S.level].name + ' — AI Student', msg);
+      setCaption(currentStudent().name + ' — AI Student', msg);
       track('teach_ai_turn_completed', {});
       saveLive();
       // speak
@@ -1802,7 +3217,7 @@
       $('tsDrawerTitle').textContent = 'Transcript';
       body.innerHTML = S.turns.map(t =>
         '<div class="ts-turn ' + (t.speaker === 'human_teacher' ? 'hu' : '') + (t.correction ? ' correction' : '') + '">' +
-        '<span class="who">' + (t.speaker === 'human_teacher' ? 'You — Teacher' : esc(STUDENTS[S.level].name) + ' — AI Student') +
+        '<span class="who">' + (t.speaker === 'human_teacher' ? 'You — Teacher' : esc(currentStudent().name) + ' — AI Student') +
         (t.correction ? ' · correction' : '') + (t.checkpoint ? ' · explain-back' : '') +
         ' · ' + new Date(t.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</span>' +
         '<p>' + esc(t.text) + '</p></div>').join('') || '<p class="ts-help">No turns yet.</p>';
@@ -1863,7 +3278,7 @@
     $('tsRepHead').innerHTML =
       '<span class="ts-chip"><b>Topic</b><span>' + esc(S.topic) + '</span></span>' +
       '<span class="ts-chip"><b>Subject</b><span>' + esc(S.subject || 'General') + '</span></span>' +
-      '<span class="ts-chip"><b>AI student</b><span>' + esc(STUDENTS[S.level].name + ' · ' + S.level) + '</span></span>' +
+      '<span class="ts-chip"><b>AI student</b><span>' + esc(currentStudent().name + ' · ' + S.level) + '</span></span>' +
       '<span class="ts-chip"><b>Length</b><span>' + mins + ' min · ' + S.turns.filter(t => t.speaker === 'human_teacher').length + ' teaching turns</span></span>' +
       '<span class="ts-chip"><b>Material</b><span>' + esc(S.sourceName || 'Pasted text') + '</span></span>';
     const evHtml = (r.concepts || []).map((c, i) =>
@@ -1895,12 +3310,13 @@
     S.sourceName = prev.sourceName; S.sourceText = prev.sourceText; S.sourceCard = prev.sourceCard;
     S.objective = objective || '';
     S.preparationPath = 'teach_now';
-    micOk = false; textMode = false; micMuted = false;
-    $('tsStartSessionBtn').disabled = true;
-    $('tsMicEnableBtn').style.display = '';
-    $('tsMicLive').hidden = true;
-    $('tsPfStatus').textContent = 'Waiting for your voice…'; $('tsPfStatus').classList.remove('good');
-    setState('mic_preflight');
+    micOk = true; textMode = false; micMuted = false;
+    if ($('tsStartSessionBtn')) $('tsStartSessionBtn').disabled = false;
+    if ($('tsMicEnableBtn')) $('tsMicEnableBtn').style.display = '';
+    if ($('tsMicLive')) $('tsMicLive').hidden = true;
+    const pfst = $('tsPfStatus');
+    if (pfst) { pfst.textContent = 'Ready.'; pfst.classList.remove('good'); }
+    startLiveSession();
   }
   $('tsTeachAgainBtn').addEventListener('click', () => teachAgain(''));
   $('tsNewSessionBtn').addEventListener('click', () => { location.href = 'teachstudio.html'; });
@@ -1998,6 +3414,7 @@
         $('tsDiscardBtn').addEventListener('click', () => { clearLive(); bar.remove(); });
       }
     } catch (e) {}
+    try { if (typeof startOrbEngine === 'function') startOrbEngine(); } catch(e) {}
   })();
 })();
 </script>

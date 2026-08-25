@@ -16,7 +16,7 @@
   :root { --grad: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%); --purple:#8b5cf6; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { height:100%; }
-  body { background:#0A0A0B; color:#E8E8E6; font-family:'Plus Jakarta Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
+  body { background:#141416; color:#E8E8E6; font-family:'Plus Jakarta Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
   button { font-family:'Plus Jakarta Sans','Inter',sans-serif; }
 
   .grad-logo { display:inline-block; background:var(--grad); -webkit-mask:url('logo.png?v=3') center/contain no-repeat; mask:url('logo.png?v=3') center/contain no-repeat; }
@@ -89,8 +89,8 @@
   .ov-head { margin-bottom:32px; }
   .ov-logo { width:130px; height:130px; flex-shrink:0; position:relative; display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
   .ov-logo .grad-logo { width:100%; height:100%; }
-  .ov-logo .topic-emoji { font-size:90px; line-height:1; user-select:none; filter:drop-shadow(0 8px 24px rgba(139,92,246,0.35)); }
-  .ov-logo lottie-player { width:130px !important; height:130px !important; filter:drop-shadow(0 8px 28px rgba(167,139,250,0.45)); transition:transform .3s ease; }
+  .ov-logo .topic-emoji { font-size:90px; line-height:1; user-select:none; filter:none; }
+  .ov-logo lottie-player { width:130px !important; height:130px !important; filter:none; transition:transform .3s ease; }
   .ov-logo lottie-player:hover { transform:scale(1.08); }
   .topic-illu-wrap { position:relative; width:130px; height:130px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; }
   .topic-illu-wrap lord-icon { width:130px; height:130px; filter:brightness(1.5) contrast(1.1); }
@@ -98,31 +98,31 @@
   .ov-title { font-size:clamp(30px,3.8vw,42px); font-weight:800; letter-spacing:-.02em; line-height:1.2; color:#ffffff; }
   .ov-start-row { display:flex; align-items:center; gap:24px; margin-bottom:44px; flex-wrap:wrap; }
 
-  /* Rich Deep Purple PopButton for Start Lesson */
+  /* Rich Deep Purple PopButton for Start Lesson — Wider layout matching Screenshot 1 */
   .start-btn {
-    padding: 12px 34px;
-    height: 50px;
+    min-width: 210px;
+    padding: 14px 48px;
+    height: 54px;
     border: 2px solid #a78bfa;
     border-bottom: 5px solid #4c1d95;
-    border-radius: 14px;
+    border-radius: 16px;
     background: #7c3aed;
     color: #ffffff;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     cursor: pointer;
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+    box-shadow: none !important;
     transition: all 0.1s ease;
     transform-origin: bottom;
   }
   .start-btn:hover {
-    background: #8b5cf6;
-    border-color: #c4b5fd;
+    background: #6d28d9;
+    border-color: #7c3aed;
     color: #ffffff;
-    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45);
   }
   .start-btn:active {
     border-bottom-width: 2px;
@@ -142,12 +142,12 @@
     content:''; position:absolute; left:26px; transform:translateX(-50%); top:var(--tl-top, 22px); height:var(--tl-track, 0px); width:2px;
     background:rgba(255, 255, 255, 0.1); z-index:0;
   }
-  /* Green Completed Line */
+  /* Green Completed Line — No Glow */
   .timeline::after {
     content:''; position:absolute; left:26px; transform:translateX(-50%); top:var(--tl-top, 22px); width:3px; border-radius:3px;
     height:var(--tl-fill, 0px);
     background:#419b67;
-    box-shadow:0 0 10px rgba(65,155,103,0.45);
+    box-shadow:none !important;
     transition:height .35s ease; z-index:0;
   }
 
@@ -155,22 +155,20 @@
   .tl-row {
     position:relative; display:flex; align-items:center; gap:20px; padding:10px 0; transition:all .15s ease; z-index:1;
   }
-  .tl-row.locked { opacity:.55; }
 
-  /* Circular Nodes with Crisp Geometry */
+  /* Circular Nodes with Crisp 3D Geometry — 100% Opaque Solid Fill */
   .tl-dot {
-    position:relative; z-index:2; width:44px; height:44px; flex-shrink:0; border-radius:50%;
-    background:#1c1c20; border:2px solid rgba(255, 255, 255, 0.12); display:flex; align-items:center;
-    justify-content:center; font-size:15px; font-weight:700; color:#a1a1aa; transition:all .15s ease;
-    margin-left:4px;
+    position:relative; z-index:10; width:44px; height:44px; flex-shrink:0; border-radius:50%;
+    background:#232326 !important; border:2px solid #38383e !important; display:flex; align-items:center;
+    justify-content:center; font-size:15px; font-weight:700; color:#b0b0b8 !important; opacity:1 !important;
+    margin-left:4px; box-shadow:none !important;
   }
   .tl-row.current .tl-dot {
-    border-color:#a78bfa; background:#7c3aed; color:#ffffff;
-    box-shadow:0 0 16px rgba(139, 92, 246, 0.45);
+    border:2px solid #a78bfa !important; border-bottom:4px solid #4c1d95 !important;
+    background:#7c3aed !important; color:#ffffff !important; opacity:1 !important;
   }
   .tl-row.done .tl-dot {
-    background:#419b67; border-color:#419b67; color:#ffffff;
-    box-shadow:0 2px 10px rgba(65,155,103,0.35);
+    background:#2e9e62 !important; border:2px solid #3fd986 !important; color:#ffffff !important; opacity:1 !important;
   }
   .tl-row.done .tl-dot svg { stroke:#ffffff; stroke-width:3.2; }
   .tl-dot svg { width:18px; height:18px; }
@@ -189,12 +187,12 @@
   .tl-meta { margin-left:auto; display:flex; align-items:center; gap:12px; font-size:13.5px; color:#a1a1aa; font-weight:600; }
   .tl-meta svg { width:15px; height:15px; stroke:#71717a; fill:none; stroke-width:1.8; }
 
-  /* Active step card container to the right of node dot */
+  /* Active step card container to the right of node dot (Matching Screenshot 1) */
   .tl-card {
     position:relative; z-index:1; margin-left:0; flex:1; display:flex; align-items:center;
     justify-content:space-between; gap:18px;
-    background:rgba(139, 92, 246, 0.08); border:1.5px solid rgba(139, 92, 246, 0.35); border-radius:16px;
-    padding:16px 20px; box-shadow:0 4px 20px rgba(124, 58, 237, 0.15);
+    background:#202024; border:1.5px solid rgba(255, 255, 255, 0.12); border-radius:16px;
+    padding:16px 22px; box-shadow:none !important;
   }
   .tl-card .tl-title { font-size:16.5px; font-weight:800; color:#ffffff; }
   .tl-card .tl-sub { font-size:13px; color:#c4b5fd; margin-top:3px; font-weight:600; }
@@ -370,8 +368,7 @@
   .tab-load .grad-logo { display:none !important; }
   .loadwrap .load-status { order:1; margin:0 0 20px; }
   .loadwrap .load-progress { order:2; }
-  /* While loading, pin the block to the content area so text + bar sit dead
-     centre of the page regardless of each tab's own padding. */
+  /* While loading, center status text + progress bar dead in the middle center */
   .is-loading .tab-load {
     position:fixed; top:58px; left:86px; right:0; bottom:0;
     padding:0 20px; margin:0;
@@ -754,37 +751,37 @@
   .sc-card.drop.open .sc-drop-body { display:block; }
 
   /* ── Checkpoint Quiz Container ── */
-  .checkpoint { display:none; width:100%; max-width:680px; margin:0 auto; padding:24px 20px 40px; position:relative; min-height:calc(100vh - 120px); flex-direction:column; box-sizing:border-box; }
-  #cpBody { display:flex; flex-direction:column; flex:1; }
+  .checkpoint { display:none; width:100%; max-width:680px; margin:0 auto; padding:24px 20px 48px; position:relative; min-height:calc(100vh - 120px); flex-direction:column; box-sizing:border-box; }
+  #cpBody { display:flex; flex-direction:column; flex:1; width:100%; justify-content:flex-start; align-items:center; }
 
-  /* Summary footer Continue button — same purple 3D pop */
+  /* Summary footer Continue button — matching sleek Check button style */
   .cps-btn-continue {
-    min-width:140px;
-    height:52px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
-    font-size:16px;
-    font-weight:700;
-    color:#f4f4f5;
-    background:#7c3aed;
-    border:2px solid #6d28d9;
-    border-bottom:5px solid #4c1d95;
-    border-radius:16px;
-    cursor:pointer;
-    user-select:none;
-    transition:all 0.1s ease;
-    transform-origin:bottom;
-    box-shadow:0 4px 20px rgba(109,40,217,0.45);
-    padding:0 32px;
+    padding: 10px 24px;
+    height: 44px;
+    min-width: 110px;
+    border: 2px solid #a78bfa;
+    border-bottom: 4px solid #4c1d95;
+    border-radius: 12px;
+    background: #7c3aed;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important;
+    transition: all 0.1s ease;
+    transform-origin: bottom;
+    user-select: none;
   }
-  .cps-btn-continue:hover { background:#6d28d9; border-color:#7c3aed; color:#fff; }
-  .cps-btn-continue:active { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); box-shadow:0 2px 8px rgba(109,40,217,0.3); }
-  .cp-card-wrap { flex:1; display:flex; flex-direction:column; justify-content:center; margin-top:0; }
-  .cp-card { background:transparent; border:none; padding:0; }
-  .cp-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; font-size:23px; font-weight:700; line-height:1.4; color:#ffffff; letter-spacing:-0.02em; margin-bottom:32px; text-align:left; }
-  .cp-opts { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+  .cps-btn-continue:hover { background:#8b5cf6; border-color:#c4b5fd; color:#fff; }
+  .cps-btn-continue:active { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); }
+  .cp-card-wrap { flex:1; display:flex; flex-direction:column; justify-content:flex-start; align-items:center; width:100%; margin-top:24px; padding-bottom:32px; }
+  .cp-card { background:transparent; border:none; padding:0; width:100%; max-width:640px; margin:0 auto; }
+  .cp-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; font-size:24px; font-weight:700; line-height:1.4; color:#ffffff; letter-spacing:-0.02em; margin-bottom:32px; text-align:left; }
+  .cp-opts { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; width:100%; }
   
   .cp-opt {
     display:flex; align-items:center; justify-content:space-between; width:100%;
@@ -803,48 +800,48 @@
     content:''; width:8px; height:8px; border-radius:50%; background:#ffffff; opacity:0; transition:opacity 0.15s ease;
   }
   
-  /* Selected State before submit */
+  /* Selected State before submit — No glow */
   .cp-opt.sel {
     border: 2px solid #a78bfa !important;
     background: #1b1728 !important;
     color: #ffffff !important;
-    box-shadow: 0 0 18px rgba(167, 139, 250, 0.4), 0 4px 20px rgba(139, 92, 246, 0.25) !important;
+    box-shadow: none !important;
   }
   .cp-opt.sel .opt-radio {
     border-color: #a78bfa !important;
     background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%) !important;
-    box-shadow: 0 0 10px rgba(167, 139, 250, 0.5) !important;
+    box-shadow: none !important;
   }
   .cp-opt.sel .opt-radio::after { opacity:1; background:#ffffff; }
 
-  /* Correct State ALWAYS overrides selected (GREEN) */
+  /* Correct State ALWAYS overrides selected (GREEN — No glow, matching Screenshot 1) */
   .cp-opt.correct, .cp-opt.sel.correct, .qz-opt.correct, .qz-opt.sel.correct {
-    border: 2px solid #2ec06a !important;
-    background: rgba(46, 192, 106, 0.12) !important;
+    border: 1.5px solid #2ec06a !important;
+    background: #122319 !important;
     color: #ffffff !important;
-    box-shadow: 0 0 20px rgba(46, 192, 106, 0.35) !important;
+    box-shadow: none !important;
   }
   .cp-opt.correct .opt-radio, .cp-opt.sel.correct .opt-radio, .qz-opt.correct .opt-radio, .qz-opt.sel.correct .opt-radio {
     border-color: #2ec06a !important;
     background: #2ec06a !important;
-    box-shadow: 0 0 10px rgba(46, 192, 106, 0.5) !important;
+    box-shadow: none !important;
   }
   .cp-opt.correct .opt-radio::after, .cp-opt.sel.correct .opt-radio::after, .qz-opt.correct .opt-radio::after, .qz-opt.sel.correct .opt-radio::after {
     opacity: 1 !important;
     background: #ffffff !important;
   }
 
-  /* Wrong State ALWAYS overrides selected (RED) */
+  /* Wrong State ALWAYS overrides selected (RED — No glow) */
   .cp-opt.wrong, .cp-opt.sel.wrong, .qz-opt.wrong, .qz-opt.sel.wrong {
-    border: 2px solid #ef4444 !important;
-    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1.5px solid #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
     color: #ffffff !important;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.35) !important;
+    box-shadow: none !important;
   }
   .cp-opt.wrong .opt-radio, .cp-opt.sel.wrong .opt-radio, .qz-opt.wrong .opt-radio, .qz-opt.sel.wrong .opt-radio {
     border-color: #ef4444 !important;
     background: #ef4444 !important;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+    box-shadow: none !important;
   }
   .cp-opt.wrong .opt-radio::after, .cp-opt.sel.wrong .opt-radio::after, .qz-opt.wrong .opt-radio::after, .qz-opt.sel.wrong .opt-radio::after {
     opacity: 1 !important;
@@ -855,16 +852,45 @@
   .cp-opt.correct .cp-opt-icon { color:#00e599; }
   .cp-opt.wrong .cp-opt-icon { color:#ff3d3d; }
 
-  /* ── Modern Human-Centric Feedback Card ── */
+  /* ── Feedback Card matching User Screenshots 1 & 2 ── */
   .cp-fb {
-    background: #141417;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
-    padding: 24px 28px;
+    border-radius: 20px;
+    padding: 22px 26px;
     margin-top: 28px;
     animation: fadeIn 0.25s ease;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    box-shadow: none !important;
+    width: 100%;
+    border: none;
   }
+  .cp-fb.correct {
+    background: #122319;
+    color: #34d399;
+  }
+  .cp-fb.incorrect, .cp-fb.bad {
+    background: #271618;
+    color: #f87171;
+  }
+  .cp-fb-hd {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .cp-fb-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .cp-fb.correct .cp-fb-title { color: #34d399; }
+  .cp-fb.incorrect .cp-fb-title, .cp-fb.bad .cp-fb-title { color: #f87171; }
+  .cp-fb-text {
+    font-size: 15.5px;
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  .cp-fb.correct .cp-fb-text { color: #6ee7b7; }
+  .cp-fb.incorrect .cp-fb-text, .cp-fb.bad .cp-fb-text { color: #fca5a5; }
   .cp-fb-hd {
     display: flex;
     align-items: center;
@@ -930,13 +956,15 @@
   .cp-fb-actions {
     margin-top: 24px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
   }
-  /* Checkpoint Action Row — Right aligned Check button */
+  /* Checkpoint Action Row — Center aligned Check button */
   .cp-action-row {
-    margin-top: 24px;
+    margin-top: 28px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
     width: 100%;
   }
   /* Input & Textarea Styling */
@@ -1243,13 +1271,7 @@
   .cps-btn-retry:hover { background: #27272a; border-color: #52525b; color: #ffffff; }
   .cps-btn-retry:active { transform: translateY(1px); }
 
-  /* Continue button in summary footer */
-  .cps-btn-continue {
-    flex: 1;
-    min-width: 170px;
-    height: 48px;
-    padding: 0 32px;
-  }
+
 
   /* ── Learning Zone Card ── */
   .cps-zone-card {
@@ -1330,25 +1352,60 @@
   .pl-bar { height:5px; border-radius:99px; background:#1e1e22; overflow:hidden; margin-bottom:40px; }
   .pl-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .3s ease; }
 
-  /* Section reader */
-  .reader { font-size:16.5px; line-height:1.75; color:#d6d6d4; }
-  .reader h1, .reader h2 { font-size:26px; font-weight:800; letter-spacing:-.015em; color:#fff; margin:0 0 18px; }
-  .reader h3 { font-size:19px; font-weight:700; color:#fff; margin:26px 0 10px; }
-  .reader p { margin:0 0 16px; }
-  .reader ul, .reader ol { margin:0 0 16px; padding-left:26px; }
-  .reader li { margin-bottom:8px; }
-  .reader strong { color:#fff; }
-  .reader blockquote { border-left:3px solid #7c3aed; background:rgba(139,92,246,0.08); border-radius:0 10px 10px 0; padding:12px 16px; margin:0 0 16px; color:#cfc6ea; }
+  /* Section reader (Matching Screenshots 1 & 2 format) */
+  .reader {
+    max-width:680px; margin:110px auto 0; padding:0 10px 40px;
+    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    font-size:18px; line-height:1.68; color:#d4d4d8;
+  }
+  .reader h1, .reader h2 {
+    font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1.3;
+    color:#ffffff; margin:0 0 22px;
+  }
+  .reader h3 {
+    font-size:20px; font-weight:800; letter-spacing:-.01em;
+    color:#ffffff; margin:28px 0 14px;
+  }
+  .reader p { margin:0 0 24px; color:#d4d4d8; font-weight:400; }
+  .reader strong, .reader b { font-weight:800; color:#ffffff !important; }
+  .reader ul, .reader ol { margin:12px 0 24px; padding-left:0; list-style:none; }
+  .reader li {
+    position:relative; padding-left:22px; margin-bottom:14px;
+    font-size:17.5px; line-height:1.6; color:#e4e4e7; font-weight:600;
+  }
+  .reader ul li::before {
+    content:'•'; position:absolute; left:0; top:-1px;
+    color:#a78bfa; font-size:22px; line-height:1; font-weight:800;
+  }
+  .reader blockquote {
+    border-left:3px solid #7c3aed; background:#1c1c22;
+    border-radius:0 12px 12px 0; padding:16px 20px; margin:20px 0;
+    color:#e4e4e7; font-size:16.5px; line-height:1.6;
+  }
   .reader code { background:#1c1c20; border:1px solid #2a2a2e; border-radius:6px; padding:2px 6px; font-size:14px; }
   .reader table { width:100%; border-collapse:collapse; margin:0 0 18px; font-size:14.5px; }
   .reader th, .reader td { border:1px solid #2a2a2e; padding:9px 12px; text-align:left; }
   .reader th { background:#161619; color:#fff; }
   .pl-nav { display:flex; justify-content:space-between; align-items:center; margin-top:44px; }
-  .pl-back { padding:12px 26px; border:1px solid #2e2e34; border-radius:12px; background:transparent; color:#c7c7cc; font-size:14.5px; font-weight:600; cursor:pointer; }
-  .pl-back:hover { background:#1c1c20; color:#fff; }
-  .pl-back[disabled] { opacity:.35; pointer-events:none; }
-  .pl-next { padding:12px 34px; border:none; border-radius:12px; background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(123,92,250,0.28); }
-  .pl-next:hover { filter:brightness(1.07); }
+  .pl-back {
+    padding:12px 28px; height:50px; border:2px solid #3f3f46; border-bottom:5px solid #18181b;
+    border-radius:14px; background:#27272a; color:#e4e4e7; font-size:15px; font-weight:700;
+    cursor:pointer; font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    display:inline-flex; align-items:center; justify-content:center; user-select:none;
+    transition:all 0.1s ease; transform-origin:bottom; box-shadow:0 4px 16px rgba(0,0,0,0.4);
+  }
+  .pl-back:hover:not([disabled]) { background:#3f3f46; border-color:#52525b; color:#ffffff; }
+  .pl-back:active:not([disabled]) { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); box-shadow:0 2px 8px rgba(0,0,0,0.25); }
+  .pl-back[disabled] { opacity:.35; cursor:not-allowed; pointer-events:none; }
+  .pl-next {
+    padding:12px 34px; height:50px; border:2px solid #a78bfa; border-bottom:5px solid #4c1d95;
+    border-radius:14px; background:#7c3aed; color:#ffffff; font-size:16px; font-weight:700;
+    cursor:pointer; font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+    display:inline-flex; align-items:center; justify-content:center; user-select:none;
+    transition:all 0.1s ease; transform-origin:bottom; box-shadow:0 4px 20px rgba(109,40,217,0.45);
+  }
+  .pl-next:hover { background:#6d28d9; border-color:#7c3aed; color:#fff; }
+  .pl-next:active { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); box-shadow:0 2px 8px rgba(109,40,217,0.3); }
 
   /* Checkpoint quiz */
   /* ── Quiz / Checkpoint layout (raised-key option cards) ────── */
@@ -1372,11 +1429,11 @@
     display:inline-flex; align-items:center; justify-content:flex-start;
     font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
   }
-  /* Selected: vibrant progress bar purple outline & glow. */
+  /* Selected: vibrant progress bar purple outline — NO GLOW */
   .qz-opt.sel, .cp-opt.sel {
     border: 2px solid #a78bfa !important;
     background: #1b1728 !important;
-    box-shadow: 0 0 18px rgba(167, 139, 250, 0.4) !important;
+    box-shadow: none !important;
   }
   .qz-opt.sel .num, .cp-opt.sel .num { color: #a78bfa !important; }
   .qz-opt.correct, .cp-opt.correct {
@@ -1394,6 +1451,7 @@
   }
   /* Progress bars across quiz, recall & lesson: exact same Flux progress bar as generation */
   .cp-bar, .rc-bar, .pl-bar {
+    width: 100%;
     height: 6px;
     border-radius: 999px;
     background: #1c1c20;
@@ -1430,10 +1488,10 @@
   .qz-opt .num { width:30px; height:30px; flex-shrink:0; border-radius:8px; border:1.5px solid #3a3a40; display:flex; align-items:center; justify-content:center; font-size:13.5px; font-weight:700; color:#9a9aa2; }
   .qz-opt.sel { border-color:#8b5cf6; background:#1d1730; }
   .qz-opt.sel .num { border-color:#8b5cf6; color:#c9b6ef; }
-  .qz-opt.correct { border-color:#3fb950; background:rgba(63,185,80,0.10); }
-  .qz-opt.correct .num { border-color:#3fb950; color:#3fb950; }
-  .qz-opt.wrong { border-color:#f85149; background:rgba(248,81,73,0.10); }
-  .qz-opt.wrong .num { border-color:#f85149; color:#f85149; }
+  .qz-opt.correct { border-color:#2ec06a !important; background:#122319 !important; box-shadow:none !important; }
+  .qz-opt.correct .num { border-color:#2ec06a !important; color:#2ec06a !important; }
+  .qz-opt.wrong { border-color:#ef4444 !important; background:#271618 !important; box-shadow:none !important; }
+  .qz-opt.wrong .num { border-color:#ef4444 !important; color:#ef4444 !important; }
   .qz-opt.disabled { pointer-events:none; }
   /* Same raised-key treatment as the Checkpoint tab. Declared after the
      original .qz-* rules so it actually wins the cascade. */
@@ -1444,6 +1502,29 @@
     box-shadow:none;
     transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
   }
+  .cp-fb-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  /* Checkpoint Action Row — Right aligned Check button */
+  .cp-action-row {
+    margin-top: 28px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+  }
+  /* Input & Textarea Styling — Auto Expanding */
+  .cp-input {
+    width:100%; min-height:110px; resize:none; overflow-y:hidden; background:#1b1b1f;
+    border:1px solid #2c2c30; border-radius:16px; padding:16px 18px;
+    color:#ffffff; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif;
+    outline:none; transition:border-color 0.18s ease, background 0.18s ease, height 0.1s ease; box-shadow:none !important;
+  }
+  .cp-input:focus { border-color:#8b5cf6; background:#1f1f25; box-shadow:0 0 0 3.5px rgba(139,92,246,0.22); }
+  .cp-input::placeholder { color:#6a6a78; }
   .qz-opts { gap:14px; }
   .qz-opt:hover { border-color:#3a3a3a; }
   .qz-opt .num {
@@ -1457,30 +1538,33 @@
   .qz-opt.correct .num { color:#2ec06a; }
   .qz-opt.wrong { background:#1c1c1c; border:2px solid #ef4444; box-shadow:none; }
   .qz-opt.wrong .num { color:#ef4444; }
-  .qz-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important; font-size:23px !important; font-weight:700 !important; line-height:1.4 !important; letter-spacing:-.02em !important; color:#ffffff !important; margin-bottom:28px !important; text-align:left !important; }
-  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#6ee7b7; background:rgba(46,192,106,0.12); border:1px solid rgba(46,192,106,0.35); border-radius:14px; padding:16px 20px; display:none; }
-  .qz-wrap { max-width:680px; margin:0 auto; width:100%; box-sizing:border-box; }
+  .qz-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important; font-size:24px !important; font-weight:700 !important; line-height:1.4 !important; letter-spacing:-.02em !important; color:#ffffff !important; margin-bottom:28px !important; text-align:left !important; }
+  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#2ec06a; background:rgba(46,192,106,0.12); border:1px solid rgba(46,192,106,0.35); border-radius:14px; padding:16px 20px; display:none; }
+  .qz-explain.bad, .qz-explain.wrong { color:#f87171 !important; background:rgba(239,68,68,0.12) !important; border:1px solid rgba(239,68,68,0.35) !important; }
+  .qz-wrap { max-width:680px; margin:95px auto 0; width:100%; box-sizing:border-box; }
   .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
-  /* Unified 3D PopButton style matching .start-btn ("Review lesson" / "Start lesson" button) */
-  .qz-check, .cp-submit-btn, .cps-btn-continue {
-    padding: 12px 34px;
-    height: 50px;
+  /* Unified 3D PopButton style for Check, Next, and Continue buttons — Sleek & Compact */
+  .qz-check, .cp-submit-btn, .cps-btn-continue, .pl-next {
+    padding: 0 26px;
+    height: 44px;
+    min-width: 110px;
     border: 2px solid #a78bfa;
-    border-bottom: 5px solid #4c1d95;
-    border-radius: 14px;
+    border-bottom: 4px solid #4c1d95;
+    border-radius: 12px;
     background: #7c3aed;
     color: #ffffff;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+    box-shadow: none !important;
     transition: all 0.1s ease;
     transform-origin: bottom;
     user-select: none;
+    flex: initial;
   }
   .qz-check[disabled], .cp-submit-btn[disabled] {
     opacity: 0.4;
@@ -1488,53 +1572,54 @@
     box-shadow: none;
     transform: none;
   }
-  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover {
+  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover, .pl-next:hover {
     background: #8b5cf6;
     border-color: #c4b5fd;
     color: #ffffff;
-    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45);
   }
-  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active {
+  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active, .pl-next:active {
     border-bottom-width: 2px;
     transform: translateY(3px) scaleY(0.98);
   }
 
-  /* Fill-in-the-blank Slot & Option Pill Styling */
+  /* Fill-in-the-blank Slot & Option Pill Styling — NO GLOW */
   .fill-blank-slot {
     display: inline-block;
     min-width: 130px;
-    padding: 2px 14px;
+    padding: 3px 14px;
     margin: 0 4px;
-    border-bottom: 2.5px dashed #8b5cf6;
+    border: 1.5px solid #8b5cf6;
     color: #c4b5fd;
     font-weight: 700;
     text-align: center;
-    border-radius: 6px;
-    background: rgba(139, 92, 246, 0.12);
+    border-radius: 8px;
+    background: #1b1728;
+    box-shadow: none !important;
     transition: all 0.15s ease;
   }
   .fill-blank-slot.empty {
     color: #71717a;
-    border-bottom-color: #52525b;
-    background: rgba(255, 255, 255, 0.04);
+    border-color: #52525b;
+    background: #18181b;
+    box-shadow: none !important;
   }
   .fill-blank-slot.filled {
     color: #ffffff;
-    border-bottom-style: solid;
-    border-bottom-color: #a78bfa;
-    background: rgba(139, 92, 246, 0.22);
-    box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+    border-color: #a78bfa;
+    background: #231b36;
+    box-shadow: none !important;
   }
   .fill-blank-slot.correct {
     color: #ffffff;
-    border-bottom-color: #10b981;
-    background: rgba(16, 185, 129, 0.25);
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+    border: 2px solid #2ec06a !important;
+    background: #122319 !important;
+    box-shadow: none !important;
   }
   .fill-blank-slot.wrong {
     color: #ffffff;
-    border-bottom-color: #ef4444;
-    background: rgba(239, 68, 68, 0.25);
+    border: 2px solid #ef4444 !important;
+    background: #271618 !important;
+    box-shadow: none !important;
   }
 
   .qz-opts.horizontal, .cp-opts.horizontal {
@@ -1860,13 +1945,16 @@
 
   <!-- Overview / contents -->
   <div class="overview" id="overview">
-    <div class="ov-head">
-      <div class="br-kicker">Learn</div>
-      <h1 class="br-title" id="ovTitle"></h1>
+    <div class="ov-hero" style="display:flex;align-items:center;gap:24px;margin-bottom:32px;">
+      <div class="ov-logo" id="ovLogo"></div>
+      <h1 class="ov-title" id="ovTitle"></h1>
     </div>
     <div class="ov-start-row">
       <button class="start-btn" id="startLessonBtn" type="button">Start lesson</button>
-      <div class="upnext"><div class="k">Up next</div><div class="v" id="upNext"></div></div>
+      <div class="upnext">
+        <div class="k" style="font-size:12px;font-weight:700;color:#71717a;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">UP NEXT</div>
+        <div class="v" id="upNext" style="font-size:15.5px;font-weight:700;color:#ffffff;"></div>
+      </div>
     </div>
     <div class="contents-head">
       <h2>Contents</h2>
@@ -1879,7 +1967,7 @@
   <div class="brief" id="briefView">
     <div class="br-head hero-head">
       <div class="ov-hero">
-        <div class="ov-logo" id="brLogo"><span class="grad-logo"></span></div>
+        <div class="ov-logo" id="brLogo"></div>
         <h1 class="ov-title" id="brTitle"></h1>
       </div>
       <button class="br-regen" id="brRegen" type="button" title="Regenerate">Regenerate</button>
@@ -1962,11 +2050,11 @@
   const retryBtn = document.getElementById('retryBtn');
 
   let lesson = null;   // { title, overview, items:[{type:'checkpoint'|'section', title, questions|pages}] }
-  let state = { done: [], scores: {}, answers: {} };
-  try { const st = JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); if (st && Array.isArray(st.done)) state = { done: st.done, scores: st.scores || {}, answers: st.answers || {} }; } catch (e) {}
+  let state = { done: [], scores: {}, answers: {}, progress: {} };
+  try { const st = JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); if (st && Array.isArray(st.done)) state = { done: st.done, scores: st.scores || {}, answers: st.answers || {}, progress: st.progress || {} }; } catch (e) {}
   function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (e) {} }
   const isDone = i => state.done.indexOf(i) !== -1;
-  function markDone(i) { if (!isDone(i)) { state.done.push(i); saveState(); } }
+  function markDone(i) { if (!isDone(i)) { state.done.push(i); delete state.progress[i]; saveState(); } }
   function firstIncomplete() { for (let i = 0; i < lesson.items.length; i++) if (!isDone(i)) return i; return -1; }
   function isLocked(i) { for (let j = 0; j < i; j++) if (!isDone(j)) return true; return false; }
   function totalScore() { let n = 0; for (const k in state.scores) n += state.scores[k]; return n; }
@@ -2133,7 +2221,7 @@
       renderTopicIllustration(ovLogoEl, title, subject);
     }
     document.getElementById('upNext').textContent = cur === -1 ? 'All complete' : lesson.items[cur].title;
-    document.getElementById('startLessonBtn').textContent = cur === -1 ? 'Review lesson' : (state.done.length ? 'Continue lesson' : 'Start lesson');
+    document.getElementById('startLessonBtn').textContent = cur === -1 ? 'Review lesson' : (state.progress[cur] > 0 ? 'Continue' : (state.done.length ? 'Continue lesson' : 'Start lesson'));
     document.getElementById('ovProg').textContent = state.done.length + ' of ' + lesson.items.length + ' complete';
 
     const tl = document.getElementById('timeline');
@@ -2153,14 +2241,34 @@
         const card = document.createElement('div');
         card.className = 'tl-card';
         const info = document.createElement('div');
+        const p = state.progress[i] || 0;
+        const inProgress = p > 0;
+        
         info.innerHTML = '<div class="tl-title"></div><div class="tl-sub"></div>';
         info.querySelector('.tl-title').textContent = item.title;
-        info.querySelector('.tl-sub').textContent = item.type === 'checkpoint'
-          ? 'Checkpoint · answers lock after one attempt'
-          : item.pages.length + (item.pages.length === 1 ? ' page' : ' pages');
+        
+        const sub = info.querySelector('.tl-sub');
+        if (item.type === 'checkpoint') {
+            sub.textContent = 'Checkpoint · answers lock after one attempt';
+        } else {
+            if (inProgress) {
+                sub.style.color = '#9ca3af';
+                sub.textContent = item.pages.length + ' pages · ' + p + ' done';
+                const dashContainer = document.createElement('div');
+                dashContainer.style.cssText = 'display:flex; gap:6px; margin-top:8px;';
+                for (let j = 0; j < item.pages.length; j++) {
+                    const dash = document.createElement('div');
+                    dash.style.cssText = 'height:4px; flex:1; max-width:24px; border-radius:2px; background-color:' + (j < p ? '#419b67' : 'rgba(255,255,255,0.1)');
+                    dashContainer.appendChild(dash);
+                }
+                sub.appendChild(dashContainer);
+            } else {
+                sub.textContent = item.pages.length + (item.pages.length === 1 ? ' page' : ' pages');
+            }
+        }
         card.appendChild(info);
         const btn = document.createElement('button');
-        btn.className = 'tl-start'; btn.type = 'button'; btn.textContent = 'Start';
+        btn.className = 'tl-start'; btn.type = 'button'; btn.textContent = inProgress ? 'Continue' : 'Start';
         btn.style.marginLeft = 'auto';
         btn.addEventListener('click', () => openItem(i));
         card.appendChild(btn);
@@ -2258,15 +2366,17 @@
     else playCheckpoint(i, item);
   }
 
-  // ── Section reader ──
+  // ── Section reader with Inline Quiz Support (Matching Screenshot 2) ──
   function playSection(idx, item) {
     const plTop = document.querySelector('.pl-top');
     if (plScore) plScore.hidden = true;
     if (plBarFill && plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
-    let page = 0;
+    let page = state.progress[idx] || 0;
     function render() {
+      state.progress[idx] = page;
+      saveState();
       if (plLabel) {
-        plLabel.innerHTML = '<span></span><span class="dim">· page ' + (page + 1) + ' of ' + item.pages.length + '</span>';
+        plLabel.innerHTML = '<span></span><span class="dim">· ' + (page + 1) + ' of ' + item.pages.length + '</span>';
         plLabel.querySelector('span').textContent = item.title;
       }
       if (plBarFill) plBarFill.style.width = Math.round(((page + 1) / item.pages.length) * 100) + '%';
@@ -2274,21 +2384,112 @@
       const art = document.createElement('div');
       art.className = 'reader';
       art.innerHTML = md(item.pages[page]);
+
+      // Inline Quiz support for section pages (Matching Screenshot 2)
+      const pageQuiz = (item.quizzes && item.quizzes[page]) || (page === item.pages.length - 1 ? item.quiz : null);
+      if (pageQuiz && pageQuiz.q && Array.isArray(pageQuiz.options)) {
+        const qBox = document.createElement('div');
+        qBox.className = 'inline-quiz-box';
+        qBox.style.cssText = 'margin-top:36px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);';
+        const qTitle = document.createElement('div');
+        qTitle.className = 'qz-q';
+        qTitle.style.cssText = 'font-size:20px !important;line-height:1.45 !important;margin-bottom:20px !important;color:#ffffff !important;';
+        qTitle.textContent = pageQuiz.q;
+        qBox.appendChild(qTitle);
+
+        const optsWrap = document.createElement('div');
+        optsWrap.className = 'qz-opts';
+        optsWrap.style.cssText = 'display:flex;flex-direction:column;gap:12px;margin-bottom:24px;';
+        let picked = -1, checked = false;
+
+        pageQuiz.options.forEach((optText, oIdx) => {
+          const btn = document.createElement('button');
+          btn.className = 'qz-opt'; btn.type = 'button';
+          btn.innerHTML = '<span class="num">' + (oIdx + 1) + '</span><span>' + esc(optText) + '</span>';
+          btn.addEventListener('click', () => {
+            if (checked) return;
+            picked = oIdx;
+            optsWrap.querySelectorAll('.qz-opt').forEach((b, k) => {
+              b.classList.toggle('sel', k === picked);
+            });
+            checkBtn.disabled = false;
+          });
+          optsWrap.appendChild(btn);
+        });
+        qBox.appendChild(optsWrap);
+
+        const checkRow = document.createElement('div');
+        checkRow.className = 'qz-actions';
+        checkRow.style.cssText = 'display:flex;justify-content:flex-end;margin-bottom:16px;';
+        
+        const checkBtn = document.createElement('button');
+        checkBtn.className = 'qz-check'; checkBtn.type = 'button'; checkBtn.textContent = 'Check';
+        checkBtn.disabled = true;
+
+        const fbBox = document.createElement('div');
+        fbBox.className = 'cp-fb';
+        fbBox.style.display = 'none';
+
+        checkBtn.addEventListener('click', () => {
+          if (picked === -1) return;
+          if (checked) {
+            if (page === item.pages.length - 1) { markDone(idx); renderOverview(); }
+            else { page++; render(); }
+            return;
+          }
+          checked = true;
+          state.answers[idx + '_' + page] = picked;
+          saveState();
+          checkBtn.textContent = page === item.pages.length - 1 ? 'Finish section' : 'Next';
+          const isCorrect = (picked === pageQuiz.answer);
+          optsWrap.querySelectorAll('.qz-opt').forEach((b, k) => {
+            b.classList.remove('sel');
+            if (k === pageQuiz.answer) b.classList.add('correct');
+            else if (k === picked) b.classList.add('wrong');
+            b.classList.add('disabled');
+          });
+          fbBox.className = 'cp-fb ' + (isCorrect ? 'correct' : 'incorrect');
+          fbBox.style.display = 'block';
+          fbBox.innerHTML = '<div class="cp-fb-hd">' +
+            (isCorrect
+              ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><h4 class="cp-fb-title">Correct</h4>'
+              : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><h4 class="cp-fb-title">Incorrect</h4>') +
+          '</div>' +
+          '<p class="cp-fb-text">' + esc(pageQuiz.explain || (isCorrect ? 'Great understanding!' : 'Review the key concepts above.')) + '</p>';
+        });
+
+        if (state.answers[idx + '_' + page] !== undefined) {
+          picked = state.answers[idx + '_' + page];
+          const btnToClick = optsWrap.querySelectorAll('.qz-opt')[picked];
+          if (btnToClick) {
+            btnToClick.click();
+            checkBtn.click();
+          }
+        }
+
+        checkRow.appendChild(checkBtn);
+        qBox.appendChild(checkRow);
+        qBox.appendChild(fbBox);
+        art.appendChild(qBox);
+      }
+
       mathify(art);
       plBody.appendChild(art);
-      const nav = document.createElement('div');
-      nav.className = 'pl-nav';
-      const back = document.createElement('button'); back.className = 'pl-back'; back.type = 'button'; back.textContent = 'Back';
-      if (page === 0) back.disabled = true;
-      back.addEventListener('click', () => { page--; render(); });
-      const next = document.createElement('button'); next.className = 'pl-next'; next.type = 'button';
-      next.textContent = page === item.pages.length - 1 ? 'Finish section' : 'Next';
-      next.addEventListener('click', () => {
-        if (page === item.pages.length - 1) { markDone(idx); renderOverview(); }
-        else { page++; render(); }
-      });
-      nav.appendChild(back); nav.appendChild(next);
-      plBody.appendChild(nav);
+
+      if (!pageQuiz) {
+        const nav = document.createElement('div');
+        nav.className = 'pl-nav';
+        nav.style.justifyContent = 'flex-end';
+
+        const nextBtn = document.createElement('button'); nextBtn.className = 'pl-next'; nextBtn.type = 'button';
+        nextBtn.textContent = page === item.pages.length - 1 ? 'Finish section' : 'Next';
+        nextBtn.addEventListener('click', () => {
+          if (page === item.pages.length - 1) { markDone(idx); renderOverview(); }
+          else { page++; render(); }
+        });
+        nav.appendChild(nextBtn);
+        plBody.appendChild(nav);
+      }
       window.scrollTo(0, 0);
     }
     render();
@@ -2697,23 +2898,36 @@
   // sections, generated once and cached alongside the lesson.
   function getTopicLordicon(topic, subj) {
     const t = ((topic || '') + ' ' + (subj || '')).toLowerCase();
+    // Biology / Cell / Membrane / Genetics / Organelles
+    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || t.includes('gene') || t.includes('genetics') || t.includes('protein') || t.includes('eukaryot') || t.includes('prokaryot'))
+      return { json: 'https://cdn.lordicon.com/mrdiiocb.json', img: 'https://img.icons8.com/3d-fluency/180/microscope.png' };
+    // Physics / Chemistry / Science / Atom / Molecule
+    if (t.includes('physic') || t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('quantum') || t.includes('force') || t.includes('motion') || t.includes('gravity'))
+      return { json: 'https://cdn.lordicon.com/kthelypq.json', img: 'https://img.icons8.com/3d-fluency/180/molecule.png' };
+    // Computer Science / Coding / Tech
+    if (t.includes('computer') || t.includes('code') || t.includes('program') || t.includes('tech') || t.includes('algorithm') || t.includes('python') || t.includes('java') || t.includes('data'))
+      return { json: 'https://cdn.lordicon.com/qhgjhxev.json', img: 'https://img.icons8.com/3d-fluency/180/laptop.png' };
     // Microeconomics / Macroeconomics / Finance / Market / Money
     if (t.includes('econ') || t.includes('micro') || t.includes('macro') || t.includes('finance') || t.includes('market') || t.includes('money') || t.includes('trade') || t.includes('stock') || t.includes('price'))
       return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/bar-chart.png' };
-    // Biology / Cell / Membrane / Genetics
-    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || t.includes('gene') || t.includes('genetics') || t.includes('protein'))
-      return { json: 'https://cdn.lordicon.com/mrdiiocb.json', img: 'https://img.icons8.com/3d-fluency/180/microscope.png' };
-    // Physics / Chemistry / Science / Atom
-    if (t.includes('physic') || t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('quantum') || t.includes('force'))
-      return { json: 'https://cdn.lordicon.com/kthelypq.json', img: 'https://img.icons8.com/3d-fluency/180/molecule.png' };
+    // Geography / Earth / Planet / Environment
+    if (t.includes('geography') || t.includes('earth') || t.includes('planet') || t.includes('map') || t.includes('climate') || t.includes('ocean'))
+      return { json: 'https://cdn.lordicon.com/oaflahpk.json', img: 'https://img.icons8.com/3d-fluency/180/globe.png' };
+    // History / Past / Revolution
+    if (t.includes('history') || t.includes('past') || t.includes('war') || t.includes('revolution') || t.includes('ancient') || t.includes('empire'))
+      return { json: 'https://cdn.lordicon.com/lupuorrc.json', img: 'https://img.icons8.com/3d-fluency/180/scroll.png' };
+    // Psychology / Brain / Mind / Neuroscience / Philosophy
+    if (t.includes('psych') || t.includes('brain') || t.includes('mind') || t.includes('thought') || t.includes('philosoph') || t.includes('logic'))
+      return { json: 'https://cdn.lordicon.com/gqdnbgzi.json', img: 'https://img.icons8.com/3d-fluency/180/brain.png' };
+    // Default
     return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/graduation-cap.png' };
   }
 
   function renderTopicIllustration(targetEl, topic, subj) {
     if (!targetEl) return;
     const item = getTopicLordicon(topic, subj);
-    targetEl.innerHTML = '<div class="topic-illu-wrap">' +
-      '<lord-icon src="' + item.json + '" trigger="loop" delay="300" colors="primary:#ffffff,secondary:#a78bfa,tertiary:#38bdf8" style="width:130px;height:130px;"></lord-icon>' +
+    targetEl.innerHTML = '<div class="topic-illu-wrap" style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;margin-bottom:12px;">' +
+      '<img src="' + item.img + '" alt="' + esc(topic) + '" style="width:110px;height:110px;object-fit:contain;filter:none;animation:float 4s ease-in-out infinite;" class="topic-illu-img">' +
       '</div>';
   }
 
@@ -3101,7 +3315,7 @@
     let picked = -1;
 
     cpBody.innerHTML =
-      '<div class="cp-meta" style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">' +
+      '<div class="cp-meta" style="width:100%; margin-bottom:12px;display:flex;align-items:center;justify-content:center;">' +
         '<div class="cp-count" style="font-size:14px;font-weight:600;color:#8a8a9e;">' + (cpIndex + 1) + ' / ' + total + '</div>' +
       '</div>' +
       '<div class="cp-bar"><i style="width:' + Math.round(((cpIndex + 1) / total) * 100) + '%;"></i></div>' +
@@ -3149,7 +3363,11 @@
       ta.className = 'cp-input'; ta.id = 'cpText';
       ta.placeholder = 'Answer in a sentence or two…';
       ta.spellcheck = false;
-      ta.addEventListener('input', () => { submit.disabled = !ta.value.trim(); });
+      ta.addEventListener('input', () => {
+        submit.disabled = !ta.value.trim();
+        ta.style.height = 'auto';
+        ta.style.height = Math.max(110, ta.scrollHeight) + 'px';
+      });
       area.appendChild(ta);
     }
 
@@ -3212,13 +3430,11 @@
     const host = document.getElementById('cpFeedback');
     const good = correct === true;
 
-    let html = '<div class="cp-fb">' +
+    let html = '<div class="cp-fb ' + (good ? 'correct' : 'incorrect') + '">' +
       '<div class="cp-fb-hd">' +
-        '<h4 class="cp-fb-title">Explanation</h4>' +
-        '<div class="cp-status-pill ' + (good ? 'correct' : 'incorrect') + '">' +
-          (good ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Correct'
-                 : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Incorrect') +
-        '</div>' +
+        (good
+          ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><h4 class="cp-fb-title">Correct</h4>'
+          : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><h4 class="cp-fb-title">Incorrect</h4>') +
       '</div>' +
       '<p class="cp-fb-text">' + esc(feedback || item.why) + '</p>';
 
@@ -3951,7 +4167,7 @@
     }
     setStatus(0);
 
-    const system = 'You are Noura, an expert study tutor who builds structured interactive lessons. Reply with ONLY a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "items": [ {"type":"checkpoint","title":"Warm-up","questions":[{"q":string,"options":[string,string,string,string],"answer":number (0-based index),"explain":string} x4]} , {"type":"section","title":string,"pages":[string x2]} x3 , one mid "checkpoint" (title "Checkpoint") after the first 2 sections with 4 questions, and a final "checkpoint" (title "Final checkpoint") at the end with 4 questions ]. The FIRST item must be the Warm-up checkpoint testing intuition before teaching. Each page is GitHub-flavored Markdown, 90-130 words, starting with a ## heading, using **bold** key terms, short paragraphs or bullets, one concrete example; write all maths in plain readable text (see the maths rule below). Questions must be answerable from the lesson (warm-up = common-sense intuition), each with exactly 4 options and a one-sentence explain. Include fill-in-the-blank style questions where the question string contains "___________" for the blank slot to be filled by the correct option. Keep the whole lesson tight and readable in 10-15 minutes. Be concise - no filler. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
+    const system = 'You are Noura, an expert study tutor who builds comprehensive, structured interactive lessons. Reply with ONLY a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "items": [ {"type":"checkpoint","title":"Warm-up","questions":[{"q":string,"options":[string,string,string,string],"answer":number (0-based index),"explain":string} x4]} , {"type":"section","title":string,"pages":[string x3-5],"quiz":{"q":string,"options":[string,string,string],"answer":number,"explain":string}} x5 , {"type":"checkpoint","title":"Mid Checkpoint","questions":[... x4]} , {"type":"section","title":string,"pages":[string x3-5],"quiz":{...}} x5 , {"type":"checkpoint","title":"Final Quiz","questions":[... x4]} ]. Build 6-8 full sections (20-30 total content pages) plus 3 interactive checkpoints (Warm-up, Mid Checkpoint, Final Quiz), giving 10-12 items total in the lesson syllabus. The FIRST item must be the Warm-up checkpoint. Each section module MUST have 3-5 pages. Each page is GitHub-flavored Markdown, 100-140 words, starting with a ## heading, using **bold** key terms, short paragraphs or bullets, one concrete example. Include an inline section quiz on key pages where appropriate. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message.';
     const user = 'Build the interactive lesson titled: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
 
     try {
