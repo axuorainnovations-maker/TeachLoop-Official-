@@ -342,21 +342,70 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         self.end_headers()
                         self.wfile.write(resp_data)
 
+            def send_via_nvidia():
+                nv_key = env_vars.get('NVIDIA_API_KEY', '')
+                if not nv_key:
+                    raise RuntimeError("Missing NVIDIA_API_KEY")
+                msgs = data.get('messages', [])
+                sys_prompt = data.get('system', '')
+                formatted_msgs = []
+                if sys_prompt:
+                    if isinstance(sys_prompt, list):
+                        sys_str = "\n\n".join([x.get('text', '') if isinstance(x, dict) else str(x) for x in sys_prompt])
+                    else:
+                        sys_str = str(sys_prompt)
+                    formatted_msgs.append({"role": "system", "content": sys_str})
+                for m in msgs:
+                    content = m.get("content", "")
+                    if isinstance(content, list):
+                        content_str = "\n".join([x.get('text', '') if isinstance(x, dict) else str(x) for x in content])
+                    else:
+                        content_str = str(content)
+                    formatted_msgs.append({"role": m.get("role", "user"), "content": content_str})
+                
+                req_body = json.dumps({
+                    "model": "meta/llama-3.1-8b-instruct",
+                    "messages": formatted_msgs,
+                    "max_tokens": data.get("max_tokens", 300)
+                }).encode('utf-8')
+                
+                req = urllib.request.Request(
+                    'https://integrate.api.nvidia.com/v1/chat/completions',
+                    data=req_body,
+                    headers={
+                        'Authorization': f'Bearer {nv_key}',
+                        'Content-Type': 'application/json'
+                    }
+                )
+                with urllib.request.urlopen(req, timeout=12) as resp:
+                    resp_data = json.loads(resp.read().decode('utf-8'))
+                    reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
+                    out_payload = {
+                        "reply": reply,
+                        "content": [{"type": "text", "text": reply}]
+                    }
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self._set_uid_cookie()
+                    self.end_headers()
+                    self.wfile.write(json.dumps(out_payload).encode('utf-8'))
+
             if anthropic_key:
                 try:
                     send_via_anthropic()
                     return
-                except urllib.error.HTTPError as e:
-                    err_body = e.read().decode('utf-8')
-                    try:
-                        err_json = json.loads(err_body)
-                        self._json(e.code, err_json)
-                    except:
-                        self._json(e.code, {"error": {"message": f"Anthropic API Error: {err_body}"}})
                 except Exception as e:
-                    self._json(500, {"error": {"message": f"Anthropic API Error: {e}"}})
+                    print('[chat] Anthropic failed, falling back to NVIDIA NIM:', e)
+
+            if env_vars.get('NVIDIA_API_KEY'):
+                try:
+                    send_via_nvidia()
+                    return
+                except Exception as e:
+                    self._json(500, {"error": {"message": f"NVIDIA NIM Chat Error: {e}"}})
             else:
-                self._json(500, {"error": {"message": "No valid API key available. Missing ANTHROPIC_API_KEY"}})
+                self._json(500, {"error": {"message": "No valid API key available."}})
         elif self.path == '/api/welcome':
             # Called when onboarding completes. Idempotent: the signup grant is
             # issued once per user id, and first_time is true only the first
