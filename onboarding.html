@@ -1214,7 +1214,7 @@
     /* Photo sits in FRONT of the tightly-stacked name, overlapping its centre */
     .fh-photo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: clamp(118px, 18vw, 180px); height: clamp(160px, 26vw, 250px); border-radius: 999px; overflow: hidden; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32); z-index: 3; }
     .fh-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .fh-desc { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); color: #000; width: min(440px, 86%); max-width: 440px; text-align: center; font-size: 15px; line-height: 1.5; font-weight: 500; opacity: .82; z-index: 4; }
+    .fh-desc { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); color: #000; width: min(540px, 90%); text-align: center; font-size: 14px; line-height: 1.5; font-weight: 500; opacity: .82; z-index: 4; }
     .fh-down { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.14); border: none; color: #000; width: 46px; height: 46px; border-radius: 999px; cursor: pointer; display: flex; align-items: center; justify-content: center; animation: fhBounce 1.8s ease-in-out infinite; }
     .fh-down:hover { background: rgba(0, 0, 0, 0.24); }
     .fh-down svg { width: 22px; height: 22px; }
@@ -1282,7 +1282,7 @@
     const FOUNDERS = [
       { name: "Mathieu Marchis", img: "mathieu.jpg", pos: "43% 50%", accolade: "3 startups by 17. Placed 1st (solo & team) at MIT's entrepreneurship internship. Built the full backend for all 3." },
       { name: "Daniel Liu", img: "daniel.jpg", pos: "38% 50%", accolade: "Built 2 startups at 15. Won international design competitions across France & China." },
-      { name: "Jayden Liew", img: "jayden.jpg", pos: "50% 18%", accolade: "Featured in Malaysia's The Star for mastery in Computer Science & Design Technology. Founder of 2 startups." },
+      { name: "Jayden Liew", img: "jayden.jpg", pos: "50% 18%", accolade: "Featured in Malaysia's national newspaper as a young entrepreneur, earned an Excellence Award in Design Technology out of 100+ students, achieved mastery level in Computer Science, and has founded two startups." },
       { name: "Maya Zelazna", img: "maya.jpg", pos: "50% 20%", accolade: "Completed Wharton's entrepreneurship programme. Founded a 25+ member investment club and co-founded a fintech venture — a top-7 finalist at Poland's largest startup competition." },
       { name: "Hayk Osipyan", img: "hayk.jpg", pos: "50% 28%", accolade: "Coding for 9 years and over $500k in sales closed. Managed deals for British Aerospace, ranked the UK's best high-ticket closer and a top-10 stock trader in the United States." },
     ];
@@ -1406,7 +1406,7 @@
         const prompt = `A learner is about to teach the subject "${subject}". List exactly 4 starting knowledge levels for ${subject}, ordered beginner → advanced. Each references real ${subject} content. Return JSON: {"options":[{"t":"1-3 word label","d":"first-person one-liner, e.g. 'I can ...'"}]} — exactly 4 items.`;
         const r = await fetch('/api/chat', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 400, system: sys, messages: [{ role: 'user', content: prompt }] })
+          body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 400, system: sys, messages: [{ role: 'user', content: prompt }] })
         });
         if (!r.ok) { done(LEVEL_LADDER); return; }
         const data = await r.json();
@@ -1743,7 +1743,7 @@
           try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
             try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
           document.body.style.transition = 'opacity .3s ease'; document.body.style.opacity = '0';
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+          setTimeout(() => { window.location.href = 'chatbot.html'; }, 300);
         };
 
         // Real email + password sign-up via Supabase Auth. Creates an account
@@ -1774,7 +1774,7 @@
           // Stash onboarding answers so the dashboard attaches them to the
           // account once the session exists (now, or after email confirmation).
           try { localStorage.setItem('NOURA_PENDING_PROFILE', JSON.stringify(profilePayload(email))); } catch (e) { }
-          const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'dashboard.html');
+          const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'chatbot.html');
           try {
             const { data, error } = await sb.auth.signUp({
               email, password,
@@ -1812,7 +1812,7 @@
             try { localStorage.setItem('NOURA_PENDING_PROFILE', JSON.stringify(profilePayload(null))); } catch (e) { }
             try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
             try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
-            const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'dashboard.html');
+            const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'chatbot.html');
             try {
               const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
               if (error) throw error;

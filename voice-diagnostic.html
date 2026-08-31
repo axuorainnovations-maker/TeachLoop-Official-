@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Voice Diagnostic</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#111; color:#fff; font-family:system-ui; padding:20px; }
+h1 { color:#0f0; margin-bottom:20px; }
+.btn { padding:12px 24px; margin:8px; font-size:16px; border:none; border-radius:8px; cursor:pointer; color:#fff; }
+.btn-blue { background:#2563eb; }
+.btn-green { background:#16a34a; }
+.btn-red { background:#dc2626; }
+.btn-yellow { background:#ca8a04; }
+#log { background:#000; border:2px solid #333; padding:12px; margin-top:20px; font:13px/1.6 monospace; color:#0f0; height:400px; overflow-y:auto; white-space:pre-wrap; }
+#meter { width:100%; height:30px; background:#222; margin:12px 0; border-radius:4px; overflow:hidden; }
+#meterFill { height:100%; background:linear-gradient(90deg,#0f0,#ff0,#f00); width:0; transition:width 0.05s; }
+.status { padding:8px 16px; margin:8px 0; border-radius:4px; font-weight:bold; }
+.ok { background:#065f46; color:#34d399; }
+.fail { background:#7f1d1d; color:#fca5a5; }
+.info { background:#1e3a5f; color:#93c5fd; }
+</style>
+</head>
+<body>
+<h1>🔧 Voice Diagnostic Tool</h1>
+<p>This page tests your microphone, STT, and TTS independently to find what's broken.</p>
+
+<div style="margin:20px 0;">
+  <button class="btn btn-blue" onclick="testMic()">1. Test Microphone</button>
+  <button class="btn btn-green" onclick="testRecord()">2. Record 3s + STT</button>
+  <button class="btn btn-yellow" onclick="testTTS()">3. Test TTS</button>
+  <button class="btn btn-red" onclick="testFullPipeline()">4. Test Chat API</button>
+</div>
+
+<div id="meter"><div id="meterFill"></div></div>
+<div id="results"></div>
+<div id="log"></div>
+
+<script>
+let micStream = null, audioCtx = null, procNode = null, srcNode = null;
+let pcmChunks = [];
+let recording = false;
+
+function log(msg) {
+  const el = document.getElementById('log');
+  const t = new Date().toLocaleTimeString();
+  el.textContent = '[' + t + '] ' + msg + '\n' + el.textContent;
+  console.log('[DIAG]', msg);
+}
+
+function result(msg, ok) {
+  const el = document.getElementById('results');
+  const d = document.createElement('div');
+  d.className = 'status ' + (ok ? 'ok' : ok === false ? 'fail' : 'info');
+  d.textContent = msg;
+  el.insertBefore(d, el.firstChild);
+}
+
+async function testMic() {
+  log('=== MICROPHONE TEST ===');
+  try {
+    log('Requesting getUserMedia...');
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+    var tracks = micStream.getAudioTracks();
+    log('getUserMedia OK! Tracks: ' + tracks.length);
+    log('Track label: ' + tracks[0].label);
+    log('Track state: ' + tracks[0].readyState + ' enabled: ' + tracks[0].enabled + ' muted: ' + tracks[0].muted);
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    log('AudioContext state: ' + audioCtx.state + ' sampleRate: ' + audioCtx.sampleRate);
+    if (audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+      log('AudioContext resumed: ' + audioCtx.state);
+    }
+
+    srcNode = audioCtx.createMediaStreamSource(micStream);
+    procNode = audioCtx.createScriptProcessor(4096, 1, 1);
+    var sinkNode = audioCtx.createGain();
+    sinkNode.gain.value = 0;
+    srcNode.connect(procNode);
+    procNode.connect(sinkNode);
+    sinkNode.connect(audioCtx.destination);
+
+    var frameCount = 0, maxRms = 0;
+    procNode.onaudioprocess = function(e) {
+      var inp = e.inputBuffer.getChannelData(0);
+      var sum = 0;
+      for (var i = 0; i < inp.length; i++) sum += inp[i] * inp[i];
+      var rms = Math.sqrt(sum / inp.length);
+      if (rms > maxRms) maxRms = rms;
+      frameCount++;
+      document.getElementById('meterFill').style.width = Math.min(100, rms * 1000) + '%';
+      if (recording) pcmChunks.push(new Float32Array(inp));
+      if (frameCount % 10 === 0) {
+        log('Frame #' + frameCount + ' RMS=' + rms.toFixed(6) + ' Max=' + maxRms.toFixed(6) + ' Rec=' + recording + ' Chunks=' + pcmChunks.length);
+      }
+    };
+
+    log('Audio graph wired. Speak into your mic and watch the meter!');
+    result('Mic initialized - speak and watch the green meter bar above', true);
+
+    setTimeout(function() {
+      log('--- 5s report: ' + frameCount + ' frames, maxRMS=' + maxRms.toFixed(6) + ' ---');
+      if (frameCount === 0) result('NO audio frames received! ScriptProcessor broken.', false);
+      else if (maxRms < 0.001) result('Audio frames OK but ALL SILENT (maxRMS < 0.001)', false);
+      else if (maxRms < 0.005) result('Very low audio (maxRMS < 0.005). Speak louder?', false);
+      else result('Audio working! MaxRMS=' + maxRms.toFixed(4), true);
+    }, 5000);
+  } catch (err) {
+    log('FAILED: ' + err.name + ': ' + err.message);
+    result('Mic FAILED: ' + err.message, false);
+  }
+}
+
+async function testRecord() {
+  if (!micStream || !audioCtx) { result('Run mic test first!', false); return; }
+  log('=== RECORD + STT ===');
+  pcmChunks = [];
+  recording = true;
+  result('Recording 3 seconds...', null);
+  await new Promise(function(r) { setTimeout(r, 3000); });
+  recording = false;
+  log('Done. Chunks: ' + pcmChunks.length);
+  if (pcmChunks.length === 0) { result('No audio chunks!', false); return; }
+
+  var totalLen = 0;
+  pcmChunks.forEach(function(c) { totalLen += c.length; });
+  var merged = new Float32Array(totalLen);
+  var off = 0;
+  pcmChunks.forEach(function(c) { merged.set(c, off); off += c.length; });
+
+  var ratio = audioCtx.sampleRate / 16000;
+  var outLen = Math.floor(merged.length / ratio);
+  var out = new Int16Array(outLen);
+  for (var i = 0; i < outLen; i++) {
+    var s = merged[Math.floor(i * ratio)] || 0;
+    var v = Math.max(-1, Math.min(1, s));
+    out[i] = v < 0 ? v * 0x8000 : v * 0x7FFF;
+  }
+  log('PCM16: ' + out.length + ' samples (' + (out.length/16000).toFixed(1) + 's)');
+
+  try {
+    log('Sending to /api/stt...');
+    var res = await fetch('/api/stt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream', 'X-Sample-Rate': '16000', 'X-Language': 'en-US' },
+      body: out.buffer
+    });
+    var data = await res.json();
+    log('STT: ' + JSON.stringify(data));
+    if (data.transcript && data.transcript.trim()) result('STT OK: "' + data.transcript + '"', true);
+    else result('STT returned empty. Speak louder?', false);
+  } catch (err) {
+    log('STT FAILED: ' + err.message);
+    result('STT failed: ' + err.message, false);
+  }
+}
+
+async function testTTS() {
+  log('=== TTS TEST ===');
+  try {
+    var res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'Hello! This is a test of the text to speech system.' })
+    });
+    if (!res.ok) { result('TTS HTTP ' + res.status, false); return; }
+    var blob = await res.blob();
+    log('TTS: ' + blob.size + ' bytes');
+    var url = URL.createObjectURL(blob);
+    var audio = new Audio(url);
+    audio.onended = function() { URL.revokeObjectURL(url); result('TTS played OK!', true); };
+    audio.onerror = function() { URL.revokeObjectURL(url); result('TTS playback failed', false); };
+    await audio.play();
+    result('Playing TTS...', null);
+  } catch (err) {
+    log('TTS FAILED: ' + err.message);
+    result('TTS failed: ' + err.message, false);
+  }
+}
+
+async function testFullPipeline() {
+  log('=== CHAT API TEST ===');
+  try {
+    var res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 50, messages: [{ role: 'user', content: 'Say hello in one word.' }] })
+    });
+    if (!res.ok) { var err = await res.text(); log('Chat HTTP ' + res.status + ': ' + err); result('Chat API HTTP ' + res.status, false); return; }
+    var data = await res.json();
+    log('Chat: ' + JSON.stringify(data).substring(0, 300));
+    var txt = (data.content && data.content[0] && data.content[0].text) || '';
+    result('Chat API OK: "' + txt + '"', true);
+  } catch (err) {
+    log('Chat FAILED: ' + err.message);
+    result('Chat API failed: ' + err.message, false);
+  }
+}
+
+log('Diagnostic page loaded. Click buttons to test.');
+</script>
+</body>
+</html>

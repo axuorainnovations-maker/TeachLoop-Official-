@@ -226,24 +226,24 @@
         if (password.length < 6) { showMsg('Password must be at least 6 characters.', true); return; }
 
         saveLocal(email);
-        if (!sb) { go('dashboard.html'); return; }
+        if (!sb) { go('chatbot.html'); return; }
 
         submit.disabled = true;
-        const redirectTo = window.location.href.replace(/login\.html.*$/, 'dashboard.html');
+        const redirectTo = window.location.href.replace(/login\.html.*$/, 'chatbot.html');
 
         try {
           if (mode === 'login') {
             submit.textContent = 'Signing in…';
             const { data, error } = await sb.auth.signInWithPassword({ email, password });
             if (error) { submit.disabled = false; submit.textContent = 'Log in'; showMsg(error.message || 'Sign-in failed.', true); return; }
-            go('dashboard.html');
+            go('chatbot.html');
           } else {
             submit.textContent = 'Creating account…';
             const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
             if (error) { submit.disabled = false; submit.textContent = 'Create account'; showMsg(error.message || 'Sign-up failed.', true); return; }
             if (data && data.session) {
               // Confirmations OFF → signed in immediately; onboarding already done.
-              go('dashboard.html');
+              go('chatbot.html');
             } else {
               // Confirmations ON → verify by email first.
               submit.textContent = 'Confirmation sent';
@@ -259,7 +259,7 @@
 
       async function submitGoogle() {
         saveLocal(null);
-        const dest = 'dashboard.html';
+        const dest = 'chatbot.html';
         if (!sb) { go(dest); return; }
         const redirectTo = window.location.href.replace(/login\.html.*$/, dest);
         try {

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noura — Course Learning Journey</title>
+  <style>
+    *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }
+    ::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }
+    *,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}
+    :after,:before{--tw-content:""}
+    :host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+    body{line-height:inherit;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+    button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;font-weight:inherit;line-height:inherit;color:inherit;margin:0;padding:0}
+    button,select{text-transform:none}
+    button,[role=button]{cursor:pointer}
+    audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}
+    .fixed{position:fixed}.relative{position:relative}.bottom-6{bottom:1.5rem}.left-1\/2{left:50%}.z-50{z-index:50}
+    .mx-auto{margin-left:auto;margin-right:auto}.mt-6{margin-top:1.5rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}
+    .min-h-screen{min-height:100vh}.w-full{width:100%}.min-w-0{min-width:0}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}
+    .-translate-x-1\/2{--tw-translate-x:-50%}.transform,.-translate-x-1\/2{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}
+    .cursor-default{cursor:default}.cursor-pointer{cursor:pointer}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}
+    .place-items-center{place-items:center}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}
+    .gap-4{gap:1rem}.gap-\[14px\]{gap:14px}.gap-\[3px\]{gap:3px}.gap-\[6px\]{gap:6px}.gap-\[8px\]{gap:8px}.overflow-hidden{overflow:hidden}
+    .whitespace-nowrap{white-space:nowrap}.rounded-full{border-radius:9999px}.border{border-width:1px}.px-4{padding-left:1rem;padding-right:1rem}
+    .py-2{padding-top:.5rem;padding-bottom:.5rem}.pr-2{padding-right:.5rem}.text-sm{font-size:.875rem;line-height:1.25rem}.font-medium{font-weight:500}
+    .leading-none{line-height:1}.shadow{box-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1)}
+    .transition{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+    .transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+    .transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+    .duration-200{transition-duration:.2s}
+    #root,body,html{min-height:100%}
+    .hover\:scale-\[1\.02\]:hover{--tw-scale-x:1.02;--tw-scale-y:1.02;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}
+    .hover\:scale-\[1\.05\]:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}
+    @media (min-width:768px){.md\:inline{display:inline}}
+    @media (max-width: 640px) {
+      .course-wrap { padding: 12px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React 18 & ReactDOM via CDN for clean execution -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <script>
+    (function () {
+      const e = React.createElement;
+      const { useState, useEffect } = React;
+
+      // Extract URL params for dynamic course title & subject
+      const params = new URLSearchParams(window.location.search);
+      const urlTitle = params.get('title') || params.get('course') || 'Cell Biology';
+      const urlSubject = params.get('subject') || 'Biology';
+
+      // Course generator definitions based on subject/title
+      function generateCourseData(title, subject) {
+        const t = (title + ' ' + subject).toLowerCase();
+
+        if (t.includes('cell') || t.includes('bio')) {
+          return {
+            courseTitle: title.toLowerCase().includes('cell') ? title : 'Exploring Cell Biology',
+            subject: 'Biology',
+            iconType: 'cell',
+            sections: [
+              {
+                id: 'sec-1',
+                title: '1. Cell Structure & Basics',
+                progressText: '0/5 lessons',
+                notebookLabel: 'Notebook: Cell Structure',
+                offsets: [-24, 12, 36, 18, -8],
+                lessons: [
+                  { id: '1-1', title: 'Cell Theory & Discovery', state: 'active' },
+                  { id: '1-2', title: 'Prokaryotes vs Eukaryotes', state: 'locked' },
+                  { id: '1-3', title: 'Membrane & Transport', state: 'locked' },
+                  { id: '1-4', title: 'Cytoskeleton & Motility', subtitle: 'Advanced Lesson', subtitleKind: 'advanced', state: 'locked' },
+                  { id: '1-5', title: 'Section Review', subtitle: '0/3 sessions', subtitleKind: 'review', state: 'locked' }
+                ]
+              },
+              {
+                id: 'sec-2',
+                title: '2. Organelles & Energy',
+                progressText: '0/6 lessons',
+                notebookLabel: 'Notebook: Organelles & Energy',
+                offsets: [-20, 10, 32, 14, -10, 8],
+                lessons: [
+                  { id: '2-1', title: 'Nucleus & Genetic Material', state: 'locked' },
+                  { id: '2-2', title: 'Mitochondria & ATP', state: 'locked' },
+                  { id: '2-3', title: 'Chloroplasts & Photosynthesis', state: 'locked' },
+                  { id: '2-4', title: 'Endoplasmic Reticulum & Golgi', state: 'locked' },
+                  { id: '2-5', title: 'Cellular Respiration', subtitle: 'Advanced Lesson', subtitleKind: 'advanced', state: 'locked' },
+                  { id: '2-6', title: 'Section Review', subtitle: '0/4 sessions', subtitleKind: 'review', state: 'locked' }
+                ]
+              }
+            ]
+          };
+        }
+
+        if (t.includes('sapiens') || t.includes('origin') || t.includes('history') || t.includes('war') || t.includes('d-day') || t.includes('theater') || t.includes('revolution') || t.includes('holocaust')) {
+          return {
+            courseTitle: title.length > 5 ? title : 'Exploring Sapiens',
+            subject: 'History',
+            iconType: 'history',
+            sections: [
+              {
+                id: 'sec-1',
+                title: '1. Human Origins',
+                progressText: '0/4 lessons',
+                notebookLabel: 'Notebook: Human Origins',
+                offsets: [-24, 12, 36, 18, -8],
+                lessons: [
+                  { id: '1-1', title: 'Sapiens Rise', state: 'active' },
+                  { id: '1-2', title: 'Megafauna Extinctions', state: 'locked' },
+                  { id: '1-3', title: 'Species Extinction', state: 'locked' },
+                  { id: '1-4', title: 'Human Origins', subtitle: 'Advanced Lesson', subtitleKind: 'advanced', state: 'locked' },
+                  { id: '1-5', title: 'Section Review', subtitle: '0/3 sessions', subtitleKind: 'review', state: 'locked' }
+                ]
+              },
+              {
+                id: 'sec-2',
+                title: '2. Cognitive Revolution',
+                progressText: '0/6 lessons',
+                notebookLabel: 'Notebook: Cognitive Revolution',
+                offsets: [-20, 10, 32, 14, -10, 8],
+                lessons: [
+                  { id: '2-1', title: 'Language', state: 'locked' },
+                  { id: '2-2', title: 'Cooperation', state: 'locked' },
+                  { id: '2-3', title: 'Fictions', state: 'locked' },
+                  { id: '2-4', title: 'Social Orders', state: 'locked' },
+                  { id: '2-5', title: 'Cognitive Revolution', subtitle: 'Advanced Lesson', subtitleKind: 'advanced', state: 'locked' },
+                  { id: '2-6', title: 'Section Review', subtitle: '0/4 sessions', subtitleKind: 'review', state: 'locked' }
+                ]
+              }
+            ]
+          };
+        }
+
+        // Generic Course breakdown
+        return {
+          courseTitle: title,
+          subject: subject,
+          iconType: 'generic',
+          sections: [
+            {
+              id: 'sec-1',
+              title: '1. Foundations of ' + title,
+              progressText: '0/5 lessons',
+              notebookLabel: 'Notebook: Foundations',
+              offsets: [-24, 12, 36, 18, -8],
+              lessons: [
+                { id: '1-1', title: 'Core Principles', state: 'active' },
+                { id: '1-2', title: 'Key Mechanisms', state: 'locked' },
+                { id: '1-3', title: 'Structural Elements', state: 'locked' },
+                { id: '1-4', title: 'Deep Conceptualization', subtitle: 'Advanced Lesson', subtitleKind: 'advanced', state: 'locked' },
+                { id: '1-5', title: 'Section Review', subtitle: '0/3 sessions', subtitleKind: 'review', state: 'locked' }
+              ]
+            },
+            {
+              id: 'sec-2',
+              title: '2. Advanced Systems & Applications',
+              progressText: '0/6 lessons',
+              notebookLabel: 'Notebook: Applications',
+              offsets: [-20, 10, 32, 14, -10, 8],
+              lessons: [
+                { id: '2-1', title: 'Complex Interactions', state: 'locked' },
+                { id: '2-2', title: 'Dynamic Systems', state: 'locked' },
+                { id: '2-3', title: 'Analytical Frameworks', state: 'locked' },
+                { id: '2-4', title: 'Case Studies', state: 'locked' },
+                { id: '2-5', title: 'Synthesis & Mastery', subtitle: 'Advanced Lesson', subtitleKind: 'advanced', state: 'locked' },
+                { id: '2-6', title: 'Comprehensive Review', subtitle: '0/4 sessions', subtitleKind: 'review', state: 'locked' }
+              ]
+            }
+          ]
+        };
+      }
+
+      // Course Badge Art
+      function CourseBadge({ isDark }) {
+        const textColor = isDark ? "#D6CFC3" : "#3D2F28";
+        const bg = isDark ? "#1F1B17" : "#FFFEF9";
+        const border = isDark ? "#2E2822" : "#E6DFCD";
+        const coral = isDark ? "#E8715D" : "#E94A35";
+        const blueBg = isDark ? "#2A3545" : "#C7DDF5";
+        const blueStroke = isDark ? "#5A7FBF" : "#4A7FBF";
+        const greenBg = isDark ? "#3D4A3A" : "#A8C9A0";
+        const greenStroke = isDark ? "#5A7A55" : "#7AB86F";
+
+        return e("div", {
+          className: "shrink-0 grid place-items-center overflow-hidden transition-colors duration-200",
+          style: { width: 48, height: 48, borderRadius: 14, background: bg, border: `1px solid ${border}` }
+        },
+          e("svg", { viewBox: "0 0 48 48", width: "48", height: "48", "aria-hidden": true },
+            e("rect", { width: "48", height: "48", rx: "13", fill: bg }),
+            e("g", { transform: "translate(7,6)" },
+              e("path", { d: "M1 2 C4 2 2 6 5 6 C8 6 6 10 9 10", stroke: coral, strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round", fill: "none" }),
+              e("path", { d: "M1.5 4.5 L5 4.5 M2 8 L7.5 8", stroke: textColor, strokeWidth: "1.1", strokeLinecap: "round", opacity: "0.9" })
+            ),
+            e("g", { transform: "translate(27,5)" },
+              e("path", { d: "M6 2 L6 14", stroke: isDark ? "#D6CFC3" : "#D9A514", strokeWidth: "1.5", strokeLinecap: "round" }),
+              e("path", { d: "M6 3.5 C7.5 2.5 9 3.5 8 5 M6 6 C7.5 5 9 6 8 7.5 M6 8.5 C7.5 7.5 9 8.5 8 10 M6 3.5 C4.5 2.5 3 3.5 4 5 M6 6 C4.5 5 3 6 4 7.5 M6 8.5 C4.5 7.5 3 8.5 4 10", stroke: textColor, strokeWidth: "1.1", strokeLinecap: "round", fill: "none" }),
+              e("path", { d: "M6 3.5 C7.2 2.8 8.6 3.4 8 5 M6 6 C7.2 5.2 8.6 6 8 7.5", stroke: isDark ? "#C9B67A" : "#E6B422", strokeWidth: "1.2", strokeLinecap: "round", fill: "none" })
+            ),
+            e("g", { transform: "translate(6,26)" },
+              e("path", { d: "M2 8 L11 3 L12.5 5.5 L3.5 10.5 Z", fill: greenBg, stroke: textColor, strokeWidth: "1.1", strokeLinejoin: "round" }),
+              e("path", { d: "M11 3 L13 1.5 L15 4 L12.5 5.5", fill: greenStroke, stroke: textColor, strokeWidth: "1.1", strokeLinejoin: "round" }),
+              e("circle", { cx: "4", cy: "9", r: "1", fill: textColor })
+            ),
+            e("g", { transform: "translate(27,27)" },
+              e("circle", { cx: "7", cy: "7", r: "5.5", fill: blueBg, stroke: textColor, strokeWidth: "1.1" }),
+              e("path", { d: "M1.8 7 Q7 9.5 12.2 7 M7 1.5 Q9 4 7 12.5 Q5 9 7 1.5", stroke: textColor, strokeWidth: "1", fill: "none", strokeLinecap: "round" }),
+              e("path", { d: "M2.5 5.5 Q7 6.5 11.5 5 M2.5 8.5 Q7 9.5 11.5 8", stroke: blueStroke, strokeWidth: "0.9", strokeLinecap: "round", fill: "none" })
+            )
+          )
+        );
+      }
+
+      // Active Node Character Mascot Avatar
+      function ActiveMascot({ isDark }) {
+        return e("svg", { viewBox: "0 0 32 28", width: "30", height: "26", "aria-hidden": true },
+          e("path", { d: "M3.5 19.2 C5.8 7.8 9.2 5.2 13.1 7.2 C14.8 8.1 16.6 11.2 19.6 10.2 C23.8 8.8 26.9 15.4 27.5 18.5 C27.9 20.8 25.6 22 22.8 22.6 C18.5 23.5 9.8 24.2 5.2 22.1 C3.3 21.2 2.6 20 3.5 19.2 Z", fill: "#0E0A08" }),
+          e("circle", { cx: "13", cy: "15.2", r: "1.35", fill: "white" }),
+          e("circle", { cx: "19.2", cy: "14.8", r: "1.35", fill: "white" }),
+          e("circle", { cx: "13.3", cy: "15.4", r: "0.35", fill: "#2B1E1A", opacity: "0.9" }),
+          e("circle", { cx: "19.5", cy: "15", r: "0.35", fill: "#2B1E1A", opacity: "0.9" })
+        );
+      }
+
+      // Lock SVG Icon
+      function LockIcon({ size = 18, color = "#6B6560" }) {
+        return e("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2" }),
+          e("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" })
+        );
+      }
+
+      // Lucide Icons
+      function BookOpenIcon() {
+        return e("svg", { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "M12 7v14" }),
+          e("path", { d: "M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" })
+        );
+      }
+
+      function HeadphonesIcon() {
+        return e("svg", { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" })
+        );
+      }
+
+      function ZapIcon() {
+        return e("svg", { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" })
+        );
+      }
+
+      function NotebookPenIcon({ size = 18, color = "currentColor" }) {
+        return e("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" }),
+          e("path", { d: "M2 6h4M2 10h4M2 14h4M2 18h4" }),
+          e("path", { d: "M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" })
+        );
+      }
+
+      function MoonIcon() {
+        return e("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" })
+        );
+      }
+
+      function SunIcon() {
+        return e("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("circle", { cx: "12", cy: "12", r: "4" }),
+          e("path", { d: "M12 2v2M12 20v2m-7.07-15.07 1.41 1.41m12.72 12.72 1.41 1.41M2 12h2m16 0h2m-15.66 5.66 1.41-1.41m12.72-12.72 1.41-1.41" })
+        );
+      }
+
+      function ShareIcon() {
+        return e("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("circle", { cx: "18", cy: "5", r: "3" }),
+          e("circle", { cx: "6", cy: "12", r: "3" }),
+          e("circle", { cx: "18", cy: "19", r: "3" }),
+          e("line", { x1: "8.59", y1: "13.51", x2: "15.42", y2: "17.49" }),
+          e("line", { x1: "15.41", y1: "6.51", x2: "8.59", y2: "10.49" })
+        );
+      }
+
+      function SettingsIcon() {
+        return e("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "M20 7h-9M14 17H5" }),
+          e("circle", { cx: "17", cy: "17", r: "3" }),
+          e("circle", { cx: "7", cy: "7", r: "3" })
+        );
+      }
+
+      function ChevronsUpDownIcon() {
+        return e("svg", { width: 12, height: 12, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" },
+          e("path", { d: "m7 15 5 5 5-5M7 9l5-5 5 5" })
+        );
+      }
+
+      // Single Lesson Node Component in Winding Path
+      function LessonNode({ lesson, offset, onClick, isDark }) {
+        const isActive = lesson.state === 'active';
+
+        return e("div", {
+          className: "flex items-center gap-4 transition-colors duration-200",
+          style: { transform: `translateX(${offset}px)`, width: "fit-content" }
+        },
+          e("div", { className: "relative shrink-0" },
+            isActive ?
+              e("div", {
+                className: "grid place-items-center transition-transform hover:scale-[1.02] cursor-pointer duration-200",
+                style: {
+                  width: 70,
+                  height: 70,
+                  borderRadius: "50%",
+                  background: isDark ? "#1F1B17" : "#D6EDFF",
+                  padding: 4,
+                  boxShadow: isDark ? "0 0 0 8px rgba(126,196,255,0.25)" : "0 0 0 8px rgba(168,220,255,0.4)",
+                  transition: "all 200ms"
+                },
+                onClick: onClick
+              },
+                e("div", {
+                  className: "grid place-items-center transition-colors duration-200",
+                  style: {
+                    width: 62,
+                    height: 62,
+                    borderRadius: "50%",
+                    background: isDark ? "#FEFDF9" : "white",
+                    border: `3px solid ${isDark ? "#7EC4FF" : "#A8DCFF"}`,
+                    boxShadow: isDark ? "0 4px 0 #2A4A65" : "0 4px 0 #A8DCFF"
+                  }
+                },
+                  e(ActiveMascot, { isDark })
+                )
+              ) :
+              e("div", {
+                className: "grid place-items-center transition-transform hover:scale-[1.02] cursor-pointer transition-colors duration-200",
+                style: {
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: isDark ? "#2A2621" : "#F1EBDD",
+                  border: `1.5px solid ${isDark ? "#3A352E" : "#E5DCC8"}`,
+                  boxShadow: isDark ? "0 4px 0 #1C1916" : "0 4px 0 #DDD6C5"
+                },
+                onClick: onClick
+              },
+                e(LockIcon, { size: 18, color: isDark ? "#6B6560" : "#C4BCAD" })
+              )
+          ),
+          e("div", { className: "flex flex-col justify-center leading-none gap-[3px] pr-2" },
+            e("div", {
+              className: "whitespace-nowrap transition-colors duration-200",
+              style: { fontSize: 15, fontWeight: 500, letterSpacing: "-0.01em", color: isDark ? "#F2ECE1" : "#1E1A15", lineHeight: "20px" }
+            }, lesson.title),
+            lesson.subtitle ?
+              e("div", {
+                className: "transition-colors duration-200",
+                style: {
+                  fontSize: 12,
+                  fontWeight: 500,
+                  letterSpacing: "-0.01em",
+                  color: isDark ? "#9E9589" : lesson.subtitleKind === 'review' ? '#7D756B' : '#9A9186',
+                  lineHeight: "14px"
+                }
+              }, lesson.subtitle) : null
+          )
+        );
+      }
+
+      // Main Course App Component
+      function CourseApp() {
+        const [isDark, setIsDark] = useState(true);
+        const [toast, setToast] = useState(null);
+        const courseData = generateCourseData(urlTitle, urlSubject);
+
+        useEffect(() => {
+          try {
+            const saved = localStorage.getItem('noura-theme') || localStorage.getItem('sapiens-theme');
+            if (saved) setIsDark(saved === 'dark');
+          } catch (e) {}
+        }, []);
+
+        const toggleTheme = () => {
+          const next = !isDark;
+          setIsDark(next);
+          try { localStorage.setItem('noura-theme', next ? 'dark' : 'light'); } catch (e) {}
+        };
+
+        const showToast = (msg) => {
+          setToast(msg);
+          setTimeout(() => setToast(null), 2000);
+        };
+
+        const handleLessonClick = (lesson) => {
+          if (lesson.state === 'active') {
+            showToast(`Starting: ${lesson.title}`);
+            setTimeout(() => {
+              window.location.href = 'lesson.html?title=' + encodeURIComponent(lesson.title) + '&subject=' + encodeURIComponent(courseData.subject) + '&resume=1';
+            }, 400);
+          } else {
+            showToast('Locked — complete previous lesson to unlock');
+          }
+        };
+
+        return e("div", {
+          className: "min-h-screen w-full transition-colors duration-200 course-wrap",
+          style: {
+            background: isDark ? "#12100E" : "#FFFBEB",
+            fontFamily: "Inter, Sora, ui-sans-system, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+            letterSpacing: "-0.01em",
+            padding: 24
+          }
+        },
+          // Floating Toast Notification
+          toast ?
+            e("div", {
+              className: "fixed left-1/2 -translate-x-1/2 bottom-6 z-50 px-4 py-2 rounded-full text-sm font-medium shadow transition-colors duration-200",
+              style: {
+                background: isDark ? "#F5F0E6" : "#231C16",
+                color: isDark ? "#12100E" : "#FFFEF9",
+                border: `1px solid ${isDark ? "#E6DFCD" : "#3A2F27"}`
+              }
+            }, toast) : null,
+
+          e("div", { className: "mx-auto w-full", style: { maxWidth: 880 } },
+            // Top Course Header Card
+            e("div", {
+              className: "w-full flex items-center justify-between transition-colors duration-200",
+              style: {
+                background: isDark ? "#1F1B17" : "#FFFEF9",
+                border: `1px solid ${isDark ? "#2E2822" : "#E6DFCD"}`,
+                borderRadius: 24,
+                padding: "16px 20px",
+                gap: 16
+              }
+            },
+              e("div", { className: "flex items-center gap-4 min-w-0 flex-1" },
+                e(CourseBadge, { isDark }),
+                e("div", { className: "flex flex-col gap-[8px] min-w-0" },
+                  e("div", { className: "flex items-center gap-[6px]" },
+                    e("span", {
+                      className: "transition-colors duration-200",
+                      style: { fontSize: 16, fontWeight: 700, color: isDark ? "#F5F0E6" : "#211A14", letterSpacing: "-0.01em", lineHeight: "20px" }
+                    }, courseData.courseTitle),
+                    e("span", {
+                      className: "grid place-items-center rounded-full transition-colors duration-200",
+                      style: { width: 18, height: 18, background: isDark ? "#2A2621" : "#F6EFE0", border: `1px solid ${isDark ? "#2E2822" : "#E6DFCD"}` }
+                    }, e(ChevronsUpDownIcon))
+                  ),
+                  e("div", { className: "flex items-center gap-[14px] flex-wrap" },
+                    e("button", {
+                      className: "flex items-center gap-[6px] whitespace-nowrap transition-colors duration-200",
+                      style: { color: isDark ? "#F5F0E6" : "#5B5248" },
+                      onClick: () => showToast("Learning Map — you're here")
+                    },
+                      e(BookOpenIcon),
+                      e("span", { className: "hidden md:inline", style: { fontSize: 14, fontWeight: 500, lineHeight: "18px" } }, "Learning Map")
+                    ),
+                    e("button", {
+                      className: "flex items-center gap-[6px] whitespace-nowrap transition-colors duration-200",
+                      style: { color: isDark ? "#9E9589" : "#5B5248" },
+                      onClick: () => showToast("Podcast coming soon")
+                    },
+                      e(HeadphonesIcon),
+                      e("span", { className: "hidden md:inline", style: { fontSize: 14, fontWeight: 500, lineHeight: "18px" } }, "Podcast")
+                    ),
+                    e("button", {
+                      className: "flex items-center gap-[6px] whitespace-nowrap cursor-default transition-colors duration-200",
+                      style: { color: isDark ? "#5A5550" : "#B8B0A3" }
+                    },
+                      e(ZapIcon),
+                      e("span", { className: "hidden md:inline", style: { fontSize: 14, fontWeight: 500, lineHeight: "18px" } }, "Quick Exercise")
+                    ),
+                    e("button", {
+                      className: "flex items-center gap-[6px] whitespace-nowrap transition-colors duration-200",
+                      style: { color: isDark ? "#9E9589" : "#5B5248" },
+                      onClick: () => showToast("No saved items yet")
+                    },
+                      e(NotebookPenIcon, { size: 16 }),
+                      e("span", { className: "hidden md:inline", style: { fontSize: 14, fontWeight: 500, lineHeight: "18px" } }, "View Saved")
+                    )
+                  )
+                )
+              ),
+              e("div", { className: "flex items-center gap-4 shrink-0" },
+                e("button", {
+                  "aria-label": "Toggle theme",
+                  className: "grid place-items-center rounded-full transition-colors duration-200 hover:scale-[1.05]",
+                  style: { width: 36, height: 36, background: isDark ? "#2A2621" : "#F6EFE0", border: `1px solid ${isDark ? "#2E2822" : "#E6DFCD"}`, color: isDark ? "#F5F0E6" : "#5B5248" },
+                  onClick: toggleTheme
+                }, isDark ? e(SunIcon) : e(MoonIcon)),
+                e("button", {
+                  className: "flex items-center gap-[6px] transition-colors duration-200",
+                  style: { color: isDark ? "#9E9589" : "#5B5248" },
+                  onClick: () => {
+                    if (navigator.clipboard) navigator.clipboard.writeText(window.location.href);
+                    showToast("Link copied to clipboard");
+                  }
+                },
+                  e(ShareIcon),
+                  e("span", { className: "hidden md:inline", style: { fontSize: 14, fontWeight: 500 } }, "Share")
+                ),
+                e("button", {
+                  className: "flex items-center gap-[6px] transition-colors duration-200",
+                  style: { color: isDark ? "#9E9589" : "#5B5248" },
+                  onClick: () => showToast("Settings")
+                },
+                  e(SettingsIcon),
+                  e("span", { className: "hidden md:inline", style: { fontSize: 14, fontWeight: 500 } }, "Settings")
+                )
+              )
+            ),
+
+            // Render Course Sections
+            courseData.sections.map((section, secIdx) =>
+              e("div", { key: section.id, className: secIdx === 0 ? "mt-6" : "" },
+                // Section Header Bar
+                e("div", {
+                  className: "w-full flex overflow-hidden transition-colors duration-200",
+                  style: {
+                    background: isDark ? "#1F1B17" : "#FFFEF9",
+                    border: `1px solid ${isDark ? "#2E2822" : "#E2D9C5"}`,
+                    borderRadius: 16,
+                    height: 72
+                  }
+                },
+                  e("div", { className: "flex-1 flex flex-col justify-center", style: { padding: "16px 20px" } },
+                    e("div", {
+                      className: "transition-colors duration-200",
+                      style: { fontSize: 16, fontWeight: 700, color: isDark ? "#F2ECE1" : "#231C16", lineHeight: "20px", letterSpacing: "-0.01em" }
+                    }, section.title),
+                    e("div", {
+                      className: "transition-colors duration-200",
+                      style: { fontSize: 13, fontWeight: 500, color: isDark ? "#9E9589" : "#8B7F74", marginTop: 2, lineHeight: "16px" }
+                    }, section.progressText)
+                  ),
+                  e("button", {
+                    className: "grid place-items-center shrink-0 transition-colors duration-200",
+                    style: { width: 56, borderLeft: `1px solid ${isDark ? "#2E2822" : "#E2D9C5"}`, background: "transparent" },
+                    onClick: () => showToast(section.notebookLabel),
+                    "aria-label": "Open notebook"
+                  },
+                    e(NotebookPenIcon, { size: 20, color: isDark ? "#9E9589" : "#5B4D3F" })
+                  )
+                ),
+
+                // Winding Path Nodes
+                e("div", {
+                  className: "flex flex-col items-center",
+                  style: { padding: secIdx === courseData.sections.length - 1 ? "48px 0 80px" : "48px 0 32px", gap: 28 }
+                },
+                  section.lessons.map((lesson, idx) =>
+                    e(LessonNode, {
+                      key: lesson.id,
+                      lesson: lesson,
+                      offset: section.offsets[idx] ?? 0,
+                      isDark: isDark,
+                      onClick: () => handleLessonClick(lesson)
+                    })
+                  )
+                )
+              )
+            )
+          ),
+
+          // Floating Action Sparkle Button
+          e("button", {
+            "aria-label": "Quick actions",
+            className: "fixed grid place-items-center transition-colors duration-200 hover:scale-[1.05]",
+            style: {
+              right: 24,
+              bottom: 24,
+              width: 48,
+              height: 48,
+              background: isDark ? "#1F1B17" : "#FFFEF9",
+              border: `1px solid ${isDark ? "#2E2822" : "#E6DFCD"}`,
+              borderRadius: "50%",
+              boxShadow: isDark ? "0 2px 12px rgba(0,0,0,0.4)" : "0 2px 8px rgba(0,0,0,0.08)"
+            },
+            onClick: () => showToast("Quick actions — Ask study assistant")
+          },
+            e("svg", { viewBox: "0 0 24 24", width: "22", height: "22", "aria-hidden": true },
+              e("path", {
+                d: "M12 2.5 C12.8 6 14.6 8 18.2 8.8 C14.6 9.6 12.8 11.6 12 15.1 C11.2 11.6 9.4 9.6 5.8 8.8 C9.4 8 11.2 6 12 2.5 Z M19 12.8 C19.4 14.1 20.2 14.9 21.5 15.3 C20.2 15.7 19.4 16.5 19 17.8 C18.6 16.5 17.8 15.7 16.5 15.3 C17.8 14.9 18.6 14.1 19 12.8 Z",
+                fill: isDark ? "#F5F0E6" : "#3A2A20"
+              })
+            )
+          )
+        );
+      }
+
+      ReactDOM.render(e(CourseApp), document.getElementById('root'));
+    })();
+  </script>
+</body>
+</html>

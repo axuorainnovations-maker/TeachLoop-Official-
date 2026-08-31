@@ -9,6 +9,7 @@ import urllib.error
 import concurrent.futures
 import secrets
 import time
+import threading
 
 import noura_meter
 from noura_meter import LEDGER
@@ -67,12 +68,15 @@ if not TTS_FUNCTION_ID:
     print('TTS model "%s" has no NVCF function ID — set NVIDIA_TTS_FUNCTION_ID in '
           '.env.local (find it on the model page at build.nvidia.com). '
           'Audio Recap will report this until it is set.' % NVIDIA_TTS_MODEL)
+TTS_LOCK = threading.Lock()
+LAST_TTS_TIME = 0.0
+
 # Voice naming differs per model, so it is env-overridable too.
 # Voice names and native sample rate both differ per model — Chatterbox reports
 # 24 kHz and only ships Male subvoices; sending Magpie's 44.1 kHz here would
 # play the audio back at the wrong pitch.
 TTS_DEFAULT_VOICES = {
-    'magpie-tts-multilingual': 'Magpie-Multilingual.EN-US.Mia',
+    'magpie-tts-multilingual': 'Magpie-Multilingual.EN-US.Sofia',
     'chatterbox-multilingual-tts': 'Chatterbox-Multilingual.en-US.Male',
 }
 TTS_DEFAULT_RATES = {
@@ -363,33 +367,49 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         content_str = str(content)
                     formatted_msgs.append({"role": m.get("role", "user"), "content": content_str})
                 
-                req_body = json.dumps({
-                    "model": "meta/llama-3.1-8b-instruct",
-                    "messages": formatted_msgs,
-                    "max_tokens": data.get("max_tokens", 300)
-                }).encode('utf-8')
+                candidate_models = [
+                    'google/diffusiongemma-26b-a4b-it',
+                    'meta/llama-3.2-11b-vision-instruct',
+                    'poolside/laguna-xs-2.1',
+                    'nvidia/nemotron-3.5-lightning-30b-a3b'
+                ]
                 
-                req = urllib.request.Request(
-                    'https://integrate.api.nvidia.com/v1/chat/completions',
-                    data=req_body,
-                    headers={
-                        'Authorization': f'Bearer {nv_key}',
-                        'Content-Type': 'application/json'
-                    }
-                )
-                with urllib.request.urlopen(req, timeout=12) as resp:
-                    resp_data = json.loads(resp.read().decode('utf-8'))
-                    reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
-                    out_payload = {
-                        "reply": reply,
-                        "content": [{"type": "text", "text": reply}]
-                    }
-                    self.send_response(200)
-                    self.send_header('Content-Type', 'application/json')
-                    self.send_header('Access-Control-Allow-Origin', '*')
-                    self._set_uid_cookie()
-                    self.end_headers()
-                    self.wfile.write(json.dumps(out_payload).encode('utf-8'))
+                last_err = None
+                for chosen_model in candidate_models:
+                    req_body = json.dumps({
+                        "model": chosen_model,
+                        "messages": formatted_msgs,
+                        "max_tokens": min(data.get("max_tokens", 800) or 800, 1200)
+                    }).encode('utf-8')
+                    
+                    req = urllib.request.Request(
+                        'https://integrate.api.nvidia.com/v1/chat/completions',
+                        data=req_body,
+                        headers={
+                            'Authorization': f'Bearer {nv_key}',
+                            'Content-Type': 'application/json'
+                        }
+                    )
+                    try:
+                        with urllib.request.urlopen(req, timeout=16) as resp:
+                            resp_data = json.loads(resp.read().decode('utf-8'))
+                            reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
+                            out_payload = {
+                                "reply": reply,
+                                "content": [{"type": "text", "text": reply}]
+                            }
+                            self.send_response(200)
+                            self.send_header('Content-Type', 'application/json')
+                            self.send_header('Access-Control-Allow-Origin', '*')
+                            self._set_uid_cookie()
+                            self.end_headers()
+                            self.wfile.write(json.dumps(out_payload).encode('utf-8'))
+                            return
+                    except Exception as e:
+                        last_err = e
+                        print(f'[chat] NVIDIA model {chosen_model} failed: {e}')
+                
+                raise RuntimeError(f"All NVIDIA models failed. Last error: {last_err}")
 
             if anthropic_key:
                 try:
@@ -480,7 +500,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not text:
                 self._json(400, {"error": "missing text"})
                 return
-            voice = data.get('voice') or TTS_VOICE
+            req_model = data.get('model') or NVIDIA_TTS_MODEL
+            req_func_id = TTS_FUNCTION_IDS.get(req_model) or TTS_FUNCTION_ID
+            req_voice = data.get('voice') or TTS_DEFAULT_VOICES.get(req_model) or TTS_VOICE
+            req_rate = TTS_DEFAULT_RATES.get(req_model) or TTS_RATE
             language = data.get('language') or 'en-US'
             tts_uid = self._identify(data)
             tts_surface = self._surface(data) if self._surface(data) != 'unknown' else 'tts'
@@ -488,31 +511,39 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not tts_allowed:
                 self._json(402, tts_gate)
                 return
+
             try:
                 chunks = _split_for_tts(text)
 
                 def _say(part):
-                    # One service per call: the stub is not documented as
-                    # thread-safe, and construction is cheap next to inference.
-                    # NVCF rate-limits concurrent stateful requests, so back off
-                    # and retry rather than failing the whole recap.
+                    global LAST_TTS_TIME
+                    with TTS_LOCK:
+                        now = time.time()
+                        elapsed = now - LAST_TTS_TIME
+                        if elapsed < 0.4:
+                            time.sleep(0.4 - elapsed)
+                        LAST_TTS_TIME = time.time()
+
                     delay = 0.4
-                    for attempt in range(5):
+                    for attempt in range(8):
                         try:
-                            svc = riva.client.SpeechSynthesisService(_riva_auth(TTS_FUNCTION_ID))
+                            svc = riva.client.SpeechSynthesisService(_riva_auth(req_func_id))
                             return svc.synthesize(
-                                text=part, voice_name=voice, language_code=language,
-                                sample_rate_hz=TTS_RATE,
+                                text=part, voice_name=req_voice, language_code=language,
+                                sample_rate_hz=req_rate,
                                 encoding=riva.client.AudioEncoding.LINEAR_PCM).audio
                         except Exception as err:
-                            if 'exceeded rate limit' not in str(err) or attempt == 4:
-                                raise
-                            time.sleep(delay)
-                            delay *= 1.4
+                            err_str = str(err).lower()
+                            if 'exceeded rate limit' in err_str or 'resource_exhausted' in err_str or '429' in err_str:
+                                if attempt < 7:
+                                    time.sleep(delay)
+                                    delay *= 1.4
+                                    continue
+                            raise
                     raise RuntimeError('tts retries exhausted')
 
                 pcm = b''.join(_say(c) for c in chunks)
-                wav = pcm_to_wav(pcm, TTS_RATE, 1)
+                wav = pcm_to_wav(pcm, req_rate, 1)
                 # Speech has no token concept, so bill by characters at a
                 # configured rate. Estimated, not an invoiced figure.
                 LEDGER.append(user_id=tts_uid, surface=tts_surface, provider='nvidia',
@@ -756,11 +787,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             }).encode('utf-8'))
             return
 
-        # admin.html is only served with a valid token.
-        if path == '/admin.html' and not self._admin_ok():
-            self._json(403, {"error": "admin token required",
-                             "hint": "open /admin.html?key=YOUR_NOURA_ADMIN_TOKEN"})
-            return
+        # Clean URL handling — support routes without .html extension
+        if not path.startswith('/api/'):
+            if path in ('/admin', '/admin.html') and not self._admin_ok():
+                self._json(403, {"error": "admin token required",
+                                 "hint": "open /admin?key=YOUR_NOURA_ADMIN_TOKEN"})
+                return
+
+            p_lower = path.lower()
+            if p_lower in ('/chat', '/chat.html', '/chatbot', '/chatbot.html'):
+                self.path = '/chatbot.html'
+            elif p_lower in ('/create', '/create.html', '/create-course', '/create-course.html'):
+                self.path = '/create-course.html'
+            elif p_lower == '/dashboard':
+                self.path = '/chatbot.html'
+            elif p_lower == '/dashboard.html':
+                self.path = '/dashboard.html'
+            else:
+                rel = path.lstrip('/')
+                if rel and not os.path.exists(rel) and not os.path.isdir(rel):
+                    if os.path.exists(rel + '.html'):
+                        self.path = '/' + rel + '.html'
 
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 

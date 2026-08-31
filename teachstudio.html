@@ -1096,7 +1096,7 @@
       <h1 class="ts-h1" style="margin-bottom:8px;">Ready to start teaching?</h1>
       <p class="ts-sub" style="margin-bottom:28px;">Your AI student is ready for your lesson.</p>
 
-      <button class="ts-btn-3d-purple" id="tsStartSessionBtn" type="button" onclick="document.getElementById('tsPreflight').style.display='none'; document.getElementById('tsPreflight').classList.remove('on'); document.getElementById('tsLive').style.display='flex'; document.getElementById('tsLive').classList.add('on'); if(window.startLiveSession) window.startLiveSession(event);" style="width:100%; max-width:480px; height:52px; font-size:16.5px; font-weight:700; margin-bottom:24px; cursor:pointer;">Start Teaching</button>
+      <button class="ts-btn-3d-purple" id="tsStartSessionBtn" type="button" onclick="if(window.saveDraft) window.saveDraft(); window.location.href='teachroom.html';" style="width:100%; max-width:480px; height:52px; font-size:16.5px; font-weight:700; margin-bottom:24px; cursor:pointer;">Start Teaching</button>
 
       <div class="ts-privacy" style="width:100%; max-width:480px; background:rgba(20,20,24,0.6); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; text-align:left;">
         <b style="color:#ffffff; font-size:14.5px; display:block; margin-bottom:6px;">You remain the teacher throughout the session.</b>
@@ -1283,8 +1283,8 @@
   'use strict';
 
   /* ── Constants ─────────────────────────────────────────────────────── */
-  const STUDENT_MODEL = 'claude-haiku-4-5-20251001';
-  const FAST_MODEL = 'claude-haiku-4-5-20251001';
+  const STUDENT_MODEL = 'claude-3-5-haiku-20241022';
+  const FAST_MODEL = 'claude-3-5-haiku-20241022';
   const NS = 'NOURA_TS_';
   const STUDENTS = {
     beginner: {
@@ -1924,16 +1924,7 @@
     }
     const startSessionBtn = e.target.closest('#tsStartSessionBtn');
     if (startSessionBtn) {
-      if (e) { e.preventDefault(); e.stopPropagation(); }
-      textMode = false; S.voiceMode = 'pipeline';
-      if (!S.topic || !S.topic.trim()) S.topic = 'General Overview';
-      saveDraft();
-      try {
-        if (typeof Voice !== 'undefined' && Voice && !Voice.stream && Voice.init) {
-          Voice.init().catch(err => console.warn('Mic init background:', err));
-        }
-      } catch (err) {}
-      startLiveSession();
+      // Handled by direct addEventListener below — do NOT duplicate.
       return;
     }
     const teachNowBtn = e.target.closest('#tsTeachNowBtn');
@@ -2505,98 +2496,141 @@
   });
 
   /* ── Voice adapter (mic capture → PCM16 → /api/stt; /api/tts → play) ─ */
-    const Voice = {
-    stream: null, ctx: null, proc: null, srcNode: null,
-    capturing: false, chunks: [], speechDetected: false,
-    speechMs: 0, silenceMs: 0, noiseFloor: 0.005, level: 0,
-    onLevel: null, onAutoCommit: null, onSpeechStart: null,
-    async init() {
-      if (this.stream && this.ctx) {
-        if (this.ctx.state === 'suspended') await this.ctx.resume();
-        return;
-      }
-      this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (this.ctx.state === 'suspended') await this.ctx.resume();
-      this.srcNode = this.ctx.createMediaStreamSource(this.stream);
-      this.proc = this.ctx.createScriptProcessor(4096, 1, 1);
-      this.srcNode.connect(this.proc);
-      this.proc.connect(this.ctx.destination);
-      this.proc.onaudioprocess = e => this._frame(e.inputBuffer.getChannelData(0));
-    },
-    _frame(f32) {
-      let sum = 0;
-      for (let i = 0; i < f32.length; i++) sum += f32[i] * f32[i];
-      const rms = Math.sqrt(sum / f32.length);
-      this.level = rms;
+    window._vdbg = function(msg) {
+      console.log('[VOICE-DBG]', msg);
+    };
 
-      if (!this.speechDetected) {
-        this.noiseFloor = this.noiseFloor * 0.92 + rms * 0.08;
-      }
+    let micStream = null, audioCtx = null, srcNode = null, procNode = null;
+    let pcmChunks = [], speechDetected = false, capturing = false;
+    let silenceMs = 0, lastTs = 0;
+    let onLevel = null, onAutoCommit = null, onSpeechStart = null;
+    let _audioFrameCount = 0;
 
-      if (this.onLevel) this.onLevel(rms);
-      if (!this.capturing) return;
-
-      this.chunks.push(this._downsample(f32, this.ctx.sampleRate, 16000));
-      const frameMs = (f32.length / this.ctx.sampleRate) * 1000;
-
-      const speakingThreshold = Math.max(0.012, this.noiseFloor * 2.2);
-      const speaking = rms > speakingThreshold;
-
-      if (speaking) {
-        this.speechMs += frameMs;
-        this.silenceMs = 0;
-        if (!this.speechDetected && this.speechMs > 160) {
-          this.speechDetected = true;
-          if (this.onSpeechStart) this.onSpeechStart();
-        }
-      } else if (this.speechDetected) {
-        this.silenceMs += frameMs;
-        if (this.silenceMs > 450 && this.speechMs > 100) {
-          this.capturing = false;
-          this.speechDetected = false;
-          if (this.onAutoCommit) this.onAutoCommit();
-        }
-      }
-    },
-    _downsample(f32, from, to) {
-      const ratio = from / to, out = new Int16Array(Math.floor(f32.length / ratio));
-      for (let i = 0; i < out.length; i++) {
-        const v = Math.max(-1, Math.min(1, f32[Math.floor(i * ratio)]));
+    function encodePCM16(chunks, srcRate, dstRate) {
+      let len = 0; chunks.forEach(c => len += c.length);
+      const merged = new Float32Array(len); let o = 0;
+      chunks.forEach(c => { merged.set(c, o); o += c.length; });
+      const ratio = srcRate / dstRate;
+      const outLen = Math.max(0, Math.floor(merged.length / ratio));
+      const out = new Int16Array(outLen);
+      for (let i = 0; i < outLen; i++) {
+        const s = merged[Math.floor(i * ratio)] || 0;
+        const v = Math.max(-1, Math.min(1, s));
         out[i] = v < 0 ? v * 0x8000 : v * 0x7FFF;
       }
-      return out;
-    },
-    startCapture() {
-      this.chunks = [];
-      this.speechDetected = false;
-      this.speechMs = 0;
-      this.silenceMs = 0;
-      this.capturing = true;
-    },
-    stopCapture() {
-      this.capturing = false;
-      this.speechDetected = false;
-      this.speechMs = 0;
-      this.silenceMs = 0;
-      let len = 0; this.chunks.forEach(c => len += c.length);
-      const all = new Int16Array(len); let o = 0;
-      this.chunks.forEach(c => { all.set(c, o); o += c.length; });
-      this.chunks = [];
-      return all;
-    },
-    deviceLabel() {
-      const t = this.stream && this.stream.getAudioTracks()[0];
-      return t ? t.label : '';
-    },
-    destroy() {
-      try { if (this.proc) { this.proc.disconnect(); this.proc.onaudioprocess = null; } } catch (e) {}
-      try { if (this.srcNode) this.srcNode.disconnect(); } catch (e) {}
-      try { if (this.ctx) this.ctx.close(); } catch (e) {}
-      try { if (this.stream) this.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
-      this.stream = this.ctx = this.proc = this.srcNode = null; this.capturing = false;
+      return out.buffer;
     }
-  };
+
+    function onAudio(e) {
+      const inp = e.inputBuffer.getChannelData(0);
+      let sum = 0; for (let i = 0; i < inp.length; i++) sum += inp[i] * inp[i];
+      const rms = Math.sqrt(sum / inp.length);
+      
+      _audioFrameCount++;
+      
+      // Update visual reactive elements
+      if (typeof activeOrb !== 'undefined' && activeOrb) activeOrb.setAudioLevel(rms);
+      const stage = $('tsStage'); if (stage) stage.style.setProperty('--pulse', Math.min(14, rms * 260) + 'px');
+      if ($('tsMeterFill')) $('tsMeterFill').style.width = Math.min(100, rms * 900) + '%';
+
+      if (onLevel) onLevel(rms);
+      if (!capturing) return;
+
+      const now = performance.now(), dt = now - lastTs; lastTs = now;
+      pcmChunks.push(new Float32Array(inp));
+      
+      const ONSET = 0.005, SUSTAIN = 0.003, END_SILENCE = 1200;
+      if (!speechDetected) {
+        if (rms > ONSET) { 
+          speechDetected = true; 
+          silenceMs = 0; 
+          window._vdbg(`🎤 SPEECH DETECTED! rms=${rms.toFixed(5)}`);
+          if (onSpeechStart) onSpeechStart(); 
+        }
+      } else {
+        if (rms > SUSTAIN) { silenceMs = 0; } else { silenceMs += dt; }
+      }
+      
+      if (speechDetected && silenceMs > END_SILENCE) { 
+        capturing = false;
+        window._vdbg(`⏹ AUTO-COMMIT: silenceMs=${silenceMs.toFixed(0)} > ${END_SILENCE}`);
+        if (onAutoCommit) onAutoCommit();
+      } else if (audioCtx && pcmChunks.length * 4096 > audioCtx.sampleRate * 45) {
+        capturing = false;
+        window._vdbg(`⏹ AUTO-COMMIT: max duration reached`);
+        if (onAutoCommit) onAutoCommit();
+      }
+    }
+
+    const Voice = {
+      get stream() { return micStream; },
+      get ctx() { return audioCtx; },
+      get capturing() { return capturing; },
+      set capturing(v) { capturing = v; },
+      get chunks() { return pcmChunks; },
+      get speechDetected() { return speechDetected; },
+      set onLevel(cb) { onLevel = cb; },
+      set onAutoCommit(cb) { onAutoCommit = cb; },
+      set onSpeechStart(cb) { onSpeechStart = cb; },
+
+      async init() {
+        // Promise guard: prevent concurrent init calls
+        if (Voice._initPromise) return Voice._initPromise;
+        window._vdbg && window._vdbg('Voice.init() called — micStream=' + !!micStream + ' audioCtx=' + !!audioCtx);
+        if (micStream && audioCtx) {
+          if (audioCtx.state === 'suspended') await audioCtx.resume();
+          window._vdbg && window._vdbg('Voice.init() already initialized, returning early');
+          return;
+        }
+        Voice._initPromise = (async () => {
+          try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+            window._vdbg && window._vdbg('getUserMedia succeeded — tracks=' + micStream.getAudioTracks().length);
+          } catch(err) {
+            window._vdbg && window._vdbg('getUserMedia FAILED: ' + err.message);
+            throw err;
+          }
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          window._vdbg && window._vdbg('AudioContext created — state=' + audioCtx.state + ' sampleRate=' + audioCtx.sampleRate);
+          if (audioCtx.state === 'suspended') await audioCtx.resume();
+          srcNode = audioCtx.createMediaStreamSource(micStream);
+          procNode = audioCtx.createScriptProcessor(4096, 1, 1);
+          var sinkNode = audioCtx.createGain();
+          sinkNode.gain.value = 0;
+          srcNode.connect(procNode);
+          procNode.connect(sinkNode);
+          sinkNode.connect(audioCtx.destination);
+          procNode.onaudioprocess = onAudio;
+          window._vdbg && window._vdbg('Voice.init() complete — audio graph wired');
+        })();
+        try { await Voice._initPromise; } finally { Voice._initPromise = null; }
+      },
+      startCapture() {
+        pcmChunks = [];
+        speechDetected = false;
+        silenceMs = 0;
+        lastTs = performance.now();
+        capturing = true;
+      },
+      stopCapture() {
+        capturing = false;
+        const outBuffer = encodePCM16(pcmChunks, audioCtx.sampleRate, 16000);
+        pcmChunks = [];
+        speechDetected = false;
+        return new Int16Array(outBuffer);
+      },
+      deviceLabel() {
+        const t = micStream && micStream.getAudioTracks()[0];
+        return t ? t.label : '';
+      },
+      destroy() {
+        try { if (procNode) { procNode.disconnect(); procNode.onaudioprocess = null; } } catch (e) {}
+        try { if (srcNode) srcNode.disconnect(); } catch (e) {}
+        try { if (audioCtx) audioCtx.close(); } catch (e) {}
+        try { if (micStream) micStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        micStream = audioCtx = procNode = srcNode = null; capturing = false;
+      }
+    };
   async function sttTranscribe(pcm16) {
     const r = await fetch('/api/stt', {
       method: 'POST',
@@ -2688,15 +2722,7 @@
     textMode = false; S.voiceMode = 'pipeline';
     if (!S.topic || !S.topic.trim()) S.topic = 'General Overview';
     saveDraft();
-    try {
-      if (typeof Voice !== 'undefined' && Voice && !Voice.stream && Voice.init) {
-        Voice.init().catch(err => console.warn('Mic init background:', err));
-      }
-      micOk = true;
-    } catch (e) {
-      micOk = true;
-    }
-    startLiveSession();
+    window.location.href = 'teachroom.html';
   });
 
   /* ── Live session ──────────────────────────────────────────────────── */
@@ -2891,7 +2917,10 @@
     }
   }
 
+  let _sessionRunning = false;
   window.startLiveSession = async function(e) {
+    if (_sessionRunning) { window._vdbg && window._vdbg('startLiveSession BLOCKED — already running'); return; }
+    _sessionRunning = true;
     if (e) {
       try { e.preventDefault(); e.stopPropagation(); } catch(err){}
     }
@@ -2941,46 +2970,54 @@
       pushTurn('ai_student', opening);
       setCaption(stu.name + ' AI Student', opening);
       setState('ai_speaking');
+      window._vdbg(`startLiveSession: about to speak opening (textMode=${textMode})`);
       if (!textMode) {
-        await speak(opening).catch(err => console.warn('TTS opening:', err));
+        await speak(opening).catch(err => { window._vdbg(`TTS opening FAILED: ${err.message}`); });
       }
+      window._vdbg('startLiveSession: speak() finished, setting state to listening');
       setState('listening');
+      window._vdbg(`startLiveSession: about to call armListening (textMode=${textMode})`);
       if (!textMode) armListening();
-
-      try {
-        if (typeof Voice !== 'undefined' && Voice && !Voice.stream && Voice.init) {
-          Voice.init().catch(err => console.warn('Mic init background:', err));
-        }
-        micOk = true;
-      } catch (err) {
-        micOk = true;
-      }
+      // armListening() already calls Voice.init() — no need to duplicate here
+      micOk = true;
     } catch (err) {
       console.warn('startLiveSession error, falling back to listening view:', err);
       setState('listening');
     }
+    // Note: _sessionRunning stays true while session is active
   };
 
   function armListening() {
-    if (textMode || micMuted) return;
+    window._vdbg(`armListening() called — textMode=${textMode} micMuted=${micMuted} state=${state}`);
+    if (textMode || micMuted) { window._vdbg('armListening ABORTED: textMode or micMuted'); return; }
     try {
-      Voice.onSpeechStart = () => { if (state === 'listening') setState('user_speaking'); };
-      Voice.onAutoCommit = () => commitVoiceTurn();
+      Voice.onSpeechStart = () => { 
+        window._vdbg(`onSpeechStart fired — state=${state}`);
+        if (state === 'listening') setState('user_speaking'); 
+      };
+      Voice.onAutoCommit = () => { 
+        window._vdbg('onAutoCommit fired — calling commitVoiceTurn');
+        commitVoiceTurn(); 
+      };
       Voice.onLevel = rms => {
         const stage = $('tsStage');
         if (stage) stage.style.setProperty('--pulse', Math.min(14, rms * 260) + 'px');
       };
       if (!Voice.stream || !Voice.ctx) {
+        window._vdbg('armListening: Voice not initialized, calling Voice.init()...');
         Voice.init().then(() => {
+          window._vdbg(`armListening: Voice.init() resolved — stream=${!!Voice.stream} textMode=${textMode} micMuted=${micMuted}`);
           if (!textMode && !micMuted && Voice.stream) {
+            window._vdbg('armListening: calling Voice.startCapture()');
             Voice.startCapture();
           }
-        }).catch(e => console.warn('Voice init deferred:', e));
+        }).catch(e => { window._vdbg(`armListening: Voice.init() REJECTED: ${e.message}`); });
         return;
       }
+      window._vdbg('armListening: Voice already initialized, calling Voice.startCapture()');
       Voice.startCapture();
     } catch (e) {
-      console.warn('armListening exception handled:', e);
+      window._vdbg(`armListening EXCEPTION: ${e.message}`);
     }
   }
   async function commitVoiceTurn() {
@@ -3350,6 +3387,7 @@
     }
     S.status = 'completed';
     saveDone(S); clearLive();
+    _sessionRunning = false;
     Voice.destroy();
     renderReport();
     setState('report_ready');

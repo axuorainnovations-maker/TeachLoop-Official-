@@ -10,7 +10,7 @@
     (function () {
       var onboarded = false;
       try { onboarded = localStorage.getItem('TEACHLOOP_ONBOARDED') === '1'; } catch (e) {}
-      window.location.replace(onboarded ? 'dashboard.html' : 'onboarding.html');
+      window.location.replace(onboarded ? 'chatbot.html' : 'onboarding.html');
     })();
   </script>
   <style>html,body{margin:0;height:100%;background:#0c0c0e;}</style>

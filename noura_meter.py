@@ -24,7 +24,7 @@ USERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_use
 # Keyed by model so a model switch is a one-line change. Cache read is ~0.1x
 # input and cache write ~1.25x input, per Anthropic's caching pricing.
 PRICING = {
-    'claude-haiku-4-5-20251001': {'in': 1.00, 'out': 5.00},
+    'claude-3-5-haiku-20241022': {'in': 1.00, 'out': 5.00},
     'claude-haiku-4-5':          {'in': 1.00, 'out': 5.00},
     'claude-sonnet-5':           {'in': 3.00, 'out': 15.00},
     'claude-opus-5':             {'in': 5.00, 'out': 25.00},

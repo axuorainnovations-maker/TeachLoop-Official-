@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noura — TeachRoom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="beginnerPrompt.js"></script>
+<script src="intermediatePrompt.js"></script>
+<script src="advancedPrompt.js"></script>
+<script src="noura-credits.js"></script>
+<style>
+  :root {
+    --ts-bg:#0a0a0d;
+    --ts-text:#E8E8E6;
+    --ts-dim:#9a9aa2;
+    --ts-accent:#8b5cf6;
+    --ts-good:#3fb950;
+    --ts-bad:#ef4444;
+    --grad: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%);
+  }
+  * { box-sizing:border-box; }
+  html, body { min-height:100%; margin:0; padding:0; background:var(--ts-bg); color:var(--ts-text); font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; overflow:hidden; }
+  
+  .avatar-wrapper {
+    position: relative;
+    border-radius: 50%;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  /* Shimmer Text Animation */
+  @keyframes textShimmer {
+    0% { background-position: 100% center; }
+    100% { background-position: 0% center; }
+  }
+  .tr-text-shimmer {
+    display: inline-block;
+    background-size: 250% 100%, auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent !important;
+    background-repeat: no-repeat, padding-box;
+    --spread: 50px;
+    --base-color: #c084fc;
+    --base-gradient-color: #ffffff;
+    background-image:
+      linear-gradient(90deg, transparent calc(50% - var(--spread)), var(--base-gradient-color), transparent calc(50% + var(--spread))),
+      linear-gradient(var(--base-color), var(--base-color));
+    animation: textShimmer 2s linear infinite;
+  }
+
+  .tr-dock-container {
+    width: 100%;
+    padding-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .tr-dock-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #a1a1aa;
+    margin-bottom: 12px;
+  }
+
+  #trLive {
+    background:#0a0a0d; width:100vw; height:100vh; position:fixed; inset:0; z-index:100;
+    display:flex; flex-direction:column; justify-content:space-between; align-items:center; overflow:hidden;
+  }
+  
+  .tr-topbar { width:100%; display:flex; justify-content:space-between; align-items:center; padding:20px 28px 0; z-index:10; }
+  .tr-conn { display:flex; align-items:center; gap:8px; font-size:13px; color:#a1a1aa; }
+  .tr-conn i { width:8px; height:8px; border-radius:50%; background:#10b981; display:inline-block; box-shadow:0 0 8px #10b981; }
+  .tr-elapsed { color:#71717a; font-weight:600; margin-left:8px; }
+  
+  .tr-stage { flex:1; width:100%; max-width:760px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 24px; text-align:center; position:relative; }
+  
+  .tr-response-box { display:none; max-width:620px; margin-bottom:24px; text-align:center; }
+  .tr-response-text { font-size:22px; font-weight:600; color:#ffffff; line-height:1.6; letter-spacing:-0.01em; }
+  
+  .tr-caption { max-width:640px; margin-top:0; transition:all 0.3s ease; }
+  .tr-caption-text { font-size:20px; font-weight:600; color:#c084fc; line-height:1.5; text-shadow:0 0 16px rgba(192,132,252,0.35); letter-spacing:-0.01em; }
+  .tr-state-label { display: none !important; }
+  
+  .tr-dock { width:100%; padding:0 0 32px; display:flex; justify-content:center; align-items:center; gap:28px; z-index:10; }
+  .tr-btn-circle { width:58px; height:58px; border-radius:50%; background:#222226; border:1px solid rgba(255,255,255,0.08); color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.15s, background 0.15s; box-shadow:0 6px 24px rgba(0,0,0,0.5); }
+  .tr-btn-circle:hover { background:#2e2e34; transform:scale(1.05); }
+  .tr-btn-circle:active { transform:scale(0.95); }
+  .tr-btn-circle.muted { background:#ef4444; border-color:#ef4444; }
+
+  /* Toast notification */
+  .tr-toast { position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:#1e1e24; border:1px solid rgba(255,255,255,0.12); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:200; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .tr-toast.on { opacity:1; }
+
+    /* Natural Human Eye Blinking Animation */
+    @keyframes humanBlink {
+      0%, 86%, 94%, 100% {
+        transform: scaleY(1);
+      }
+      90% {
+        transform: scaleY(0.06);
+      }
+    }
+    .bear-blinking-eyes {
+      transform-origin: 210px 172px;
+      animation: humanBlink 3.8s infinite ease-in-out;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="trLive">
+  <!-- Top Header Bar -->
+  <div class="tr-topbar">
+    <div class="tr-conn" id="trConn">
+      <i id="trConnDot"></i>
+      <span id="trConnTxt" style="font-weight:600; color:#e4e4e7;">TeachRoom Active</span>
+      <span class="tr-elapsed" id="trElapsed">0:00</span>
+    </div>
+    <button type="button" id="trSettingsBtn" style="background:transparent; border:none; color:#71717a; cursor:pointer; padding:8px;" title="Settings">
+      <svg viewBox="0 0 24 24" style="width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Center Stage Layout -->
+  <div class="tr-stage" id="trStage">
+    <!-- Response Box for AI Student Speaking -->
+    <div class="tr-response-box" id="trResponseBox">
+      <p class="tr-response-text" id="trResponseText">I'm ready to learn!</p>
+    </div>
+
+    <!-- Animated Character Avatar -->
+    <div id="avatarContainer" class="avatar-wrapper avatar-idle" style="width:256px; height:256px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; position:relative; z-index:10;">
+      <svg class="interactive-avatar__canvas" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg" width="256" height="256" style="display:block; filter:drop-shadow(0 12px 32px rgba(0,0,0,0.6));"><defs><clipPath id="oneworks-avatar-export-frame"><path d="M 210 0 A 210 210 0 1 1 210 420 A 210 210 0 1 1 210 0 Z"/></clipPath></defs><g clip-path="url(#oneworks-avatar-export-frame)"><path d="M 210 0 A 210 210 0 1 1 210 420 A 210 210 0 1 1 210 0 Z" fill="#382641"/><g><title>Interactive default avatar</title><defs><clipPath id="r0-clip"><path d="M 71.03 202.51 L 71.91 187.18 L 72.18 185.10 L 74.78 169.99 L 79.09 155.29 L 85.04 141.17 L 92.56 127.82 L 93.69 126.06 L 102.60 113.77 L 112.87 102.60 L 114.54 101.15 L 125.83 91.39 L 138.18 83.03 L 139.99 81.96 L 152.90 75.29 L 154.81 74.45 L 167.99 69.57 L 169.76 68.95 L 171.84 68.36 L 174.21 67.81 L 185.89 65.17 L 187.67 64.82 L 189.62 64.50 L 191.73 64.21 L 193.97 63.95 L 196.34 63.73 L 198.81 63.54 L 201.36 63.39 L 203.98 63.28 L 206.65 63.21 L 209.34 63.18 L 212.04 63.19 L 214.72 63.24 L 217.37 63.33 L 219.96 63.47 L 222.47 63.63 L 224.89 63.84 L 227.20 64.08 L 229.37 64.36 L 231.40 64.66 L 233.27 65.00 L 234.95 65.36 L 247.04 68.09 L 249.26 68.66 L 251.19 69.27 L 264.11 74.05 L 266.22 74.88 L 267.91 75.74 L 281.01 82.51 L 293.22 90.78 L 295.01 92.05 L 306.41 101.89 L 316.60 112.99 L 318.04 114.60 L 327.00 126.96 L 334.50 140.26 L 340.43 154.33 L 341.17 156.30 L 345.48 171.04 L 348.09 186.17 L 348.97 201.49 L 348.09 216.82 L 347.82 218.90 L 345.22 234.01 L 340.91 248.71 L 334.96 262.83 L 327.44 276.18 L 326.31 277.94 L 317.40 290.23 L 307.13 301.40 L 305.46 302.85 L 294.17 312.61 L 281.82 320.97 L 280.01 322.04 L 267.10 328.71 L 265.19 329.55 L 252.01 334.43 L 250.24 335.05 L 248.16 335.64 L 245.79 336.19 L 234.11 338.83 L 232.33 339.18 L 230.38 339.50 L 228.27 339.79 L 226.03 340.05 L 223.66 340.27 L 221.19 340.46 L 218.64 340.61 L 216.02 340.72 L 213.35 340.79 L 210.66 340.82 L 207.96 340.81 L 205.28 340.76 L 202.63 340.67 L 200.04 340.53 L 197.53 340.37 L 195.11 340.16 L 192.80 339.92 L 190.63 339.64 L 188.60 339.34 L 186.73 339.00 L 185.05 338.64 L 172.96 335.91 L 170.74 335.34 L 168.81 334.73 L 155.89 329.95 L 153.78 329.12 L 152.09 328.26 L 138.99 321.49 L 126.78 313.22 L 124.99 311.95 L 113.59 302.11 L 103.40 291.01 L 101.96 289.40 L 93.00 277.04 L 85.50 263.74 L 79.57 249.67 L 78.83 247.70 L 74.52 232.96 L 71.91 217.83 Z"/></clipPath><clipPath id="r0-eye-0-highlight-clip"><path d="M 173.183 154.455 L 175.899 154.586 L 178.509 155.234 L 180.914 156.375 L 183.020 157.966 L 184.748 159.944 L 186.030 162.234 L 186.818 164.747 L 187.081 167.387 L 187.077 170.078 L 187.074 172.779 L 187.072 175.490 L 187.072 178.210 L 187.072 180.940 L 187.074 183.679 L 187.077 186.429 L 187.081 189.187 L 186.818 191.928 L 186.030 194.589 L 184.748 197.067 L 183.020 199.269 L 180.914 201.108 L 178.509 202.516 L 175.899 203.437 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 173.183 203.836 L 170.467 203.698 L 167.855 203.029 L 165.446 201.853 L 163.333 200.216 L 161.598 198.180 L 160.308 195.823 L 159.511 193.237 L 159.238 190.519 L 159.234 187.759 L 159.231 185.008 L 159.229 182.268 L 159.229 179.538 L 159.229 176.818 L 159.231 174.108 L 159.234 171.408 L 159.238 168.718 L 159.511 166.055 L 160.308 163.468 L 161.598 161.056 L 163.333 158.913 L 165.446 157.120 L 167.855 155.747 L 170.467 154.847 L 173.183 154.455 L 173.183 154.455 L 173.183 154.455 L 173.183 154.455 L 173.183 154.455 L 173.183 154.455 L 173.183 154.455 L 173.183 154.455 Z"/></clipPath><clipPath id="r0-eye-1-highlight-clip"><path d="M 241.168 154.206 L 243.913 154.579 L 246.552 155.460 L 248.983 156.815 L 251.112 158.592 L 252.859 160.722 L 254.155 163.125 L 254.951 165.706 L 255.217 168.367 L 255.213 171.057 L 255.209 173.757 L 255.208 176.467 L 255.207 179.187 L 255.208 181.917 L 255.209 184.657 L 255.213 187.408 L 255.217 190.168 L 254.951 192.888 L 254.155 195.480 L 252.859 197.846 L 251.112 199.895 L 248.983 201.548 L 246.552 202.741 L 243.913 203.430 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 241.168 203.587 L 238.422 203.208 L 235.781 202.306 L 233.346 200.916 L 231.210 199.092 L 229.457 196.904 L 228.152 194.435 L 227.347 191.780 L 227.072 189.041 L 227.068 186.282 L 227.065 183.533 L 227.063 180.794 L 227.063 178.064 L 227.063 175.343 L 227.065 172.633 L 227.068 169.932 L 227.072 167.240 L 227.347 164.599 L 228.152 162.080 L 229.457 159.780 L 231.210 157.789 L 233.346 156.184 L 235.781 155.024 L 238.422 154.357 L 241.168 154.206 L 241.168 154.206 L 241.168 154.206 L 241.168 154.206 L 241.168 154.206 L 241.168 154.206 L 241.168 154.206 L 241.168 154.206 Z"/></clipPath><filter id="r0-face-shadow-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="0"/></filter><filter id="r0-avatar-shadow" x="-100%" y="-100%" width="300%" height="300%"><feDropShadow dx="8.174593080251336" dy="7.360436669947441" stdDeviation="8" flood-color="#6f3f25" flood-opacity="0.26"/></filter></defs><g filter="url(#r0-avatar-shadow)" transform="translate(2.5577159148380715 40.23575248290976) translate(210 210) rotate(0) scale(1.72) translate(-210 -210)"><g data-avatar-entity-preset="bear"><defs><filter id="r0-entity-face-shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="0"/></filter><filter id="r0-entity-outline" x="-30%" y="-30%" width="160%" height="160%"><feMorphology in="SourceAlpha" operator="dilate" radius="2" result="expanded"/><feFlood flood-color="#2b1d18" flood-opacity="0.84"/><feComposite in2="expanded" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><mask id="r0-entity-occlusion-0" x="-420" y="-420" width="1260" height="1260" maskUnits="userSpaceOnUse"><rect x="-420" y="-420" width="1260" height="1260" fill="white"/><path d="M 106.87 233.92 L 107.38 221.28 L 110.11 199.60 L 113.68 177.93 L 116.71 165.35 L 117.23 163.79 L 120.65 153.54 L 124.59 144.75 L 129.07 137.10 L 134.11 130.43 L 134.95 129.34 L 140.49 123.65 L 146.63 118.84 L 147.68 118.02 L 154.34 114.15 L 155.58 113.50 L 162.78 110.56 L 164.12 110.05 L 165.71 109.58 L 173.25 107.68 L 174.80 107.33 L 176.56 107.01 L 178.55 106.73 L 180.78 106.48 L 187.62 105.78 L 189.52 105.61 L 191.62 105.47 L 193.95 105.35 L 196.57 105.25 L 199.57 105.18 L 203.19 105.13 L 209.40 105.09 L 215.62 105.08 L 219.25 105.11 L 222.26 105.16 L 224.90 105.23 L 227.26 105.34 L 229.40 105.47 L 231.33 105.62 L 237.86 106.27 L 240.14 106.51 L 242.20 106.77 L 244.04 107.08 L 245.67 107.42 L 253.00 109.26 L 254.70 109.72 L 256.16 110.22 L 263.21 113.10 L 264.61 113.75 L 271.15 117.57 L 272.39 118.38 L 278.44 123.15 L 279.47 124.15 L 285.02 129.88 L 290.00 136.51 L 294.44 144.13 L 295.27 145.58 L 299.21 154.40 L 302.64 164.67 L 305.65 177.23 L 306.23 179.95 L 309.80 201.63 L 312.54 223.33 L 313.05 235.95 L 313.13 238.74 L 312.38 249.05 L 310.46 257.92 L 309.89 259.48 L 306.84 267.16 L 302.67 273.84 L 301.63 275.04 L 296.36 280.73 L 289.94 285.53 L 288.61 286.44 L 281.11 290.29 L 279.51 291.02 L 270.94 293.91 L 269.21 294.49 L 267.14 295.01 L 264.73 295.48 L 255.78 297.22 L 253.47 297.58 L 250.87 297.90 L 247.96 298.18 L 244.74 298.43 L 236.75 298.93 L 234.00 299.10 L 230.93 299.23 L 227.50 299.34 L 223.57 299.43 L 218.82 299.49 L 210.67 299.53 L 210.67 299.53 L 202.53 299.55 L 197.77 299.52 L 193.82 299.47 L 190.36 299.38 L 187.27 299.27 L 184.47 299.12 L 176.86 298.68 L 173.57 298.46 L 170.60 298.19 L 167.92 297.89 L 165.53 297.55 L 163.42 297.17 L 154.31 295.42 L 152.11 294.91 L 150.24 294.35 L 141.84 291.52 L 140.07 290.81 L 132.70 287.01 L 131.14 286.12 L 124.81 281.36 L 123.55 280.25 L 118.29 274.52 L 114.16 267.87 L 113.23 266.36 L 110.20 258.65 L 109.61 255.98 L 107.70 247.06 L 106.95 236.71 Z" fill="black" transform="translate(0 19.700127436160937)"/></mask><mask id="r0-entity-occlusion-1" x="-420" y="-420" width="1260" height="1260" maskUnits="userSpaceOnUse"><rect x="-420" y="-420" width="1260" height="1260" fill="white"/><path d="M 106.87 233.92 L 107.38 221.28 L 110.11 199.60 L 113.68 177.93 L 116.71 165.35 L 117.23 163.79 L 120.65 153.54 L 124.59 144.75 L 129.07 137.10 L 134.11 130.43 L 134.95 129.34 L 140.49 123.65 L 146.63 118.84 L 147.68 118.02 L 154.34 114.15 L 155.58 113.50 L 162.78 110.56 L 164.12 110.05 L 165.71 109.58 L 173.25 107.68 L 174.80 107.33 L 176.56 107.01 L 178.55 106.73 L 180.78 106.48 L 187.62 105.78 L 189.52 105.61 L 191.62 105.47 L 193.95 105.35 L 196.57 105.25 L 199.57 105.18 L 203.19 105.13 L 209.40 105.09 L 215.62 105.08 L 219.25 105.11 L 222.26 105.16 L 224.90 105.23 L 227.26 105.34 L 229.40 105.47 L 231.33 105.62 L 237.86 106.27 L 240.14 106.51 L 242.20 106.77 L 244.04 107.08 L 245.67 107.42 L 253.00 109.26 L 254.70 109.72 L 256.16 110.22 L 263.21 113.10 L 264.61 113.75 L 271.15 117.57 L 272.39 118.38 L 278.44 123.15 L 279.47 124.15 L 285.02 129.88 L 290.00 136.51 L 294.44 144.13 L 295.27 145.58 L 299.21 154.40 L 302.64 164.67 L 305.65 177.23 L 306.23 179.95 L 309.80 201.63 L 312.54 223.33 L 313.05 235.95 L 313.13 238.74 L 312.38 249.05 L 310.46 257.92 L 309.89 259.48 L 306.84 267.16 L 302.67 273.84 L 301.63 275.04 L 296.36 280.73 L 289.94 285.53 L 288.61 286.44 L 281.11 290.29 L 279.51 291.02 L 270.94 293.91 L 269.21 294.49 L 267.14 295.01 L 264.73 295.48 L 255.78 297.22 L 253.47 297.58 L 250.87 297.90 L 247.96 298.18 L 244.74 298.43 L 236.75 298.93 L 234.00 299.10 L 230.93 299.23 L 227.50 299.34 L 223.57 299.43 L 218.82 299.49 L 210.67 299.53 L 202.53 299.55 L 197.77 299.52 L 193.82 299.47 L 190.36 299.38 L 187.27 299.27 L 184.47 299.12 L 176.86 298.68 L 173.57 298.46 L 170.60 298.19 L 167.92 297.89 L 165.53 297.55 L 163.42 297.17 L 154.31 295.42 L 152.11 294.91 L 150.24 294.35 L 141.84 291.52 L 140.07 290.81 L 132.70 287.01 L 131.14 286.12 L 124.81 281.36 L 123.55 280.25 L 118.29 274.52 L 114.16 267.87 L 113.23 266.36 L 110.20 258.65 L 109.61 255.98 L 107.70 247.06 L 106.95 236.71 Z" fill="black" transform="translate(0 19.700127436160937)"/></mask><clipPath id="r0-entity-eye-0-highlight-clip"><path d="M 183.115 170.237 L 185.131 170.376 L 187.068 170.887 L 188.853 171.751 L 190.417 172.936 L 191.700 174.395 L 192.653 176.073 L 193.239 177.906 L 193.435 179.822 L 193.434 181.770 L 193.433 183.722 L 193.432 185.678 L 193.432 187.638 L 193.432 189.602 L 193.433 191.570 L 193.434 193.542 L 193.435 195.518 L 193.239 197.476 L 192.653 199.369 L 191.700 201.124 L 190.417 202.674 L 188.853 203.959 L 187.068 204.930 L 185.131 205.549 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 183.115 205.792 L 181.100 205.650 L 179.161 205.128 L 177.374 204.247 L 175.807 203.040 L 174.521 201.554 L 173.564 199.846 L 172.975 197.981 L 172.774 196.033 L 172.772 194.056 L 172.771 192.083 L 172.770 190.115 L 172.770 188.151 L 172.770 186.191 L 172.771 184.235 L 172.772 182.283 L 172.774 180.336 L 172.975 178.411 L 173.564 176.550 L 174.521 174.825 L 175.807 173.302 L 177.374 172.039 L 179.161 171.085 L 181.100 170.477 L 183.115 170.237 L 183.115 170.237 L 183.115 170.237 L 183.115 170.237 L 183.115 170.237 L 183.115 170.237 L 183.115 170.237 L 183.115 170.237 Z"/></clipPath><clipPath id="r0-entity-eye-1-highlight-clip"><path d="M 233.424 170.053 L 235.450 170.278 L 237.397 170.872 L 239.192 171.813 L 240.764 173.064 L 242.054 174.578 L 243.012 176.296 L 243.601 178.152 L 243.798 180.076 L 243.796 182.024 L 243.795 183.975 L 243.794 185.931 L 243.794 187.891 L 243.794 189.855 L 243.795 191.824 L 243.796 193.796 L 243.798 195.773 L 243.601 197.723 L 243.012 199.592 L 242.054 201.307 L 240.764 202.802 L 239.192 204.021 L 237.397 204.915 L 235.450 205.451 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 233.424 205.608 L 231.398 205.379 L 229.449 204.775 L 227.653 203.817 L 226.078 202.544 L 224.785 201.003 L 223.823 199.255 L 223.230 197.367 L 223.029 195.410 L 223.027 193.434 L 223.026 191.462 L 223.025 189.494 L 223.025 187.530 L 223.025 185.570 L 223.026 183.614 L 223.027 181.662 L 223.029 179.714 L 223.230 177.796 L 223.823 175.959 L 224.785 174.274 L 226.078 172.806 L 227.653 171.609 L 229.449 170.732 L 231.398 170.207 L 233.424 170.053 L 233.424 170.053 L 233.424 170.053 L 233.424 170.053 L 233.424 170.053 L 233.424 170.053 L 233.424 170.053 L 233.424 170.053 Z"/></clipPath></defs><g filter="url(#r0-entity-outline)"><g data-avatar-entity-part="ear-left" mask="url(#r0-entity-occlusion-0)" pointer-events="none"><g transform="translate(-57.605395823373435 -67.60372130819275)"><defs><clipPath id="r0-entity-bear-0"><path d="M 179.41 207.25 L 179.41 202.80 L 179.80 198.35 L 179.83 198.14 L 180.59 193.73 L 181.73 189.43 L 183.23 185.28 L 185.06 181.35 L 187.20 177.67 L 189.63 174.30 L 192.32 171.28 L 195.23 168.64 L 195.39 168.53 L 198.46 166.33 L 201.68 164.58 L 205.00 163.30 L 205.16 163.25 L 208.49 162.47 L 208.65 162.45 L 208.85 162.43 L 212.03 162.17 L 212.15 162.17 L 212.30 162.16 L 212.47 162.17 L 212.67 162.17 L 212.88 162.18 L 213.10 162.19 L 213.35 162.21 L 213.60 162.23 L 213.87 162.25 L 214.15 162.28 L 214.44 162.31 L 214.73 162.34 L 215.02 162.37 L 215.32 162.41 L 215.61 162.45 L 215.90 162.49 L 216.18 162.53 L 216.46 162.57 L 216.73 162.62 L 216.98 162.66 L 217.22 162.71 L 217.45 162.75 L 217.65 162.79 L 218.01 162.87 L 218.15 162.91 L 218.28 162.95 L 221.28 163.97 L 221.47 164.04 L 221.62 164.11 L 224.64 165.68 L 224.79 165.76 L 227.67 167.82 L 230.34 170.30 L 230.45 170.43 L 232.87 173.33 L 235.01 176.59 L 236.83 180.17 L 238.32 184.03 L 239.45 188.11 L 240.21 192.37 L 240.59 196.75 L 240.59 201.20 L 240.20 205.65 L 240.17 205.86 L 239.41 210.27 L 238.27 214.57 L 236.77 218.72 L 234.94 222.65 L 232.80 226.33 L 230.37 229.70 L 227.68 232.72 L 224.77 235.36 L 224.61 235.47 L 221.54 237.67 L 218.32 239.42 L 215.00 240.70 L 214.84 240.75 L 211.51 241.53 L 211.35 241.55 L 211.15 241.57 L 207.97 241.83 L 207.85 241.83 L 207.70 241.84 L 207.53 241.83 L 207.33 241.83 L 207.12 241.82 L 206.90 241.81 L 206.65 241.79 L 206.40 241.77 L 206.13 241.75 L 205.85 241.72 L 205.56 241.69 L 205.27 241.66 L 204.98 241.63 L 204.68 241.59 L 204.39 241.55 L 204.10 241.51 L 203.82 241.47 L 203.54 241.43 L 203.27 241.38 L 203.02 241.34 L 202.78 241.29 L 202.55 241.25 L 202.35 241.21 L 202.16 241.17 L 201.99 241.13 L 201.85 241.09 L 201.72 241.05 L 198.72 240.03 L 198.53 239.96 L 198.38 239.89 L 195.36 238.32 L 195.21 238.24 L 192.33 236.18 L 189.66 233.70 L 189.55 233.57 L 187.13 230.67 L 184.99 227.41 L 183.17 223.83 L 181.68 219.97 L 180.55 215.89 L 179.79 211.63 Z"/></clipPath></defs><g clip-path="url(#r0-entity-bear-0)"><path d="M 179.41 207.25 L 179.41 202.80 L 179.80 198.35 L 179.83 198.14 L 180.59 193.73 L 181.73 189.43 L 183.23 185.28 L 185.06 181.35 L 187.20 177.67 L 189.63 174.30 L 192.32 171.28 L 195.23 168.64 L 195.39 168.53 L 198.46 166.33 L 201.68 164.58 L 205.00 163.30 L 205.16 163.25 L 208.49 162.47 L 208.65 162.45 L 208.85 162.43 L 212.03 162.17 L 212.15 162.17 L 212.30 162.16 L 212.47 162.17 L 212.67 162.17 L 212.88 162.18 L 213.10 162.19 L 213.35 162.21 L 213.60 162.23 L 213.87 162.25 L 214.15 162.28 L 214.44 162.31 L 214.73 162.34 L 215.02 162.37 L 215.32 162.41 L 215.61 162.45 L 215.90 162.49 L 216.18 162.53 L 216.46 162.57 L 216.73 162.62 L 216.98 162.66 L 217.22 162.71 L 217.45 162.75 L 217.65 162.79 L 217.84 162.83 L 218.01 162.87 L 218.15 162.91 L 218.28 162.95 L 221.28 163.97 L 221.47 164.04 L 221.62 164.11 L 224.64 165.68 L 224.79 165.76 L 227.67 167.82 L 230.34 170.30 L 230.45 170.43 L 232.87 173.33 L 235.01 176.59 L 236.83 180.17 L 238.32 184.03 L 239.45 188.11 L 240.21 192.37 L 240.59 196.75 L 240.59 201.20 L 240.20 205.65 L 240.17 205.86 L 239.41 210.27 L 238.27 214.57 L 236.77 218.72 L 234.94 222.65 L 232.80 226.33 L 230.37 229.70 L 227.68 232.72 L 224.77 235.36 L 224.61 235.47 L 221.54 237.67 L 218.32 239.42 L 215.00 240.70 L 214.84 240.75 L 211.51 241.53 L 211.35 241.55 L 211.15 241.57 L 207.97 241.83 L 207.85 241.83 L 207.70 241.84 L 207.53 241.83 L 207.33 241.83 L 207.12 241.82 L 206.90 241.81 L 206.65 241.79 L 206.40 241.77 L 206.13 241.75 L 205.85 241.72 L 205.56 241.69 L 205.27 241.66 L 204.98 241.63 L 204.68 241.59 L 204.39 241.55 L 204.10 241.51 L 203.82 241.47 L 203.54 241.43 L 203.27 241.38 L 203.02 241.34 L 202.78 241.29 L 202.55 241.25 L 202.35 241.21 L 202.16 241.17 L 201.99 241.13 L 201.85 241.09 L 201.72 241.05 L 198.72 240.03 L 198.53 239.96 L 198.38 239.89 L 195.36 238.32 L 195.21 238.24 L 192.33 236.18 L 189.66 233.70 L 189.55 233.57 L 187.13 230.67 L 184.99 227.41 L 183.17 223.83 L 181.68 219.97 L 180.55 215.89 L 179.79 211.63 Z" fill="#ffffff"/></g><g clip-path="url(#r0-entity-bear-0)"/></g></g><g data-avatar-entity-part="ear-right" mask="url(#r0-entity-occlusion-1)" pointer-events="none"><g transform="translate(58.41093446917991 -65.71297403528997)"><defs><clipPath id="r0-entity-bear-1"><path d="M 180.89 200.81 L 180.93 196.51 L 181.34 192.27 L 182.11 188.16 L 183.23 184.23 L 184.68 180.51 L 186.46 177.07 L 186.56 176.88 L 188.62 173.77 L 190.95 171.02 L 193.51 168.66 L 193.67 168.53 L 196.41 166.62 L 196.60 166.52 L 199.45 165.08 L 199.62 165.01 L 199.84 164.94 L 202.62 164.04 L 202.76 164.00 L 202.91 163.96 L 203.08 163.92 L 203.28 163.88 L 203.49 163.83 L 203.71 163.79 L 203.95 163.75 L 204.20 163.71 L 204.46 163.67 L 204.73 163.63 L 205.01 163.60 L 205.29 163.56 L 205.57 163.53 L 205.85 163.50 L 206.13 163.48 L 206.40 163.45 L 206.67 163.43 L 206.93 163.41 L 207.17 163.40 L 207.41 163.39 L 207.63 163.38 L 207.84 163.38 L 208.02 163.38 L 208.19 163.38 L 208.34 163.39 L 208.47 163.40 L 211.45 163.67 L 211.66 163.70 L 211.82 163.74 L 214.97 164.52 L 215.14 164.59 L 218.28 165.86 L 221.31 167.59 L 221.47 167.71 L 224.38 169.89 L 227.12 172.48 L 229.64 175.43 L 231.92 178.73 L 233.92 182.31 L 235.62 186.14 L 236.99 190.17 L 237.07 190.41 L 238.11 194.59 L 238.79 198.87 L 239.11 203.19 L 239.07 207.49 L 238.66 211.73 L 237.89 215.84 L 236.77 219.77 L 235.32 223.49 L 233.54 226.93 L 233.44 227.12 L 231.38 230.23 L 229.05 232.98 L 226.49 235.34 L 226.33 235.47 L 223.59 237.38 L 223.40 237.48 L 220.55 238.92 L 220.38 238.99 L 220.16 239.06 L 217.38 239.96 L 217.24 240.00 L 217.09 240.04 L 216.92 240.08 L 216.72 240.12 L 216.51 240.17 L 216.29 240.21 L 216.05 240.25 L 215.80 240.29 L 215.54 240.33 L 215.27 240.37 L 214.99 240.40 L 214.71 240.44 L 214.43 240.47 L 214.15 240.50 L 213.87 240.52 L 213.60 240.55 L 213.33 240.57 L 213.07 240.59 L 212.83 240.60 L 212.59 240.61 L 212.37 240.62 L 212.16 240.62 L 211.98 240.62 L 211.81 240.62 L 211.66 240.61 L 211.53 240.60 L 208.55 240.33 L 208.34 240.30 L 208.18 240.26 L 205.03 239.48 L 204.86 239.41 L 201.72 238.14 L 198.69 236.41 L 198.53 236.29 L 195.62 234.11 L 192.88 231.52 L 190.36 228.57 L 188.08 225.27 L 186.08 221.69 L 184.38 217.86 L 183.01 213.83 L 182.93 213.59 L 181.89 209.41 L 181.21 205.13 Z"/></clipPath></defs><g clip-path="url(#r0-entity-bear-1)"><path d="M 180.89 200.81 L 180.93 196.51 L 181.34 192.27 L 182.11 188.16 L 183.23 184.23 L 184.68 180.51 L 186.46 177.07 L 186.56 176.88 L 188.62 173.77 L 190.95 171.02 L 193.51 168.66 L 193.67 168.53 L 196.41 166.62 L 196.60 166.52 L 199.45 165.08 L 199.62 165.01 L 199.84 164.94 L 202.62 164.04 L 202.76 164.00 L 202.91 163.96 L 203.08 163.92 L 203.28 163.88 L 203.49 163.83 L 203.71 163.79 L 203.95 163.75 L 204.20 163.71 L 204.46 163.67 L 204.73 163.63 L 205.01 163.60 L 205.29 163.56 L 205.57 163.53 L 205.85 163.50 L 206.13 163.48 L 206.40 163.45 L 206.67 163.43 L 206.93 163.41 L 207.17 163.40 L 207.41 163.39 L 207.63 163.38 L 208.74 163.38 L 208.02 163.38 L 208.19 163.38 L 208.34 163.39 L 208.47 163.40 L 211.45 163.67 L 211.66 163.70 L 211.82 163.74 L 214.97 164.52 L 215.14 164.59 L 218.28 165.86 L 221.31 167.59 L 221.47 167.71 L 224.38 169.89 L 227.12 172.48 L 229.64 175.43 L 231.92 178.73 L 233.92 182.31 L 235.62 186.14 L 236.99 190.17 L 237.07 190.41 L 238.11 194.59 L 238.79 198.87 L 239.11 203.19 L 239.07 207.49 L 238.66 211.73 L 237.89 215.84 L 236.77 219.77 L 235.32 223.49 L 233.54 226.93 L 233.44 227.12 L 231.38 230.23 L 229.05 232.98 L 226.49 235.34 L 226.33 235.47 L 223.59 237.38 L 223.40 237.48 L 220.55 238.92 L 220.38 238.99 L 220.16 239.06 L 217.38 239.96 L 217.24 240.00 L 217.09 240.04 L 216.92 240.08 L 216.72 240.12 L 216.51 240.17 L 216.29 240.21 L 216.05 240.25 L 215.80 240.29 L 215.54 240.33 L 215.27 240.37 L 214.99 240.40 L 214.71 240.44 L 214.43 240.47 L 214.15 240.50 L 213.87 240.52 L 213.60 240.55 L 213.33 240.57 L 213.07 240.59 L 212.83 240.60 L 212.59 240.61 L 212.37 240.62 L 212.16 240.62 L 211.98 240.62 L 211.81 240.62 L 211.66 240.61 L 211.53 240.60 L 208.55 240.33 L 208.34 240.30 L 208.18 240.26 L 205.03 239.48 L 204.86 239.41 L 201.72 238.14 L 198.69 236.41 L 198.53 236.29 L 195.62 234.11 L 192.88 231.52 L 190.36 228.57 L 188.08 225.27 L 186.08 221.69 L 184.38 217.86 L 183.01 213.83 L 182.93 213.59 L 181.89 209.41 L 181.21 205.13 Z" fill="#ffffff"/></g></g></g><g data-avatar-entity-part="primary" pointer-events="none"><g transform="translate(0 19.700127436160937)"><defs><clipPath id="r0-entity-bear-2"><path d="M 106.87 233.92 L 107.38 221.28 L 110.11 199.60 L 113.68 177.93 L 116.71 165.35 L 117.23 163.79 L 120.65 153.54 L 124.59 144.75 L 129.07 137.10 L 134.11 130.43 L 134.95 129.34 L 140.49 123.65 L 146.63 118.84 L 147.68 118.02 L 154.34 114.15 L 155.58 113.50 L 162.78 110.56 L 164.12 110.05 L 165.71 109.58 L 173.25 107.68 L 174.80 107.33 L 176.56 107.01 L 178.55 106.73 L 180.78 106.48 L 187.62 105.78 L 189.52 105.61 L 191.62 105.47 L 193.95 105.35 L 196.57 105.25 L 199.57 105.18 L 203.19 105.13 L 209.40 105.09 L 215.62 105.08 L 219.25 105.11 L 222.26 105.16 L 224.90 105.23 L 227.26 105.34 L 229.40 105.47 L 231.33 105.62 L 237.86 106.27 L 240.14 106.51 L 242.20 106.77 L 244.04 107.08 L 245.67 107.42 L 253.00 109.26 L 254.70 109.72 L 256.16 110.22 L 263.21 113.10 L 264.61 113.75 L 271.15 117.57 L 272.39 118.38 L 278.44 123.15 L 279.47 124.15 L 285.02 129.88 L 290.00 136.51 L 294.44 144.13 L 295.27 145.58 L 299.21 154.40 L 302.64 164.67 L 305.65 177.23 L 306.23 179.95 L 309.80 201.63 L 312.54 223.33 L 313.05 235.95 L 313.13 238.74 L 312.38 249.05 L 310.46 257.92 L 309.89 259.48 L 306.84 267.16 L 302.67 273.84 L 301.63 275.04 L 296.36 280.73 L 289.94 285.53 L 288.61 286.44 L 281.11 290.29 L 279.51 291.02 L 270.94 293.91 L 269.21 294.49 L 267.14 295.01 L 264.73 295.48 L 255.78 297.22 L 253.47 297.58 L 250.87 297.90 L 247.96 298.18 L 244.74 298.43 L 236.75 298.93 L 234.00 299.10 L 230.93 299.23 L 227.50 299.34 L 223.57 299.43 L 218.82 299.49 L 210.67 299.53 L 210.67 299.53 L 202.53 299.55 L 197.77 299.52 L 193.82 299.47 L 190.36 299.38 L 187.27 299.27 L 184.47 299.12 L 176.86 298.68 L 173.57 298.46 L 170.60 298.19 L 167.92 297.89 L 165.53 297.55 L 163.42 297.17 L 154.31 295.42 L 152.11 294.91 L 150.24 294.35 L 141.84 291.52 L 140.07 290.81 L 132.70 287.01 L 131.14 286.12 L 124.81 281.36 L 123.55 280.25 L 118.29 274.52 L 114.16 267.87 L 113.23 266.36 L 110.20 258.65 L 109.61 255.98 L 107.70 247.06 L 106.95 236.71 Z"/></clipPath></defs><g clip-path="url(#r0-entity-bear-2)"><path d="M 106.87 233.92 L 107.38 221.28 L 110.11 199.60 L 113.68 177.93 L 116.71 165.35 L 117.23 163.79 L 120.65 153.54 L 124.59 144.75 L 129.07 137.10 L 134.11 130.43 L 134.95 129.34 L 140.49 123.65 L 146.63 118.84 L 147.68 118.02 L 154.34 114.15 L 155.58 113.50 L 162.78 110.56 L 164.12 110.05 L 165.71 109.58 L 173.25 107.68 L 174.80 107.33 L 176.56 107.01 L 178.55 106.73 L 180.78 106.48 L 187.62 105.78 L 189.52 105.61 L 191.62 105.47 L 193.95 105.35 L 196.57 105.25 L 199.57 105.18 L 203.19 105.13 L 209.40 105.09 L 215.62 105.08 L 219.25 105.11 L 222.26 105.16 L 224.90 105.23 L 227.26 105.34 L 229.40 105.47 L 231.33 105.62 L 237.86 106.27 L 240.14 106.51 L 242.20 106.77 L 244.04 107.08 L 245.67 107.42 L 253.00 109.26 L 254.70 109.72 L 256.16 110.22 L 263.21 113.10 L 264.61 113.75 L 271.15 117.57 L 272.39 118.38 L 278.44 123.15 L 279.47 124.15 L 285.02 129.88 L 290.00 136.51 L 294.44 144.13 L 295.27 145.58 L 299.21 154.40 L 302.64 164.67 L 305.65 177.23 L 306.23 179.95 L 309.80 201.63 L 312.54 223.33 L 313.05 235.95 L 313.13 238.74 L 312.38 249.05 L 310.46 257.92 L 309.89 259.48 L 306.84 267.16 L 302.67 273.84 L 301.63 275.04 L 296.36 280.73 L 289.94 285.53 L 288.61 286.44 L 281.11 290.29 L 279.51 291.02 L 270.94 293.91 L 269.21 294.49 L 267.14 295.01 L 264.73 295.48 L 255.78 297.22 L 253.47 297.58 L 250.87 297.90 L 247.96 298.18 L 244.74 298.43 L 236.75 298.93 L 234.00 299.10 L 230.93 299.23 L 227.50 299.34 L 223.57 299.43 L 218.82 299.49 L 210.67 299.53 L 210.67 299.53 L 202.53 299.55 L 197.77 299.52 L 193.82 299.47 L 190.36 299.38 L 187.27 299.27 L 184.47 299.12 L 176.86 298.68 L 173.57 298.46 L 170.60 298.19 L 167.92 297.89 L 165.53 297.55 L 163.42 297.17 L 154.31 295.42 L 152.11 294.91 L 150.24 294.35 L 141.84 291.52 L 140.07 290.81 L 132.70 287.01 L 131.14 286.12 L 124.81 281.36 L 123.55 280.25 L 118.29 274.52 L 114.16 267.87 L 113.23 266.36 L 110.20 258.65 L 109.61 255.98 L 107.70 247.06 L 106.95 236.71 Z" fill="#ffffff"/></g><g clip-path="url(#r0-entity-bear-2)"/></g></g></g><g class="bear-face-features" transform="translate(0 19.7001)"><g class="bear-blinking-eyes" style="transform-origin: 210px 188px;"><rect x="170" y="167" width="26" height="42" rx="13" fill="#000000"/><rect x="224" y="167" width="26" height="42" rx="13" fill="#000000"/></g></g></g></g></g></g></g></svg>
+    </div>
+
+    <!-- Status & Caption Area -->
+    <div class="tr-caption" id="trCaption">
+      <span class="tr-caption-text" id="trCaptionText">Say something...</span>
+    </div>
+    <div class="tr-state-label" id="trStateLabel">Connecting…</div>
+  </div>
+
+  <!-- Bottom Floating Controls -->
+  <div class="tr-dock-container">
+    <div id="trDockLabel" class="tr-dock-label" style="display:none;">Muted</div>
+    <div class="tr-dock" style="padding:0;">
+      <button type="button" class="tr-btn-circle" id="trCloseBtn" title="Close TeachRoom">
+        <svg viewBox="0 0 24 24" style="width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <button type="button" class="tr-btn-circle" id="trMicBtn" title="Toggle Microphone">
+        <svg id="trMicIcon" viewBox="0 0 24 24" style="width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;">
+          <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="tr-toast" id="trToast"></div>
+
+<script>
+(function() {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const FAST_MODEL = 'claude-3-5-haiku-20241022';
+
+  // ── Session State ────────────────────────────────────────────────────────
+  let sessionData = {};
+  try {
+    sessionData = JSON.parse(localStorage.getItem('NOURA_TS_LIVE') || localStorage.getItem('NOURA_TS_DRAFT') || '{}');
+  } catch(e) { sessionData = {}; }
+
+  const topic = sessionData.topic || 'General Overview';
+  const level = (sessionData.level || 'intermediate').toLowerCase();
+
+  const STUDENTS = {
+    beginner: {
+      name: 'Alex',
+      opening: "Hey! Ready whenever you are. What are we starting with today?",
+      prompt: () => window.BEGINNER_SYSTEM_PROMPT
+    },
+    intermediate: {
+      name: 'Taylor',
+      opening: "Hey! I'm ready. Where should we kick off?",
+      prompt: () => window.INTERMEDIATE_SYSTEM_PROMPT
+    },
+    advanced: {
+      name: 'Sam',
+      opening: "Hey, ready when you are! What's our first main topic today?",
+      prompt: () => window.ADVANCED_SYSTEM_PROMPT
+    }
+  };
+  const currentStudent = STUDENTS[level] || STUDENTS.intermediate;
+  // ── Pre-fetch Opening TTS Audio for Instant Playback ─────────────────────
+  let prefetchedOpeningAudio = null;
+  const openingText = currentStudent.opening;
+  fetch('/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: openingText, model: 'chatterbox-multilingual-tts' })
+  }).then(r => r.ok ? r.arrayBuffer() : null).then(buf => {
+    if (buf) prefetchedOpeningAudio = buf;
+  }).catch(e => console.warn('[Prefetch] Opening TTS error:', e));
+
+
+  // ── State Variables ──────────────────────────────────────────────────────
+  // state: 'connecting' | 'listening' | 'user_speaking' | 'processing_turn' | 'ai_speaking'
+  let state = 'connecting';
+  let micMuted = false;
+  let turnBusy = false;
+  let turns = [];
+  let currentAudio = null;
+  let currentSource = null;
+  let audioCtx = null;
+  let audioUnlocked = false;
+  let recognition = null;
+  let speechSilenceTimer = null;
+  let lastFinalTranscript = '';
+  let pendingSpeechText = '';
+  let typingTimer = null;
+  let lastTurnTime = 0;
+
+  // ── Toast ────────────────────────────────────────────────────────────────
+  function toast(msg) {
+    const t = $('trToast');
+    t.textContent = msg;
+    t.classList.add('on');
+    setTimeout(() => t.classList.remove('on'), 3500);
+  }
+
+  // ── setState ─────────────────────────────────────────────────────────────
+  function setState(s) {
+    state = s;
+    const avatar = $('avatarContainer');
+    const capTxt = $('trCaptionText');
+    const respBox = $('trResponseBox');
+
+    avatar.className = 'avatar-wrapper ' + (
+      s === 'ai_speaking' ? 'avatar-speaking' :
+      s === 'user_speaking' ? 'avatar-listening' :
+      s === 'processing_turn' ? 'avatar-thinking' : 'avatar-idle'
+    );
+
+    if (s === 'listening') {
+      capTxt.textContent = 'Say something...';
+      capTxt.classList.add('tr-text-shimmer');
+      capTxt.style.color = '';
+      respBox.style.display = 'none';
+    } else if (s === 'user_speaking') {
+      capTxt.classList.remove('tr-text-shimmer');
+      capTxt.style.color = '#ffffff';
+      respBox.style.display = 'none';
+    } else if (s === 'processing_turn') {
+      capTxt.textContent = 'Thinking…';
+      capTxt.classList.add('tr-text-shimmer');
+      capTxt.style.color = '';
+      respBox.style.display = 'none';
+    } else if (s === 'ai_speaking') {
+      capTxt.classList.remove('tr-text-shimmer');
+      capTxt.style.color = '';
+      respBox.style.display = 'block';
+    }
+  }
+
+  // ── Timer ────────────────────────────────────────────────────────────────
+  let elapsedSec = 0;
+  setInterval(() => {
+    elapsedSec++;
+    const m = Math.floor(elapsedSec / 60);
+    const s = elapsedSec % 60;
+    $('trElapsed').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+
+  // ── Chat API ─────────────────────────────────────────────────────────────
+  async function chat(data) {
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error('Chat API returned ' + r.status);
+    const res = await r.json();
+    return res.content?.[0]?.text || '';
+  }
+
+  // ── Audio Unlock ─────────────────────────────────────────────────────────
+  function unlockAudio() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!audioCtx && AudioCtx) {
+        audioCtx = new AudioCtx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      if (!audioUnlocked) {
+        audioUnlocked = true;
+        const dummy = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+        dummy.play().then(() => dummy.pause()).catch(() => {});
+      }
+    } catch(e) {
+      console.warn('[AudioUnlock] error:', e);
+    }
+  }
+
+  ['click', 'touchstart', 'mousedown', 'pointerdown', 'keydown'].forEach(evt => {
+    window.addEventListener(evt, unlockAudio, { passive: true });
+  });
+
+  // ── Stop AI Speech ───────────────────────────────────────────────────────
+  function stopAiSpeech() {
+    if (currentSource) {
+      try { currentSource.stop(); } catch(e){}
+      currentSource = null;
+    }
+    if (currentAudio) {
+      try { currentAudio.pause(); currentAudio.currentTime = 0; } catch(e){}
+      currentAudio = null;
+    }
+    if (typingTimer) {
+      clearInterval(typingTimer);
+      typingTimer = null;
+    }
+  }
+
+  // ── TTS Speak ─────────────────────────────────────────────────────────────
+  // Speaks text via Chatterbox TTS. Calls onStart() when audio begins playing.
+  // If TTS fails or is slow, onStart() fires after 900ms as a fallback.
+  async function speak(text, onStart) {
+    unlockAudio();
+    stopAiSpeech();
+
+    if (!text) {
+      if (typeof onStart === 'function') onStart();
+      return;
+    }
+
+    let started = false;
+    function triggerStart() {
+      if (!started) {
+        started = true;
+        if (typeof onStart === 'function') onStart();
+      }
+    }
+
+    // Fallback: start typewriter even if audio takes too long
+    const fallbackId = setTimeout(triggerStart, 900);
+
+    try {
+      let arrayBuf = null;
+      if (text === currentStudent.opening && prefetchedOpeningAudio) {
+        arrayBuf = prefetchedOpeningAudio;
+        prefetchedOpeningAudio = null; // Use once
+        console.log('[TTS] Using pre-fetched opening audio buffer instantly!');
+      } else {
+        console.log('[TTS] Requesting synthesis for:', text.slice(0, 60) + (text.length > 60 ? '...' : ''));
+        const r = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text, model: 'chatterbox-multilingual-tts' })
+        });
+        if (r.ok) arrayBuf = await r.arrayBuffer();
+      }
+
+      if (arrayBuf) {
+
+        // Prefer Web Audio API (no autoplay block, precise timing)
+        unlockAudio();
+        if (audioCtx) {
+          try {
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuf.slice(0));
+            const source = audioCtx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(audioCtx.destination);
+            currentSource = source;
+            clearTimeout(fallbackId);
+            triggerStart();
+            source.start(0);
+            await new Promise(resolve => {
+              source.onended = () => { currentSource = null; resolve(); };
+            });
+            return;
+          } catch(err) {
+            console.warn('[AudioContext] decode failed, trying HTML5 Audio:', err);
+          }
+        }
+
+        // HTML5 Audio fallback
+        const blob = new Blob([arrayBuf], { type: 'audio/wav' });
+        const url = URL.createObjectURL(blob);
+        currentAudio = new Audio(url);
+        clearTimeout(fallbackId);
+        triggerStart();
+        await new Promise(resolve => {
+          currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+          currentAudio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+          currentAudio.play().catch(() => { URL.revokeObjectURL(url); currentAudio = null; resolve(); });
+        });
+      } else {
+        console.warn('[TTS] HTTP error:', r.status);
+        clearTimeout(fallbackId);
+        triggerStart();
+      }
+    } catch(e) {
+      console.warn('[TTS] Network/parse error:', e.message);
+      clearTimeout(fallbackId);
+      triggerStart();
+    }
+  }
+
+  // ── Speak + Typewriter ────────────────────────────────────────────────────
+  // Plays TTS audio while animating text character by character.
+  // Text is always fully shown when done (no partial cut-offs).
+  async function speakAndType(text) {
+    if (!text) return;
+
+    // Switch status to AI speaking
+    setState('ai_speaking');
+
+    const respTxt = $('trResponseText');
+    respTxt.textContent = '';
+
+    const charDelay = Math.max(20, Math.min(45, Math.floor(2800 / Math.max(text.length, 1))));
+    let charIdx = 0;
+    let typewriterRunning = false;
+
+    function startTypewriter() {
+      if (typewriterRunning) return;
+      typewriterRunning = true;
+      setState('ai_speaking');
+      if (typingTimer) clearInterval(typingTimer);
+      typingTimer = setInterval(() => {
+        if (state !== 'ai_speaking') {
+          clearInterval(typingTimer);
+          typingTimer = null;
+          return;
+        }
+        charIdx++;
+        respTxt.textContent = text.slice(0, charIdx);
+        if (charIdx >= text.length) {
+          clearInterval(typingTimer);
+          typingTimer = null;
+        }
+      }, charDelay);
+    }
+
+    await speak(text, startTypewriter);
+
+    // Ensure typewriter started (covers all edge cases)
+    startTypewriter();
+
+    // Wait for typing to finish if it's still running
+    if (typingTimer) {
+      await new Promise(resolve => {
+        const check = setInterval(() => {
+          if (!typingTimer) { clearInterval(check); resolve(); }
+        }, 100);
+      });
+    }
+
+    // Always ensure full text is visible when done
+    respTxt.textContent = text;
+  }
+
+  // ── Parse AI Reply ────────────────────────────────────────────────────────
+  function parseAiReply(raw) {
+    if (!raw) return '';
+    let text = raw.trim();
+
+    // 1. Extract "message": "..." via robust regex
+    const m = text.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)"/i);
+    if (m && m[1]) return m[1].replace(/\\"/g, '"').replace(/\\n/g, ' ').trim();
+
+    // 2. Truncated mid-quote
+    const tm = text.match(/"message"\s*:\s*"([^"\n]*)/i);
+    if (tm && tm[1]) return tm[1].replace(/\\"/g, '"').trim();
+
+    // 3. Strip code blocks
+    if (text.startsWith('```')) {
+      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    }
+
+    // 4. JSON parse fallback
+    if (text.includes('{') && text.includes('}')) {
+      try {
+        const a = text.indexOf('{'), b = text.lastIndexOf('}');
+        const parsed = JSON.parse(text.slice(a, b + 1));
+        if (parsed && parsed.message) return parsed.message;
+      } catch(e) {}
+    }
+
+    // 5. Strip JSON wrapper tokens
+    return text.replace(/^\{\s*"message"\s*:\s*"/i, '').replace(/",?\s*"move"[\s\S]*$/, '').replace(/"\s*\}\s*$/, '').trim();
+  }
+
+  // ── Handle Human Turn ─────────────────────────────────────────────────────
+    // ── Speaker Echo Detection ───────────────────────────────────────────────
+  function isSpeakerEcho(text) {
+    if (!text) return false;
+    const lastTurn = turns[turns.length - 1];
+    if (lastTurn && lastTurn.role === 'assistant' && lastTurn.content) {
+      const aiWords = lastTurn.content.toLowerCase().split(/\s+/);
+      const userWords = text.toLowerCase().split(/\s+/);
+      let matches = 0;
+      for (const w of userWords) {
+        if (w.length > 3 && aiWords.includes(w)) matches++;
+      }
+      if (matches >= 2) return true;
+    }
+    return false;
+  }
+
+async function handleHumanTurn(text) {
+    // Prevent duplicate calls
+    if (turnBusy) return;
+    if (!text || !text.trim()) return;
+
+    // Rate-limiting: enforce gap between turns
+    const now = Date.now();
+    const timeSinceLast = now - lastTurnTime;
+    if (timeSinceLast < 1200) {
+      await new Promise(r => setTimeout(r, 1200 - timeSinceLast));
+    }
+
+    // Double check not busy after delay
+    if (turnBusy) return;
+    turnBusy = true;
+    lastTurnTime = Date.now();
+
+    // Stop recognition while processing
+    try { if (recognition) recognition.stop(); } catch(e){}
+
+    turns.push({ role: 'user', content: text.trim() });
+    setState('processing_turn');
+
+    try {
+      const basePrompt = (typeof currentStudent.prompt === 'function' ? currentStudent.prompt() : '') || window.BEGINNER_SYSTEM_PROMPT || '';
+      const voiceRules = `\n\nREAL-TIME VOICE ROOM RULES:\n- Topic: ${topic}\n- Your Name (AI Student): ${currentStudent.name}\n- Role: You are the student (${currentStudent.name}) learning from the human Teacher.\n- Address the human as "Teacher" or by their topic. Never call the teacher Jordan.\n- Speak completely naturally, casually, and conversationally.\n- CRITICAL OUTPUT FORMAT: Return ONLY a JSON object: {"message": "your response here"}. No other fields.\n- Keep response under 20 words as 1 short natural spoken sentence.`;
+      const sysPrompt = basePrompt + voiceRules;
+      const messages = turns.slice(-8).map(t => ({ role: t.role === 'user' ? 'user' : 'assistant', content: t.content }));
+
+      const rawReply = await chat({
+        model: FAST_MODEL,
+        max_tokens: 160,
+        system: sysPrompt,
+        messages: messages
+      });
+
+      const aiReply = parseAiReply(rawReply);
+      console.log('[TeachRoom] AI reply:', aiReply);
+
+      if (aiReply) {
+        turns.push({ role: 'assistant', content: aiReply });
+        await speakAndType(aiReply);
+      }
+
+    } catch(err) {
+      console.error('[TeachRoom] Error:', err);
+      toast('Student had trouble responding — try again!');
+    } finally {
+      turnBusy = false;
+      lastFinalTranscript = '';
+      pendingSpeechText = '';
+      setState('listening');
+      // Safely restart recognition for next teacher turn
+      if (!micMuted) {
+        setTimeout(safeStartRecognition, 300);
+      }
+    }
+  }
+
+  // ── Speech Recognition ────────────────────────────────────────────────────
+  function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast('Speech recognition not supported — please use Chrome.');
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = event => {
+      // Only capture speech when not muted or in LLM thinking phase
+      if (micMuted || state === 'processing_turn') return;
+      // If AI is busy but NOT in ai_speaking state (e.g. initial setup), ignore
+      if (turnBusy && state !== 'ai_speaking') return;
+
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const trans = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          lastFinalTranscript += ' ' + trans;
+        } else {
+          interim += trans;
+        }
+      }
+
+      const fullText = (lastFinalTranscript + ' ' + interim).trim();
+      if (!fullText) return;
+
+      // If AI is speaking and teacher speaks a clear phrase (>6 chars), allow barge-in interruption
+      if (state === 'ai_speaking') {
+        if (fullText.length >= 7 && !isSpeakerEcho(fullText)) {
+          console.log('[TeachRoom] Teacher interrupted AI with:', fullText);
+          stopAiSpeech();
+          turnBusy = false;
+          setState('user_speaking');
+        } else {
+          return; // Ignore echo / ambient noise during AI speech
+        }
+      } else if (state === 'listening') {
+        setState('user_speaking');
+      }
+
+      // Show live transcript
+      $('trCaptionText').textContent = fullText;
+      pendingSpeechText = fullText;
+
+      // Reset silence timer: commit speech after 750ms of silence
+      clearTimeout(speechSilenceTimer);
+      speechSilenceTimer = setTimeout(() => {
+        const committedText = pendingSpeechText;
+        lastFinalTranscript = '';
+        pendingSpeechText = '';
+        if (committedText && committedText.trim().length >= 2 && !turnBusy && state !== 'processing_turn') {
+          handleHumanTurn(committedText);
+        }
+      }, 750);
+    };
+
+    recognition.onerror = event => {
+      if (event.error === 'not-allowed') {
+        toast('Microphone blocked — check browser permissions.');
+        return;
+      }
+      if (event.error === 'no-speech' || event.error === 'aborted') {
+        // Normal — just restart
+        return;
+      }
+      console.warn('[STT] error:', event.error);
+    };
+
+    recognition.onend = () => {
+      // Auto-restart recognition unless muted or busy
+      if (!document.hidden && !micMuted && state !== 'processing_turn') {
+        setTimeout(safeStartRecognition, 200);
+      }
+    };
+  }
+
+  function safeStartRecognition() {
+    if (micMuted || !recognition) return;
+    if (state === 'processing_turn') return;
+    try {
+      recognition.start();
+    } catch(e) {
+      // Already running — abort and retry
+      if (e.name === 'InvalidStateError') {
+        try { recognition.abort(); } catch(e2){}
+        setTimeout(() => {
+          if (!micMuted && state !== 'processing_turn') {
+            try { recognition.start(); } catch(e3){}
+          }
+        }, 300);
+      }
+    }
+  }
+
+  // ── Tab Visibility Recovery ───────────────────────────────────────────────
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      unlockAudio();
+      if (state === 'listening' || state === 'user_speaking') {
+        safeStartRecognition();
+      }
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    if (!document.hidden && (state === 'listening' || state === 'user_speaking')) {
+      unlockAudio();
+      safeStartRecognition();
+    }
+  });
+
+  // ── Watchdog: restart recognition every 4s if it stopped ─────────────────
+  setInterval(() => {
+    if (!document.hidden && !micMuted && !turnBusy && (state === 'listening' || state === 'connecting')) {
+      safeStartRecognition();
+    }
+  }, 4000);
+
+  // ── Mute Button ───────────────────────────────────────────────────────────
+  $('trMicBtn').addEventListener('click', () => {
+    micMuted = !micMuted;
+    const dockLbl = $('trDockLabel');
+    if (micMuted) {
+      clearTimeout(speechSilenceTimer);
+      try { if (recognition) recognition.stop(); } catch(e){}
+      $('trMicIcon').innerHTML = `
+        <line x1="2" y1="2" x2="22" y2="22"/>
+        <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/>
+        <path d="M5 10v2a7 7 0 0 0 12.23 4.86"/>
+        <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/>
+        <path d="M9 9v3a3 3 0 0 0 4.29 2.71"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+      `;
+      dockLbl.textContent = 'Muted';
+      dockLbl.style.display = 'block';
+      toast('Microphone muted');
+    } else {
+      $('trMicIcon').innerHTML = `
+        <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+      `;
+      dockLbl.style.display = 'none';
+      toast('Microphone on');
+      if (state !== 'ai_speaking' && state !== 'processing_turn') {
+        safeStartRecognition();
+      }
+    }
+  });
+
+  // ── Close Button ──────────────────────────────────────────────────────────
+  $('trCloseBtn').addEventListener('click', () => {
+    if (confirm('End TeachRoom session?')) {
+      stopAiSpeech();
+      clearTimeout(speechSilenceTimer);
+      try { if (recognition) recognition.stop(); } catch(e){}
+      window.location.href = 'teachstudio.html';
+    }
+  });
+
+  // ── Init TeachRoom ────────────────────────────────────────────────────────
+  async function initTeachRoom() {
+    initSpeechRecognition();
+
+    // Play AI student opening
+    const openingText = currentStudent.opening;
+    turns.push({ role: 'assistant', content: openingText });
+
+    await speakAndType(openingText);
+
+    // Small pause after opening, then start listening
+    await new Promise(r => setTimeout(r, 800));
+    setState('listening');
+    safeStartRecognition();
+  }
+
+  // Fire after DOM is ready
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initTeachRoom);
+  } else {
+    initTeachRoom();
+  }
+
+})();
+</script>
+</body>
+</html>
