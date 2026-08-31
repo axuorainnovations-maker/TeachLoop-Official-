@@ -16,11 +16,10 @@
       --accent: #8b5cf6;
     }
 
-    html { background:
-        radial-gradient(1100px 620px at 50% -10%, rgba(139, 92, 246, 0.35), transparent 60%),
-        radial-gradient(900px 600px at 90% 110%, rgba(124, 58, 237, 0.28), transparent 60%),
-        linear-gradient(180deg, #0c0a13 0%, #131020 45%, #0b0a12 100%);
+    html {
+      background: radial-gradient(ellipse 85% 65% at 50% 115%, rgba(168, 85, 247, 0.42) 0%, rgba(124, 58, 237, 0.24) 40%, rgba(109, 40, 217, 0.08) 68%, transparent 92%), #141416;
       background-attachment: fixed;
+      min-height: 100%;
     }
 
     html, body { min-height: 100%; }
@@ -29,7 +28,8 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
-      background: transparent;
+      background: radial-gradient(ellipse 85% 65% at 50% 115%, rgba(168, 85, 247, 0.42) 0%, rgba(124, 58, 237, 0.24) 40%, rgba(109, 40, 217, 0.08) 68%, transparent 92%), #141416;
+      background-attachment: fixed;
     }
 
     body.light-mode {
@@ -39,20 +39,44 @@
       --card-border: rgba(20, 18, 30, 0.10);
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 22px 26px 0;
+    /* Completely hide topbar, streak badge & credits pill in dashboard */
+    .topbar, .streak-wrap, .nc-pill-wrap, .nc-pill { display: none !important; }
+
+    .wrap { max-width: 1140px; margin: 0 auto; padding: 24px 32px 60px; }
+
+    .dash-header { text-align: left; margin-bottom: 24px; margin-top: 4px; }
+    .greet { font-size: 28px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.15; color: #ffffff; }
+    .dash-sub { font-size: 14px; color: #a1a1aa; font-weight: 500; margin-top: 4px; }
+
+    /* Arrow navigation & dots */
+    .stack-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
     }
-
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.3px; }
-    .brand img { width: 30px; height: 30px; }
-
-    /* Learning-streak badge — top-right, mirrors the one in the chat header. */
-    .streak-wrap { position: fixed; top: 18px; right: 22px; z-index: 50; }
+    .stack-arrow-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: transparent; border: none;
+      color: rgba(255, 255, 255, 0.7); display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.15s ease; user-select: none; outline: none; padding: 0;
+    }
+    .stack-arrow-btn:hover {
+      color: #ffffff; background: rgba(255, 255, 255, 0.08);
+      transform: scale(1.08);
+    }
+    .stack-arrow-btn:active {
+      transform: scale(0.95);
+    }
+    .stack-dots-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .stack-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.2s ease; cursor: pointer;
+    }
+    .stack-dot.active {
+      width: 18px; border-radius: 99px; background: #8b5cf6;
+    }
     /* Credit pill and streak badge share a flex row; see mountPill(group). */
     .streak-badge {
       display: flex; align-items: center; gap: 6px;
@@ -146,26 +170,148 @@
       60% { transform: scale(0.96) rotate(2deg); }
     }
 
-    .wrap { max-width: 900px; margin: 0 auto; padding: 30px 26px 60px; }
 
-    .dash-header { text-align: center; margin-bottom: 10px; }
-    .greet { font-size: clamp(36px, 5.4vw, 56px); font-weight: 800; letter-spacing: -1.4px; line-height: 1.04; }
-    .dash-sub { font-size: 16px; color: var(--muted); font-weight: 600; margin-top: 10px; }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 26px;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; gap: 28px; }
     }
 
-    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+    .dash-left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Start Learning / Stacked Lesson Card Styling */
+    .start-learning-wrap { width: 100%; }
+    .start-learning-head {
+      font-size: 20px; font-weight: 700; color: #ffffff;
+      margin-bottom: 16px; letter-spacing: -0.2px;
+    }
+    .stack-container { position: relative; width: 100%; }
+    .stack-back-layer-2 {
+      position: absolute; top: 16px; left: -8px; right: -8px; bottom: -16px;
+      background: #1C1C1C; border: 1.5px solid #2E2E2E; border-radius: 24px; pointer-events: none;
+    }
+    .stack-back-layer-1 {
+      position: absolute; top: 8px; left: -4px; right: -4px; bottom: -8px;
+      background: #1C1C1C; border: 1.5px solid #2E2E2E; border-radius: 24px; pointer-events: none;
+    }
+    .stack-main-card {
+      position: relative; background: #181818; border: 1.5px solid #2E2E2E;
+      border-radius: 24px; overflow: hidden;
+    }
+    .stack-top { padding: 36px 28px 20px; text-align: center; }
+    .stack-title {
+      font-size: 26px; font-weight: 700; color: #ffffff;
+      line-height: 1.18; letter-spacing: -0.5px; word-break: break-word;
+    }
+    .stack-level {
+      font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      color: #7C4DFF; margin-top: 10px; text-transform: uppercase;
+    }
+    .stack-illust {
+      position: relative; height: 180px; width: 260px; margin: 36px auto 12px;
+    }
+    .illust-yellow {
+      position: absolute; left: 34px; top: 0px; width: 138px; height: 56px;
+      background: #FFD54F; border-radius: 12px; border-bottom: 6px solid #C9A227;
+      padding: 12px; box-sizing: border-box;
+    }
+    .illust-yellow-bar1 { width: 58px; height: 5px; background: rgba(139,107,31,0.7); border-radius: 99px; }
+    .illust-yellow-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .illust-yellow-bar2 { width: 26px; height: 5px; background: rgba(139,107,31,0.7); border-radius: 99px; }
+    .illust-yellow-txt { font-size: 12px; font-weight: 700; color: rgba(139,107,31,0.7); line-height: 1; }
+
+    .illust-purple {
+      position: absolute; left: 20px; top: 62px; width: 124px; height: 52px;
+      background: #8B6BFF; border-radius: 12px; border-bottom: 6px solid #6D4BD6;
+      transform: rotate(-14deg); display: flex; align-items: center; padding: 0 12px; box-sizing: border-box; z-index: 10;
+    }
+    .illust-purple-bar1 { width: 26px; height: 5px; background: rgba(255,255,255,0.9); border-radius: 99px; }
+    .illust-purple-bar2 { width: 38px; height: 5px; background: rgba(255,255,255,0.9); border-radius: 99px; margin-left: 12px; }
+
+    .illust-hand {
+      position: absolute; right: -14px; top: -8px; width: 28px; height: 28px;
+      background: #ffffff; border-radius: 8px; border-bottom-left-radius: 2px;
+      border: 2px solid #181818; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.2); transform: rotate(12deg);
+    }
+    .illust-hand-inner { width: 12px; height: 12px; background: #fff; position: relative; }
+    .hand-f1 { position: absolute; top: 0; left: 2px; width: 3px; height: 8px; background: #181818; border-radius: 99px; }
+    .hand-f2 { position: absolute; top: 0; left: 6px; width: 3px; height: 10px; background: #181818; border-radius: 99px; }
+    .hand-f3 { position: absolute; top: 2px; left: 10px; width: 3px; height: 6px; background: #181818; border-radius: 99px; }
+
+    .illust-bottom-row { position: absolute; left: 24px; top: 122px; display: flex; gap: 10px; }
+    .illust-play-btn {
+      width: 46px; height: 46px; background: #2A2A2A; border-radius: 12px;
+      border-bottom: 4px solid #1A1A1A; display: flex; align-items: center; justify-content: center;
+    }
+    .illust-light-purple {
+      width: 94px; height: 46px; background: #C4B5FD; border-radius: 12px;
+      border-bottom: 4px solid #9F8ACD; display: flex; align-items: center; justify-content: center;
+      padding: 0 12px; box-sizing: border-box;
+    }
+    .illust-light-purple-bar { width: 100%; height: 8px; background: rgba(139,107,255,0.8); border-radius: 99px; }
+
+    .stack-bottom-grad {
+      background: linear-gradient(180deg, rgba(24,24,24,0) 0%, #2D1F6B 20%, #4A2FB8 55%, #5E3DCF 100%);
+      padding: 28px 24px 24px;
+    }
+    .stack-status-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
+    .stack-status-badge {
+      width: 22px; height: 22px; border-radius: 6px; background: #2ECC71; border: 1px solid #1FAE5A;
+      display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+    }
+    .stack-status-badge-inner {
+      position: absolute; top: 3px; width: 14px; height: 8px; background: #1A7A3A; border-top-left-radius: 8px; border-top-right-radius: 8px;
+    }
+    .stack-status-dots { display: flex; gap: 4px; margin-top: 1px; position: relative; z-index: 10; }
+    .stack-status-dot { width: 4px; height: 4px; background: #ffffff; border-radius: 50%; }
+    .stack-status-txt { font-size: 14px; font-weight: 600; color: #C8BBE8; }
+
+    .stack-topic-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 0 8px; }
+    .stack-topic-left { display: flex; align-items: center; gap: 12px; }
+    .stack-topic-icon {
+      width: 32px; height: 32px; border-radius: 50%; background: #3A3A4A; display: flex; align-items: center; justify-content: center;
+    }
+    .stack-topic-name { font-size: 15px; color: #9A8BBF; font-weight: 500; }
+    .stack-topic-check {
+      width: 22px; height: 22px; border-radius: 50%; background: #8B5CF6; display: flex; align-items: center; justify-content: center;
+    }
+
+    .stack-continue-btn {
+      width: 100%; height: 52px; border-radius: 999px; background: #8B5CF6; color: #ffffff;
+      font-size: 16px; font-weight: 600; border: none; cursor: pointer; box-shadow: 0 4px 0 #6D3AE0;
+      transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; text-decoration: none;
+    }
+    .stack-continue-btn:hover { background: #9A70FF; }
+    .stack-continue-btn:active { box-shadow: 0 2px 0 #6D3AE0; transform: translateY(2px); }
+
+    .stack-nav-row { margin-top: 22px; display: flex; gap: 12px; }
+    .stack-nav-item {
+      position: relative; flex: 1; height: 58px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; background: #1C1C1C; border: 1.5px solid #2E2E2E; transition: all 0.15s ease;
+    }
+    .stack-nav-item:hover { border-color: #444; }
+    .stack-nav-item.active { background: #1F1932; border: 1.5px solid #8B5CF6; }
+    .stack-nav-badge {
+      position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%;
+      background: #8B5CF6; border: 2px solid #0F0F0F; display: flex; align-items: center; justify-content: center;
+    }
 
     .card {
       background: var(--card);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 22px;
+      border-radius: 24px;
+      padding: 26px 28px;
       -webkit-backdrop-filter: blur(14px);
       backdrop-filter: blur(14px);
     }
@@ -180,7 +326,7 @@
       background: conic-gradient(var(--accent) 0 100%);
       transition: background .5s ease; }
     .donut::after { content: ''; position: absolute; inset: 26px; border-radius: 50%;
-      background: #0c0a13; }
+      background: #0f0f12; }
     body.light-mode .donut::after { background: #efeef4; }
     .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
     .donut-total { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
@@ -279,44 +425,132 @@
     </div>
 
     <div class="grid">
-      <!-- Study balance donut -->
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Study balance</div>
-            <div class="card-sub">Time spent per subject</div>
-          </div>
-        </div>
-        <div class="donut-row">
-          <div class="donut" id="donut">
-            <div class="donut-center">
-              <div class="donut-total" id="donutTotal">0h</div>
-              <div class="donut-label">studied</div>
+      <!-- Left Column: Study balance + Activity + CTA -->
+      <div class="dash-left-col">
+        <h2 class="start-learning-head">Your progress</h2>
+        <!-- Study balance donut -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Study balance</div>
+              <div class="card-sub">Time spent per subject</div>
             </div>
           </div>
-          <div class="legend" id="legend"></div>
+          <div class="donut-row">
+            <div class="donut" id="donut">
+              <div class="donut-center">
+                <div class="donut-total" id="donutTotal">0h</div>
+                <div class="donut-label">studied</div>
+              </div>
+            </div>
+            <div class="legend" id="legend"></div>
+          </div>
+        </div>
+
+        <!-- Weekly activity -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Activity</div>
+              <div class="card-sub">This week</div>
+            </div>
+          </div>
+          <div class="act-top">
+            <div>
+              <div class="act-total" id="actTotal">0h</div>
+              <div class="act-note"><span class="up">▲</span> Keep your streak going</div>
+            </div>
+            <div class="bars" id="bars"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Weekly activity -->
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Activity</div>
-            <div class="card-sub">This week</div>
+      <!-- Right Column: Start learning stacked lesson card -->
+      <div class="start-learning-wrap">
+        <div class="stack-header-row">
+          <h2 class="start-learning-head" style="margin-bottom:0;">Start learning</h2>
+          
+          <!-- Arrows & Dots navigation -->
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="stack-dots-row" id="stackDotsRow"></div>
+            <div style="display:flex; gap:6px;">
+              <button class="stack-arrow-btn" id="stackPrevBtn" title="Previous lesson" type="button" aria-label="Previous lesson">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="stack-arrow-btn" id="stackNextBtn" title="Next lesson" type="button" aria-label="Next lesson">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
           </div>
         </div>
-        <div class="act-top">
-          <div>
-            <div class="act-total" id="actTotal">0h</div>
-            <div class="act-note"><span class="up">▲</span> Keep your streak going</div>
+
+        <div class="stack-container">
+          <div class="stack-back-layer-2"></div>
+          <div class="stack-back-layer-1"></div>
+
+          <div class="stack-main-card" id="stackMainCard">
+            <div class="stack-top">
+              <h3 class="stack-title" id="stackCardTitle">Thinking in Code</h3>
+              <div class="stack-level" id="stackCardLevel">LEVEL 1</div>
+
+              <div class="stack-illust" id="stackIllust">
+                <div class="illust-yellow" id="illustYellow">
+                  <div class="illust-yellow-bar1"></div>
+                  <div class="illust-yellow-row">
+                    <div class="illust-yellow-bar2"></div>
+                    <span class="illust-yellow-txt">V</span>
+                  </div>
+                </div>
+
+                <div class="illust-purple" id="illustPurple">
+                  <div class="illust-purple-bar1"></div>
+                  <div class="illust-purple-bar2"></div>
+                  <div class="illust-hand">
+                    <div class="illust-hand-inner">
+                      <div class="hand-f1"></div>
+                      <div class="hand-f2"></div>
+                      <div class="hand-f3"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="illust-bottom-row">
+                  <div class="illust-play-btn">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 2.5L11 7L3 11.5V2.5Z" fill="white" /></svg>
+                  </div>
+                  <div class="illust-light-purple" id="illustLightPurple">
+                    <div class="illust-light-purple-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Purple Gradient Bottom (KEEP THE PURPLE GLOW) -->
+            <div class="stack-bottom-grad">
+              <div class="stack-topic-row">
+                <div class="stack-topic-left">
+                  <div class="stack-topic-icon">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M2.5 7L5.5 10L11.5 4" stroke="#8A8AB0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <span class="stack-topic-name" id="stackTopicSub">Interactive Lessons & Quizzes</span>
+                </div>
+                <div class="stack-topic-check">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <a class="stack-continue-btn" id="stackContinueBtn" href="lesson.html" target="_top">
+                Continue lesson
+              </a>
+            </div>
           </div>
-          <div class="bars" id="bars"></div>
         </div>
       </div>
     </div>
-
-    <a class="cta" href="chatbot.html" id="startBtn">Start teaching →</a>
   </div>
 
   <script>
@@ -340,6 +574,20 @@
           }
         });
       }
+
+      // Ensure clicking any lesson links in dashboard opens full page
+      document.addEventListener('click', function(e) {
+        var a = e.target.closest('a[href*="lesson.html"]');
+        if (a) {
+          e.preventDefault();
+          var href = a.getAttribute('href') || a.href;
+          if (window.parent && window.parent !== window) {
+            window.parent.location.href = href;
+          } else {
+            window.location.href = href;
+          }
+        }
+      });
     })();
 
     (function () {
@@ -615,16 +863,156 @@
           '<div class="bar" style="height:' + pct + '%; animation-delay:' + (i * 70) + 'ms"></div>' +
           '<div class="bar-day">' + x.letter + '</div></div>';
       }).join('');
-    })();
-  </script>
-  <script>
-    // Credit balance sits to the left of the streak badge, top right.
-    (function () {
-      function go() {
-        if (window.NouraCredits) window.NouraCredits.mountPill('.streak-wrap', { group: true, gap: '12px' });
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
-      else go();
+
+      // ---- Start learning card: Arrow nav, trackpad swipe & dynamic subject mockup ----
+      (function () {
+        function getLessons() {
+          try {
+            var rec = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]');
+            if (Array.isArray(rec) && rec.length) {
+              return rec.map(function(item) {
+                if (typeof item === 'string') return { title: item, subject: 'General' };
+                return { title: item.title || item.subject || 'Lesson', subject: item.subject || 'General' };
+              });
+            }
+          } catch (e) {}
+          try {
+            var subs = JSON.parse(localStorage.getItem('TEACHLOOP_SUBJECTS') || '[]');
+            if (Array.isArray(subs) && subs.length) {
+              return subs.map(function(s) { return { title: s, subject: s }; });
+            }
+          } catch (e) {}
+          return [
+            { title: 'Cell Biology & Division', subject: 'Biology' },
+            { title: 'Consumer Behavior & Utility in Microeconomics', subject: 'Microeconomics' },
+            { title: 'Exploring Venn Diagrams', subject: 'Maths' },
+            { title: 'Marketing Strategies', subject: 'Marketing' }
+          ];
+        }
+
+        var lessons = getLessons();
+        var activeIdx = 0;
+
+        var titleEl = document.getElementById('stackCardTitle');
+        var levelEl = document.getElementById('stackCardLevel');
+        var btnEl = document.getElementById('stackContinueBtn');
+        var topicSubEl = document.getElementById('stackTopicSub');
+        var dotsRow = document.getElementById('stackDotsRow');
+        var prevBtn = document.getElementById('stackPrevBtn');
+        var nextBtn = document.getElementById('stackNextBtn');
+        var mainCard = document.getElementById('stackMainCard');
+
+        var yellowBlock = document.getElementById('illustYellow');
+        var purpleBlock = document.getElementById('illustPurple');
+        var lightPurpleBlock = document.getElementById('illustLightPurple');
+
+        // Theme palette per subject
+        var themes = {
+          'biology': { yBg: '#4ADE80', yBdr: '#16A34A', pBg: '#059669', pBdr: '#047857', lpBg: '#6EE7B7', lpBdr: '#059669' },
+          'cell biology': { yBg: '#38BDF8', yBdr: '#0284C7', pBg: '#2563EB', pBdr: '#1D4ED8', lpBg: '#7DD3FC', lpBdr: '#0284C7' },
+          'maths': { yBg: '#FBBF24', yBdr: '#D97706', pBg: '#D97706', pBdr: '#B45309', lpBg: '#FDE047', lpBdr: '#CA8A04' },
+          'history': { yBg: '#F97316', yBdr: '#C2410C', pBg: '#B45309', pBdr: '#78350F', lpBg: '#FDBA74', lpBdr: '#EA580C' },
+          'business': { yBg: '#A855F7', yBdr: '#7E22CE', pBg: '#6D28D9', pBdr: '#4C1D95', lpBg: '#C084FC', lpBdr: '#7E22CE' },
+          'microeconomics': { yBg: '#EC4899', yBdr: '#BE185D', pBg: '#9333EA', pBdr: '#6B21A8', lpBg: '#F472B6', lpBdr: '#9333EA' },
+          'marketing': { yBg: '#FB7185', yBdr: '#E11D48', pBg: '#E11D48', pBdr: '#9F1239', lpBg: '#FDA4AF', lpBdr: '#E11D48' },
+          'default': { yBg: '#FFD54F', yBdr: '#C9A227', pBg: '#8B6BFF', pBdr: '#6D4BD6', lpBg: '#C4B5FD', lpBdr: '#9F8ACD' }
+        };
+
+        function updateCard(idx) {
+          if (idx < 0) idx = lessons.length - 1;
+          if (idx >= lessons.length) idx = 0;
+          activeIdx = idx;
+
+          var item = lessons[idx] || lessons[0];
+          var subKey = (item.subject || '').toLowerCase().trim();
+          var t = themes[subKey] || themes['default'];
+
+          if (titleEl) titleEl.textContent = item.title;
+          if (levelEl) levelEl.textContent = (item.subject ? item.subject : 'LESSON 1').toUpperCase();
+          if (topicSubEl) topicSubEl.textContent = item.subject ? (item.subject + ' • Interactive Lessons') : 'Interactive Lessons & Quizzes';
+          if (btnEl) btnEl.href = 'lesson.html?title=' + encodeURIComponent(item.title) + (item.subject ? ('&subject=' + encodeURIComponent(item.subject)) : '') + '&resume=1';
+
+          // Apply subject 3D mockup colors
+          if (yellowBlock) {
+            yellowBlock.style.background = t.yBg;
+            yellowBlock.style.borderBottomColor = t.yBdr;
+          }
+          if (purpleBlock) {
+            purpleBlock.style.background = t.pBg;
+            purpleBlock.style.borderBottomColor = t.pBdr;
+          }
+          if (lightPurpleBlock) {
+            lightPurpleBlock.style.background = t.lpBg;
+            lightPurpleBlock.style.borderBottomColor = t.lpBdr;
+          }
+
+          renderDots();
+        }
+
+        function renderDots() {
+          if (!dotsRow) return;
+          var list = lessons.slice(0, 6);
+          dotsRow.innerHTML = list.map(function(l, i) {
+            var isActive = i === activeIdx;
+            return '<div class="stack-dot ' + (isActive ? 'active' : '') + '" data-idx="' + i + '" title="' + (l.title || '').replace(/"/g, '&quot;') + '"></div>';
+          }).join('');
+
+          dotsRow.querySelectorAll('.stack-dot').forEach(function(el) {
+            el.addEventListener('click', function() {
+              var i = parseInt(el.getAttribute('data-idx'), 10);
+              if (!isNaN(i)) updateCard(i);
+            });
+          });
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            updateCard(activeIdx - 1);
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            updateCard(activeIdx + 1);
+          });
+        }
+
+        // Mousepad / Trackpad horizontal swipe gesture & touch swipe
+        if (mainCard) {
+          var swipeLock = false;
+          mainCard.addEventListener('wheel', function(e) {
+            if (Math.abs(e.deltaX) > 20) {
+              e.preventDefault();
+              if (swipeLock) return;
+              swipeLock = true;
+              if (e.deltaX > 0) {
+                updateCard(activeIdx + 1);
+              } else {
+                updateCard(activeIdx - 1);
+              }
+              setTimeout(function() { swipeLock = false; }, 320);
+            }
+          }, { passive: false });
+
+          var touchStartX = 0;
+          mainCard.addEventListener('touchstart', function(e) {
+            if (e.touches && e.touches[0]) touchStartX = e.touches[0].clientX;
+          }, { passive: true });
+          mainCard.addEventListener('touchend', function(e) {
+            if (e.changedTouches && e.changedTouches[0]) {
+              var diff = touchStartX - e.changedTouches[0].clientX;
+              if (Math.abs(diff) > 35) {
+                if (diff > 0) {
+                  updateCard(activeIdx + 1);
+                } else {
+                  updateCard(activeIdx - 1);
+                }
+              }
+            }
+          }, { passive: true });
+        }
+
+        updateCard(0);
+      })();
     })();
   </script>
 </body>

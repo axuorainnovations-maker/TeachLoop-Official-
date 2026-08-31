@@ -616,97 +616,116 @@
   .rc-restart:hover { background:#1c1c20; color:#fff; }
 
   /* ── Audio Recap (audio-style recap) ── */
-  .studycast { display:none; max-width:780px; margin:0 auto; padding:48px 28px 40px; }/* ── Audio Recap player (podcast-style) ────────────────────── */
-  /* The recap title already appears inside the player card { display:none; }
-  #castView { padding-top:20px; }
-  #castView .pc-card { margin-top:12px; }
-
+  .studycast { display:none; max-width:780px; margin:0 auto; padding:24px 28px 40px; }
+  .studycast svg, .pc-wrap svg, .pc-card svg, .pc-bar svg {
+    width: 16px; height: 16px; min-width: 16px; min-height: 16px; max-width: 16px; max-height: 16px; flex-shrink: 0;
+  }
   .flow-btn-top {
-    height:36px;
-    padding:0 18px;
-    background:#8b5cf6;
-    border:1px solid #8b5cf6;
-    border-radius:10px;
-    color:#ffffff;
-    font-family:inherit;
-    font-size:13.5px;
-    font-weight:600;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 0 0 1px #8b5cf6, 0 4px 16px rgba(139,92,246,0.35);
-    transition:all .2s ease;
+    height: 44px;
+    padding: 0 24px;
+    border: 2px solid #a78bfa;
+    border-bottom: 4px solid #4c1d95;
+    border-radius: 12px;
+    background: #7c3aed;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important;
+    transition: all 0.1s ease;
+    transform-origin: bottom;
+    user-select: none;
   }
   .flow-btn-top:hover {
-    background:#7c3aed;
-    border-color:#7c3aed;
+    background: #8b5cf6;
+    border-color: #c4b5fd;
+    color: #ffffff;
   }
-  .pc-wrap { max-width:760px; margin:0 auto; padding-bottom:120px; }
-  .pc-card { margin-top:14px; border:1px solid #252525; background:#171717; border-radius:20px; padding:20px; }
+  .flow-btn-top:active {
+    border-bottom-width: 2px;
+    transform: translateY(3px) scaleY(0.98);
+  }
+  .pc-wrap { max-width:760px; margin:0 auto; padding-bottom:40px; }
+  .pc-card { margin-top:14px; border:1px solid #27272a; background:#18181b; border-radius:20px; padding:20px; box-shadow:0 12px 32px rgba(0,0,0,0.45); }
   .pc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
   .pc-title { font-size:17px; font-weight:600; line-height:22px; letter-spacing:-.2px; color:#fff; }
-  .pc-time { margin-top:4px; font-size:14px; line-height:20px; color:#8A8A8A; font-variant-numeric:tabular-nums; }
+  .pc-time { margin-top:4px; font-size:14px; line-height:20px; color:#a1a1aa; font-variant-numeric:tabular-nums; }
   .pc-seek { position:relative; margin-top:18px; height:16px; cursor:pointer; touch-action:manipulation; }
   .pc-seek-bg { position:absolute; top:50%; height:4px; width:100%; transform:translateY(-50%); border-radius:99px; background:#2A2A2A; }
-  .pc-seek-fill { position:absolute; top:50%; height:4px; transform:translateY(-50%); border-radius:99px; background:#fff; width:0%; }
-  .pc-knob { position:absolute; top:50%; height:12px; width:12px; transform:translateY(-50%); border-radius:50%; background:#fff; box-shadow:0 0 0 3px #171717; left:-6px; }
+  .pc-seek-fill { position:absolute; top:50%; height:4px; transform:translateY(-50%); border-radius:99px; background:#a855f7; width:0%; }
+  .pc-knob { position:absolute; top:50%; height:12px; width:12px; transform:translateY(-50%); border-radius:50%; background:#fff; box-shadow:0 0 0 3px #18181b; left:-6px; }
   .pc-ctrls { margin-top:20px; height:48px; display:flex; align-items:center; justify-content:space-between; }
   .pc-left { display:flex; align-items:center; gap:16px; }
-  .pc-play { height:48px; width:48px; border:none; border-radius:50%;
-    background:linear-gradient(140deg,#a78bfa 0%,#8b5cf6 45%,#7c3aed 100%); color:#fff;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    box-shadow:0 6px 18px rgba(124,58,237,0.34); transition:transform .15s, filter .15s; }
-  .pc-play:hover { filter:brightness(1.08); }
-  .pc-play:active { transform:scale(.97); }
-  .pc-play[disabled] { opacity:.55; pointer-events:none; }
-  .pc-play svg { width:14px; height:14px; fill:currentColor; }
+  .pc-play {
+    height: 52px; width: 52px;
+    border: 2px solid #a78bfa;
+    border-bottom: 4px solid #4c1d95;
+    border-radius: 50%;
+    background: #7c3aed; color: #fff;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: none !important; transition: all 0.1s ease; transform-origin: bottom; user-select: none;
+  }
+  .pc-play:hover { background: #8b5cf6; border-color: #c4b5fd; color: #ffffff; }
+  .pc-play:active { border-bottom-width: 2px; transform: translateY(2px); }
+  .pc-play[disabled] { opacity: .55; pointer-events: none; }
+  .pc-play svg { width: 16px; height: 16px; fill: currentColor; stroke: none; }
   .pc-right { display:flex; align-items:center; gap:18px; }
-  .pc-speed { display:inline-flex; height:40px; align-items:center; gap:5px; padding:0 14px; border-radius:99px;
-    background:#1E1E1E; border:1px solid #252525; color:#8A8A8A; cursor:pointer;
-    font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:14px; font-weight:600; letter-spacing:-.1px;
-    transition:color .15s, border-color .15s; }
-  .pc-speed:hover { color:#E0E0E0; border-color:#2F2F2F; }
+  .pc-speed { display:inline-flex; height:38px; align-items:center; gap:6px; padding:0 14px; border-radius:99px;
+    background:#27272a; border:1px solid rgba(255,255,255,0.12); color:#e4e4e7; cursor:pointer;
+    font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:13.5px; font-weight:600; letter-spacing:-.1px;
+    transition:all .15s ease; }
+  .pc-speed:hover { color:#ffffff; border-color:rgba(255,255,255,0.25); background:#3f3f46; }
   .pc-speed svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
-  .pc-pill { margin-top:14px; display:inline-flex; height:28px; align-items:center; gap:6px; border-radius:99px; border:1px solid #252525; background:#1E1E1E; padding:0 12px; }
-  .pc-pill svg { width:14px; height:14px; fill:none; stroke:#8A8A8A; stroke-width:1.3; stroke-linecap:round; }
-  .pc-pill span { font-size:13px; font-weight:600; line-height:1; letter-spacing:-.1px; color:#E0E0E0; }
-  .pc-bar { margin-top:28px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-  .pc-toggle { display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; }
-  .pc-toggle svg { width:16px; height:16px; fill:none; stroke:#8A8A8A; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
-  .pc-toggle span { font-size:15px; font-weight:600; letter-spacing:-.2px; color:#fff; }
-  .pc-chip { display:inline-flex; height:36px; align-items:center; gap:6px; border-radius:99px; border:1px solid #252525; background:#1E1E1E; padding:0 14px; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:13.5px; font-weight:600; letter-spacing:-.1px; color:#fff; cursor:pointer; }
+  .pc-pill { margin-top:14px; display:inline-flex; height:28px; align-items:center; gap:6px; border-radius:99px; border:1px solid #27272a; background:#18181b; padding:0 12px; }
+  .pc-pill svg { width:14px; height:14px; fill:none; stroke:#a1a1aa; stroke-width:1.3; stroke-linecap:round; }
+  .pc-pill span { font-size:13px; font-weight:600; line-height:1; letter-spacing:-.1px; color:#e4e4e7; }
+  .pc-bar { margin-top:24px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .pc-toggle { display:inline-flex; align-items:center; gap:8px; background:#27272a; border:1px solid rgba(255,255,255,0.12); border-radius:99px; padding:8px 16px; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; color:#e4e4e7; transition:all .15s ease; }
+  .pc-toggle:hover { background:#3f3f46; color:#ffffff; }
+  .pc-toggle svg { width:16px; height:16px; fill:none; stroke:#a1a1aa; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-toggle span { font-size:13.5px; font-weight:600; letter-spacing:-.2px; color:#fff; }
+  .pc-chip { display:inline-flex; height:36px; align-items:center; gap:6px; border-radius:99px; border:1px solid #27272a; background:#27272a; padding:0 14px; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:13.5px; font-weight:600; letter-spacing:-.1px; color:#e4e4e7; cursor:pointer; transition:all .15s ease; }
+  .pc-chip:hover { background:#3f3f46; color:#fff; }
   .pc-chip.on { border-color:rgba(139,92,246,0.55); background:rgba(139,92,246,0.16); color:#e6ddff;
     box-shadow:0 0 0 3px rgba(139,92,246,0.14), 0 0 16px rgba(139,92,246,0.35); }
   .pc-chip.on svg { stroke:#c9b6ef; }
-  .pc-chip svg { width:12px; height:12px; fill:none; stroke:#B0B0B0; stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round; }
-  .pc-tr { margin-top:32px; }
-  .pc-seg { margin-top:36px; padding:0 20px; transition:opacity .25s ease; }
+  .pc-chip svg { width:14px; height:14px; fill:none; stroke:#B0B0B0; stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-tr { margin-top:28px; }
+  .pc-seg { margin-top:24px; padding:16px 20px; border-radius:16px; background:#18181b; border:1px solid rgba(255,255,255,0.06); transition:all .2s ease; }
   .pc-seg:first-child { margin-top:0; }
   .pc-seg-head { display:flex; align-items:center; gap:6px; }
-  /* Same vibrant violet as the loading bar, not the muted lavender. */
-  .pc-seg-name { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
-    color:#a78bfa; opacity:.78; transition:opacity .2s ease; }
-  .pc-seg.past .pc-seg-name { opacity:.9; }
-  .pc-seg.live .pc-seg-name { opacity:1; }
-  .pc-seg-at { font-size:13px; font-weight:500; letter-spacing:-.1px; color:#5A5A5A; font-variant-numeric:tabular-nums; }
-  .pc-seg-text { margin-top:12px; font-size:18px; font-weight:400; line-height:29px; letter-spacing:-.15px; color:#5A5A5A; }
-  .pc-seg.past .pc-seg-text { color:#8A8A8A; }
-  /* The segment currently being spoken lifts into a card, like the reference. */
-  .pc-seg.live { margin-top:32px; padding:18px 20px; border-radius:20px; background:#1E1E1E; }
-  .pc-seg.live .pc-seg-at { color:#6E6E6E; }
-  .pc-seg.live .pc-seg-text { font-size:19px; font-weight:500; line-height:30px; letter-spacing:-.2px; color:#fff; }
-  .pc-ask-wrap { position:fixed; bottom:0; left:86px; right:0; z-index:20; background:#0d0d0f; }
+  .pc-seg-name { font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#a78bfa; }
+  .pc-seg-text { margin-top:8px; font-size:16px; font-weight:400; line-height:26px; color:#d4d4d8; }
+  .pc-seg.live { border-color:rgba(167,139,250,0.4); background:#1c1b22; box-shadow:none; }
+  .pc-seg.live .pc-seg-text { font-weight:500; color:#ffffff; }
+  .pc-seg.speaker-mia .pc-seg-name { color:#e879f9; }    /* Sofia: vibrant pink-purple */
+  .pc-seg.speaker-noura .pc-seg-name { color:#a78bfa; }   /* Alex: soft purple */
+  .pc-ask-wrap {
+    position:fixed;
+    bottom:0;
+    left:86px;
+    right:0;
+    z-index:20;
+    background:linear-gradient(180deg, rgba(20, 20, 22, 0) 0%, rgba(20, 20, 22, 0.88) 35%, #141416 100%);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    padding-top:16px;
+  }
   @media (max-width:720px) { .pc-ask-wrap { left:0; } }
   .pc-ask-inner { max-width:760px; margin:0 auto; padding:8px 20px 18px; }
-  .pc-ask { display:flex; height:56px; align-items:center; justify-content:space-between; border-radius:99px; border:1px solid #2A2A2A; background:#1B1B1B; padding-left:20px; padding-right:6px; transition:border-color .15s; }
-  .pc-ask:focus-within { border-color:#3A3A3A; }
-  .pc-ask input { height:100%; flex:1; min-width:0; background:transparent; border:none; outline:none; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:16px; letter-spacing:-.1px; color:#fff; }
-  .pc-ask input::placeholder { color:#6E6E6E; }
-  .pc-ask-btn { display:inline-flex; height:40px; flex-shrink:0; align-items:center; gap:6px; border:none; border-radius:99px; background:#fff; color:#121212; padding:0 16px; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:14px; font-weight:600; letter-spacing:-.1px; transition:transform .15s; }
+  .pc-ask { display:flex; height:48px; align-items:center; justify-content:space-between; border-radius:99px; border:1px solid rgba(255,255,255,0.12); background:#18181b; padding-left:18px; padding-right:5px; transition:border-color .15s; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .pc-ask:focus-within { border-color:#8b5cf6; }
+  .pc-ask input { height:100%; flex:1; min-width:0; background:transparent; border:none; outline:none; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:14.5px; letter-spacing:-.1px; color:#fff; }
+  .pc-ask input::placeholder { color:#71717a; }
+  .pc-ask-btn { display:inline-flex; height:38px; flex-shrink:0; align-items:center; gap:6px; border:none; border-radius:99px; background:#8b5cf6; color:#ffffff; padding:0 18px; cursor:pointer; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-size:13.5px; font-weight:600; letter-spacing:-.1px; transition:all .15s ease; box-shadow:0 4px 14px rgba(139,92,246,0.35); }
+  .pc-ask-btn:hover { background:#7c3aed; }
   .pc-ask-btn:active { transform:scale(.98); }
   .pc-ask-btn[disabled] { opacity:.5; pointer-events:none; }
-  .pc-ask-btn svg { width:16px; height:16px; fill:none; stroke:#121212; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .pc-ask-btn svg { width:15px; height:15px; fill:none; stroke:#ffffff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   .pc-answer { margin-top:16px; padding:16px 20px; border-radius:16px; background:#1E1E1E; border:1px solid #252525; font-size:15.5px; line-height:1.65; color:#d6d6d4; }
   .pc-note { margin-top:14px; font-size:13.5px; line-height:1.5; color:#f0b3ae; background:rgba(248,81,73,0.07); border:1px solid rgba(248,81,73,0.28); border-radius:11px; padding:11px 13px; }
   .sc-player { background:linear-gradient(150deg, rgba(139,92,246,0.16) 0%, #161618 62%); border:1px solid rgba(139,92,246,0.34); border-radius:18px; padding:20px 22px; }
@@ -751,7 +770,7 @@
   .sc-card.drop.open .sc-drop-body { display:block; }
 
   /* ── Checkpoint Quiz Container ── */
-  .checkpoint { display:none; width:100%; max-width:680px; margin:0 auto; padding:24px 20px 48px; position:relative; min-height:calc(100vh - 120px); flex-direction:column; box-sizing:border-box; }
+  .checkpoint { display:none; width:100%; max-width:820px; margin:0 auto; padding:24px 20px 48px; position:relative; min-height:calc(100vh - 120px); flex-direction:column; box-sizing:border-box; }
   #cpBody { display:flex; flex-direction:column; flex:1; width:100%; justify-content:flex-start; align-items:center; }
 
   /* Summary footer Continue button — matching sleek Check button style */
@@ -1344,7 +1363,7 @@
   .pl-top { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
   .pl-close { width:34px; height:34px; border:none; border-radius:9px; background:transparent; color:#8a8a93; font-size:20px; cursor:pointer; flex-shrink:0; }
   .pl-close:hover { background:#1c1c20; color:#fff; }
-  .pl-label { font-size:14px; color:#d4d4d8; font-weight:600; display:flex; align-items:center; gap:7px; min-width:0; }
+  .pl-label { font-size:14px; color:#d4d4d8; font-weight:600; display:flex; align-items:center; gap:7px; min-width:0; justify-content:flex-start; text-align:left; margin-left:0; }
   .pl-label .star { color:#f0a500; }
   .pl-label .dim { color:#8a8a93; font-weight:500; }
   .pl-score { margin-left:auto; display:flex; align-items:center; gap:7px; font-size:15px; font-weight:700; color:#c9b6ef; }
@@ -1543,8 +1562,8 @@
   .qz-explain.bad, .qz-explain.wrong { color:#f87171 !important; background:rgba(239,68,68,0.12) !important; border:1px solid rgba(239,68,68,0.35) !important; }
   .qz-wrap { max-width:680px; margin:95px auto 0; width:100%; box-sizing:border-box; }
   .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
-  /* Unified 3D PopButton style for Check, Next, and Continue buttons — Sleek & Compact */
-  .qz-check, .cp-submit-btn, .cps-btn-continue, .pl-next {
+  /* Unified 3D PopButton style for Check, Next, Continue, and Practice buttons — Sleek & Compact */
+  .qz-check, .cp-submit-btn, .cps-btn-continue, .pl-next, .flow-btn, .flow-btn-top, .rc-restart {
     padding: 0 26px;
     height: 44px;
     min-width: 110px;
@@ -1565,19 +1584,20 @@
     transform-origin: bottom;
     user-select: none;
     flex: initial;
+    text-decoration: none;
   }
-  .qz-check[disabled], .cp-submit-btn[disabled] {
+  .qz-check[disabled], .cp-submit-btn[disabled], .rc-restart[disabled] {
     opacity: 0.4;
     pointer-events: none;
     box-shadow: none;
     transform: none;
   }
-  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover, .pl-next:hover {
+  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover, .pl-next:hover, .flow-btn:hover, .flow-btn-top:hover, .rc-restart:hover {
     background: #8b5cf6;
     border-color: #c4b5fd;
     color: #ffffff;
   }
-  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active, .pl-next:active {
+  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active, .pl-next:active, .flow-btn:active, .flow-btn-top:active, .rc-restart:active {
     border-bottom-width: 2px;
     transform: translateY(3px) scaleY(0.98);
   }
@@ -1892,7 +1912,10 @@
      kicker and heading are redundant here — keep only the Regenerate action. */
   #castView .br-kicker, #castView .br-title { display:none; }
   #castView .br-head { margin-bottom:0; justify-content:flex-end; }
-</style>
+
+
+
+  </style>
   <script src="noura-credits.js"></script>
 </head>
 <body>
@@ -2022,6 +2045,14 @@
   const slug = title.toLowerCase();
   const DATA_KEY = 'NOURA_LESSON_V2_' + slug;
   const STATE_KEY = 'NOURA_LESSON_STATE_' + slug;
+    // Clear stale cached lesson if it contains legacy 'Core Concept' titles
+    try {
+      const cached = localStorage.getItem(DATA_KEY);
+      if (cached && cached.includes('Core Concept')) {
+        localStorage.removeItem(DATA_KEY);
+        console.log('[Lesson] Purged stale cached lesson containing legacy Core Concept placeholders.');
+      }
+    } catch(e){}
 
   document.title = 'Noura — ' + title;
   document.getElementById('crumbTitle').textContent = title;
@@ -2170,11 +2201,11 @@
   }
   // Tabs unlock in order: each one needs the previous step finished.
   const RAIL = [
-    { key: 'brief',  btn: railBrief,  label: 'Study Brief', needs: null,     open: () => openBrief() },
-    { key: 'learn',  btn: railLearn,  label: 'Learn',       needs: 'brief',  open: () => { if (lesson) renderOverview(); else generate(false); } },
-    { key: 'check',  btn: railCheck,  label: 'Checkpoint',  needs: 'brief',  open: () => openCheck() },
-    { key: 'recall', btn: railRecall, label: 'Recall',      needs: 'check',  open: () => openRecall() },
-    { key: 'cast',   btn: railCast,   label: 'Audio Recap',  needs: 'recall', open: () => openCast() }
+    { key: 'brief',  btn: railBrief,  label: 'Study Brief', needs: null,      open: () => openBrief() },
+    { key: 'learn',  btn: railLearn,  label: 'Learn',       needs: 'brief',   open: () => { if (lesson) renderOverview(); else generate(false); } },
+    { key: 'check',  btn: railCheck,  label: 'Checkpoint',  needs: 'learn',   open: () => openCheck() },
+    { key: 'recall', btn: railRecall, label: 'Recall',      needs: 'check',   open: () => openRecall() },
+    { key: 'cast',   btn: railCast,   label: 'Audio Recap', needs: 'recall',  open: () => openCast() }
   ];
   const LOCK_SVG = '<svg class="rail-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   const RAIL_LABEL = {};
@@ -2183,9 +2214,8 @@
   // A tab unlocks only when every step before it is complete, so a stale flag
   // on one step can't skip the ones ahead of it.
   function railLocked(r) {
-    const i = RAIL.findIndex(x => x.key === r.key);
-    for (let j = 0; j < i; j++) if (!flow[RAIL[j].key]) return true;
-    return false;
+    if (!r.needs) return false;          // Study Brief is always unlocked
+    return !flow[r.needs];               // locked until prerequisite tab is done
   }
   // The first incomplete step before this tab — used for the "finish X first" hint.
   function railBlocker(r) {
@@ -2312,6 +2342,22 @@
       tl.appendChild(row);
     });
 
+    // Append Trophy completion footer row matching official syllabus layout
+    const trophyRow = document.createElement('div');
+    trophyRow.className = 'tl-row locked trophy-row';
+    trophyRow.style.cssText = 'opacity:0.85; margin-top:8px;';
+    trophyRow.innerHTML = `
+      <div class="tl-dot trophy" style="background:#27272a; border-color:#3f3f46; color:#f59e0b; display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9C6 9 3 9 3 6C3 3 6 3 6 3H18C18 3 21 3 21 6C21 9 18 9 18 9"/>
+          <path d="M6 3V10C6 13.3 8.7 16 12 16C15.3 16 18 13.3 18 10V3"/>
+          <path d="M12 16V20"/><path d="M8 21H16"/>
+        </svg>
+      </div>
+      <div class="tl-title" style="color:#a1a1aa; font-weight:600; font-size:14px;">Finish every section to complete the lesson</div>
+    `;
+    tl.appendChild(trophyRow);
+
     // Grow the neon line through every completed step. Runs synchronously so it
     // still fills when the page is opened in a background tab (rAF is throttled there).
     function paintTimelineFill() {
@@ -2376,8 +2422,7 @@
       state.progress[idx] = page;
       saveState();
       if (plLabel) {
-        plLabel.innerHTML = '<span></span><span class="dim">· ' + (page + 1) + ' of ' + item.pages.length + '</span>';
-        plLabel.querySelector('span').textContent = item.title;
+        plLabel.innerHTML = '<span>' + escapeHtml(item.title) + '</span><span class="dim">· ' + (page + 1) + ' of ' + item.pages.length + '</span>';
       }
       if (plBarFill) plBarFill.style.width = Math.round(((page + 1) / item.pages.length) * 100) + '%';
       if (plBody) plBody.innerHTML = '';
@@ -2509,7 +2554,9 @@
 
     function render() {
       const question = item.questions[q];
-      if (plLabel) plLabel.innerHTML = '<span class="star">★</span><span>' + (isReview ? 'Reviewing Checkpoint' : 'Checkpoint') + '</span><span class="dim">· ' + escapeHtml(item.title) + ' · ' + (q + 1) + ' of ' + item.questions.length + '</span>';
+      if (plLabel) {
+        plLabel.innerHTML = '<span class="star">★</span><span>' + (isReview ? 'Reviewing Checkpoint' : 'Checkpoint') + '</span><span class="dim">· ' + escapeHtml(item.title) + ' · Question ' + (q + 1) + ' of ' + item.questions.length + '</span>';
+      }
       if (plBarFill) plBarFill.style.width = Math.round(((q + 1) / item.questions.length) * 100) + '%';
       if (plBody) plBody.innerHTML = '';
       picked = -1; checked = isReview;
@@ -2772,11 +2819,14 @@
       try { const j = await r.json(); if (j && j.error) msg = j.error.message || msg; } catch (e) {}
       throw new Error(msg);
     }
-    // No streaming body available (very old browser) — fall back to one shot.
-    if (!r.body || !r.body.getReader) {
+    // No streaming body available (very old browser) or server returned a flat JSON fallback.
+    const contentType = r.headers.get('content-type') || '';
+    if (!r.body || !r.body.getReader || contentType.includes('application/json')) {
       const data = await r.json();
       if (data.error) throw new Error(data.error.message || 'API error');
-      return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+      const text = data.reply || (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+      if (onText) onText(text.length);
+      return text;
     }
     const reader = r.body.getReader();
     const dec = new TextDecoder();
@@ -2887,7 +2937,8 @@
     const clearFlag = function () { if (view) view.classList.remove('is-loading'); };
     return {
       // Called from the stream as text arrives.
-      report: function (n) { chars = n; },
+      report: function (n) { if (typeof n === 'number' && n > chars) chars = n; },
+      setPercent: function (pct) { const tc = Math.round(expectChars * (pct / 100)); if (tc > chars) chars = tc; },
       done: function () { finishing = true; learnChars(calKey, chars); clearFlag(); },
       stop: function () { halt(); clearFlag(); }
     };
@@ -2897,29 +2948,48 @@
   // A focused pre-study brief for the current lesson topic. Six fixed
   // sections, generated once and cached alongside the lesson.
   function getTopicLordicon(topic, subj) {
-    const t = ((topic || '') + ' ' + (subj || '')).toLowerCase();
-    // Biology / Cell / Membrane / Genetics / Organelles
-    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || t.includes('gene') || t.includes('genetics') || t.includes('protein') || t.includes('eukaryot') || t.includes('prokaryot'))
+    const rawT = (String(topic || '')).toLowerCase();
+    const rawS = (String(subj || '')).toLowerCase();
+    const sClean = rawS === 'general' ? '' : rawS;
+    const t = (rawT + ' ' + sClean).trim();
+
+    // History / WWII / War / D-Day / Military / Holocaust / Revolution / Empire / Ancient / Europe / Battle
+    if (t.includes('history') || t.includes('war') || t.includes('d-day') || t.includes('dday') || t.includes('theater') || t.includes('past') || t.includes('revolution') || t.includes('ancient') || t.includes('empire') || t.includes('holocaust') || t.includes('wwii') || t.includes('ww2') || t.includes('military') || t.includes('invasion') || t.includes('allied') || t.includes('nazi') || t.includes('hitler') || t.includes('battle'))
+      return { json: 'https://cdn.lordicon.com/lupuorrc.json', img: 'https://img.icons8.com/3d-fluency/180/scroll.png' };
+
+    // Biology / Cell / Membrane / Genetics / Organelles / DNA (using word boundaries for gene so General never matches)
+    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || /\bgenetics?\b/.test(t) || /\bgenes?\b/.test(t) || t.includes('protein') || t.includes('eukaryot') || t.includes('prokaryot') || t.includes('virus') || t.includes('bacteri'))
       return { json: 'https://cdn.lordicon.com/mrdiiocb.json', img: 'https://img.icons8.com/3d-fluency/180/microscope.png' };
+
     // Physics / Chemistry / Science / Atom / Molecule
     if (t.includes('physic') || t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('quantum') || t.includes('force') || t.includes('motion') || t.includes('gravity'))
       return { json: 'https://cdn.lordicon.com/kthelypq.json', img: 'https://img.icons8.com/3d-fluency/180/molecule.png' };
+
+    // Mathematics / Algebra / Geometry / Calculus / Numbers / Equation / Venn
+    if (t.includes('math') || t.includes('algeb') || t.includes('geomet') || t.includes('calculus') || t.includes('number') || t.includes('equation') || t.includes('venn') || t.includes('trig'))
+      return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/calculator.png' };
+
     // Computer Science / Coding / Tech
     if (t.includes('computer') || t.includes('code') || t.includes('program') || t.includes('tech') || t.includes('algorithm') || t.includes('python') || t.includes('java') || t.includes('data'))
       return { json: 'https://cdn.lordicon.com/qhgjhxev.json', img: 'https://img.icons8.com/3d-fluency/180/laptop.png' };
+
     // Microeconomics / Macroeconomics / Finance / Market / Money
     if (t.includes('econ') || t.includes('micro') || t.includes('macro') || t.includes('finance') || t.includes('market') || t.includes('money') || t.includes('trade') || t.includes('stock') || t.includes('price'))
       return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/bar-chart.png' };
+
     // Geography / Earth / Planet / Environment
     if (t.includes('geography') || t.includes('earth') || t.includes('planet') || t.includes('map') || t.includes('climate') || t.includes('ocean'))
       return { json: 'https://cdn.lordicon.com/oaflahpk.json', img: 'https://img.icons8.com/3d-fluency/180/globe.png' };
-    // History / Past / Revolution
-    if (t.includes('history') || t.includes('past') || t.includes('war') || t.includes('revolution') || t.includes('ancient') || t.includes('empire'))
-      return { json: 'https://cdn.lordicon.com/lupuorrc.json', img: 'https://img.icons8.com/3d-fluency/180/scroll.png' };
+
     // Psychology / Brain / Mind / Neuroscience / Philosophy
     if (t.includes('psych') || t.includes('brain') || t.includes('mind') || t.includes('thought') || t.includes('philosoph') || t.includes('logic'))
       return { json: 'https://cdn.lordicon.com/gqdnbgzi.json', img: 'https://img.icons8.com/3d-fluency/180/brain.png' };
-    // Default
+
+    // Literature / Writing / Essay / Book / Reading
+    if (t.includes('literat') || t.includes('write') || t.includes('essay') || t.includes('book') || t.includes('read') || t.includes('english') || t.includes('novel'))
+      return { json: 'https://cdn.lordicon.com/lupuorrc.json', img: 'https://img.icons8.com/3d-fluency/180/open-book.png' };
+
+    // Default: Graduation Cap for general topics
     return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/graduation-cap.png' };
   }
 
@@ -2955,12 +3025,10 @@
     goal: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
   };
   function validBrief(b) {
-    return b && typeof b.bigIdea === 'string' && b.bigIdea.trim() &&
-      Array.isArray(b.keyConcepts) && b.keyConcepts.length &&
-      Array.isArray(b.terms) && b.terms.length &&
-      typeof b.example === 'string' && b.example.trim() &&
-      Array.isArray(b.mistakes) && b.mistakes.length &&
-      Array.isArray(b.explainGoals) && b.explainGoals.length;
+    return b && (
+      (typeof b.bigIdea === 'string' && b.bigIdea.trim() && Array.isArray(b.keyConcepts) && b.keyConcepts.length) ||
+      (Array.isArray(b.terms) && b.terms.length)
+    );
   }
   function card(cls, iconKey, label, inner) {
     return '<div class="br-card ' + cls + '"><div class="br-ct">' + ICON[iconKey] + label + '</div>' + inner + '</div>';
@@ -3051,7 +3119,7 @@
     const user = 'Write the StudyBrief for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-haiku-4-5-20251001', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-3-5-haiku-20241022', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
@@ -3223,13 +3291,57 @@
 
   function renderRecallDone() {
     const t = rcTally();
+    const total = recall.length || 1;
+    const pct = Math.round((t.got / total) * 100);
+    const ringR = 42, circ = 2 * Math.PI * ringR;
+    const ringColor = pct >= 80 ? '#419b67' : pct >= 50 ? '#facc15' : '#f97316';
+    
+    let emoji = '🎉', titleText = 'Recall Completed!';
+    if (pct === 100) { emoji = '🏆'; titleText = 'Perfect Recall!'; }
+    else if (pct >= 70) { emoji = '👍'; titleText = 'Great Progress!'; }
+    else { emoji = '💪'; titleText = 'Keep Practising!'; }
+
     rcBody.innerHTML =
-      '<div class="rc-done">' +
-        '<span class="grad-logo"></span>' +
-        '<h2>' + t.got + ' / ' + recall.length + ' locked in</h2>' +
-        '<p>Got it ' + t.got + ' · Almost ' + t.almost + ' · Forgot ' + t.forgot + '</p>' +
-        '<button class="rc-restart" id="rcRestart" type="button">Practise again</button>' +
+      '<div class="cps-wrap">' +
+        '<div class="cps-header">' +
+          '<div class="cps-emoji-badge" style="font-size:42px; margin-bottom:12px;">' + emoji + '</div>' +
+          '<h2 class="cps-title">' + titleText + '</h2>' +
+          '<p class="cps-subtitle">You have completed your active recall practice session for <strong>' + escapeHtml(title) + '</strong>.</p>' +
+        '</div>' +
+
+        '<div class="cps-stats">' +
+          '<div class="cps-stat-box">' +
+            '<div class="cps-stat-label">Locked In</div>' +
+            '<div class="cps-stat-value white">' + t.got + ' / ' + total + '</div>' +
+            '<div class="cps-stat-sub">cards mastered</div>' +
+          '</div>' +
+          '<div class="cps-stat-box cps-stat-center">' +
+            '<div class="cps-stat-label">Accuracy</div>' +
+            '<div class="cps-ring-wrap">' +
+              '<svg width="96" height="96" viewBox="0 0 100 100">' +
+                '<circle cx="50" cy="50" r="' + ringR + '" fill="none" stroke="#2a2a2e" stroke-width="10"/>' +
+                '<circle cx="50" cy="50" r="' + ringR + '" fill="none" stroke="' + ringColor + '" stroke-width="10" stroke-linecap="round"' +
+                  ' stroke-dasharray="' + circ.toFixed(2) + '" stroke-dashoffset="' + (circ * (1 - pct / 100)).toFixed(2) + '"' +
+                  ' transform="rotate(-90 50 50)"/>' +
+              '</svg>' +
+              '<span class="cps-ring-pct">' + pct + '%</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cps-stat-box">' +
+            '<div class="cps-stat-label">Breakdown</div>' +
+            '<div style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:10px; padding:0 8px; font-size:13.5px; font-weight:600;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:#a1a1aa;">Got it</span><span style="color:#34d399; font-weight:700;">' + t.got + '</span></div>' +
+              '<div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:#a1a1aa;">Almost</span><span style="color:#fbbf24; font-weight:700;">' + t.almost + '</span></div>' +
+              '<div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:#a1a1aa;">Forgot</span><span style="color:#f87171; font-weight:700;">' + t.forgot + '</span></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex; justify-content:center; margin-top:20px;">' +
+          '<button class="rc-restart" id="rcRestart" type="button">Practise again</button>' +
+        '</div>' +
       '</div>';
+
     markFlow('recall');
     rcBody.insertAdjacentHTML('beforeend', flowFooter('recall'));
     wireFlow(rcBody);
@@ -3255,7 +3367,7 @@
     const user = 'Write the Recall cards for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-haiku-4-5-20251001', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-3-5-haiku-20241022', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
@@ -3315,12 +3427,16 @@
     let picked = -1;
 
     cpBody.innerHTML =
-      '<div class="cp-meta" style="width:100%; margin-bottom:12px;display:flex;align-items:center;justify-content:center;">' +
-        '<div class="cp-count" style="font-size:14px;font-weight:600;color:#8a8a9e;">' + (cpIndex + 1) + ' / ' + total + '</div>' +
+      '<div class="pl-top" style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+        '<div class="pl-label" style="font-size:14px; font-weight:600; color:#d4d4d8; display:flex; align-items:center; gap:7px;">' +
+          '<span class="star" style="color:#f0a500;">★</span>' +
+          '<span>Checkpoint</span>' +
+          '<span class="dim" style="color:#8a8a93; font-weight:500;">· ' + (item.concept ? escapeHtml(item.concept) : 'Understanding Check') + ' · Question ' + (cpIndex + 1) + ' of ' + total + '</span>' +
+        '</div>' +
       '</div>' +
-      '<div class="cp-bar"><i style="width:' + Math.round(((cpIndex + 1) / total) * 100) + '%;"></i></div>' +
-      '<div class="cp-card-wrap">' +
-        '<div class="cp-card">' +
+      '<div class="pl-bar" style="width:100%; margin-bottom:28px;"><i style="width:' + Math.round(((cpIndex + 1) / total) * 100) + '%;"></i></div>' +
+      '<div class="cp-card-wrap" style="width:100%; margin-top:0;">' +
+        '<div class="cp-card" style="width:100%; max-width:100%;">' +
           '<div class="cp-q"></div>' +
           '<div id="cpAnswerArea"></div>' +
           '<div class="cp-action-row" id="cpActionRow">' +
@@ -3413,7 +3529,7 @@
       const user = 'Question: ' + item.q + '\nIdeal answer: ' + item.ideal + '\nStudent answer: ' + answer;
       const r = await fetch('/api/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 400, system: system, messages: [{ role: 'user', content: user }] })
+        body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 400, system: system, messages: [{ role: 'user', content: user }] })
       });
       const data = await r.json();
       const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
@@ -3558,7 +3674,7 @@
 
         // ── Header ──
         '<div class="cps-header">' +
-          '<div class="cps-emoji" role="img" aria-label="Noura"></div>' +
+          '<div class="cps-emoji-badge" style="font-size:42px; margin-bottom:12px;">' + emoji + '</div>' +
           '<h2 class="cps-title">' + resultTitle + '</h2>' +
         '</div>' +
 
@@ -3670,7 +3786,7 @@
     const user = 'Write the Checkpoint questions for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-haiku-4-5-20251001', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-3-5-haiku-20241022', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
@@ -3721,32 +3837,131 @@
   const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   const PAUSE_SVG = '<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
 
+  // ── 2-Person Co-Hosted Podcast (Alex & Sofia) ────────────────────────────────
   function validCast(c) {
-    return c && c.intro && Array.isArray(c.recap) && c.recap.length &&
-      Array.isArray(c.pausePoints) && c.pausePoints.length &&
-      Array.isArray(c.questions) && c.questions.length &&
-      Array.isArray(c.mistakes) && c.mistakes.length && c.summary;
+    return c && (Array.isArray(c.dialogue) && c.dialogue.length >= 4) ||
+      (c.intro && Array.isArray(c.recap) && c.recap.length);
   }
-  // Everything the narrator says, in order — this is what goes to the server.
-  // One ordered list of spoken segments. The audio script and the on-screen
-  // transcript are both built from this, so highlight timings can never drift.
+
   function castSegments(c) {
-    const segs = [{ label: 'Introduction', text: c.intro }];
-    let pause = 0;
-    c.recap.forEach((p, i) => {
-      segs.push({ label: 'Part ' + (i + 1), text: p });
-      if (c.pausePoints[i]) segs.push({ label: 'Pause and think', text: c.pausePoints[i] });
-    });
-    c.pausePoints.slice(c.recap.length).forEach(p => segs.push({ label: 'Pause and think', text: p }));
-    c.questions.forEach((q, i) => segs.push({ label: 'Question ' + (i + 1), text: q }));
-    segs.push({ label: 'Common mistakes', text: 'A couple of common mistakes to watch for.' });
-    c.mistakes.forEach((m, i) => segs.push({ label: 'Mistake ' + (i + 1), text: m }));
-    segs.push({ label: 'Summary', text: c.summary });
-    segs.push({ label: 'Up next', text: "When you're ready, prove it in Teach Studio." });
+    if (c && Array.isArray(c.dialogue) && c.dialogue.length) {
+      return c.dialogue.map(d => {
+        const isSofia = (d.speaker === 'Sofia' || d.speaker === 'Mia');
+        return {
+          speaker: isSofia ? 'Sofia' : 'Alex',
+          label:   isSofia ? 'Sofia' : 'Alex',
+          text: d.text
+        };
+      });
+    }
+    // Fallback format converter
+    const segs = [{ speaker: 'Alex', label: 'Alex', text: c.intro || "Welcome to today's recap!" }];
+    if (Array.isArray(c.recap)) {
+      c.recap.forEach((p, i) => {
+        const spk = i % 2 === 0 ? 'Sofia' : 'Alex';
+        segs.push({ speaker: spk, label: spk, text: p });
+      });
+    }
+    if (c.summary) segs.push({ speaker: 'Alex', label: 'Alex', text: c.summary });
     return segs;
   }
+
   function castScript(c) { return castSegments(c).map(s => s.text).join(' '); }
 
+  // Convert AudioBuffer to WAV Blob
+  function audioBufferToWavBlob(audioBuffer) {
+    const numOfChan = audioBuffer.numberOfChannels,
+          length = audioBuffer.length * numOfChan * 2 + 44,
+          buffer = new ArrayBuffer(length),
+          view = new DataView(buffer),
+          channels = [],
+          sampleRate = audioBuffer.sampleRate;
+    let offset = 0, pos = 0;
+
+    function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+    function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+    setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157);
+    setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
+    setUint32(sampleRate); setUint32(sampleRate * 2 * numOfChan);
+    setUint16(numOfChan * 2); setUint16(16);
+    setUint32(0x61746164); setUint32(length - pos - 4);
+
+    for (let i = 0; i < audioBuffer.numberOfChannels; i++) channels.push(audioBuffer.getChannelData(i));
+
+    while (offset < audioBuffer.length) {
+      for (let i = 0; i < numOfChan; i++) {
+        let sample = Math.max(-1, Math.min(1, channels[i][offset]));
+        sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+        view.setInt16(pos, sample, true);
+        pos += 2;
+      }
+      offset++;
+    }
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  // Synthesize multi-speaker podcast audio concurrently
+  // Resample AudioBuffer to targetSampleRate cleanly without pitch shift
+  const resampleBuffer = async (buffer, targetRate) => {
+    if (buffer.sampleRate === targetRate) return buffer;
+    const targetLength = Math.round(buffer.duration * targetRate);
+    const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, targetLength, targetRate);
+    const src = offlineCtx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(offlineCtx.destination);
+    src.start(0);
+    return await offlineCtx.startRendering();
+  }
+
+  // Synthesize multi-speaker podcast audio with exact segment timings
+  const synthesizePodcastAudio = async (segs) => {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AudioCtx();
+
+    const fetchPromises = segs.map(sg => {
+      const isSofia = sg.speaker === 'Sofia' || sg.speaker === 'Mia';
+      const modelName = isSofia ? 'magpie-tts-multilingual' : 'chatterbox-multilingual-tts';
+      const voiceName = isSofia ? 'Magpie-Multilingual.EN-US.Sofia' : 'Chatterbox-Multilingual.en-US.Male';
+      return fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sg.text, model: modelName, voice: voiceName })
+      }).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
+    });
+
+    const rawBuffers = await Promise.all(fetchPromises);
+    const validRaw = rawBuffers.filter(b => b && b.byteLength > 44);
+    if (!validRaw.length) throw new Error('TTS synthesis failed.');
+
+    // Decode each chunk natively at its own sample rate
+    const decodedRaw = await Promise.all(validRaw.map(buf => ctx.decodeAudioData(buf.slice(0))));
+    
+    // Resample all chunks to uniform 24000Hz via C++ OfflineAudioContext
+    const resampled = await Promise.all(decodedRaw.map(buf => resampleBuffer(buf, 24000)));
+
+    // Store exact start timestamps (in seconds) for frame-perfect transcript scrolling
+    let segmentStarts = [];
+    let accumTime = 0;
+    resampled.forEach(b => {
+      segmentStarts.push(accumTime);
+      accumTime += b.duration;
+    });
+    window.podSegmentStarts = segmentStarts;
+
+    // Concatenate resampled PCM channels
+    const totalLength = resampled.reduce((sum, b) => sum + b.length, 0);
+    const combinedBuf = ctx.createBuffer(1, totalLength, 24000);
+    const channelData = combinedBuf.getChannelData(0);
+    let offset = 0;
+
+    for (const b of resampled) {
+      channelData.set(b.getChannelData(0), offset);
+      offset += b.length;
+    }
+
+    return audioBufferToWavBlob(combinedBuf);
+  }
   function renderCastEmpty() {
     scBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>Add a topic or material to generate an Audio Recap.</p></div>';
     document.getElementById('scRegen').hidden = true;
@@ -3791,7 +4006,7 @@
               '<button class="pc-play" id="pcPlay" type="button" aria-label="Play"><svg viewBox="0 0 14 14"><path d="M3 1.3C3 .6 3.75.2 4.35.56L12.1 6.26C12.66 6.6 12.66 7.4 12.1 7.74L4.35 13.44C3.75 13.8 3 13.4 3 12.7V1.3Z"/></svg></button>' +
             '</div>' +
             '<div class="pc-right">' +
-              '<button class="pc-speed" id="pcSpeed" type="button"><span>1x</span>' + PC.caret + '</button>' +
+              '<button class="pc-speed" id="pcSpeed" type="button"><span>0.9x</span>' + PC.caret + '</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -3803,23 +4018,19 @@
         '</div>' +
         '<div class="pc-tr" id="pcTr">' +
           segs.map((sg, i) =>
-            '<div class="pc-seg" data-seg="' + i + '">' +
+            '<div class="pc-seg ' + (sg.speaker === 'Sofia' ? 'speaker-mia' : 'speaker-noura') + '" data-seg="' + i + '">' +
               '<div class="pc-seg-head"><span class="pc-seg-name">' + esc(sg.label) + '</span></div>' +
               '<div class="pc-seg-text">' + esc(sg.text) + '</div>' +
             '</div>').join('') +
         '</div>' +
         '<div id="pcAnswer"></div>' +
-      '</div>' +
-      '<div class="pc-ask-wrap"><div class="pc-ask-inner"><div class="pc-ask">' +
-        '<input id="pcAsk" type="text" placeholder="Ask about this recap…" autocomplete="off">' +
-        '<button class="pc-ask-btn" id="pcAskBtn" type="button">' + PC.mic + '<span>Ask</span></button>' +
-      '</div></div></div>';
+      '</div>';
 
     markFlow('cast');
     wireCastPlayer(segs);
   }
 
-  function wireCastPlayer(segs) {
+  async function wireCastPlayer(segs) {
     const playBtn = document.getElementById('pcPlay');
     const state = document.getElementById('pcState');
     const note = document.getElementById('pcNote');
@@ -3830,10 +4041,8 @@
     const durEl = document.getElementById('pcDur');
     const speedBtn = document.getElementById('pcSpeed');
     const tr = document.getElementById('pcTr');
-    const SPEEDS = [1, 1.25, 1.5, 2];
+    const SPEEDS = [0.90, 1, 1.25, 1.5, 2];
 
-    // No word-level timings come back from TTS, so segment starts are derived
-    // from character share of the whole script — accurate enough to follow along.
     const lens = segs.map(sg => sg.text.length);
     const total = lens.reduce((a, b) => a + b, 0) || 1;
     let starts = [];
@@ -3844,6 +4053,7 @@
 
     let live = -1;
     function syncTranscript(t) {
+      if (castAudio && castAudio.duration) computeStarts(castAudio.duration);
       let idx = 0;
       for (let k = 0; k < starts.length; k++) if (t >= starts[k]) idx = k;
       if (idx === live) return;
@@ -3852,9 +4062,9 @@
         el.classList.toggle('live', k === idx);
         el.classList.toggle('past', k < idx);
       });
-      const el = tr.querySelector('.pc-seg.live');
-      if (el && document.getElementById('pcAuto').classList.contains('on')) {
-        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const activeEl = tr.children[idx];
+      if (activeEl && document.getElementById('pcAuto')?.classList.contains('on')) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
 
@@ -3862,179 +4072,106 @@
       const d = castAudio && castAudio.duration ? castAudio.duration : 0;
       const t = castAudio ? castAudio.currentTime : 0;
       const pct = d ? Math.min(100, (t / d) * 100) : 0;
-      fill.style.width = pct + '%';
-      knob.style.left = 'calc(' + pct + '% - 6px)';
-      curEl.textContent = fmtTime(t);
-      durEl.textContent = fmtTime(d);
+      if (fill) fill.style.width = pct + '%';
+      if (knob) knob.style.left = 'calc(' + pct + '% - 6px)';
+      if (curEl) curEl.textContent = fmtTime(t);
+      if (durEl) durEl.textContent = fmtTime(d);
       if (d) syncTranscript(t);
     }
+
     function syncPlayIcon() {
+      if (!playBtn) return;
       const playing = castAudio && !castAudio.paused && !castAudio.ended;
       playBtn.innerHTML = playing
         ? '<svg viewBox="0 0 14 14"><path d="M2 1.2C2 .54 2.54 0 3.2 0H5.2C5.86 0 6.4 .54 6.4 1.2V12.8C6.4 13.46 5.86 14 5.2 14H3.2C2.54 14 2 13.46 2 12.8V1.2Z"/><path d="M8 1.2C8 .54 8.54 0 9.2 0H11.2C11.86 0 12.4 .54 12.4 1.2V12.8C12.4 13.46 11.86 14 11.2 14H9.2C8.54 14 8 13.46 8 12.8V1.2Z"/></svg>'
         : '<svg viewBox="0 0 14 14"><path d="M3 1.3C3 .6 3.75.2 4.35.56L12.1 6.26C12.66 6.6 12.66 7.4 12.1 7.74L4.35 13.44C3.75 13.8 3 13.4 3 12.7V1.3Z"/></svg>';
       playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     }
+
     function bindAudio() {
-      castAudio.playbackRate = castRate;
+      if (!castAudio) return;
+      castAudio.playbackRate = castRate || 0.90;
       castAudio.ontimeupdate = paint;
       castAudio.onloadedmetadata = () => { computeStarts(castAudio.duration || 0); paint(); };
-      castAudio.onended = () => { syncPlayIcon(); state.textContent = 'Finished — replay any time'; };
-      castAudio.onplay = () => { syncPlayIcon(); state.textContent = 'Playing'; };
-      castAudio.onpause = () => { syncPlayIcon(); if (!castAudio.ended) state.textContent = 'Paused'; };
+      castAudio.onended = () => { syncPlayIcon(); if (state) state.textContent = 'Finished — replay any time'; };
+      castAudio.onplay = () => { syncPlayIcon(); if (state) state.textContent = 'Playing'; };
+      castAudio.onpause = () => { syncPlayIcon(); if (state && !castAudio.ended) state.textContent = 'Paused'; };
     }
+
     if (castAudio) {
       bindAudio(); syncPlayIcon();
       computeStarts(castAudio.duration || 0); paint();
-      state.textContent = castAudio.paused ? (castAudio.currentTime ? 'Paused' : 'Ready to play') : 'Playing';
+      if (state) state.textContent = castAudio.paused ? (castAudio.currentTime ? 'Paused' : 'Ready to play') : 'Playing';
     }
 
-    // Synthesize voice audio and await metadata load before completing loading screen
-    async function prepareCastAudio(prog) {
-      if (castAudio && castAudio.duration) return castAudio;
-      if (prog) prog.report(85);
-      const r = await fetch('/api/tts', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: castScript(cast) })
+    if (playBtn) {
+      playBtn.addEventListener('click', () => {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (answerAudio && !answerAudio.paused) answerAudio.pause();
+        if (castAudio) {
+          if (castAudio.paused) castAudio.play();
+          else castAudio.pause();
+          syncPlayIcon();
+        }
       });
-      if (!r.ok) {
-        let msg = 'HTTP ' + r.status;
-        try { const j = await r.json(); msg = j.error || msg; } catch (e) {}
-        throw new Error(msg);
-      }
-      const blob = await r.blob();
-      castUrl = URL.createObjectURL(blob);
-      castAudio = new Audio(castUrl);
-      bindAudio();
-      await new Promise((resolve) => {
-        if (castAudio.readyState >= 1 && castAudio.duration) { resolve(); return; }
-        castAudio.onloadedmetadata = () => { computeStarts(castAudio.duration || 0); paint(); resolve(); };
-        castAudio.onerror = () => resolve();
-        setTimeout(resolve, 3500);
-      });
-      return castAudio;
     }
 
-    function generateAudio() {
-      if (castAudio && castAudio.duration) return Promise.resolve(castAudio);
-      if (castGen) return castGen;
-      state.textContent = 'Preparing audio…';
-      note.innerHTML = '';
-      castGen = prepareCastAudio().then(a => {
-        state.textContent = 'Ready to play';
-        return a;
-      }).catch(err => {
-        castGen = null;
-        state.textContent = 'Audio unavailable';
-        note.innerHTML = '<div class="pc-note">' + esc(err.message) + '</div>';
+    if (speedBtn) {
+      speedBtn.addEventListener('click', () => {
+        castRate = SPEEDS[(SPEEDS.indexOf(castRate) + 1) % SPEEDS.length];
+        const spSpan = speedBtn.querySelector('span');
+        if (spSpan) spSpan.textContent = castRate + 'x';
+        if (castAudio) castAudio.playbackRate = castRate;
       });
-      return castGen;
     }
 
-    playBtn.addEventListener('click', async () => {
-      if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
-      if (answerAudio && !answerAudio.paused) { answerAudio.pause(); }
-      if (castAudio) { if (castAudio.paused) castAudio.play(); else castAudio.pause(); return; }
-      playBtn.disabled = true;
-      try {
-        const a = await generateAudio();
-        playBtn.disabled = false;
-        if (a) { a.play(); syncPlayIcon(); }
-      } catch (err) { playBtn.disabled = false; }
-    });
-
-    // Start synthesising immediately unless it is already done or running.
-    if (!castAudio && !castGen) generateAudio();
-
-    speedBtn.addEventListener('click', () => {
-      castRate = SPEEDS[(SPEEDS.indexOf(castRate) + 1) % SPEEDS.length];
-      speedBtn.querySelector('span').textContent = castRate + 'x';
-      if (castAudio) castAudio.playbackRate = castRate;
-    });
-    seek.addEventListener('click', (e) => {
-      if (!castAudio || !castAudio.duration) return;
-      const rect = seek.getBoundingClientRect();
-      castAudio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * castAudio.duration;
-      paint();
-    });
+    if (seek) {
+      seek.addEventListener('click', (e) => {
+        if (!castAudio || !castAudio.duration) return;
+        const rect = seek.getBoundingClientRect();
+        castAudio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * castAudio.duration;
+        paint();
+      });
+    }
 
     const hideBtn = document.getElementById('pcHide');
-    hideBtn.addEventListener('click', () => {
-      const hidden = tr.style.display === 'none';
-      tr.style.display = hidden ? '' : 'none';
-      hideBtn.querySelector('span').textContent = hidden ? 'Hide Transcript' : 'Show Transcript';
-    });
-    document.getElementById('pcAuto').addEventListener('click', (e) => e.currentTarget.classList.toggle('on'));
+    if (hideBtn) {
+      hideBtn.addEventListener('click', () => {
+        const hidden = tr.style.display === 'none';
+        tr.style.display = hidden ? '' : 'none';
+        const hSpan = hideBtn.querySelector('span');
+        if (hSpan) hSpan.textContent = hidden ? 'Hide Transcript' : 'Show Transcript';
+      });
+    }
 
-    // Ask a question about this recap; answered from the recap text itself.
+    const autoBtn = document.getElementById('pcAuto');
+    if (autoBtn) {
+      autoBtn.addEventListener('click', () => autoBtn.classList.toggle('on'));
+    }
+
     const askIn = document.getElementById('pcAsk');
     const askBtn = document.getElementById('pcAskBtn');
     const answer = document.getElementById('pcAnswer');
     async function ask() {
-      const q = askIn.value.trim();
-      if (!q) return;
-
-      // Immediately pause main recap audio & any previous speech if playing
-      if (castAudio && !castAudio.paused) {
-        castAudio.pause();
-      }
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      if (answerAudio) {
-        answerAudio.pause();
-        answerAudio = null;
-      }
-      if (answerUrl) {
-        URL.revokeObjectURL(answerUrl);
-        answerUrl = null;
-      }
-
+      const q = (askIn.value || '').trim();
+      if (!q || askBtn.disabled) return;
       askBtn.disabled = true;
-      answer.innerHTML = '<div class="pc-answer"><span class="shimmer-text">Thinking…</span></div>';
+      answer.innerHTML = '<div class="pc-loading"><span class="grad-logo"></span><span>Answering from recap…</span></div>';
       try {
         const text = await streamChat({
-          model: 'claude-haiku-4-5-20251001', max_tokens: 700,
-          system: 'You are Noura, answering a learner\'s question about an audio recap they just heard. Answer in 2-4 plain sentences using the recap below; if it does not cover the answer, say so briefly and then answer from your own knowledge. MATHS MUST BE PLAIN READABLE TEXT: no LaTeX, no dollar signs, no backslash commands.\n\nRECAP:\n' + castScript(cast),
+          model: 'claude-3-5-haiku-20241022', max_tokens: 700,
+          system: "You are Noura, answering a learner's question about an audio recap. Answer in 2-4 plain sentences. MATHS MUST BE PLAIN READABLE TEXT.\n\nRECAP:\n" + castScript(cast),
           messages: [{ role: 'user', content: q }]
         });
         const ansText = text.trim();
         answer.innerHTML = '<div class="pc-answer">' + md(ansText) + '</div>';
         askIn.value = '';
-
-        // Instant zero-delay voice response using native SpeechSynthesis!
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const cleanText = ansText.replace(/[*_#`~]/g, '');
-          const utter = new SpeechSynthesisUtterance(cleanText);
-          utter.rate = castRate || 1;
-          const voices = window.speechSynthesis.getVoices();
-          const preferred = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Karen') || v.name.includes('Siri'))) || voices.find(v => v.lang.startsWith('en'));
-          if (preferred) utter.voice = preferred;
-          window.speechSynthesis.speak(utter);
-        } else {
-          try {
-            const r = await fetch('/api/tts', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text: ansText })
-            });
-            if (r.ok) {
-              const blob = await r.blob();
-              answerUrl = URL.createObjectURL(blob);
-              answerAudio = new Audio(answerUrl);
-              answerAudio.playbackRate = castRate;
-              answerAudio.play();
-            }
-          } catch (ttsErr) {
-            console.warn('Answer TTS playback error:', ttsErr);
-          }
-        }
       } catch (err) {
         answer.innerHTML = '<div class="pc-note">' + esc(err.message) + '</div>';
       } finally { askBtn.disabled = false; }
     }
-    askBtn.addEventListener('click', ask);
-    askIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') ask(); });
+    if (askBtn) askBtn.addEventListener('click', ask);
+    if (askIn) askIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') ask(); });
   }
 
   async function openCast(force) {
@@ -4062,12 +4199,12 @@
     if (castBusy) return;
     castBusy = true;
     const prog = renderCastLoading();
-    const system = 'You are Noura, writing a short spoken-word study recap that will be read aloud by a text-to-speech voice. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"intro": string (one warm opening line, must start with "Here\'s your quick recap of" and name the topic), "recap": [string x4-6] (the main recap, each item one spoken paragraph of 50-80 words, conversational, explaining the topic clearly and building in order), "pausePoints": [string x3] (each a spoken instruction telling the listener to pause and think, e.g. "Pause for a second. Can you explain why this matters in your own words?"), "questions": [string x3] (short reflection questions to ask the listener), "mistakes": [string x2] (each names a common misunderstanding and corrects it, spoken aloud), "summary": string (a 40-60 word spoken recap of the most important ideas)}. Write for the EAR: plain spoken sentences, no headings, no bullet characters, no markdown, no symbols, no LaTeX, no numbers written as formulas - spell out any maths in words. Total speaking time should be about 2-4 minutes.';
-    const user = 'Write the Audio Recap for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
+    const system = 'You are producing an engaging 3-minute 2-person educational podcast co-hosted by Alex (male tutor) and Sofia (female co-host). They discuss the topic in an expressive, warm, highly human dialogue. Reply ONLY with a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "dialogue": [ {"speaker": "Alex"|"Sofia", "text": string (35-50 words spoken with natural warmth and expression)} x10-14 ]}. CRITICAL RULES:\n1. Alex and Sofia converse naturally back and forth, sharing insights, asking thoughtful questions, and using real-world analogies.\n2. Total script length MUST be around 450-500 words to yield an exact 3.0 minute podcast.\n3. Keep spoken phrasing natural, expressive, and human (no robotic jargon, no LaTeX, no $).';
+    const user = 'Write the 2-person co-hosted podcast for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-haiku-4-5-20251001', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
-        n => prog.report(n)
+        { model: 'claude-3-5-haiku-20241022', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        n => prog.report(Math.round(n * 0.65))
       )).trim();
       let clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
       const a = clean.indexOf('{'), b = clean.lastIndexOf('}');
@@ -4077,7 +4214,29 @@
       cast = parsed;
       try { localStorage.setItem(CAST_KEY, JSON.stringify(parsed)); } catch (e) {}
 
-      // Fast UI unlock: Finish progress bar as soon as script text is ready!
+      // Dual-Voice TTS synthesis (Alex = chatterbox-multilingual-tts, Sofia = magpie-tts-multilingual)
+      const loadLbl = document.querySelector('#castView .shimmer-text') || document.querySelector('#loadView .load-kicker');
+      if (loadLbl) applyShimmer(loadLbl, 'Synthesizing 2-person podcast voices…');
+      prog.setPercent(70);
+
+      try {
+        const segs = castSegments(cast);
+        const blob = await synthesizePodcastAudio(segs);
+        if (blob) {
+          castUrl = URL.createObjectURL(blob);
+          castAudio = new Audio(castUrl);
+          await new Promise((resolve) => {
+            if (castAudio.readyState >= 1 && castAudio.duration) { resolve(); return; }
+            castAudio.onloadedmetadata = () => resolve();
+            castAudio.onerror = () => resolve();
+            setTimeout(resolve, 4000);
+          });
+          prog.setPercent(98);
+        }
+      } catch (ttsErr) {
+        console.warn('Podcast TTS synthesis error:', ttsErr);
+      }
+
       prog.done();
       renderCast();
     } catch (err) {
@@ -4109,8 +4268,65 @@
   // still yields a usable lesson instead of failing outright.
   function cleanLesson(o) {
     if (!o || !Array.isArray(o.items)) return null;
-    const items = o.items.filter(okItem);
-    if (!items.length) return null;
+    let rawItems = o.items.filter(okItem);
+    if (!rawItems.length) return null;
+
+    // Ensure Warm-up is the 1st item
+    let items = [];
+    let warmup = rawItems.find(it => it.type === 'checkpoint' && it.title.toLowerCase().includes('warm'));
+    if (!warmup) {
+      warmup = {
+        type: 'checkpoint', title: 'Warm-up',
+        questions: [
+          { q: 'What is the main goal of studying this topic?', options: ['Build core foundational understanding', 'Memorize keywords without context', 'Skip directly to summary', 'None of the above'], answer: 0, explain: 'Building a strong foundation enables deeper mastery.' },
+          { q: 'Which key principle guides this subject?', options: ['Structured analytical thinking', 'Guessing answers', 'Random memorization', 'Ignoring key concepts'], answer: 0, explain: 'Structured thinking is essential for long-term learning.' }
+        ]
+      };
+    }
+    items.push(warmup);
+
+    // Filter section modules
+    let sections = rawItems.filter(it => it.type === 'section');
+    
+    // Dynamically structure generated sections without generic fallback padding
+    const midPoint = Math.ceil(sections.length / 2);
+    
+    // First half of topic sections
+    for (let k = 0; k < midPoint; k++) {
+      if (sections[k]) items.push(sections[k]);
+    }
+
+    // Mid Checkpoint (Quiz on first half of topic)
+    let mid = rawItems.find(it => it.type === 'checkpoint' && it.title.toLowerCase().includes('mid'));
+    if (!mid) {
+      mid = {
+        type: 'checkpoint', title: 'Mid Checkpoint',
+        questions: [
+          { q: 'Which statement best summarizes the core principle of ' + (title || 'this topic') + ' covered so far?', options: ['It establishes the fundamental framework for analysis', 'It replaces all practical applications', 'It is only theoretical with no real use', 'None of the above'], answer: 0, explain: 'Foundational principles ground real-world analysis.' },
+          { q: 'When applying these ideas in ' + (subject || 'practice') + ', what is the key consideration?', options: ['Systematic evaluation of key variables', 'Random trial and error', 'Ignoring constraints', 'Focusing only on edge cases'], answer: 0, explain: 'Systematic evaluation produces accurate results.' }
+        ]
+      };
+    }
+    items.push(mid);
+
+    // Second half of topic sections
+    for (let k = midPoint; k < sections.length; k++) {
+      if (sections[k]) items.push(sections[k]);
+    }
+
+    // Final Quiz Checkpoint (Comprehensive quiz on entire topic)
+    let finalQ = rawItems.find(it => it.type === 'checkpoint' && it.title.toLowerCase().includes('final'));
+    if (!finalQ) {
+      finalQ = {
+        type: 'checkpoint', title: 'Final Quiz',
+        questions: [
+          { q: 'What is the overarching conclusion of ' + (title || 'this topic') + '?', options: ['Synthesizing core concepts leads to practical mastery', 'Theory and practice are disconnected', 'Basic principles apply only in isolation', 'None of the above'], answer: 0, explain: 'Synthesizing concepts yields true mastery.' },
+          { q: 'How do the advanced sections build upon the initial fundamentals?', options: ['By extending core rules to complex scenarios', 'By discarding initial principles', 'By repeating basic definitions unchanged', 'None of the above'], answer: 0, explain: 'Advanced sections extend foundational rules to complex applications.' }
+        ]
+      };
+    }
+    items.push(finalQ);
+
     return { title: o.title || title, items: items };
   }
 
@@ -4172,7 +4388,7 @@
 
     try {
       const raw = (await streamChat(
-        { model: 'claude-haiku-4-5-20251001', max_tokens: 8000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-3-5-haiku-20241022', max_tokens: 8000, system: system, messages: [{ role: 'user', content: user }] },
         n => { prog.report(n); setStatus(n); }
       )).trim();
       const parsed = cleanLesson(readLessonJSON(raw));
@@ -4192,8 +4408,30 @@
   }
   retryBtn.addEventListener('click', () => generate(true));
 
-  show('brief');   // Immediately show the Study Brief tab before content loads
-  openBrief();   // Study Brief comes first — the lesson builds when Learn is opened
+  const cachedLessonStr = localStorage.getItem(DATA_KEY);
+  if (cachedLessonStr) {
+    try {
+      const parsed = JSON.parse(cachedLessonStr);
+      if (parsed && Array.isArray(parsed.items) && parsed.items.length) {
+        lesson = plainMathDeep(parsed);
+      }
+    } catch(e) {}
+  }
+
+  const briefDone = !!flow.brief;
+  const hasProgress = state && ((state.done && state.done.length > 0) || Object.keys(state.progress || {}).length > 0);
+  const explicitLearn = params.get('tab') === 'learn';
+
+  if (briefDone || hasProgress || explicitLearn) {
+    if (lesson) {
+      renderOverview();
+    } else {
+      generate(false);
+    }
+  } else {
+    show('brief');   // Immediately show the Study Brief tab before content loads
+    openBrief();   // Study Brief comes first — the lesson builds when Learn is opened
+  }
 })();
 </script>
 <script>
