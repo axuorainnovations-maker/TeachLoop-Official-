@@ -63,7 +63,7 @@
                     <a href="#study-plan" class="hover:text-white transition-colors">Study Plan</a>
                 </div>
                 <div class="flex items-center gap-6">
-                    <a href="https://nouraofficial.vercel.app/" id="start-teaching-btn" class="bg-white text-black text-[14px] font-semibold px-4 py-2 rounded-md hover:bg-[#E5E5E5] transition-colors" style="text-decoration:none;">
+                    <a href="https://nouraofficial.vercel.app/" id="start-teaching-btn" class="bg-white text-black text-[14px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#E5E5E5] transition-all" style="text-decoration:none;">
                         Join the waitlist →
                     </a>
                 </div>
@@ -104,7 +104,7 @@
                             </div>
                         </a>
                         <a href="https://nouraofficial.vercel.app/" class="cursor-pointer w-full" style="text-decoration:none;">
-                            <div class="text-white !h-14 flex flex-col items-center justify-center rounded-none !text-base flex w-full border-[1.2px] border-white/5 bg-gradient-to-tr from-purple-800 via-purple-700 to-purple-400 font-semibold shadow-[0_8px_24px_rgba(124,58,237,0.35)] transition-all hover:brightness-110">
+                            <div class="text-white !h-14 flex flex-col items-center justify-center rounded-full !text-base flex w-full border-[1.2px] border-white/5 bg-gradient-to-tr from-purple-800 via-purple-700 to-purple-400 font-semibold shadow-[0_8px_24px_rgba(124,58,237,0.35)] transition-all hover:brightness-110">
                                 Join the waitlist
                             </div>
                         </a>
@@ -198,57 +198,18 @@
                 <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-5">
                     
                     <!-- Card 1: Interactive Teach Studio -->
-                    <div class="bg-[#111111] rounded-[20px] p-6 md:p-8 relative overflow-hidden min-h-[520px] flex flex-col justify-between border border-white/[0.08]">
-                        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1.5px 1.5px, rgba(255,255,255,0.18) 1.5px, transparent 0); background-size: 28px 28px;"></div>
+                    <div class="bg-[#111111] rounded-[20px] p-6 md:p-8 relative overflow-hidden min-h-[560px] flex flex-col justify-between border border-white/[0.08]">
+                        <div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle at 1.5px 1.5px, rgba(255,255,255,0.14) 1.5px, transparent 0); background-size: 28px 28px;"></div>
                         
                         <div class="relative z-10 flex flex-col flex-1">
-                            <!-- Teach Studio Interaction Card -->
-                            <div class="bg-white rounded-[16px] p-5 shadow-[0_8px_40px_rgba(0,0,0,0.2)] mx-auto w-[92%] mt-2 text-black">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-                                        <span class="font-bold text-[14px] tracking-tight text-black">Teach Studio</span>
-                                    </div>
-                                    <span class="bg-[#B18CFF] text-white text-[11px] font-[700] tracking-[0.04em] px-2.5 py-1 rounded-full flex items-center gap-1 leading-none">
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                            <path d="M6 0L6.9 3.6L10.5 4.5L6.9 5.4L6 9L5.1 5.4L1.5 4.5L5.1 3.6L6 0Z" fill="white"/>
-                                            <path d="M9.5 1.5L9.9 2.8L11.2 3.2L9.9 3.6L9.5 4.9L9.1 3.6L7.8 3.2L9.1 2.8L9.5 1.5Z" fill="white"/>
-                                        </svg>
-                                        AI STUDENT
-                                    </span>
-                                </div>
-                                <div class="mt-3 p-2.5 rounded-[10px] bg-[#F7F7F8] border border-[#EAEAEA]">
-                                    <p class="text-[13px] leading-[1.4] text-[#444] font-[400]">
-                                        <span class="font-semibold text-black">Student (Kai):</span> "I don't understand why increasing pressure shifts equilibrium in the Haber process. Can you teach me?"
-                                    </p>
-                                </div>
-                                <div class="text-right text-[11.5px] font-[600] mt-1.5 text-[#888]">Your Explanation:</div>
-                                
-                                <div class="border-[1.5px] border-[#1EA7FF] rounded-[10px] p-3 mt-1.5 relative bg-white overflow-hidden">
-                                    <div class="absolute inset-0 top-[10px] pointer-events-none" style="background-image: repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.08) 24px);"></div>
-                                    <div class="relative z-10">
-                                        <p class="text-[15.5px] leading-[23px] text-[#111]" style="font-family: 'Caveat', cursive; font-weight: 500;">
-                                            Higher pressure shifts equilibrium toward the side with fewer gas molecules (2 vs 4), relieving stress and forming more ammonia.
-                                            <span id="handwriting-cursor" class="inline-block w-[2px] h-[16px] bg-[#1EA7FF] ml-[1px] -mb-[2px] cursor-blink"></span>
-                                            <span id="handwriting-badge" class="hidden ml-2 text-[12px] text-[#0A5A2A] bg-[#E4FF7A] px-2 py-0.5 rounded-full align-middle font-bold" style="font-family: 'Inter Tight', sans-serif;">✓ Mastered (+50 XP)</span>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-end mt-3 relative">
-                                    <button id="check-question-btn" onclick="toggleQuestionCheck()" class="bg-[#1EA7FF] text-white text-[13.5px] font-[600] px-5 py-2.5 rounded-[10px] leading-none hover:bg-[#0f95e8] active:scale-[0.97] transition-all cursor-pointer">
-                                        Teach Student
-                                    </button>
-                                    <div class="absolute -bottom-[10px] -right-[6px] pointer-events-none">
-                                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                                            <path d="M2 2L19 11L11.5 12.5L9 20L2 2Z" fill="black" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
-                                        </svg>
-                                    </div>
+                            <!-- Teach Studio Real Screenshot Mockup -->
+                            <div class="relative w-full rounded-[16px] overflow-hidden border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)] group bg-[#0A0A0D]">
+                                <img src="assets/mockups/teachroom.png" alt="Teach Studio AI Student" class="w-full h-auto object-cover object-top transition-transform duration-300 group-hover:scale-[1.02]" />
+                                <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-bold text-[#c084fc] flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                                    <span>LIVE VOICE</span>
                                 </div>
                             </div>
-
-                            <div class="mx-auto w-[70%] h-[64px] bg-gradient-to-b from-white/40 to-white/[0.05] rounded-[12px] mt-4 opacity-80 border border-white/10"></div>
-                            <div class="flex-1"></div>
                             
                             <div class="mt-auto pt-6">
                                 <h3 class="text-white text-[26px] font-[600] tracking-[-0.01em] leading-[1.1]">Interactive Teach Studio</h3>
@@ -259,68 +220,30 @@
                         </div>
                     </div>
 
-                    <!-- Card 2: Lesson Roadmap -->
-                    <div id="study-plan" class="bg-[#111111] rounded-[20px] p-6 md:p-8 relative overflow-hidden min-h-[520px] flex flex-col border border-white/[0.08]">
-                        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 28px 28px;"></div>
+                    <!-- Card 2: Interactive Lesson Mastery Loop Showcase -->
+                    <div id="study-plan" class="bg-[#111111] rounded-[20px] p-6 md:p-8 relative overflow-hidden min-h-[560px] flex flex-col border border-white/[0.08]">
+                        <div class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 28px 28px;"></div>
                         
-                        <div class="relative z-10 flex-1 flex flex-col">
-                            <div class="relative flex-1 min-h-[380px]">
-                                
-                                <!-- Progress Chart Card -->
-                                <div class="bg-white rounded-[16px] p-4 w-[68%] h-[380px] relative shadow-[0_8px_32px_rgba(0,0,0,0.15)] flex flex-col text-black">
-                                    <div class="flex gap-5 items-center">
-                                        <div class="flex items-center gap-[6px]">
-                                            <div class="w-[10px] h-[10px] rounded-[2px] bg-[#E5E5E5]"></div>
-                                            <span class="text-[12px] text-[#111] font-[500]">New</span>
-                                        </div>
-                                        <div class="flex items-center gap-[6px]">
-                                            <div class="w-[10px] h-[10px] rounded-[2px] bg-[#E4FF7A]"></div>
-                                            <span class="text-[12px] text-[#111] font-[500]">Teaching</span>
-                                        </div>
-                                        <div class="flex items-center gap-[6px]">
-                                            <div class="w-[10px] h-[10px] rounded-[2px] bg-[#0A5A2A]"></div>
-                                            <span class="text-[12px] text-[#111] font-[500]">Mastered</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Bar Timeline -->
-                                    <div class="flex-1 flex items-end gap-[4px] md:gap-[6px] mt-4" id="chart-bars">
-                                        <!-- Rendered via JS -->
-                                    </div>
-
-                                    <div class="flex justify-between mt-3 text-black">
-                                        <span class="text-[12px] text-[#999]">Lesson 1</span>
-                                        <span class="text-[12px] text-[#999] mr-[22%]">Exam Ready</span>
-                                    </div>
-                                </div>
-
-                                <!-- Target Goal Overlay Widget -->
-                                <div class="absolute right-[0px] md:right-[8px] top-[82px] bg-white rounded-[16px] p-2 shadow-[0_8px_32px_rgba(0,0,0,0.18)] w-[168px] border border-[#EAEAEA] text-black z-20">
-                                    <p id="plan-desc-text" class="text-[12px] leading-[1.4] text-[#555] p-2 pt-1.5 font-[400]">
-                                        With just 30 min/day of teaching lessons, you'll reach 100% concept mastery before exams.
-                                    </p>
-                                    <div class="flex flex-col gap-[6px] mt-1 px-1 pb-1" id="plan-options">
-                                        <button onclick="selectPlan('15 min/day')" class="plan-opt-btn rounded-[10px] h-[36px] text-[14px] font-[500] border border-[#EAEAEA] bg-white text-black hover:bg-[#F7F7F7] active:scale-[0.98]">15 min/day</button>
-                                        <button onclick="selectPlan('30 min/day')" class="plan-opt-btn rounded-[10px] h-[36px] text-[14px] font-[600] bg-[#E8F2FF] border-[2px] border-[#1EA7FF] text-black flex items-center justify-center">30 min/day</button>
-                                        <button onclick="selectPlan('1 h/day')" class="plan-opt-btn rounded-[10px] h-[36px] text-[14px] font-[500] border border-[#EAEAEA] bg-white text-black hover:bg-[#F7F7F7] active:scale-[0.98]">1 h/day</button>
-                                        <button onclick="selectPlan('Custom')" class="plan-opt-btn rounded-[10px] h-[36px] text-[14px] font-[500] border border-[#EAEAEA] bg-white text-black hover:bg-[#F7F7F7] active:scale-[0.98]">Custom</button>
-                                    </div>
-                                    <div id="plan-cursor" class="absolute left-[62px] top-[98px] pointer-events-none transition-all duration-200">
-                                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                                            <path d="M2 2L19 11L11.5 12.5L9 20L2 2Z" fill="black" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
-                                        </svg>
-                                    </div>
-                                </div>
+                        <div class="relative z-10 flex-1 flex flex-col justify-between">
+                            <!-- Tab Selector Box -->
+                            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-white/[0.04] border border-white/[0.08] overflow-x-auto mb-4 scrollbar-none">
+                                <button onclick="switchLessonTab('studybrief')" id="tab-btn-studybrief" class="lesson-tab-btn flex-1 min-w-[85px] py-1.5 px-3 rounded-lg text-[12.5px] font-[600] transition-all bg-white text-black shadow-sm text-center whitespace-nowrap">Study Brief</button>
+                                <button onclick="switchLessonTab('learn')" id="tab-btn-learn" class="lesson-tab-btn flex-1 min-w-[85px] py-1.5 px-3 rounded-lg text-[12.5px] font-[500] text-[#A1A1AA] hover:text-white transition-all text-center whitespace-nowrap">Learn Lesson</button>
+                                <button onclick="switchLessonTab('recall')" id="tab-btn-recall" class="lesson-tab-btn flex-1 min-w-[75px] py-1.5 px-3 rounded-lg text-[12.5px] font-[500] text-[#A1A1AA] hover:text-white transition-all text-center whitespace-nowrap">Recall</button>
+                                <button onclick="switchLessonTab('checkpoint')" id="tab-btn-checkpoint" class="lesson-tab-btn flex-1 min-w-[80px] py-1.5 px-3 rounded-lg text-[12.5px] font-[500] text-[#A1A1AA] hover:text-white transition-all text-center whitespace-nowrap">Checkpoint</button>
+                                <button onclick="switchLessonTab('audiorecap')" id="tab-btn-audiorecap" class="lesson-tab-btn flex-1 min-w-[85px] py-1.5 px-3 rounded-lg text-[12.5px] font-[500] text-[#A1A1AA] hover:text-white transition-all text-center whitespace-nowrap">Audio Recap</button>
                             </div>
 
-                            <div class="mt-6">
-                                <h3 class="text-white text-[26px] font-[600] tracking-[-0.01em] leading-[1.1]">Personalized lesson roadmap</h3>
-                                <p class="text-[#9A9A9A] text-[15px] leading-[1.5] mt-2 max-w-[92%]">
-                                    Noura evaluates every explanation you deliver, dynamically ordering lessons and recall drills to turn weak points into lasting mastery.
+                            <!-- Mockup Display Screen -->
+                            <div class="relative w-full rounded-[16px] overflow-hidden border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)] bg-[#0B0B0E] aspect-[16/10]">
+                                <img id="lesson-mockup-img" src="assets/mockups/studybrief.png" alt="Lesson Feature Mockup" class="w-full h-full object-cover object-top transition-opacity duration-200" />
+                            </div>
+
+                            <div class="mt-auto pt-6">
+                                <h3 id="lesson-tab-title" class="text-white text-[26px] font-[600] tracking-[-0.01em] leading-[1.1]">Study Brief Document</h3>
+                                <p id="lesson-tab-desc" class="text-[#9A9A9A] text-[15px] leading-[1.5] mt-2 max-w-[92%]">
+                                    Instant pre-study document highlighting core principles, big ideas, common pitfalls, and what you must be able to explain.
                                 </p>
-                                <div id="plan-badge" class="hidden mt-3 text-[12px] text-[#A1A1AA] bg-white/10 rounded-full px-3 py-1 inline-block">
-                                    Plan updated: 30 min/day selected
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -469,89 +392,62 @@
 
     <!-- Interactive Script -->
     <script>
-        // Render Study Plan Timeline Bars
-        const barData = [
-            {total:14,m:0,l:0},{total:18,m:0,l:0},{total:22,m:0,l:0},{total:16,m:0,l:0},
-            {total:30,m:5,l:0},{total:36,m:10,l:3},{total:32,m:12,l:4},{total:44,m:18,l:6},
-            {total:56,m:24,l:10},{total:48,m:20,l:12},{total:62,m:28,l:14},{total:72,m:34,l:16},
-            {total:66,m:38,l:14},{total:80,m:46,l:16},{total:86,m:52,l:18},{total:92,m:58,l:20}
-        ];
-        
-        const chartContainer = document.getElementById('chart-bars');
-        if (chartContainer) {
-            chartContainer.innerHTML = barData.map((u) => {
-                const s = u.total - u.m - u.l;
-                return `
-                    <div class="flex-1 flex flex-col justify-end rounded-[3px] overflow-hidden" style="height:100%; background:transparent;">
-                        <div class="flex flex-col justify-end w-full" style="height:${u.total}%">
-                            ${u.l > 0 ? `<div class="w-full bg-[#E4FF7A]" style="height:${(u.l / u.total) * 100}%"></div>` : ''}
-                            ${u.m > 0 ? `<div class="w-full bg-[#0A5A2A]" style="height:${(u.m / u.total) * 100}%"></div>` : ''}
-                            <div class="w-full bg-[#F0F0F0] rounded-[3px] rounded-b-none" style="height:${(s / u.total) * 100}%; min-height:${s > 0 ? '4px' : '0'}"></div>
-                        </div>
-                        <div class="w-full flex-1 bg-[#F5F5F5] rounded-[3px] -mt-[1px]" style="display:${u.total < 100 ? 'block' : 'none'}"></div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Teach Studio Check Answer State
-        let isChecked = false;
-        function toggleQuestionCheck() {
-            isChecked = !isChecked;
-            const btn = document.getElementById('check-question-btn');
-            const badge = document.getElementById('handwriting-badge');
-            const cursor = document.getElementById('handwriting-cursor');
-            
-            if (isChecked) {
-                btn.textContent = 'Taught ✓';
-                btn.classList.add('bg-[#10B981]');
-                btn.classList.remove('bg-[#1EA7FF]');
-                badge.classList.remove('hidden');
-                badge.classList.add('inline-block');
-                cursor.classList.add('hidden');
-            } else {
-                btn.textContent = 'Teach Student';
-                btn.classList.remove('bg-[#10B981]');
-                btn.classList.add('bg-[#1EA7FF]');
-                badge.classList.add('hidden');
-                badge.classList.remove('inline-block');
-                cursor.classList.remove('hidden');
+        // Lesson Feature Tabs Data & Switcher
+        const lessonMockupData = {
+            studybrief: {
+                img: 'assets/mockups/studybrief.png',
+                title: 'Study Brief Document',
+                desc: 'Instant pre-study document highlighting core principles, big ideas, key concepts, common pitfalls, and what you must be able to explain.'
+            },
+            learn: {
+                img: 'assets/mockups/learn.png',
+                title: 'Interactive Concept Roadmap',
+                desc: 'Structured section breakdown with bite-sized lessons, milestone progress tracking, and locked checkpoints to guide mastery.'
+            },
+            recall: {
+                img: 'assets/mockups/recall.png',
+                title: 'Active Recall Drills',
+                desc: 'Targeted prompt cards that challenge you to retrieve knowledge from memory, compare against model answers, and rate retention.'
+            },
+            checkpoint: {
+                img: 'assets/mockups/checkpoint.png',
+                title: 'Conceptual Checkpoints',
+                desc: 'Formative diagnostic multiple-choice and conceptual problems with instant AI rationale feedback to evaluate deep understanding.'
+            },
+            audiorecap: {
+                img: 'assets/mockups/audiorecap.png',
+                title: 'Audio Recap Podcast',
+                desc: 'Bite-sized AI-generated audio episodes with speed control, synchronized transcripts, and high-yield reviews for on-the-go studying.'
             }
-        }
+        };
 
-        // Study Plan Selector
-        function selectPlan(plan) {
-            const cursor = document.getElementById('plan-cursor');
-            const desc = document.getElementById('plan-desc-text');
-            const badge = document.getElementById('plan-badge');
-            const buttons = document.querySelectorAll('.plan-opt-btn');
+        function switchLessonTab(tabKey) {
+            const data = lessonMockupData[tabKey];
+            if (!data) return;
 
-            buttons.forEach(b => {
-                if (b.textContent.trim() === plan) {
-                    b.className = 'plan-opt-btn rounded-[10px] h-[36px] text-[14px] font-[600] bg-[#E8F2FF] border-[2px] border-[#1EA7FF] text-black flex items-center justify-center';
-                } else {
-                    b.className = 'plan-opt-btn rounded-[10px] h-[36px] text-[14px] font-[500] border border-[#EAEAEA] bg-white text-black hover:bg-[#F7F7F7] active:scale-[0.98]';
-                }
+            // Update tab buttons
+            document.querySelectorAll('.lesson-tab-btn').forEach(btn => {
+                btn.className = 'lesson-tab-btn flex-1 min-w-[75px] py-1.5 px-3 rounded-lg text-[12.5px] font-[500] text-[#A1A1AA] hover:text-white transition-all text-center whitespace-nowrap';
             });
-
-            if (plan === '15 min/day') {
-                cursor.style.top = '62px';
-                desc.textContent = "With 15 min/day, you'll be exam ready by 5 Oct — comfortably before your finals.";
-            } else if (plan === '30 min/day') {
-                cursor.style.top = '98px';
-                desc.textContent = "With just 30 min/day, you'll be exam ready by 20 Sept — 1 week before your exams.";
-            } else if (plan === '1 h/day') {
-                cursor.style.top = '140px';
-                desc.textContent = "With 1 h/day, you'll reach peak mastery by 10 Sept — 2+ weeks ahead of schedule.";
-            } else {
-                cursor.style.top = '182px';
-                desc.textContent = 'Custom plan: AI dynamically recalibrates daily targets based on your recall pace.';
+            const activeBtn = document.getElementById('tab-btn-' + tabKey);
+            if (activeBtn) {
+                activeBtn.className = 'lesson-tab-btn flex-1 min-w-[75px] py-1.5 px-3 rounded-lg text-[12.5px] font-[600] transition-all bg-white text-black shadow-sm text-center whitespace-nowrap';
             }
 
-            if (badge) {
-                badge.classList.remove('hidden');
-                badge.textContent = `Plan updated: ${plan} selected`;
+            // Smooth image transition
+            const img = document.getElementById('lesson-mockup-img');
+            const title = document.getElementById('lesson-tab-title');
+            const desc = document.getElementById('lesson-tab-desc');
+
+            if (img) {
+                img.style.opacity = '0.3';
+                setTimeout(() => {
+                    img.src = data.img;
+                    img.style.opacity = '1';
+                }, 120);
             }
+            if (title) title.textContent = data.title;
+            if (desc) desc.textContent = data.desc;
         }
 
         // Sticky Navbar Animation

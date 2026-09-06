@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200, height=750">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { margin:0; background:#0B0B0E; color:#EDEDED; font-family:'Plus Jakarta Sans',sans-serif; overflow:hidden; }
+.glass { background: #131318; border: 1px solid rgba(255, 255, 255, 0.08); }
+</style>
+</head>
+<body class="w-[1200px] h-[750px] p-8 px-14 flex flex-col justify-center select-none">
+  <div class="max-w-[860px] mx-auto w-full">
+    <!-- Top Progress Pill (Exact to screenshot) -->
+    <div class="flex items-center gap-2 text-[13px] text-[#A1A1AA] mb-2 font-medium">
+      <span class="text-amber-400">★</span>
+      <span class="font-semibold text-white">Checkpoint</span>
+      <span>•</span>
+      <span>World War II causes</span>
+      <span>•</span>
+      <span>Question 1 of 5</span>
+    </div>
+    <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mb-6">
+      <div class="w-1/5 h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
+    </div>
+
+    <!-- Question (Exact to screenshot) -->
+    <h1 class="text-[26px] font-bold text-white mb-6 leading-snug">
+      Which of the following was NOT a major factor contributing to the outbreak of World War II?
+    </h1>
+
+    <!-- Radio Options (Exact to screenshot) -->
+    <div class="space-y-3 mb-6">
+      <div class="p-4 px-5 rounded-2xl glass flex items-center gap-3.5 text-[15px] text-[#A1A1AA] hover:border-white/20">
+        <div class="w-5 h-5 rounded-full border border-white/30 flex items-center justify-center"></div>
+        <span>The Treaty of Versailles imposing harsh reparations on Germany</span>
+      </div>
+
+      <div class="p-4 px-5 rounded-2xl glass border-purple-500/50 bg-purple-950/15 flex items-center gap-3.5 text-[15px] text-white font-medium">
+        <div class="w-5 h-5 rounded-full border-2 border-purple-400 bg-purple-500/20 flex items-center justify-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-purple-400"></div>
+        </div>
+        <span>The global economic prosperity that reduced nationalist tensions</span>
+      </div>
+
+      <div class="p-4 px-5 rounded-2xl glass flex items-center gap-3.5 text-[15px] text-[#A1A1AA] hover:border-white/20">
+        <div class="w-5 h-5 rounded-full border border-white/30 flex items-center justify-center"></div>
+        <span>The rise of fascist regimes in Germany, Italy, and Japan</span>
+      </div>
+
+      <div class="p-4 px-5 rounded-2xl glass flex items-center gap-3.5 text-[15px] text-[#A1A1AA] hover:border-white/20">
+        <div class="w-5 h-5 rounded-full border border-white/30 flex items-center justify-center"></div>
+        <span>The failure of the League of Nations to prevent aggression</span>
+      </div>
+    </div>
+
+    <!-- Bottom Action Button -->
+    <div class="flex justify-end">
+      <button class="px-8 py-3 rounded-xl bg-[#5b21b6] hover:bg-[#6d28d9] text-white font-semibold text-[14.5px] shadow-lg">
+        Check
+      </button>
+    </div>
+  </div>
+</body>
+</html>

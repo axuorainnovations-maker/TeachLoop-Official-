@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200, height=750">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { margin:0; background:#0B0B0E; color:#EDEDED; font-family:'Plus Jakarta Sans',sans-serif; overflow:hidden; }
+.audio-card {
+  background: #141419;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+}
+.pill {
+  background: #18181F;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #D4D4D8;
+}
+</style>
+</head>
+<body class="w-[1200px] h-[750px] p-8 px-14 flex flex-col justify-center select-none">
+  <div class="max-w-[860px] mx-auto w-full">
+    <!-- Main Audio Card (Exact to user screenshot) -->
+    <div class="audio-card p-7 px-8 mb-5 shadow-2xl">
+      <!-- Track Title -->
+      <h1 class="text-[22px] font-bold text-white mb-1">
+        Modern History | 20th Century onwards
+      </h1>
+      <div class="text-[13.5px] text-[#71717A] font-mono mb-6 font-medium">
+        1:55 / 2:35
+      </div>
+
+      <!-- Scrubber Line -->
+      <div class="relative w-full h-1.5 bg-[#26262F] rounded-full mb-6">
+        <div class="absolute left-0 top-0 bottom-0 w-[74%] bg-[#a855f7] rounded-full"></div>
+        <div class="absolute left-[74%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="flex items-center justify-between">
+        <!-- Play/Pause Button -->
+        <button class="w-14 h-14 rounded-full bg-[#7c3aed] text-white flex items-center justify-center shadow-[0_0_24px_rgba(124,58,237,0.5)] hover:scale-105 transition-all">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+
+        <!-- Speed Dropdown -->
+        <div class="pill px-4 py-2 rounded-full flex items-center gap-2 text-[14px] font-medium">
+          <span>0.9x</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Below Card Controls (Exact to user screenshot) -->
+    <div class="space-y-3">
+      <!-- Status Pill -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full pill text-[13px] font-medium text-[#A1A1AA]">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Playing</span>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="flex items-center justify-between">
+        <button class="pill px-4 py-2 rounded-full flex items-center gap-2 text-[13.5px] font-medium hover:bg-white/10 transition-all">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          <span>Show Transcript</span>
+        </button>
+
+        <button class="pill px-4 py-2 rounded-full flex items-center gap-2 text-[13.5px] font-medium hover:bg-white/10 transition-all">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          <span>Auto Scroll</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

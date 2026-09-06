@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200, height=750">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { margin:0; background:#0B0B0E; color:#EDEDED; font-family:'Plus Jakarta Sans',sans-serif; overflow:hidden; }
+.glass { background: #131318; border: 1px solid rgba(255, 255, 255, 0.08); }
+.roadmap-line {
+  position: absolute;
+  left: 28px;
+  top: 40px;
+  bottom: 40px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+</style>
+</head>
+<body class="w-[1200px] h-[750px] p-8 px-14 flex flex-col justify-center select-none">
+  <!-- Roadmap Timeline Container (Exact to screenshot) -->
+  <div class="max-w-[860px] mx-auto w-full relative">
+    <div class="roadmap-line"></div>
+
+    <div class="space-y-4 relative z-10">
+      <!-- Item 1 (Active Warm-up) -->
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-[#7c3aed] flex items-center justify-center text-white text-xl shadow-[0_0_24px_rgba(124,58,237,0.5)] flex-shrink-0">
+          ★
+        </div>
+        <div class="flex-1 glass rounded-2xl p-4 px-6 flex items-center justify-between border-purple-500/40 bg-purple-950/20">
+          <div>
+            <div class="text-[17px] font-bold text-white">Warm-up</div>
+            <div class="text-[13px] text-[#A1A1AA]">Checkpoint • answers lock after one attempt</div>
+          </div>
+          <button class="px-6 py-2.5 rounded-xl bg-[#8b5cf6] text-white font-semibold text-[14px] shadow-lg hover:brightness-110">
+            Start
+          </button>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="flex items-center gap-4 opacity-75">
+        <div class="w-14 h-14 rounded-full bg-[#18181F] border border-white/10 flex items-center justify-center text-[#71717A] font-bold text-[16px] flex-shrink-0">
+          2
+        </div>
+        <div class="flex-1 glass rounded-2xl p-4 px-6 flex items-center justify-between">
+          <div class="text-[15px] font-medium text-white/90">Section 1: The End of Empires & World Wars (1900–1950)</div>
+          <div class="flex items-center gap-2 text-[13px] text-[#71717A]">
+            <span>8 pages</span>
+            <span>🔒</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="flex items-center gap-4 opacity-75">
+        <div class="w-14 h-14 rounded-full bg-[#18181F] border border-white/10 flex items-center justify-center text-[#71717A] font-bold text-[16px] flex-shrink-0">
+          3
+        </div>
+        <div class="flex-1 glass rounded-2xl p-4 px-6 flex items-center justify-between">
+          <div class="text-[15px] font-medium text-white/90">Section 2: The Cold War Era (1947–1991)</div>
+          <div class="flex items-center gap-2 text-[13px] text-[#71717A]">
+            <span>8 pages</span>
+            <span>🔒</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 4 (Mid Checkpoint) -->
+      <div class="flex items-center gap-4 opacity-75">
+        <div class="w-14 h-14 rounded-full bg-[#18181F] border border-white/10 flex items-center justify-center text-[#71717A] text-lg flex-shrink-0">
+          ★
+        </div>
+        <div class="flex-1 glass rounded-2xl p-4 px-6 flex items-center justify-between">
+          <div class="text-[15px] font-medium text-white/90">Mid Checkpoint</div>
+          <div class="flex items-center gap-2 text-[13px] text-[#71717A]">
+            <span>Checkpoint</span>
+            <span>🔒</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 5 -->
+      <div class="flex items-center gap-4 opacity-75">
+        <div class="w-14 h-14 rounded-full bg-[#18181F] border border-white/10 flex items-center justify-center text-[#71717A] font-bold text-[16px] flex-shrink-0">
+          5
+        </div>
+        <div class="flex-1 glass rounded-2xl p-4 px-6 flex items-center justify-between">
+          <div class="text-[15px] font-medium text-white/90">Section 3: Decolonization & the Non-Aligned Movement (1947–1975)</div>
+          <div class="flex items-center gap-2 text-[13px] text-[#71717A]">
+            <span>8 pages</span>
+            <span>🔒</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 6 (Final Quiz / Trophy) -->
+      <div class="flex items-center gap-4 opacity-70 pt-1">
+        <div class="w-14 h-14 rounded-full bg-[#18181F] border border-white/10 flex items-center justify-center text-amber-400 text-lg flex-shrink-0">
+          🏆
+        </div>
+        <div class="text-[13.5px] text-[#71717A] font-medium">Finish every section to complete the lesson</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
