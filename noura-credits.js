@@ -227,17 +227,31 @@
     try { localStorage.setItem(LOCAL_CREDITS_KEY, JSON.stringify(d)); } catch (e) {}
   }
 
+  var UNLIMITED_EMAILS = ['prorkrff@gmail.com'];
+
+  function isUnlimitedEmail(email) {
+    if (!email) return false;
+    return UNLIMITED_EMAILS.indexOf(email.trim().toLowerCase()) !== -1;
+  }
+
   function paint(el, d) {
     if (!el || !d) return;
+    var em = accountEmail();
+    var isUnlim = d.unlimited || isUnlimitedEmail(em);
     var per = d.cost_per_action || 100;
     var bal = Math.max(0, Number(d.balance) || 0);
     var dropBal = document.getElementById('ncDropBalVal');
+    var dropTitle = document.querySelector('.nc-drop-title');
+    var upgradeBtn = document.querySelector('.nc-drop-upgrade');
 
-    if (d.unlimited) {
+    if (isUnlim) {
+      d.unlimited = true;
       el.className = 'noura-credit-pill unlimited';
       el.querySelector('.n').textContent = '\u221E';   // infinity
       el.title = 'Unlimited credits on this account';
       if (dropBal) dropBal.textContent = '\u221E';
+      if (dropTitle) dropTitle.textContent = 'Unlimited';
+      if (upgradeBtn) upgradeBtn.style.display = 'none';
       return;
     }
 
@@ -245,6 +259,8 @@
     var formatted = bal.toLocaleString();
     el.querySelector('.n').textContent = formatted;
     if (dropBal) dropBal.textContent = formatted;
+    if (dropTitle) dropTitle.textContent = 'Free';
+    if (upgradeBtn) upgradeBtn.style.display = '';
 
     el.title = bal < per
       ? 'Out of credits. Top up to keep studying.'
@@ -252,6 +268,21 @@
   }
 
   function fetchStatus() {
+    var em = accountEmail();
+    if (isUnlimitedEmail(em)) {
+      return Promise.resolve({
+        user_id: 'usr_unlimited',
+        email: em,
+        tier: 'unlimited',
+        balance: null,
+        unlimited: true,
+        actions_left: 999999,
+        cost_per_action: 100,
+        granted: 999999,
+        spent: 0
+      });
+    }
+
     var local = getLocalData();
     return window.fetch('/api/me')
       .then(function (r) {
@@ -259,7 +290,10 @@
         return r.json();
       })
       .then(function (data) {
-        if (!data || data.unlimited) return data;
+        if (!data || data.unlimited || isUnlimitedEmail(accountEmail())) {
+          if (data) data.unlimited = true;
+          return data;
+        }
         // Merge server & local so spends in browser persist
         if (typeof data.balance === 'number') {
           var effectiveBal = Math.min(data.balance, local.balance);
@@ -279,10 +313,13 @@
 
   /** True if the account can spend on a new generation. Shows the out-of-credits banner when not. */
   function requireCredits(neededAmount) {
+    var em = accountEmail();
+    if (isUnlimitedEmail(em)) return Promise.resolve(true);
+
     var need = typeof neededAmount === 'number' ? neededAmount : 100;
     return fetchStatus().then(function (d) {
       if (!d) return true;
-      if (d.unlimited) return true;
+      if (d.unlimited || isUnlimitedEmail(accountEmail())) return true;
       var bal = (d.balance !== undefined && d.balance !== null) ? Number(d.balance) : 500;
       if (bal < need) {
         show(Object.assign({ error: 'insufficient_credits', cost_per_action: need }, d));
@@ -297,6 +334,9 @@
 
   /** Deduct credits for an action (e.g. 100 credits for generating a full study package). */
   async function deduct(amount, reason) {
+    var em = accountEmail();
+    if (isUnlimitedEmail(em)) return true;
+
     var cost = typeof amount === 'number' ? amount : 100;
     var res = strReason(reason || 'lesson_generation');
     var cur = getLocalData();
@@ -326,7 +366,7 @@
       window.fetch('/api/spend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: cost, reason: res })
+        body: JSON.stringify({ amount: cost, reason: res, email: em })
       }).catch(function () {});
     } catch (e) {}
 

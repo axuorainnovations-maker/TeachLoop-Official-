@@ -5487,6 +5487,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
           try { localStorage.setItem('NOURA_EMAIL', gEmail); } catch (e) { }
           try { localStorage.setItem('TEACHLOOP_NAME', updatedProfile.name); } catch (e) { }
           applyUserProfile(updatedProfile);
+          if (window.NouraCredits && window.NouraCredits.refresh) {
+            window.NouraCredits.refresh();
+          }
 
           // Clean the OAuth token hash from the URL bar for a pristine address
           if (window.location.hash && window.location.hash.includes('access_token')) {

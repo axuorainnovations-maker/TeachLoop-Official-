@@ -106,21 +106,26 @@ class handler(BaseHTTPRequestHandler):
         self._cors()
 
     def _identify(self, body_dict=None):
-        email = (self.headers.get('X-Noura-Email') or '').strip()
+        email = (self.headers.get('X-Noura-Email') or '').strip().lower()
         if not email and body_dict and isinstance(body_dict, dict):
-            email = (body_dict.get('email') or '').strip()
+            email = (body_dict.get('email') or '').strip().lower()
         
         cookie_uid = None
         if noura_meter:
             cookie_uid = noura_meter.parse_cookie_uid(self.headers.get('Cookie'))
         
         if email and '@' in email and LEDGER:
-            return LEDGER.claim_email(email, cookie_uid=cookie_uid)
+            existing = LEDGER.find_user_by_email(email)
+            if existing:
+                return existing
+            uid = cookie_uid or ('usr_' + secrets.token_hex(8))
+            LEDGER.ensure_user(uid, email=email)
+            return uid
         if cookie_uid:
             return cookie_uid
         if noura_meter:
             return noura_meter.new_user_id()
-        return 'usr_' + secrets.token_hex(6)
+        return 'usr_' + secrets.token_hex(8)
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -136,30 +141,34 @@ class handler(BaseHTTPRequestHandler):
             return
 
         if path in ('/api/me', '/api/credits'):
+            email = (self.headers.get('X-Noura-Email') or '').strip().lower()
             uid = self._identify()
             if LEDGER:
-                LEDGER.ensure_user(uid)
+                LEDGER.ensure_user(uid, email=email)
                 w = LEDGER.wallet(uid)
                 u = LEDGER.user(uid)
+                if email and not u.get('email'):
+                    u['email'] = email
             else:
                 w = {'balance': 500, 'granted': 500, 'spent': 0}
-                u = {}
+                u = {'email': email}
             cost = noura_meter.CREDIT_COST if noura_meter else 100
-            unlimited = noura_meter.is_unlimited(u) if (noura_meter and u) else False
+            user_email = (u.get('email') or email or '').strip().lower()
+            unlimited = (user_email == 'prorkrff@gmail.com') or (noura_meter.is_unlimited(u) if noura_meter else False)
             bal = w.get('balance', 500)
             if bal == 0 and w.get('spent', 0) == 0:
                 bal = 500
             
             self._json(200, {
                 "user_id": uid,
-                "email": u.get('email') or None,
-                "tier": u.get('tier', 'free'),
+                "email": user_email or None,
+                "tier": "unlimited" if unlimited else u.get('tier', 'free'),
                 "balance": None if unlimited else bal,
                 "unlimited": unlimited,
                 "actions_left": 999999 if unlimited else (bal // cost if cost else 0),
                 "cost_per_action": cost,
                 "granted": max(w.get('granted', 500), 500),
-                "spent": w.get('spent', 0),
+                "spent": 0 if unlimited else w.get('spent', 0),
                 "expires": None,
             })
             return
@@ -304,13 +313,16 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif path in ('/api/spend', '/api/deduct'):
+            email = (self.headers.get('X-Noura-Email') or data.get('email') or '').strip().lower()
             uid = self._identify(data)
             cost = int(data.get('amount') or data.get('cost') or 100)
             reason = str(data.get('reason') or data.get('surface') or 'lesson_generation')
+            unlimited = (email == 'prorkrff@gmail.com')
             if LEDGER:
-                LEDGER.ensure_user(uid)
+                LEDGER.ensure_user(uid, email=email)
                 u = LEDGER.user(uid)
-                unlimited = noura_meter.is_unlimited(u) if (noura_meter and u) else False
+                if not unlimited:
+                    unlimited = (u.get('email', '').strip().lower() == 'prorkrff@gmail.com') or (noura_meter.is_unlimited(u) if noura_meter else False)
                 if not unlimited:
                     LEDGER.append(
                         user_id=uid,
@@ -329,18 +341,17 @@ class handler(BaseHTTPRequestHandler):
                 w = LEDGER.wallet(uid)
                 bal = w.get('balance', 500)
             else:
-                bal = max(0, 500 - cost)
-                w = {'balance': bal, 'granted': 500, 'spent': cost}
-                unlimited = False
+                bal = 500 if unlimited else max(0, 500 - cost)
+                w = {'balance': bal, 'granted': 500, 'spent': 0 if unlimited else cost}
 
             self._json(200, {
                 "success": True,
                 "user_id": uid,
-                "deducted": cost,
+                "deducted": 0 if unlimited else cost,
                 "balance": None if unlimited else bal,
                 "unlimited": unlimited,
                 "granted": w.get('granted', 500),
-                "spent": w.get('spent', 0),
+                "spent": 0 if unlimited else w.get('spent', 0),
                 "actions_left": 999999 if unlimited else (bal // 100 if bal >= 0 else 0),
                 "cost_per_action": 100
             })
