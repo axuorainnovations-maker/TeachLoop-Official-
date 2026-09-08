@@ -24,7 +24,7 @@ USERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_use
 # Keyed by model so a model switch is a one-line change. Cache read is ~0.1x
 # input and cache write ~1.25x input, per Anthropic's caching pricing.
 PRICING = {
-    'claude-3-5-haiku-20241022': {'in': 1.00, 'out': 5.00},
+    'claude-haiku-4-5-20251001': {'in': 1.00, 'out': 5.00},
     'claude-haiku-4-5':          {'in': 1.00, 'out': 5.00},
     'claude-sonnet-5':           {'in': 3.00, 'out': 15.00},
     'claude-opus-5':             {'in': 5.00, 'out': 25.00},
@@ -151,6 +151,16 @@ class Ledger:
         os.replace(tmp, self.users_path)
 
     # ── users ────────────────────────────────────────────────────────────
+    def find_user_by_email(self, email):
+        if not email:
+            return None
+        target = email.strip().lower()
+        with self._lock:
+            for uid, u in self._users.items():
+                if (u.get('email') or '').strip().lower() == target:
+                    return uid
+        return None
+
     def ensure_user(self, user_id, email=None, tier=None):
         with self._lock:
             u = self._users.get(user_id)
@@ -331,7 +341,7 @@ class Ledger:
                 granted += e.get('credits', 0)
             elif e.get('ok', True):
                 spent += e.get('credits', 0)
-        return granted - spent
+        return max(0, granted - spent)
 
     def wallet(self, user_id):
         granted = spent = 0
@@ -342,7 +352,7 @@ class Ledger:
                 granted += e.get('credits', 0)
             elif e.get('ok', True):
                 spent += e.get('credits', 0)
-        return {'granted': granted, 'spent': spent, 'balance': granted - spent}
+        return {'granted': granted, 'spent': spent, 'balance': max(0, granted - spent)}
 
     # ── enforcement ──────────────────────────────────────────────────────
     def check(self, user_id, surface, enforcement='on', org_ceiling=None):

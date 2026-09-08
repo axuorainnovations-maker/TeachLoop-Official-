@@ -1,15 +1,29 @@
-.env.local
+.env*
 config.js
 node_modules/
 scratch/
 
 .DS_Store
+*.log
+*.backup
+*.orig
+.cursor/
+test_*.py
+test_*.html
+analyze_*.py
+preview_*.html
+_user_*.html
+capture_mockups.py
+generate_mockup_screens.py
+list_models.py
+hero_test_artifact.html
 
 .claude/
 
 # local dev server temp files
 .serve_3006.py
 .serve_3006.log
+serve.log
 
 # Supabase keys (local only)
 supabase-config.js
@@ -22,14 +36,6 @@ NOURA_BRAND_CONTEXT.md
 brand-gradient-example.html
 noura-creator-brief.html
 noura-creator-brief.pdf
-
-# Pitch deck and brand/marketing material (local only, not part of the app)
-noura-deck.html
-noura-deck.pdf
-noura-creator-brief.html
-noura-creator-brief.pdf
-NOURA_BRAND_CONTEXT.md
-brand-gradient-example.html
 NOURA_PROJECT_INSTRUCTIONS.md
 NOURA_CREDITS_PROMPT.md
 usage_ledger.jsonl

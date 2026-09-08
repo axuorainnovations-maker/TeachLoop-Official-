@@ -186,7 +186,7 @@ async function testFullPipeline() {
     var res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 50, messages: [{ role: 'user', content: 'Say hello in one word.' }] })
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 50, messages: [{ role: 'user', content: 'Say hello in one word.' }] })
     });
     if (!res.ok) { var err = await res.text(); log('Chat HTTP ' + res.status + ': ' + err); result('Chat API HTTP ' + res.status, false); return; }
     var data = await res.json();

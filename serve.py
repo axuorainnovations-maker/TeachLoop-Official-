@@ -6,6 +6,7 @@ import http.server
 import socketserver
 import urllib.request
 import urllib.error
+import urllib.parse
 import concurrent.futures
 import secrets
 import time
@@ -25,6 +26,10 @@ try:
 except FileNotFoundError:
     pass
 
+import stripe
+STRIPE_SECRET_KEY = env_vars.get('STRIPE_SECRET_KEY', '')
+stripe.api_key = STRIPE_SECRET_KEY
+
 # Generate config.js for the browser.
 # SECRETS (API keys/tokens) are deliberately excluded — they must stay server-side.
 _SECRET_HINTS = ('KEY', 'SECRET', 'TOKEN', 'PASSWORD')
@@ -32,6 +37,31 @@ public_env = {k: v for k, v in env_vars.items()
               if not any(h in k.upper() for h in _SECRET_HINTS)}
 with open('config.js', 'w') as f:
     f.write(f'const ENV = {repr(public_env)};\n')
+
+# Generate supabase-config.js for client pages (login, onboarding, dashboard)
+sb_url = env_vars.get('SUPABASE_URL', '').strip()
+sb_anon = (env_vars.get('SUPABASE_ANON_KEY', '') or env_vars.get('SUPABASE_KEY', '')).strip()
+
+if 'dashboard/project/' in sb_url:
+    import re
+    m = re.search(r'dashboard/project/([a-zA-Z0-9_-]+)', sb_url)
+    if m:
+        sb_url = f'https://{m.group(1)}.supabase.co'
+elif not sb_url and sb_anon:
+    try:
+        import base64
+        parts = sb_anon.split('.')
+        if len(parts) >= 2:
+            payload = json.loads(base64.b64decode(parts[1] + '===').decode('utf-8'))
+            if payload.get('ref'):
+                sb_url = f"https://{payload['ref']}.supabase.co"
+    except Exception:
+        pass
+
+if sb_url and sb_anon:
+    with open('supabase-config.js', 'w') as f:
+        f.write(f'window.SUPABASE_URL = "{sb_url}";\nwindow.SUPABASE_ANON_KEY = "{sb_anon}";\n')
+    print(f'[Supabase] Configured client with URL: {sb_url}')
 
 PORT = 3006
 
@@ -172,20 +202,39 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # ── identity ────────────────────────────────────────────────────────
     # Beta-grade only: a server-minted HttpOnly cookie the page cannot rewrite.
-    # It is NOT authentication - clearing cookies yields a fresh allowance.
     def _identify(self, data=None):
-        uid = noura_meter.parse_cookie_uid(self.headers.get('Cookie'))
-        minted = False
-        if not uid:
-            uid = noura_meter.new_user_id()
-            minted = True
         email = None
         if isinstance(data, dict):
             email = (data.get('_noura_email') or None)
         if not email:
             email = self.headers.get('X-Noura-Email') or None
-        LEDGER.ensure_user(uid, email=email)
-        self._pending_uid = uid if minted else None
+        if email:
+            email = email.strip().lower()
+            if not email or '@' not in email:
+                email = None
+
+        cookie_uid = noura_meter.parse_cookie_uid(self.headers.get('Cookie'))
+        uid = None
+
+        if email:
+            # Match existing user account by email
+            uid = LEDGER.find_user_by_email(email)
+            if not uid:
+                # Check if current cookie uid has no email assigned yet
+                if cookie_uid and not (LEDGER.user(cookie_uid) or {}).get('email'):
+                    uid = cookie_uid
+                else:
+                    uid = noura_meter.new_user_id()
+            LEDGER.ensure_user(uid, email=email)
+        else:
+            if cookie_uid:
+                uid = cookie_uid
+                LEDGER.ensure_user(uid)
+            else:
+                uid = noura_meter.new_user_id()
+                LEDGER.ensure_user(uid)
+
+        self._pending_uid = uid if uid != cookie_uid else None
         return uid
 
     def _set_uid_cookie(self):
@@ -215,7 +264,147 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return allowed, info
 
     def do_POST(self):
-        if self.path == '/api/generate-diagram':
+        if self.path in ('/create-checkout-session', '/api/create-checkout-session'):
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            try:
+                if self.headers.get('Content-Type', '').startswith('application/json'):
+                    data = json.loads(body.decode('utf-8') or '{}')
+                else:
+                    parsed = urllib.parse.parse_qs(body.decode('utf-8'))
+                    data = {k: v[0] for k, v in parsed.items()}
+            except Exception:
+                data = {}
+
+            plan = (data.get('plan') or data.get('lookup_key') or 'pro').lower()
+            period = (data.get('period') or 'monthly').lower()
+            customer_email = data.get('email') or None
+
+            # Pricing: Pro = $8/mo ($77/yr), Unlimited = $15/mo ($144/yr)
+            if 'unlimited' in plan:
+                unit_amount = 1500 if period == 'monthly' else 14400
+                plan_name = 'Noura Unlimited Plan'
+                plan_desc = 'Unlimited learning tokens, Unlimited subjects, Priority responses & Early access'
+            else:
+                unit_amount = 800 if period == 'monthly' else 7700
+                plan_name = 'Noura Pro Plan'
+                plan_desc = '1,500 learning tokens/mo, Priority responses, Quiz & exam-prep mode'
+
+            host = self.headers.get('Host', 'localhost:3006')
+            proto = 'https' if self.headers.get('X-Forwarded-Proto') == 'https' else 'http'
+            domain = f"{proto}://{host}"
+
+            try:
+                line_items = None
+                lookup_key = data.get('lookup_key')
+                if lookup_key:
+                    try:
+                        prices = stripe.Price.list(lookup_keys=[lookup_key], expand=['data.product'])
+                        if prices.data:
+                            line_items = [{'price': prices.data[0].id, 'quantity': 1}]
+                    except Exception:
+                        line_items = None
+
+                if not line_items:
+                    line_items = [{
+                        'price_data': {
+                            'currency': 'usd',
+                            'product_data': {
+                                'name': plan_name,
+                                'description': plan_desc,
+                            },
+                            'unit_amount': unit_amount,
+                            'recurring': {
+                                'interval': 'year' if period == 'yearly' else 'month',
+                            },
+                        },
+                        'quantity': 1,
+                    }]
+
+                session_params = {
+                    'mode': 'subscription',
+                    'line_items': line_items,
+                    'success_url': domain + '/chatbot.html?success=true&session_id={CHECKOUT_SESSION_ID}&plan=' + ('unlimited' if 'unlimited' in plan else 'pro'),
+                    'cancel_url': domain + '/chatbot.html',
+                }
+                if customer_email:
+                    session_params['customer_email'] = customer_email
+
+                checkout_session = stripe.checkout.Session.create(**session_params)
+
+                if self.headers.get('Accept', '').startswith('application/json') or self.headers.get('Content-Type', '').startswith('application/json'):
+                    self._json(200, {'url': checkout_session.url, 'id': checkout_session.id})
+                else:
+                    self.send_response(303)
+                    self.send_header('Location', checkout_session.url)
+                    self.end_headers()
+            except Exception as e:
+                self._json(400, {'error': {'message': str(e)}})
+            return
+
+        elif self.path in ('/create-portal-session', '/api/create-portal-session'):
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            try:
+                if self.headers.get('Content-Type', '').startswith('application/json'):
+                    data = json.loads(body.decode('utf-8') or '{}')
+                else:
+                    parsed = urllib.parse.parse_qs(body.decode('utf-8'))
+                    data = {k: v[0] for k, v in parsed.items()}
+            except Exception:
+                data = {}
+
+            session_id = data.get('session_id')
+            host = self.headers.get('Host', 'localhost:3006')
+            proto = 'https' if self.headers.get('X-Forwarded-Proto') == 'https' else 'http'
+            domain = f"{proto}://{host}"
+
+            try:
+                customer_id = None
+                if session_id:
+                    sess = stripe.checkout.Session.retrieve(session_id)
+                    customer_id = sess.customer
+                
+                if not customer_id:
+                    self._json(400, {'error': {'message': 'Customer ID not found for portal'}})
+                    return
+
+                portal_session = stripe.billing_portal.Session.create(
+                    customer=customer_id,
+                    return_url=domain + '/chatbot.html'
+                )
+                if self.headers.get('Accept', '').startswith('application/json') or self.headers.get('Content-Type', '').startswith('application/json'):
+                    self._json(200, {'url': portal_session.url})
+                else:
+                    self.send_response(303)
+                    self.send_header('Location', portal_session.url)
+                    self.end_headers()
+            except Exception as e:
+                self._json(400, {'error': {'message': str(e)}})
+            return
+
+        elif self.path in ('/webhook', '/api/webhook'):
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            sig_header = self.headers.get('Stripe-Signature')
+            webhook_secret = env_vars.get('STRIPE_WEBHOOK_SECRET', '')
+
+            event = None
+            try:
+                if webhook_secret and sig_header:
+                    event = stripe.Webhook.construct_event(body, sig_header, webhook_secret)
+                else:
+                    event = json.loads(body.decode('utf-8') or '{}')
+            except Exception as e:
+                self._json(400, {'error': f'Webhook verification failed: {str(e)}'})
+                return
+
+            event_type = event.get('type') if isinstance(event, dict) else getattr(event, 'type', '')
+            print(f"[Stripe Webhook] Received event: {event_type}")
+            self._json(200, {'status': 'success', 'event': event_type})
+            return
+
+        elif self.path == '/api/generate-diagram':
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length)
 
@@ -287,6 +476,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                               credits=noura_meter.credit_cost(surface),
                               request_id=request_id)
 
+            # Normalize model name to models available on Anthropic API
+            model_req = str(data.get('model') or '')
+            if 'haiku' in model_req.lower():
+                data['model'] = 'claude-haiku-4-5-20251001'
+            elif 'sonnet' in model_req.lower():
+                data['model'] = 'claude-sonnet-4-5-20250929'
+            elif 'opus' in model_req.lower():
+                data['model'] = 'claude-opus-4-5-20251101'
+            elif not model_req:
+                data['model'] = 'claude-haiku-4-5-20251001'
+
+            # Enable prompt caching on system prompt
+            if 'system' in data and data['system']:
+                if isinstance(data['system'], str):
+                    data['system'] = [{"type": "text", "text": data['system'], "cache_control": {"type": "ephemeral"}}]
+                elif isinstance(data['system'], list) and len(data['system']) > 0:
+                    if "cache_control" not in data['system'][-1]:
+                        data['system'][-1]["cache_control"] = {"type": "ephemeral"}
+
             def send_via_anthropic():
                 req_data = json.dumps(data).encode('utf-8')
                 anth_req = urllib.request.Request(
@@ -295,6 +503,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     headers={
                         'x-api-key': anthropic_key,
                         'anthropic-version': '2023-06-01',
+                        'anthropic-beta': 'prompt-caching-2024-07-31',
                         'Content-Type': 'application/json',
                     }
                 )
@@ -358,6 +567,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         sys_str = "\n\n".join([x.get('text', '') if isinstance(x, dict) else str(x) for x in sys_prompt])
                     else:
                         sys_str = str(sys_prompt)
+                    
+                    # Optimize system prompt size for NVIDIA NIM to avoid prefill timeouts
+                    if "30. Behavioral examples" in sys_str and "33. Lesson Generation" in sys_str:
+                        parts = sys_str.split("30. Behavioral examples")
+                        header = parts[0]
+                        remainder = parts[1]
+                        if "33. Lesson Generation" in remainder:
+                            workflow = remainder.split("33. Lesson Generation")[1]
+                            sys_str = header + "\n\n33. Lesson Generation" + workflow
+                            
                     formatted_msgs.append({"role": "system", "content": sys_str})
                 for m in msgs:
                     content = m.get("content", "")
@@ -368,10 +587,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     formatted_msgs.append({"role": m.get("role", "user"), "content": content_str})
                 
                 candidate_models = [
-                    'google/diffusiongemma-26b-a4b-it',
                     'meta/llama-3.2-11b-vision-instruct',
-                    'poolside/laguna-xs-2.1',
-                    'nvidia/nemotron-3.5-lightning-30b-a3b'
+                    'nvidia/nemotron-3.5-lightning-30b-a3b',
+                    'meta/llama-3.2-90b-vision-instruct'
                 ]
                 
                 last_err = None
@@ -379,7 +597,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     req_body = json.dumps({
                         "model": chosen_model,
                         "messages": formatted_msgs,
-                        "max_tokens": min(data.get("max_tokens", 800) or 800, 1200)
+                        "max_tokens": min(data.get("max_tokens", 800) or 800, 8000)
                     }).encode('utf-8')
                     
                     req = urllib.request.Request(
@@ -391,7 +609,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         }
                     )
                     try:
-                        with urllib.request.urlopen(req, timeout=16) as resp:
+                        with urllib.request.urlopen(req, timeout=30) as resp:
                             resp_data = json.loads(resp.read().decode('utf-8'))
                             reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
                             out_payload = {

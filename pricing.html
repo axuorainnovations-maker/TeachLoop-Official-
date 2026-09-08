@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plans &amp; Pricing — Noura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #121215;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --purple: #8b5cf6;
+      --purple-light: #c084fc;
+      --purple-glow: rgba(139, 92, 246, 0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(1200px 600px at 50% -10%, rgba(139, 92, 246, 0.18), transparent 70%), var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 80px;
+    }
+    .topbar {
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 60px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand-logo {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(140deg, #d8b4fe 0%, #a855f7 40%, #7c3aed 100%);
+      -webkit-mask: url('logo.png?v=3') center/contain no-repeat;
+      mask: url('logo.png?v=3') center/contain no-repeat;
+      display: inline-block;
+    }
+    .back-btn {
+      color: var(--purple-light);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .header {
+      text-align: center;
+      max-width: 640px;
+      margin-bottom: 40px;
+    }
+    .header h1 {
+      font-size: clamp(36px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #d4d4d8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .toggle {
+      display: inline-flex;
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .toggle button {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: 2;
+    }
+    .toggle button.active {
+      color: #000;
+      background: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .save-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #10b981;
+      margin-left: 4px;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      width: 100%;
+      max-width: 1120px;
+    }
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .card.popular {
+      border-color: rgba(168, 85, 247, 0.5);
+      background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.12), transparent 70%), var(--card-bg);
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+    }
+    .badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    }
+    .price-wrap {
+      margin-bottom: 24px;
+    }
+    .price {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #fff;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .per {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .per-day {
+      font-size: 13px;
+      color: #a855f7;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    .plan-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .plan-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 28px;
+      min-height: 42px;
+    }
+    .features-head {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #d4d4d8;
+      margin-bottom: 16px;
+    }
+    .features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .features-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: #e4e4e7;
+      line-height: 1.4;
+    }
+    .check-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      color: #c084fc;
+      margin-top: 1px;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      border: none;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 10px 28px rgba(124, 58, 237, 0.5);
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    }
+    .footer-note {
+      text-align: center;
+      font-size: 13px;
+      color: #71717a;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="LandingPage.html" class="brand">
+      <span class="brand-logo"></span>
+      <span>Noura</span>
+    </a>
+    <a href="chatbot.html" class="back-btn">← Back to study</a>
+  </div>
+
+  <div class="header">
+    <h1>Simple, transparent pricing</h1>
+    <p>Choose the plan that fits how much you learn. Upgrade or cancel anytime.</p>
+  </div>
+
+  <div class="toggle-wrap">
+    <div class="toggle" id="pricingToggle">
+      <button class="active" type="button" data-period="monthly" onclick="setBillingPeriod('monthly')">Monthly</button>
+      <button type="button" data-period="yearly" onclick="setBillingPeriod('yearly')">Yearly <span class="save-badge">Save 20%</span></button>
+    </div>
+  </div>
+
+  <div class="pricing-grid">
+    <!-- Starter -->
+    <div class="card">
+      <div>
+        <div class="price-wrap">
+          <div class="price">$<span class="amount" data-monthly="0" data-yearly="0">0</span><span class="per"> forever</span></div>
+          <div class="per-day">Free to learn &amp; explore</div>
+        </div>
+        <h3 class="plan-name">Starter</h3>
+        <p class="plan-desc">Great for getting started and light study sessions.</p>
+        <div class="features-head">Includes:</div>
+        <ul class="features-list">
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            500 learning tokens
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            All subjects &amp; curriculum tiers
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Homework uploads &amp; notes
+          </li>
+        </ul>
+      </div>
+      <a href="chatbot.html" class="btn">Current Plan</a>
+    </div>
+
+    <!-- Pro -->
+    <div class="card popular">
+      <span class="badge">Popular</span>
+      <div>
+        <div class="price-wrap">
+          <div class="price">$<span class="amount" data-monthly="8" data-yearly="77">8</span><span class="per">/month</span></div>
+          <div class="per-day" id="pro-perday">Just $0.27 / day</div>
+        </div>
+        <h3 class="plan-name">Pro</h3>
+        <p class="plan-desc">Best value for regular learners who study often.</p>
+        <div class="features-head">Everything in Starter, plus:</div>
+        <ul class="features-list">
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            1,500 learning tokens / month
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Priority AI student responses
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Quiz &amp; exam-prep mode
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Voice conversations &amp; Audio Recap
+          </li>
+        </ul>
+      </div>
+      <button class="btn btn-primary" type="button" onclick="checkout('pro')">Upgrade to Pro</button>
+    </div>
+
+    <!-- Unlimited -->
+    <div class="card">
+      <div>
+        <div class="price-wrap">
+          <div class="price">$<span class="amount" data-monthly="15" data-yearly="144">15</span><span class="per">/month</span></div>
+          <div class="per-day" id="unlimited-perday">Just $0.50 / day</div>
+        </div>
+        <h3 class="plan-name">Unlimited</h3>
+        <p class="plan-desc">For power users who never want to run out.</p>
+        <div class="features-head">Everything in Pro, plus:</div>
+        <ul class="features-list">
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Fair Use — Unlimited tokens
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Unlimited subjects &amp; uploads
+          </li>
+          <li>
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Priority voice generation &amp; early features
+          </li>
+        </ul>
+      </div>
+      <button class="btn" type="button" onclick="checkout('unlimited')">Upgrade to Unlimited</button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Secure payments powered by Stripe Checkout. Cancel or switch plans anytime.
+  </div>
+
+  <script>
+    let currentPeriod = 'monthly';
+
+    function setBillingPeriod(period) {
+      currentPeriod = period;
+      const yearly = period === 'yearly';
+      document.querySelectorAll('.card').forEach(card => {
+        const amt = card.querySelector('.amount');
+        const per = card.querySelector('.per');
+        if (amt) amt.textContent = yearly ? amt.dataset.yearly : amt.dataset.monthly;
+        if (per) {
+          if (amt && amt.dataset.monthly === '0') {
+            per.textContent = ' forever';
+          } else {
+            per.textContent = yearly ? '/year' : '/month';
+          }
+        }
+      });
+      const proPerDay = document.getElementById('pro-perday');
+      if (proPerDay) proPerDay.textContent = yearly ? 'Just $0.21 / day' : 'Just $0.27 / day';
+      const unPerDay = document.getElementById('unlimited-perday');
+      if (unPerDay) unPerDay.textContent = yearly ? 'Just $0.39 / day' : 'Just $0.50 / day';
+
+      const buttons = document.querySelectorAll('#pricingToggle button');
+      buttons.forEach(b => b.classList.toggle('active', b.dataset.period === period));
+    }
+
+    async function checkout(plan) {
+      const btn = event?.target;
+      const oldText = btn ? btn.textContent : '';
+      if (btn) { btn.textContent = 'Redirecting to Stripe...'; btn.disabled = true; }
+
+      let email = '';
+      try {
+        const acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}');
+        email = acc.email || localStorage.getItem('NOURA_EMAIL') || '';
+      } catch (e) {}
+
+      try {
+        const res = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ plan: plan, period: currentPeriod, email: email })
+        });
+        const data = await res.json();
+        if (data && data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Could not start checkout: ' + (data?.error?.message || 'Please try again.'));
+          if (btn) { btn.textContent = oldText; btn.disabled = false; }
+        }
+      } catch (err) {
+        alert('Checkout error: ' + err.message);
+        if (btn) { btn.textContent = oldText; btn.disabled = false; }
+      }
+    }
+  </script>
+</body>
+</html>

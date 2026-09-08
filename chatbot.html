@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Noura AI</title>
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.lordicon.com/lordicon.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -206,8 +208,12 @@ body.light-mode .nav-item svg.pen-icon, body.light-mode .nav-item svg.icon-book 
 .nav-item.active svg { stroke:#ffffff; }
 /* Dashboard iframe overlay */
 .dash-iframe-overlay {
-  display:none; flex:1; min-width:0; z-index:200; background:#0A0A0B;
+  display:none; flex:1; min-width:0; z-index:200; background:#141416;
   overflow-y:auto;
+  margin:12px 12px 12px 0;
+  border-radius:18px;
+  border:1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:0 4px 24px rgba(0, 0, 0, 0.25);
 }
 .dash-iframe-overlay.open { display:flex; flex-direction:column; }
 .dash-iframe-overlay iframe {
@@ -242,9 +248,19 @@ body.light-mode .recents-empty { color:#9a9aa0; }
   position:absolute; bottom:calc(100% + 8px); left:0; right:0; width:auto;
   background:#18181b; border:1px solid #27272a; border-radius:14px; padding:6px;
   box-shadow:0 8px 24px rgba(0,0,0,0.2);
-  display:none; z-index:10;
+  display:block;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.98);
+  transform-origin: bottom left;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+  z-index:10;
 }
-.settings-menu.open { display:block; }
+.settings-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
 .settings-menu .row { display:flex; align-items:center; padding:10px 10px; font-size:14.5px; cursor:default; position:relative; border-radius:9px; }
 .settings-menu .row:hover:not(.header) { background:#242427; }
 .settings-menu .icon { width:20px; height:20px; margin-right:12px; stroke:#d4d4d8; stroke-width:1.7; fill:none; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
@@ -289,7 +305,11 @@ body.light-mode .recents-empty { color:#9a9aa0; }
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  background:#0e0e11;
+  background:#141416;
+  margin:12px 12px 12px 0;
+  border-radius:18px;
+  border:1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:0 4px 24px rgba(0, 0, 0, 0.25);
 }
 .main-inner {
   flex:1;
@@ -1879,11 +1899,12 @@ body.light-mode .settings-menu .row.upgrade-tab .chevron { stroke:#7c3aed; }
 }
 .pricing-overlay.open .pricing-box { transform:scale(1); }
 .pricing-close {
-  position:absolute; top:18px; right:18px; width:32px; height:32px; border:none; border-radius:9px;
-  background:transparent; color:#8a8a93; font-size:22px; line-height:1; cursor:pointer; z-index:3;
+  position:absolute; top:20px; right:20px; width:36px; height:36px; border:none; border-radius:10px;
+  background:rgba(255,255,255,0.06); color:#a1a1aa; font-size:22px; line-height:1; cursor:pointer; z-index:100;
+  display:flex; align-items:center; justify-content:center;
   transition:background 0.15s, color 0.15s;
 }
-.pricing-close:hover { background:#26262b; color:#fff; }
+.pricing-close:hover { background:rgba(255,255,255,0.15); color:#fff; }
 .pricing-head { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:24px; padding-right:36px; }
 .pricing-head-left { min-width:0; }
 .pricing-h2 { font-size:30px; font-weight:600; letter-spacing:-0.02em; line-height:1.2; color:#f4f4f5; margin-bottom:8px; }
@@ -2425,7 +2446,7 @@ body.light-mode .waveform-btn:hover { color:#111827; background:rgba(0,0,0,0.04)
 }
 
 /* ===== Redesigned profile menu (bottom-left) ===== */
-.pm-menu { width: 288px !important; padding: 8px !important; border-radius:18px !important; }
+.pm-menu { padding: 8px !important; border-radius:18px !important; }
 .pm-header { display:flex; align-items:center; gap:12px; padding:8px 10px 10px; }
 .pm-avatar { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,#a855f7 0%,#ec4899 55%,#fb923c 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; flex-shrink:0; text-transform:uppercase; box-shadow:inset 0 0 0 2px rgba(255,255,255,0.06); }
 .pm-id { display:flex; flex-direction:column; min-width:0; gap:2px; }
@@ -2673,16 +2694,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     </nav>
 
     <div class="sidebar-scroll">
-      <div class="yl-section" id="subjectsSection">
-        <div class="yl-label">Spaces</div>
-        <div class="yl-items">
-          <a class="yl-item" id="newSubjectBtn">
-            <svg class="yl-ic-plus" viewBox="0 0 16 16"><path d="M8 2.5V13.5M2.5 8H13.5"/></svg>
-            <span data-i18n="new_project">New Subject</span>
-          </a>
-          <div id="subjectsList"></div>
-        </div>
-      </div>
+
 
       <div class="yl-section" id="historySection">
         <div class="yl-label">Recents</div>
@@ -2691,65 +2703,76 @@ body.light-mode .aset-member .nm { color:#16151c; }
     </div>
 
     <div class="yl-bottom">
-      <div class="yl-reminder">
-        <div class="yl-download-head">
-          <span class="yl-download-title">Daily study reminder</span>
-          <span class="yl-reminder-badge">Streak</span>
-        </div>
-        <p class="yl-download-desc">Get a daily nudge to study and keep your streak alive.</p>
-        <button class="yl-reminder-btn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span class="yl-reminder-label">Remind me daily</span>
-        </button>
-      </div>
       <div class="yl-profile-wrap" id="userProfile">
         <button class="yl-profile" type="button">
-          <span class="yl-avatar-box">
-            <span class="yl-avatar" id="ylAvatarText">JA</span>
+          <span class="yl-avatar-box" id="ylAvatarBox" style="display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:50%;">
+            <span class="yl-avatar" id="ylAvatarText">A</span>
           </span>
-          <span class="yl-name" id="ylName">Jayden Liew</span>
+          <span class="yl-name" id="ylName">Account</span>
           <svg class="yl-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 9l6 6 6-6"/>
           </svg>
         </button>
-        <div class="settings-menu pm-menu" id="settingsMenu">
-          <div class="pm-header">
-            <div class="pm-avatar" id="pmAvatar">
-              <img src="jayden.jpg" class="yl-avatar-img" alt="jayden" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" onerror="this.style.display='none';">
-            </div>
-            <div class="pm-id">
-              <span class="pm-name" id="pmName">jayden</span>
-              <span class="pm-email" id="pmEmail">Signed in</span>
+        <div class="settings-menu pm-menu" id="settingsMenu" style="width: 260px; background-color: #141415; border: 1px solid #27272A; border-radius: 16px; padding: 6px; box-sizing: border-box; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <div style="display: flex; align-items: center; padding: 10px 10px 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: radial-gradient(110% 110% at 30% 20%, #9D8DF1 0%, #6B5CE7 18%, #4B3FC8 36%, #2A7FFF 62%, #20C6B8 92%); position: relative; display:flex; align-items:center; justify-content:center;" id="pmAvatar">
+                <span id="pmAvatarInitials" style="color:#ffffff; font-weight:700; font-size:14px; position:relative; z-index:3;">A</span>
+              </div>
+              <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                <span id="pmName" style="color: #F4F4F5; font-size: 15px; font-weight: 500; letter-spacing: -0.1px;">Account</span>
+                <span id="pmEmail" style="color: #A1A1AA; font-size: 13px; font-weight: 400;">Signed in</span>
+              </div>
             </div>
           </div>
-          <div class="pm-sep"></div>
-          <button class="pm-row" type="button" id="pmProfile">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <span class="pm-label">Profile</span>
-          </button>
-          <button class="pm-row" type="button" id="pmModel">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pmModelGrad" x1="0%" y1="100%" x2="70%" y2="30%"><stop offset="0%" stop-color="#1C7DFF"/><stop offset="52%" stop-color="#1C69FF"/><stop offset="100%" stop-color="#F0DCD6"/></linearGradient></defs><path d="M12 2 L14.6 9.4 L22 12 L14.6 14.6 L12 22 L9.4 14.6 L2 12 L9.4 9.4 Z" fill="url(#pmModelGrad)"/></svg></span>
-            <span class="pm-label">Model</span>
-            <span class="pm-badge pm-badge-blue" id="pmModelBadge">Noura</span>
-          </button>
-          <button class="pm-row" type="button" id="upgradePlanTab">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
-            <span class="pm-label">Subscription</span>
-            <span class="pm-badge" id="pmPlanBadge">Free</span>
-          </button>
-          <button class="pm-row" type="button" id="pmSettings">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
-            <span class="pm-label" data-i18n="settings">Settings</span>
-          </button>
-          <a class="pm-row" href="terms.html" target="_blank" rel="noopener" style="text-decoration:none;">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
-            <span class="pm-label">Terms &amp; Policies</span>
-          </a>
-          <div class="pm-sep"></div>
-          <button class="pm-row pm-logout" type="button" id="pmLogout">
-            <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
-            <span class="pm-label">Sign Out</span>
-          </button>
+
+          <div style="height: 1px; background-color: #27272A; margin: 2px 10px 6px 10px;"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <button id="upgradePlanTab" style="width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%); border: 1px solid rgba(168, 85, 247, 0.25); cursor: pointer; transition: all 0.15s ease; margin-bottom: 3px;" onmouseover="this.style.background='linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(168, 85, 247, 0.25) 100%)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)'">
+              <span style="display: flex; align-items: center; gap: 12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span style="color: #F4F4F5; font-size: 14px; font-weight: 500;">Upgrade Plan</span>
+              </span>
+              <span style="font-size: 10.5px; font-weight: 700; color: #C084FC; background: rgba(168, 85, 247, 0.2); padding: 2px 7px; border-radius: 6px;">PRO</span>
+            </button>
+            <button id="pmProfile" style="width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Account</span>
+            </button>
+            <button id="pmSettings" style="width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+              <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Settings</span>
+            </button>
+          </div>
+
+
+
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <a href="index.html" style="width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease; text-decoration: none;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
+              <span style="display: flex; align-items: center; gap: 12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Homepage</span>
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+            </a>
+            <a href="terms.html" target="_blank" rel="noopener" style="width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease; text-decoration: none;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
+              <span style="display: flex; align-items: center; gap: 12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Terms &amp; Policies</span>
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+            </a>
+          </div>
+
+          <div style="height: 1px; background-color: #27272A; margin: 6px 10px;"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <button id="pmLogout" style="width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+              <span style="color: #EF4444; font-size: 14px; font-weight: 450;">Sign out</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3081,7 +3104,12 @@ body.light-mode .aset-member .nm { color:#16151c; }
           (function () {
             try {
               var n = (localStorage.getItem('TEACHLOOP_NAME') || '').trim();
-              var name = n ? (n.charAt(0).toUpperCase() + n.slice(1)) : 'Jayden';
+              if (!n) {
+                var acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}');
+                n = (acc.name || (acc.email ? acc.email.split('@')[0] : '') || '').trim();
+              }
+              var first = n ? n.split(/\s+/)[0] : '';
+              var name = first ? (first.charAt(0).toUpperCase() + first.slice(1)) : 'there';
               var el = document.getElementById('heroTitleName');
               if (el) { el.textContent = name; }
             } catch (e) { }
@@ -3089,7 +3117,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
         </script>
 
         <h1 class="hero-main-title" id="heroMainTitle">
-          <span id="heroTitleName">Jayden</span>, what are we <span class="title-grad">learning</span> today?
+          <span id="heroTitleName">there</span>, what are we <span class="title-grad">learning</span> today?
         </h1>
 
         <div class="suggested-section">
@@ -3360,7 +3388,12 @@ body.light-mode .aset-member .nm { color:#16151c; }
     newChatNav.classList.add('active');
   });
 
-  function sendMessage() {
+  async function sendMessage() {
+    if (window.NouraCredits && window.NouraCredits.requireCredits) {
+      const ok = await window.NouraCredits.requireCredits();
+      if (!ok) return;
+    }
+
     const text = input ? input.value.trim() : '';
     const att = pendingAttachment;
     if (!text && !att) return;
@@ -3814,7 +3847,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     if (cfg.profile === 'advanced') {
       p += 'profile: advanced\n' + 'role: ai_student\n' + 'human_role: teacher\n' +
         'topic: ' + (topic || 'null') + '\n' + 'human_goal: null\n' +
-        'difficulty: advanced\n' + 'challenge_intensity: standard\n' +
+        'difficulty: advanced\n' + 'challenge_intensity: high\n' +
         'allow_private_teacher_hints: true\n' + 'max_primary_questions: 1\n' +
         'trusted_baseline: []\n' + 'known_claims: []\n' + 'known_definitions: []\n' +
         'known_evidence: []\n' + 'known_assumptions: []\n' + 'known_misconceptions: []\n' +
@@ -5008,7 +5041,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
             '</div>' +
           '</div>' +
         '</div>';
-      card.querySelector('.page-created-btn').addEventListener('click', () => {
+      card.querySelector('.page-created-btn').addEventListener('click', async () => {
+        if (window.NouraCredits && window.NouraCredits.requireCredits) {
+          const ok = await window.NouraCredits.requireCredits();
+          if (!ok) return;
+        }
         const subj = currentSubjectName();
         window.location.href = 'lesson.html?title=' + encodeURIComponent(lessonTitle) + (subj ? '&subject=' + encodeURIComponent(subj) : '');
       });
@@ -5057,7 +5094,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
                 '</div>' +
               '</div>' +
             '</div>';
-          createdCard.querySelector('.page-created-btn').addEventListener('click', () => {
+          createdCard.querySelector('.page-created-btn').addEventListener('click', async () => {
+            if (window.NouraCredits && window.NouraCredits.requireCredits) {
+              const ok = await window.NouraCredits.requireCredits();
+              if (!ok) return;
+            }
             window.location.href = 'new-subject.html?name=' + encodeURIComponent(subjName);
           });
           card.replaceWith(createdCard);
@@ -5074,7 +5115,12 @@ body.light-mode .aset-member .nm { color:#16151c; }
   }
   window._renderLessonExtras = renderLessonExtras;   // debug hook
 
-  function sendChatMessage() {
+  async function sendChatMessage() {
+    if (window.NouraCredits && window.NouraCredits.requireCredits) {
+      const ok = await window.NouraCredits.requireCredits();
+      if (!ok) return;
+    }
+
     const text = chatInput.value.trim();
     const att = pendingAttachment;
     if (!text && !att) return;
@@ -5349,62 +5395,168 @@ body.light-mode .aset-member .nm { color:#16151c; }
     applyTheme(item.dataset.value, true);
   });
 
-  // ===== Redesigned profile menu: fill account, theme toggle, log out =====
+  // ===== Redesigned profile menu: live user profile sync, theme toggle, log out =====
   (function () {
-    // Fill the avatar / name / email from the saved account.
-    let acc = {};
-    try { acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null') || {}; } catch (e) { }
-    const nm = (acc.name || localStorage.getItem('TEACHLOOP_NAME') || 'Jayden Liew').trim();
-    const em = (acc.email || localStorage.getItem('NOURA_EMAIL') || '').trim();
-    const initials = (nm.split(/\s+/).map(w => w[0]).join('').slice(0, 2) || 'JA').toUpperCase();
-    const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
-    set('pmName', nm); set('pmEmail', em || 'Signed in');
-    const pmAv = document.getElementById('pmAvatar'); if (pmAv) pmAv.textContent = initials;
-    const bAv = document.getElementById('ylAvatarText'); if (bAv) bAv.textContent = initials;
-    const bNm = document.getElementById('ylName'); if (bNm) bNm.textContent = nm;
+    function applyUserProfile(profile) {
+      if (!profile) return;
+      var rawName = (profile.name || '').trim();
+      var email = (profile.email || '').trim();
+      if (!rawName && email) {
+        var rawUser = email.split('@')[0].replace(/[._-]+/g, ' ');
+        rawName = rawUser.split(' ').map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+      }
+      var displayName = rawName || 'Account';
+      var first = displayName.split(/\s+/)[0] || 'there';
+      var initials = (displayName.split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2) || 'A').toUpperCase();
+      var avatarUrl = profile.avatar || profile.picture || profile.avatar_url || '';
+
+      // 1. Hero greeting
+      var heroEl = document.getElementById('heroTitleName');
+      if (heroEl) heroEl.textContent = first.charAt(0).toUpperCase() + first.slice(1);
+
+      // 2. Sidebar dashboard label
+      var dashEl = document.getElementById('dashboardNavLabel');
+      if (dashEl) dashEl.textContent = first + "'s Dashboard";
+
+      // 3. Sidebar profile card & menu
+      var ylNm = document.getElementById('ylName');
+      if (ylNm) ylNm.textContent = displayName;
+
+      var pmNm = document.getElementById('pmName');
+      if (pmNm) pmNm.textContent = displayName;
+
+      var pmEm = document.getElementById('pmEmail');
+      if (pmEm) pmEm.textContent = email || 'Signed in';
+
+      // 4. Avatars (Google Profile Photo vs Initials)
+      var ylBox = document.getElementById('ylAvatarBox');
+      var pmAv = document.getElementById('pmAvatar');
+
+      if (avatarUrl) {
+        if (ylBox) {
+          ylBox.innerHTML = '<img src="' + avatarUrl + '" alt="' + displayName + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" onerror="this.parentElement.innerHTML=\'<span class=\\\'yl-avatar\\\'>' + initials + '</span>\'">';
+        }
+        if (pmAv) {
+          pmAv.innerHTML = '<img src="' + avatarUrl + '" alt="' + displayName + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" onerror="this.parentElement.innerHTML=\'<span id=\\\'pmAvatarInitials\\\' style=\\\'color:#ffffff;font-weight:700;font-size:14px;\\\'>' + initials + '</span>\'">';
+        }
+      } else {
+        if (ylBox) ylBox.innerHTML = '<span class="yl-avatar">' + initials + '</span>';
+        if (pmAv) pmAv.innerHTML = '<span id="pmAvatarInitials" style="color:#ffffff;font-weight:700;font-size:14px;">' + initials + '</span>';
+      }
+
+      // 5. Settings modal fields if open
+      var asN = document.getElementById('asetName'); if (asN) asN.textContent = displayName;
+      var asE = document.getElementById('asetEmail'); if (asE) asE.textContent = email || 'Signed in';
+
+      // 6. Refresh user-scoped credits and streak
+      if (window.NouraCredits && window.NouraCredits.refresh) {
+        try { window.NouraCredits.refresh(); } catch (err) {}
+      }
+      if (typeof window.updateUserStreak === 'function') {
+        try { window.updateUserStreak(); } catch (err) {}
+      }
+    }
+
+    // Immediate render from localStorage
+    var localAcc = {};
+    try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}') || {}; } catch (e) { }
+    var localName = localStorage.getItem('TEACHLOOP_NAME') || localAcc.name || '';
+    var localEmail = localStorage.getItem('NOURA_EMAIL') || localAcc.email || '';
+    var localAvatar = localAcc.avatar || '';
+    applyUserProfile({ name: localName, email: localEmail, avatar: localAvatar });
+
+    // Live sync from Supabase OAuth user session (e.g. Google Sign-In)
+    if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase) {
+      try {
+        var sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        var handleAuthUser = function (user) {
+          if (!user) return;
+          var meta = user.user_metadata || {};
+          var gName = (meta.full_name || meta.name || meta.given_name || '').trim();
+          var gEmail = user.email || '';
+          var gAvatar = meta.avatar_url || meta.picture || '';
+
+          var updatedProfile = {
+            id: user.id,
+            email: gEmail,
+            name: gName || (gEmail ? gEmail.split('@')[0] : 'Account'),
+            avatar: gAvatar,
+            provider: 'google'
+          };
+          try { localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(updatedProfile)); } catch (e) { }
+          try { localStorage.setItem('NOURA_EMAIL', gEmail); } catch (e) { }
+          try { localStorage.setItem('TEACHLOOP_NAME', updatedProfile.name); } catch (e) { }
+          applyUserProfile(updatedProfile);
+
+          // Clean the OAuth token hash from the URL bar for a pristine address
+          if (window.location.hash && window.location.hash.includes('access_token')) {
+            try { history.replaceState(null, document.title, window.location.pathname + window.location.search); } catch (e) { }
+          }
+        };
+
+        sb.auth.getUser().then(function (res) {
+          if (res && res.data && res.data.user) handleAuthUser(res.data.user);
+        }).catch(function () { });
+
+        sb.auth.getSession().then(function (res) {
+          if (res && res.data && res.data.session && res.data.session.user) {
+            handleAuthUser(res.data.session.user);
+          }
+        }).catch(function () { });
+
+        sb.auth.onAuthStateChange(function (evt, session) {
+          if (session && session.user) {
+            handleAuthUser(session.user);
+          }
+        });
+      } catch (err) { }
+    }
 
     // Model badge → single Study Assistant tutor.
     try {
-      const mb = document.getElementById('pmModelBadge'); if (mb) mb.textContent = 'Study';
+      var mb = document.getElementById('pmModelBadge'); if (mb) mb.textContent = 'Study';
     } catch (e) {}
 
     // Profile + Model rows → open the Settings panel.
-    const openSet = (e) => { e.stopPropagation();
-      const menu = document.getElementById('settingsMenu'); if (menu) menu.classList.remove('open');
+    var openSet = function (e) {
+      e.stopPropagation();
+      var menu = document.getElementById('settingsMenu'); if (menu) menu.classList.remove('open');
       if (window.openNouraSettings) window.openNouraSettings();
     };
     document.getElementById('pmProfile')?.addEventListener('click', openSet);
     document.getElementById('pmModel')?.addEventListener('click', openSet);
 
     // Appearance toggle → dark/light (ON = dark).
-    const tgl = document.getElementById('pmThemeToggle');
-    const syncTgl = () => { if (tgl) tgl.classList.toggle('on', !document.body.classList.contains('light-mode')); };
+    var tgl = document.getElementById('pmThemeToggle');
+    var syncTgl = function () { if (tgl) tgl.classList.toggle('on', !document.body.classList.contains('light-mode')); };
     syncTgl();
-    tgl?.addEventListener('click', (e) => {
+    tgl?.addEventListener('click', function (e) {
       e.stopPropagation();
-      const isLight = document.body.classList.contains('light-mode');
+      var isLight = document.body.classList.contains('light-mode');
       applyTheme(isLight ? 'Dark' : 'Light', true);
       syncTgl();
     });
 
     // Feedback → open a pre-filled email, then close the menu.
-    document.getElementById('pmFeedback')?.addEventListener('click', (e) => {
+    document.getElementById('pmFeedback')?.addEventListener('click', function (e) {
       e.stopPropagation();
-      const menu = document.getElementById('settingsMenu');
+      var menu = document.getElementById('settingsMenu');
       if (menu) menu.classList.remove('open');
       try { window.location.href = 'mailto:axuorainnovations@gmail.com?subject=Noura%20Feedback'; } catch (err) {}
     });
 
-    // Log out → clear the local session (+ Supabase if configured) and restart.
-    document.getElementById('pmLogout')?.addEventListener('click', (e) => {
+    // Log out → clear session and redirect to login
+    document.getElementById('pmLogout')?.addEventListener('click', function (e) {
       e.stopPropagation();
       try {
         if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase) {
           window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY).auth.signOut();
         }
       } catch (err) { }
-      ['NOURA_ACCOUNT', 'NOURA_EMAIL', 'NOURA_PENDING_PROFILE', 'TEACHLOOP_ONBOARDED'].forEach(k => { try { localStorage.removeItem(k); } catch (err) { } });
-      window.location.href = 'onboarding.html';
+      ['NOURA_ACCOUNT', 'NOURA_EMAIL', 'NOURA_PENDING_PROFILE', 'TEACHLOOP_NAME', 'TEACHLOOP_ONBOARDED'].forEach(function (k) {
+        try { localStorage.removeItem(k); } catch (err) { }
+      });
+      window.location.href = 'login.html';
     });
   })();
 
@@ -6630,9 +6782,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const menu = document.getElementById('streakMenu');
     const daysWrap = document.getElementById('streakDays');
     if (!badge || !menu || !daysWrap) return;
-    const KEY = 'TEACHLOOP_ACTIVE_DAYS';
     const GOAL = 2;
     const LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    function getStorageKey() {
+      const em = (localStorage.getItem('NOURA_EMAIL') || '').trim().toLowerCase();
+      return em ? ('TEACHLOOP_ACTIVE_DAYS_' + em) : 'TEACHLOOP_ACTIVE_DAYS';
+    }
 
     // Local calendar day as YYYY-MM-DD (avoids UTC off-by-one).
     function dayStr(d) {
@@ -6649,43 +6805,54 @@ body.light-mode .aset-member .nm { color:#16151c; }
       return s;
     }
 
-    // Load the set of active dates and record today.
     let active = [];
-    try { active = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
-    if (!Array.isArray(active)) active = [];
-    const today = new Date();
-    const todayStr = dayStr(today);
-    if (!active.includes(todayStr)) active.push(todayStr);
-    try { localStorage.setItem(KEY, JSON.stringify(active)); } catch (e) {}
 
-    // Build this week's 7 days and mark which were studied.
-    const monday = weekStart(today);
-    const activeSet = new Set(active);
-    let studiedThisWeek = 0;
+    function renderStreak() {
+      const KEY = getStorageKey();
+      active = [];
+      try { active = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+      if (!Array.isArray(active)) active = [];
+      const today = new Date();
+      const todayStr = dayStr(today);
+      if (!active.includes(todayStr)) active.push(todayStr);
+      try { localStorage.setItem(KEY, JSON.stringify(active)); } catch (e) {}
 
-    daysWrap.innerHTML = '';
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const ds = dayStr(d);
-      const isActive = activeSet.has(ds);
-      if (isActive) studiedThisWeek++;
+      // Build this week's 7 days and mark which were studied.
+      const monday = weekStart(today);
+      const activeSet = new Set(active);
+      let studiedThisWeek = 0;
 
-      const cell = document.createElement('div');
-      cell.className = 'streak-day' + (isActive ? ' active' : '') + (ds === todayStr ? ' today' : '');
-      cell.innerHTML = '<div class="streak-dot"></div><div class="streak-day-label">' + LABELS[i] + '</div>';
-      daysWrap.appendChild(cell);
+      daysWrap.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const ds = dayStr(d);
+        const isActive = activeSet.has(ds);
+        if (isActive) studiedThisWeek++;
+
+        const cell = document.createElement('div');
+        cell.className = 'streak-day' + (isActive ? ' active' : '') + (ds === todayStr ? ' today' : '');
+        cell.innerHTML = '<div class="streak-dot"></div><div class="streak-day-label">' + LABELS[i] + '</div>';
+        daysWrap.appendChild(cell);
+      }
+
+      // Show a plain number: how many days studied this week.
+      const sc = document.getElementById('streakCount');
+      if (sc) sc.textContent = studiedThisWeek;
+      const sbc = document.getElementById('streakBigCount');
+      if (sbc) sbc.textContent = studiedThisWeek;
+      const descEl = document.getElementById('streakDesc');
+      if (descEl) {
+        if (studiedThisWeek === 0) {
+          descEl.textContent = 'Study today to start your streak.';
+        } else {
+          descEl.textContent = "You've studied " + studiedThisWeek + ' day' + (studiedThisWeek === 1 ? '' : 's') + ' this week.';
+        }
+      }
     }
 
-    // Show a plain number: how many days studied this week.
-    document.getElementById('streakCount').textContent = studiedThisWeek;
-    document.getElementById('streakBigCount').textContent = studiedThisWeek;
-    const descEl = document.getElementById('streakDesc');
-    if (studiedThisWeek === 0) {
-      descEl.textContent = 'Study today to start your streak.';
-    } else {
-      descEl.textContent = "You've studied " + studiedThisWeek + ' day' + (studiedThisWeek === 1 ? '' : 's') + ' this week.';
-    }
+    window.updateUserStreak = renderStreak;
+    renderStreak();
 
     // Tap the badge to toggle the dropdown.
     badge.addEventListener('click', (e) => {
@@ -6741,6 +6908,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       }
 
       // Stats: total days studied, current streak, longest streak.
+      const todayStr = dayStr(new Date());
       const studied = [...set].filter(ds => ds <= todayStr).sort();
       let current = 0; const cur = new Date(t);
       while (set.has(dayStr(cur))) { current++; cur.setDate(cur.getDate() - 1); }
@@ -6968,15 +7136,60 @@ body.light-mode .aset-member .nm { color:#16151c; }
       if (cameFromDash) { window.location.href = 'dashboard.html'; }
     }
 
+    if (closeBtn) closeBtn.addEventListener('click', closePricing);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closePricing();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closePricing();
+    });
+
     // Both the new top "Upgrade Plan" tab and the existing "Upgrade plan" row open it.
     document.getElementById('upgradePlanTab')?.addEventListener('click', (e) => { e.stopPropagation(); openPricing(); });
     document.querySelectorAll('[data-i18n="upgrade_plan"]').forEach(el => {
       el.closest('.row')?.addEventListener('click', (e) => { e.stopPropagation(); openPricing(); });
     });
 
-    closeBtn?.addEventListener('click', closePricing);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closePricing(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePricing(); });
+    window.openPricing = openPricing;
+    window.closePricing = closePricing;
+
+    window.startStripeCheckout = async function (plan) {
+      const activeOpt = toggle ? toggle.querySelector('.mp-opt.active') : null;
+      const period = activeOpt ? (activeOpt.dataset.period || 'monthly') : 'monthly';
+      
+      let email = '';
+      try {
+        const acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}');
+        email = acc.email || localStorage.getItem('NOURA_EMAIL') || '';
+      } catch (e) {}
+
+      const btn = event && event.target ? event.target : null;
+      let oldText = '';
+      if (btn && btn.tagName === 'BUTTON') {
+        oldText = btn.textContent;
+        btn.textContent = 'Redirecting to Stripe...';
+        btn.disabled = true;
+      }
+
+      try {
+        const res = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ plan: plan, period: period, email: email })
+        });
+        const data = await res.json();
+        if (data && data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Could not start checkout: ' + (data?.error?.message || 'Please try again.'));
+          if (btn) { btn.textContent = oldText; btn.disabled = false; }
+        }
+      } catch (err) {
+        console.error('Checkout error:', err);
+        alert('Checkout error: ' + err.message);
+        if (btn) { btn.textContent = oldText; btn.disabled = false; }
+      }
+    };
 
     // Deep-link: dashboard "Explore Premium" / "Start trial" open the paywall directly.
     if (cameFromDash) openPricing();
@@ -7018,7 +7231,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
 <!-- Upgrade / pricing modal -->
 <div class="pricing-overlay" id="pricingOverlay">
   <div class="pricing-box" role="dialog" aria-modal="true">
-    <button class="pricing-close" id="pricingClose" type="button" aria-label="Close">×</button>
+    <button class="pricing-close" id="pricingClose" type="button" aria-label="Close" onclick="if(window.closePricing) window.closePricing(); else document.getElementById('pricingOverlay')?.classList.remove('open');">×</button>
     <div class="pricing-head">
       <div class="pricing-head-left">
         <h2 class="pricing-h2">Plans &amp; Pricing</h2>
@@ -7035,8 +7248,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
       <!-- Starter -->
       <div class="pt-card">
         <div>
-          <div class="pt-price">$<span class="pt-amount" data-monthly="18" data-yearly="173">18</span><span class="pt-per">/month</span></div>
-          <div class="pt-perday"></div>
+          <div class="pt-price">$<span class="pt-amount" data-monthly="0" data-yearly="0">0</span><span class="pt-per"> forever</span></div>
+          <div class="pt-perday">Free to learn &amp; explore</div>
           <h3 class="pt-name">Starter</h3>
           <p class="pt-cardesc">Great for getting started and light study sessions.</p>
           <div class="pt-includes">
@@ -7048,49 +7261,50 @@ body.light-mode .aset-member .nm { color:#16151c; }
             </ul>
           </div>
         </div>
-        <button class="pt-btn" type="button">Get started</button>
+        <button class="pt-btn" type="button" onclick="document.getElementById('pricingClose').click()">Current plan</button>
       </div>
 
-      <!-- Scholar (popular, middle) -->
+      <!-- Pro (popular, middle) -->
       <div class="pt-card popular">
         <div>
           <span class="pt-badge">Popular</span>
-          <div class="pt-price">$<span class="pt-amount" data-monthly="30" data-yearly="288">30</span><span class="pt-per">/month</span></div>
-          <div class="pt-perday"></div>
-          <h3 class="pt-name">Scholar</h3>
+          <div class="pt-price">$<span class="pt-amount" data-monthly="8" data-yearly="77">8</span><span class="pt-per">/month</span></div>
+          <div class="pt-perday">Just $0.27 / day</div>
+          <h3 class="pt-name">Pro</h3>
           <p class="pt-cardesc">Best value for regular learners who study often.</p>
           <div class="pt-includes">
             <h4 class="pt-inc-head">Everything in Starter, plus:</h4>
             <ul class="pt-list">
-              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>1,500 learning tokens</li>
-              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Priority responses</li>
+              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>1,500 learning tokens / mo</li>
+              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Priority AI student responses</li>
               <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Quiz &amp; exam-prep mode</li>
+              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Voice conversations &amp; Audio Recap</li>
             </ul>
           </div>
         </div>
-        <button class="pt-btn primary" type="button">Get started</button>
+        <button class="pt-btn primary" type="button" onclick="startStripeCheckout('pro')">Upgrade to Pro</button>
       </div>
 
       <!-- Unlimited -->
       <div class="pt-card">
         <div>
-          <div class="pt-price">$<span class="pt-amount" data-monthly="120" data-yearly="1,152">120</span><span class="pt-per">/month</span></div>
-          <div class="pt-perday"></div>
+          <div class="pt-price">$<span class="pt-amount" data-monthly="15" data-yearly="144">15</span><span class="pt-per">/month</span></div>
+          <div class="pt-perday">Just $0.50 / day</div>
           <h3 class="pt-name">Unlimited</h3>
           <p class="pt-cardesc">For power users who never want to run out.</p>
           <div class="pt-includes">
-            <h4 class="pt-inc-head">Everything in Scholar, plus:</h4>
+            <h4 class="pt-inc-head">Everything in Pro, plus:</h4>
             <ul class="pt-list">
               <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Fair Use — Unlimited tokens</li>
-              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Unlimited subjects</li>
-              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Early access to new features</li>
+              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Unlimited subjects &amp; uploads</li>
+              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Priority voice generation &amp; early features</li>
             </ul>
           </div>
         </div>
-        <button class="pt-btn" type="button">Get started</button>
+        <button class="pt-btn" type="button" onclick="startStripeCheckout('unlimited')">Upgrade to Unlimited</button>
       </div>
     </div>
-    <div class="pricing-note">Payments aren’t set up yet — this is a preview of the plans.</div>
+    <div class="pricing-note">Secure payments powered by Stripe Checkout. Cancel anytime.</div>
   </div>
 </div>
 
@@ -7175,13 +7389,6 @@ body.light-mode .aset-member .nm { color:#16151c; }
             <div class="aset-langlist" id="asetLangList" role="listbox"></div>
           </div>
         </div>
-        <div class="aset-row aset-clickable" id="asetThemeRow" style="border-bottom:none">
-          <span class="aset-row-label">Theme</span>
-          <span class="aset-row-val">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-            <span id="asetTheme">Dark</span>
-            <svg class="aset-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
-        </div>
       </div>
 
       <!-- Plan & Billing -->
@@ -7241,8 +7448,6 @@ body.light-mode .aset-member .nm { color:#16151c; }
       let subs = 0;
       try { subs = (JSON.parse(localStorage.getItem('TEACHLOOP_SUBJECTS') || '[]') || []).length; } catch (e) {}
       setTxt('asetSubjects', String(subs));
-      // Theme label
-      setTxt('asetTheme', document.body.classList.contains('light-mode') ? 'Light' : 'Dark');
       // Language label + flag
       syncLangLabel();
       // Plan
@@ -7296,16 +7501,6 @@ body.light-mode .aset-member .nm { color:#16151c; }
       const done = () => { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 1600); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done).catch(done);
       else done();
-    });
-
-    // Theme row toggles dark/light (reuses applyTheme if available)
-    document.getElementById('asetThemeRow')?.addEventListener('click', () => {
-      const isLight = document.body.classList.contains('light-mode');
-      const next = isLight ? 'Dark' : 'Light';
-      if (typeof applyTheme === 'function') applyTheme(next, true);
-      else document.body.classList.toggle('light-mode');
-      document.getElementById('asetTheme').textContent = document.body.classList.contains('light-mode') ? 'Light' : 'Dark';
-      const tgl = document.getElementById('pmThemeToggle'); if (tgl) tgl.classList.toggle('on', !document.body.classList.contains('light-mode'));
     });
 
     // Upgrade → open pricing

@@ -28,7 +28,7 @@
     s.id = 'nouraCreditCSS';
     s.textContent =
       '#' + BANNER_ID + '{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:99999;' +
-      'max-width:min(560px,92vw);background:#141416;border:1px solid rgba(227,160,8,.45);' +
+      'max-width:min(560px,92vw);background:#141416;border:1px solid rgba(139,92,246,.55);' +
       'border-radius:14px;padding:14px 17px;box-shadow:0 12px 40px rgba(0,0,0,.5);' +
       "font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;color:#E8E8E6;" +
       'display:flex;gap:13px;align-items:flex-start}' +
@@ -69,12 +69,25 @@
     b.id = BANNER_ID;
     b.setAttribute('role', 'status');
     b.innerHTML =
-      '<div><div class="t"></div><div class="d"></div></div>' +
+      '<div style="flex:1"><div class="t"></div><div class="d"></div></div>' +
+      '<button class="noura-upgrade-btn" type="button" style="background:linear-gradient(135deg,#a855f7 0%,#7c3aed 100%);color:#fff;font-weight:700;font-size:12.5px;padding:7px 15px;border-radius:9999px;border:none;cursor:pointer;flex-shrink:0;box-shadow:0 4px 14px rgba(139,92,246,0.35);margin-right:6px;transition:transform 0.15s ease;" onmouseover="this.style.transform=\'scale(1.04)\'" onmouseout="this.style.transform=\'none\'">Upgrade Plan</button>' +
       '<button class="x" type="button" aria-label="Dismiss">&#10005;</button>';
     b.querySelector('.t').textContent = title;
     b.querySelector('.d').textContent = detail;
+    b.querySelector('.noura-upgrade-btn').addEventListener('click', function () {
+      b.remove();
+      if (typeof window.openPricing === 'function') window.openPricing();
+      else document.getElementById('upgradePlanTab')?.click();
+    });
     b.querySelector('.x').addEventListener('click', function () { b.remove(); });
     document.body.appendChild(b);
+
+    // Prompt the user to upgrade directly
+    if (typeof window.openPricing === 'function') {
+      window.openPricing();
+    } else {
+      document.getElementById('upgradePlanTab')?.click();
+    }
     setTimeout(function () { if (b.parentNode) b.remove(); }, 14000);
   }
 
@@ -192,7 +205,7 @@
   function paint(el, d) {
     if (!el || !d) return;
     var per = d.cost_per_action || 50;
-    var bal = d.balance || 0;
+    var bal = Math.max(0, Number(d.balance) || 0);
     var dropBal = document.getElementById('ncDropBalVal');
 
     if (d.unlimited) {
@@ -213,6 +226,36 @@
       : Math.floor(bal / per) + ' study actions left (' + per + ' credits each)';
   }
 
+  function fetchStatus() {
+    return window.fetch('/api/me').then(function (r) { return r.json(); }).catch(function () { return null; });
+  }
+
+  /** True if the account can spend on a new generation. Shows the out-of-credits banner when not. */
+  function requireCredits() {
+    return fetchStatus().then(function (d) {
+      if (!d) {
+        show({ error: 'insufficient_credits' });
+        return false;
+      }
+      if (d.unlimited) return true;
+      var bal = Math.max(0, Number(d.balance) || 0);
+      var need = Number(d.cost_per_action) || 50;
+      if (bal <= 0 || bal < need) {
+        show(Object.assign({ error: 'insufficient_credits' }, d));
+        window.dispatchEvent(new CustomEvent('noura:credits-exhausted'));
+        return false;
+      }
+      return true;
+    }).catch(function () {
+      show({ error: 'insufficient_credits' });
+      return false;
+    });
+  }
+
+  function refreshStatus() {
+    return fetchStatus();
+  }
+
   /**
    * Mount the balance pill to the left of `where`.
    */
@@ -231,7 +274,6 @@
     el.setAttribute('tabindex', '0');
     el.innerHTML = '<svg class="sparkle-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c0 4.5-3.5 8-8 8 4.5 0 8 3.5 8 8 0-4.5 3.5-8 8-8-4.5 0-8-3.5-8-8z"/><path d="M19 3c0 1.5-1 2.5-2.5 2.5 1.5 0 2.5 1 2.5 2.5 0-1.5 1-2.5 2.5-2.5-1.5 0-2.5-1-2.5-2.5z" stroke-width="1.5"/></svg><span class="n">--</span>';
 
-    // Dropdown matching user screenshot cleanly
     var drop = document.createElement('div');
     drop.id = 'nouraCreditDropdown';
     drop.className = 'nc-dropdown';
@@ -241,13 +283,6 @@
         '<button class="nc-drop-upgrade" type="button">Upgrade</button>' +
       '</div>' +
       '<div class="nc-drop-divider"></div>' +
-      '<div class="nc-drop-banner">' +
-        '<div class="nc-drop-banner-left">' +
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c0 4.5-3.5 8-8 8 4.5 0 8 3.5 8 8 0-4.5 3.5-8 8-8-4.5 0-8-3.5-8-8z"/></svg>' +
-          '<span>Noura 1.6 Lite is free for a limited time.</span>' +
-        '</div>' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>' +
-      '</div>' +
       '<div class="nc-stat-row">' +
         '<div class="nc-stat-header">' +
           '<div class="nc-stat-title-group">' +
@@ -261,12 +296,23 @@
           '<span>Free credits</span>' +
           '<span>500</span>' +
         '</div>' +
-        '</div>';
+      '</div>';
 
     wrap.appendChild(el);
     wrap.appendChild(drop);
 
-    // Toggle dropdown on click
+    drop.querySelector('.nc-drop-upgrade')?.addEventListener('click', function (e) {
+      e.stopPropagation();
+      drop.classList.remove('open');
+      if (typeof window.openPricing === 'function') {
+        window.openPricing();
+      } else {
+        var tab = document.getElementById('upgradePlanTab');
+        if (tab) tab.click();
+        else window.location.href = 'chatbot.html?upgrade=1';
+      }
+    });
+
     el.addEventListener('click', function(e) {
       e.stopPropagation();
       drop.classList.toggle('open');
@@ -362,6 +408,8 @@
     accountEmail: accountEmail,
     mountPill: mountPill,
     refresh: refresh,
+    refreshStatus: refreshStatus,
+    requireCredits: requireCredits,
     claimWelcome: claimWelcome,
     async status() {
       try { return await (await window.fetch('/api/me')).json(); }

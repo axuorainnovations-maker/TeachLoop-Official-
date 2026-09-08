@@ -12,6 +12,8 @@
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 <script src="https://cdn.lordicon.com/lordicon.js"></script>
+<link rel="stylesheet" href="lesson-flow.css?v=17">
+<script src="lesson-flow.js?v=17"></script>
 <style>
   :root { --grad: linear-gradient(140deg,#c4b5fd 0%,#a855f7 38%,#7c3aed 72%,#6d28d9 100%); --purple:#8b5cf6; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -98,7 +100,7 @@
   .ov-title { font-size:clamp(30px,3.8vw,42px); font-weight:800; letter-spacing:-.02em; line-height:1.2; color:#ffffff; }
   .ov-start-row { display:flex; align-items:center; gap:24px; margin-bottom:44px; flex-wrap:wrap; }
 
-  /* Rich Deep Purple PopButton for Start Lesson — Wider layout matching Screenshot 1 */
+  /* Rich Deep Purple PopButton for Start Lesson */
   .start-btn {
     min-width: 210px;
     padding: 14px 48px;
@@ -137,14 +139,14 @@
   .contents-head .prog { font-size:13.5px; font-weight:600; color:#a1a1aa; background:rgba(255,255,255,0.05); padding:4px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.08); }
 
   /* 100% Dead-Center Aligned Timeline Line */
-  .timeline { position:relative; display:flex; flex-direction:column; gap:14px; }
+  .timeline { position:relative; display:flex; flex-direction:column; gap:16px; }
   .timeline::before {
-    content:''; position:absolute; left:26px; transform:translateX(-50%); top:var(--tl-top, 22px); height:var(--tl-track, 0px); width:2px;
+    content:''; position:absolute; left:29px; transform:translateX(-50%); top:var(--tl-top, 22px); height:var(--tl-track, 0px); width:2px;
     background:rgba(255, 255, 255, 0.1); z-index:0;
   }
-  /* Green Completed Line — No Glow */
+  /* Soft lavender completed line → green for progress */
   .timeline::after {
-    content:''; position:absolute; left:26px; transform:translateX(-50%); top:var(--tl-top, 22px); width:3px; border-radius:3px;
+    content:''; position:absolute; left:29px; transform:translateX(-50%); top:var(--tl-top, 22px); width:3px; border-radius:3px;
     height:var(--tl-fill, 0px);
     background:#419b67;
     box-shadow:none !important;
@@ -153,25 +155,26 @@
 
   /* Timeline Rows */
   .tl-row {
-    position:relative; display:flex; align-items:center; gap:20px; padding:10px 0; transition:all .15s ease; z-index:1;
+    position:relative; display:flex; align-items:center; gap:22px; padding:10px 0; transition:all .15s ease; z-index:1;
   }
 
-  /* Circular Nodes with Crisp 3D Geometry — 100% Opaque Solid Fill */
+  /* Circular Nodes — purple for current, green for completed */
   .tl-dot {
-    position:relative; z-index:10; width:44px; height:44px; flex-shrink:0; border-radius:50%;
-    background:#232326 !important; border:2px solid #38383e !important; display:flex; align-items:center;
-    justify-content:center; font-size:15px; font-weight:700; color:#b0b0b8 !important; opacity:1 !important;
-    margin-left:4px; box-shadow:none !important;
+    position:relative; z-index:10; width:54px; height:54px; flex-shrink:0; border-radius:50%;
+    background:#232326 !important; border:2.5px solid #38383e !important; display:flex; align-items:center;
+    justify-content:center; font-size:17px; font-weight:800; color:#b0b0b8 !important; opacity:1 !important;
+    margin-left:2px; box-shadow:none !important;
   }
   .tl-row.current .tl-dot {
-    border:2px solid #a78bfa !important; border-bottom:4px solid #4c1d95 !important;
+    border:2.5px solid #a78bfa !important; border-bottom:5px solid #4c1d95 !important;
     background:#7c3aed !important; color:#ffffff !important; opacity:1 !important;
   }
   .tl-row.done .tl-dot {
-    background:#2e9e62 !important; border:2px solid #3fd986 !important; color:#ffffff !important; opacity:1 !important;
+    background:#2e9e62 !important; border:2.5px solid #3fd986 !important; border-bottom:4px solid #1f7a4a !important;
+    color:#ffffff !important; opacity:1 !important;
   }
   .tl-row.done .tl-dot svg { stroke:#ffffff; stroke-width:3.2; }
-  .tl-dot svg { width:18px; height:18px; }
+  .tl-dot svg { width:22px; height:22px; }
 
   .tl-score-done {
     display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700;
@@ -197,8 +200,8 @@
   .tl-card .tl-title { font-size:16.5px; font-weight:800; color:#ffffff; }
   .tl-card .tl-sub { font-size:13px; color:#c4b5fd; margin-top:3px; font-weight:600; }
 
-  /* Rich Purple PopButton for Start inside active card */
-  .tl-start {
+  /* Rich purple PopButton for Start / Continue / Review */
+  .tl-start, .tl-review {
     padding: 8px 24px;
     height: 44px;
     border: 2px solid #a78bfa;
@@ -218,12 +221,12 @@
     transform-origin: bottom;
     flex-shrink: 0;
   }
-  .tl-start:hover {
+  .tl-start:hover, .tl-review:hover {
     background: #8b5cf6;
     border-color: #c4b5fd;
     color: #ffffff;
   }
-  .tl-start:active {
+  .tl-start:active, .tl-review:active {
     border-bottom-width: 2px;
     transform: translateY(2px) scaleY(0.98);
   }
@@ -233,8 +236,6 @@
   .tl-scorepill.good { color:#c4b5fd; border-color:rgba(167,139,250,0.4); background:rgba(167,139,250,0.12); }
   .tl-scorepill.low { color:#facc15; border-color:rgba(250,204,21,0.4); background:rgba(250,204,21,0.12); }
   .tl-scorepill.done-pill { color:#a1a1aa; border-color:rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); font-weight:600; }
-  .tl-review { padding:6px 16px; border:1px solid #3f3f46; border-radius:10px; background:#27272a; color:#f4f4f5; font-size:13px; font-weight:600; cursor:pointer; transition:background .15s ease; }
-  .tl-review:hover { background:#3f3f46; color:#ffffff; }
 
   /* ── Study Brief ── */
   .brief { display:none; max-width:880px; margin:0 auto; padding:48px 28px 40px; }
@@ -1371,40 +1372,150 @@
   .pl-bar { height:5px; border-radius:99px; background:#1e1e22; overflow:hidden; margin-bottom:40px; }
   .pl-bar i { display:block; height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#a78bfa,#7c3aed); transition:width .3s ease; }
 
-  /* Section reader (Matching Screenshots 1 & 2 format) */
+  /* ── Section reader — new full-screen learn page UI ── */
+  body.section-reading .topbar,
+  body.section-reading .rail { display:none !important; }
+  body.section-reading .main { padding:0 !important; min-height:100vh; background:#121212; }
+  body.section-reading .player {
+    display:block !important;
+    position:fixed; inset:0; z-index:100;
+    max-width:none; margin:0; padding:0;
+    background:#121212; color:#fff;
+    overflow:hidden;
+  }
+  body.section-reading .pl-top,
+  body.section-reading .pl-bar { display:none !important; }
+
+  .sr-header {
+    position:fixed; top:0; left:0; right:0; z-index:40;
+    height:64px; display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; background:transparent;
+  }
+  .sr-close {
+    width:40px; height:40px; border:none; border-radius:999px; background:transparent;
+    color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background .15s;
+  }
+  .sr-close:hover { background:rgba(255,255,255,0.05); }
+  .sr-progress {
+    position:absolute; left:50%; transform:translateX(-50%);
+    display:flex; align-items:center; gap:8px;
+  }
+  .sr-dot {
+    width:12px; height:12px; border-radius:999px; border:none; padding:0;
+    background:#3F3F46; cursor:pointer; transition:all .2s ease;
+  }
+  .sr-dot.active { width:28px; background:#8b5cf6; }
+  .sr-dot.visited { background:#8b5cf6; opacity:0.5; }
+  .sr-dot:hover:not(.active) { background:#71717A; }
+  .sr-actions { display:flex; align-items:center; gap:4px; }
+  .sr-icon {
+    width:40px; height:40px; border:none; border-radius:999px; background:transparent;
+    color:#71717A; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all .15s;
+  }
+  .sr-icon:hover { background:rgba(255,255,255,0.05); color:#fff; }
+
+  .sr-main {
+    height:100%; overflow-y:auto; padding:88px 24px 140px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .sr-inner {
+    max-width:680px; margin:0 auto;
+    animation:srFadeIn .3s ease;
+  }
+  @keyframes srFadeIn {
+    from { opacity:0; transform:translateY(8px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
   .reader {
-    max-width:680px; margin:110px auto 0; padding:0 10px 40px;
-    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
-    font-size:18px; line-height:1.68; color:#d4d4d8;
+    max-width:680px; margin:0 auto; padding:0;
+    font-family:'Inter','Plus Jakarta Sans',-apple-system,sans-serif;
+    font-size:17px; line-height:1.6; color:#fff;
   }
   .reader h1, .reader h2 {
-    font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1.3;
-    color:#ffffff; margin:0 0 22px;
+    font-size:32px; font-weight:700; letter-spacing:-.02em; line-height:1.15;
+    color:#ffffff; margin:0 0 20px;
   }
   .reader h3 {
-    font-size:20px; font-weight:800; letter-spacing:-.01em;
+    font-size:20px; font-weight:700; letter-spacing:-.01em;
     color:#ffffff; margin:28px 0 14px;
   }
-  .reader p { margin:0 0 24px; color:#d4d4d8; font-weight:400; }
-  .reader strong, .reader b { font-weight:800; color:#ffffff !important; }
+  .reader p { margin:0 0 24px; color:#fff; font-weight:400; }
+  .reader strong, .reader b {
+    font-weight:600; color:#ffffff !important;
+    text-decoration:underline; text-decoration-color:rgba(255,255,255,0.3);
+    text-underline-offset:3px; text-decoration-thickness:1px;
+  }
   .reader ul, .reader ol { margin:12px 0 24px; padding-left:0; list-style:none; }
   .reader li {
-    position:relative; padding-left:22px; margin-bottom:14px;
-    font-size:17.5px; line-height:1.6; color:#e4e4e7; font-weight:600;
+    position:relative; padding-left:22px; margin-bottom:12px;
+    font-size:15px; line-height:1.5; color:#A1A1AA; font-weight:500;
   }
   .reader ul li::before {
-    content:'•'; position:absolute; left:0; top:-1px;
-    color:#a78bfa; font-size:22px; line-height:1; font-weight:800;
+    content:''; position:absolute; left:0; top:8px;
+    width:6px; height:6px; border-radius:999px; background:#A1A1AA;
   }
   .reader blockquote {
-    border-left:3px solid #7c3aed; background:#1c1c22;
-    border-radius:0 12px 12px 0; padding:16px 20px; margin:20px 0;
-    color:#e4e4e7; font-size:16.5px; line-height:1.6;
+    margin:32px 0; border-radius:12px; border:1px solid rgba(255,255,255,0.1);
+    background:#1E1E1E; padding:20px 24px;
+    color:#A1A1AA; font-size:15px; line-height:1.5;
+  }
+  .reader blockquote strong, .reader blockquote b {
+    display:block; color:#fff !important; font-size:16px; font-weight:700;
+    text-decoration:none; margin-bottom:10px;
   }
   .reader code { background:#1c1c20; border:1px solid #2a2a2e; border-radius:6px; padding:2px 6px; font-size:14px; }
   .reader table { width:100%; border-collapse:collapse; margin:0 0 18px; font-size:14.5px; }
   .reader th, .reader td { border:1px solid #2a2a2e; padding:9px 12px; text-align:left; }
   .reader th { background:#161619; color:#fff; }
+  .reader img {
+    display:block; width:100%; margin:32px 0; border-radius:20px;
+    border:1px solid rgba(255,255,255,0.1); aspect-ratio:4/3; object-fit:cover;
+  }
+
+  .sr-footer {
+    position:fixed; bottom:0; left:0; right:0; z-index:40;
+    padding:24px; background:linear-gradient(to top, #121212 80%, transparent);
+  }
+  .sr-footer-inner {
+    max-width:680px; margin:0 auto; display:flex; gap:12px;
+  }
+  .sr-btn {
+    flex:1; height:54px; border-radius:14px; border:2px solid;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:13px; font-weight:500; letter-spacing:.05em; text-transform:uppercase;
+    cursor:pointer; transition:all .15s ease;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .sr-btn:hover { transform:translateY(1px); filter:brightness(0.98); }
+  .sr-btn:active { transform:translateY(2px); }
+  .sr-btn-next {
+    background:#8b5cf6; border-color:#8b5cf6; color:#ffffff;
+    box-shadow:0 4px 0 0 #5b21b6;
+  }
+  .sr-btn-next:active { box-shadow:0 2px 0 0 #5b21b6; }
+  .sr-btn-back {
+    flex:0 0 auto; min-width:132px;
+    background:#27272A; border-color:#3F3F46; color:#fff;
+    box-shadow:0 4px 0 0 #18181B;
+  }
+  .sr-btn-back:active { box-shadow:0 2px 0 0 #18181B; }
+  .sr-btn-back[disabled] { opacity:.35; cursor:not-allowed; pointer-events:none; }
+
+  .sr-help {
+    position:fixed; bottom:104px; right:24px; z-index:30;
+    width:72px; height:48px; border:1px solid rgba(255,255,255,0.1);
+    border-radius:12px; display:none; align-items:center; justify-content:center;
+    gap:4px; cursor:pointer; background:#1E1E1E;
+    box-shadow:0 2px 8px rgba(0,0,0,0.2); color:#fff;
+    font-weight:700; font-size:16px; transition:all .15s;
+  }
+  .sr-help:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+  @media (min-width:640px) { .sr-help { display:flex; } }
+
+  /* Checkpoint still uses classic nav buttons */
   .pl-nav { display:flex; justify-content:space-between; align-items:center; margin-top:44px; }
   .pl-back {
     padding:12px 28px; height:50px; border:2px solid #3f3f46; border-bottom:5px solid #18181b;
@@ -1913,8 +2024,6 @@
   #castView .br-kicker, #castView .br-title { display:none; }
   #castView .br-head { margin-bottom:0; justify-content:flex-end; }
 
-
-
   </style>
   <script src="noura-credits.js"></script>
 </head>
@@ -1989,7 +2098,7 @@
   <!-- Study Brief -->
   <div class="brief" id="briefView">
     <div class="br-head hero-head">
-      <div class="ov-hero">
+      <div class="ov-hero" style="display:flex;align-items:center;gap:20px;">
         <div class="ov-logo" id="brLogo"></div>
         <h1 class="ov-title" id="brTitle"></h1>
       </div>
@@ -2025,14 +2134,23 @@
     <div id="rcBody"></div>
   </div>
 
-  <!-- Player -->
+  <!-- Player (checkpoints keep classic chrome) -->
   <div class="player" id="player">
     <div class="pl-top">
+      <button class="pl-close" id="plClose" type="button" title="Back to overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
       <div class="pl-label" id="plLabel"></div>
+      <div class="pl-score" id="plScore" hidden><span id="plScoreN">0</span>/4</div>
     </div>
     <div class="pl-bar"><i id="plBarFill"></i></div>
     <div id="plBody"></div>
   </div>
+</div>
+
+<!-- Full-screen Learn section reader (exact design) -->
+<div class="lf-player" id="lfPlayer" data-theme="dark">
+  <div id="lfRoot"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2043,14 +2161,17 @@
   const title = (params.get('title') || 'Your lesson').trim();
   const subject = (params.get('subject') || '').trim();
   const slug = title.toLowerCase();
-  const DATA_KEY = 'NOURA_LESSON_V2_' + slug;
-  const STATE_KEY = 'NOURA_LESSON_STATE_' + slug;
-    // Clear stale cached lesson if it contains legacy 'Core Concept' titles
+  const DATA_KEY = 'NOURA_LESSON_V7_' + slug;
+  const STATE_KEY = 'NOURA_LESSON_STATE_V5_' + slug;
+    // Clear stale or incomplete cached lessons
     try {
       const cached = localStorage.getItem(DATA_KEY);
-      if (cached && cached.includes('Core Concept')) {
-        localStorage.removeItem(DATA_KEY);
-        console.log('[Lesson] Purged stale cached lesson containing legacy Core Concept placeholders.');
+      if (cached) {
+        const p = JSON.parse(cached);
+        if (!p || !Array.isArray(p.items) || p.items.length < 3 || cached.includes('Core Concept')) {
+          localStorage.removeItem(DATA_KEY);
+          console.log('[Lesson] Purged stale or invalid cached lesson.');
+        }
       }
     } catch(e){}
 
@@ -2058,6 +2179,8 @@
   document.getElementById('crumbTitle').textContent = title;
   document.getElementById('loadTitle').textContent = title;
   document.getElementById('ovTitle').textContent = title;
+
+
 
   // Opening a lesson counts as studying → keep the streak alive.
   try {
@@ -2185,6 +2308,10 @@
   const railCheck = document.getElementById('railCheck');
   const railCast = document.getElementById('railCast');
   function show(view) {
+    document.body.classList.remove('section-reading');
+    document.body.classList.remove('lf-active');
+    const lfPlayer = document.getElementById('lfPlayer');
+    if (lfPlayer) lfPlayer.classList.remove('open');
     loadView.style.display = view === 'load' ? 'flex' : 'none';
     overview.style.display = view === 'overview' ? 'block' : 'none';
     player.style.display = view === 'player' ? 'block' : 'none';
@@ -2243,7 +2370,7 @@
   function renderOverview() {
     // Reachable before the lesson exists (e.g. the "Next: Learn" flow button,
     // now that Study Brief comes first). Build it instead of rendering a shell.
-    if (!lesson || !Array.isArray(lesson.items) || !lesson.items.length) { generate(false); return; }
+    if (!lesson || !Array.isArray(lesson.items) || lesson.items.length < 3) { generate(false); return; }
     show('overview');
     const cur = firstIncomplete();
     const ovLogoEl = document.getElementById('ovLogo');
@@ -2283,17 +2410,18 @@
         } else {
             if (inProgress) {
                 sub.style.color = '#9ca3af';
-                sub.textContent = item.pages.length + ' pages · ' + p + ' done';
+                sub.textContent = sectionPageCount(item) + ' pages · ' + p + ' done';
                 const dashContainer = document.createElement('div');
                 dashContainer.style.cssText = 'display:flex; gap:6px; margin-top:8px;';
-                for (let j = 0; j < item.pages.length; j++) {
+                for (let j = 0; j < sectionPageCount(item); j++) {
                     const dash = document.createElement('div');
                     dash.style.cssText = 'height:4px; flex:1; max-width:24px; border-radius:2px; background-color:' + (j < p ? '#419b67' : 'rgba(255,255,255,0.1)');
                     dashContainer.appendChild(dash);
                 }
                 sub.appendChild(dashContainer);
             } else {
-                sub.textContent = item.pages.length + (item.pages.length === 1 ? ' page' : ' pages');
+                const n = sectionPageCount(item);
+                sub.textContent = n + (n === 1 ? ' page' : ' pages');
             }
         }
         card.appendChild(info);
@@ -2327,7 +2455,7 @@
         } else if (item.type === 'checkpoint') {
           metaHtml += '<span>Checkpoint</span>';
         } else {
-          metaHtml += '<span>' + item.pages.length + (item.pages.length === 1 ? ' page' : ' pages') + '</span>';
+          metaHtml += '<span>' + sectionPageCount(item) + (sectionPageCount(item) === 1 ? ' page' : ' pages') + '</span>';
         }
         if (locked) metaHtml += LOCK;
         meta.innerHTML = metaHtml;
@@ -2405,143 +2533,252 @@
   const plBody = document.getElementById('plBody');
 
   function openItem(i) {
+    if (!lesson || !Array.isArray(lesson.items) || !lesson.items[i]) {
+      generate(false);
+      return;
+    }
     const item = lesson.items[i];
     if (!item) return;
+    if (item.type === 'section') {
+      playSection(i, item);
+      return;
+    }
     show('player');
-    if (item.type === 'section') playSection(i, item);
-    else playCheckpoint(i, item);
+    playCheckpoint(i, item);
   }
 
-  // ── Section reader with Inline Quiz Support (Matching Screenshot 2) ──
-  function playSection(idx, item) {
-    const plTop = document.querySelector('.pl-top');
-    if (plScore) plScore.hidden = true;
-    if (plBarFill && plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
-    let page = state.progress[idx] || 0;
-    function render() {
-      state.progress[idx] = page;
-      saveState();
-      if (plLabel) {
-        plLabel.innerHTML = '<span>' + escapeHtml(item.title) + '</span><span class="dim">· ' + (page + 1) + ' of ' + item.pages.length + '</span>';
+  // ── Section reader — exact design (lesson-flow) ──
+  function topicEmojiFor(title) {
+    const t = String(title || '').toLowerCase();
+    if (/bio|cell|human|sapiens|evol/.test(t)) return '🧬';
+    if (/war|battle|military|nazi|holocaust/.test(t)) return '⚔️';
+    if (/econ|market|trade/.test(t)) return '📈';
+    if (/geo|earth|map/.test(t)) return '🌍';
+    if (/hist|empire|ancient/.test(t)) return '🏛️';
+    if (/phys|atom|energy/.test(t)) return '⚛️';
+    if (/psych|mind|brain/.test(t)) return '🧠';
+    return '📖';
+  }
+
+  function mdPageToStep(page, sectionTitle, pageIndex, total) {
+    if (page && typeof page === 'object' && page.kind) return page;
+    const raw = typeof page === 'string' ? page : (page && (page.body || page.content || page.markdown)) || '';
+    const lines = String(raw).split(/\n+/).map(l => l.trim()).filter(Boolean);
+    let title = sectionTitle || 'Learn';
+    const paragraphs = [];
+    lines.forEach(function (line) {
+      if (/^#{1,3}\s+/.test(line)) {
+        if (!paragraphs.length) title = line.replace(/^#{1,3}\s+/, '');
+        else paragraphs.push(line.replace(/^#{1,3}\s+/, ''));
+      } else {
+        paragraphs.push(line.replace(/\*\*/g, ''));
       }
-      if (plBarFill) plBarFill.style.width = Math.round(((page + 1) / item.pages.length) * 100) + '%';
-      if (plBody) plBody.innerHTML = '';
-      const art = document.createElement('div');
-      art.className = 'reader';
-      art.innerHTML = md(item.pages[page]);
+    });
+    if (!paragraphs.length) paragraphs.push(raw || 'Continue learning this section.');
 
-      // Inline Quiz support for section pages (Matching Screenshot 2)
-      const pageQuiz = (item.quizzes && item.quizzes[page]) || (page === item.pages.length - 1 ? item.quiz : null);
-      if (pageQuiz && pageQuiz.q && Array.isArray(pageQuiz.options)) {
-        const qBox = document.createElement('div');
-        qBox.className = 'inline-quiz-box';
-        qBox.style.cssText = 'margin-top:36px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);';
-        const qTitle = document.createElement('div');
-        qTitle.className = 'qz-q';
-        qTitle.style.cssText = 'font-size:20px !important;line-height:1.45 !important;margin-bottom:20px !important;color:#ffffff !important;';
-        qTitle.textContent = pageQuiz.q;
-        qBox.appendChild(qTitle);
-
-        const optsWrap = document.createElement('div');
-        optsWrap.className = 'qz-opts';
-        optsWrap.style.cssText = 'display:flex;flex-direction:column;gap:12px;margin-bottom:24px;';
-        let picked = -1, checked = false;
-
-        pageQuiz.options.forEach((optText, oIdx) => {
-          const btn = document.createElement('button');
-          btn.className = 'qz-opt'; btn.type = 'button';
-          btn.innerHTML = '<span class="num">' + (oIdx + 1) + '</span><span>' + esc(optText) + '</span>';
-          btn.addEventListener('click', () => {
-            if (checked) return;
-            picked = oIdx;
-            optsWrap.querySelectorAll('.qz-opt').forEach((b, k) => {
-              b.classList.toggle('sel', k === picked);
-            });
-            checkBtn.disabled = false;
-          });
-          optsWrap.appendChild(btn);
-        });
-        qBox.appendChild(optsWrap);
-
-        const checkRow = document.createElement('div');
-        checkRow.className = 'qz-actions';
-        checkRow.style.cssText = 'display:flex;justify-content:flex-end;margin-bottom:16px;';
-        
-        const checkBtn = document.createElement('button');
-        checkBtn.className = 'qz-check'; checkBtn.type = 'button'; checkBtn.textContent = 'Check';
-        checkBtn.disabled = true;
-
-        const fbBox = document.createElement('div');
-        fbBox.className = 'cp-fb';
-        fbBox.style.display = 'none';
-
-        checkBtn.addEventListener('click', () => {
-          if (picked === -1) return;
-          if (checked) {
-            if (page === item.pages.length - 1) { markDone(idx); renderOverview(); }
-            else { page++; render(); }
-            return;
-          }
-          checked = true;
-          state.answers[idx + '_' + page] = picked;
-          saveState();
-          checkBtn.textContent = page === item.pages.length - 1 ? 'Finish section' : 'Next';
-          const isCorrect = (picked === pageQuiz.answer);
-          optsWrap.querySelectorAll('.qz-opt').forEach((b, k) => {
-            b.classList.remove('sel');
-            if (k === pageQuiz.answer) b.classList.add('correct');
-            else if (k === picked) b.classList.add('wrong');
-            b.classList.add('disabled');
-          });
-          fbBox.className = 'cp-fb ' + (isCorrect ? 'correct' : 'incorrect');
-          fbBox.style.display = 'block';
-          fbBox.innerHTML = '<div class="cp-fb-hd">' +
-            (isCorrect
-              ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><h4 class="cp-fb-title">Correct</h4>'
-              : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><h4 class="cp-fb-title">Incorrect</h4>') +
-          '</div>' +
-          '<p class="cp-fb-text">' + esc(pageQuiz.explain || (isCorrect ? 'Great understanding!' : 'Review the key concepts above.')) + '</p>';
-        });
-
-        if (state.answers[idx + '_' + page] !== undefined) {
-          picked = state.answers[idx + '_' + page];
-          const btnToClick = optsWrap.querySelectorAll('.qz-opt')[picked];
-          if (btnToClick) {
-            btnToClick.click();
-            checkBtn.click();
-          }
-        }
-
-        checkRow.appendChild(checkBtn);
-        qBox.appendChild(checkRow);
-        qBox.appendChild(fbBox);
-        art.appendChild(qBox);
-      }
-
-      mathify(art);
-      plBody.appendChild(art);
-
-      if (!pageQuiz) {
-        const nav = document.createElement('div');
-        nav.className = 'pl-nav';
-        nav.style.justifyContent = 'flex-end';
-
-        const nextBtn = document.createElement('button'); nextBtn.className = 'pl-next'; nextBtn.type = 'button';
-        nextBtn.textContent = page === item.pages.length - 1 ? 'Finish section' : 'Next';
-        nextBtn.addEventListener('click', () => {
-          if (page === item.pages.length - 1) { markDone(idx); renderOverview(); }
-          else { page++; render(); }
-        });
-        nav.appendChild(nextBtn);
-        plBody.appendChild(nav);
-      }
-      window.scrollTo(0, 0);
+    if (pageIndex === 0 && (title.indexOf('?') !== -1 || String(paragraphs[0]).indexOf('?') !== -1)) {
+      return { kind: 'hook', question: title.indexOf('?') !== -1 ? title : paragraphs[0], subtitle: sectionTitle };
     }
-    render();
+
+    // Legacy markdown pages: use baseline (image) or context (callout) layouts only
+    if (pageIndex % 2 === 0) {
+      return {
+        kind: 'baseline',
+        title: title,
+        paragraphs: paragraphs.slice(0, 4),
+        highlightTerms: [],
+        imageQuery: (sectionTitle || title).split(/\s+/).slice(0, 3).join(' '),
+        closing: paragraphs.length > 4 ? paragraphs[paragraphs.length - 1] : ''
+      };
+    }
+    return {
+      kind: 'context',
+      title: title,
+      paragraphs: paragraphs.slice(0, 3),
+      callout: {
+        title: paragraphs.length > 1 ? 'Key takeaway' : 'Why this matters',
+        body: paragraphs[paragraphs.length - 1] || 'Keep this idea in mind as you continue.'
+      }
+    };
+  }
+
+  function buildSectionFlow(item) {
+    let steps = [];
+    if (Array.isArray(item.steps) && item.steps.length) steps = item.steps.slice();
+    else if (item.flow && Array.isArray(item.flow.steps) && item.flow.steps.length) steps = item.flow.steps.slice();
+    else {
+      const pages = Array.isArray(item.pages) ? item.pages : [];
+      steps = pages.map(function (p, i) {
+        return mdPageToStep(p, item.title, i, pages.length);
+      });
+    }
+
+    const topic = String(item.title || title || '').trim();
+
+    // Normalize: only the FIRST step may be a hook / intro question page
+    steps = steps.map(function (s, i) {
+      if (!s || typeof s !== 'object') return s;
+      const copy = Object.assign({}, s);
+      if (i > 0 && copy.kind === 'hook') {
+        copy.kind = 'baseline';
+        copy.title = copy.title || copy.question || item.title || 'Continue';
+        if (!copy.paragraphs || !copy.paragraphs.length) {
+          copy.paragraphs = [copy.subtitle || copy.question || 'Keep building on what you just learned.'].filter(Boolean);
+        }
+        copy.imageQuery = copy.imageQuery || topic;
+      }
+      // Topic-specific image search — keep queries short so diagrams stay simple & labeled
+      if ((copy.kind === 'baseline' || copy.kind === 'content') && !copy.imageUrl) {
+        let baseQ = String(copy.imageQuery || copy.title || topic || '').trim();
+        // Prefer the concrete subject phrase (first 5 words) over long concatenated titles
+        baseQ = baseQ.replace(/\s+/g, ' ').split(/\s+/).slice(0, 5).join(' ');
+        if (!/diagram|structure|labeled/i.test(baseQ)) {
+          baseQ = (baseQ || topic.split(/\s+/).slice(0, 4).join(' ')) + ' structure';
+        }
+        copy.imageQuery = baseQ;
+        if (!copy.imageCaption) {
+          copy.imageCaption = copy.title || baseQ;
+        }
+      }
+      // Shorten timeline event labels for the colored chart
+      if (copy.kind === 'consequence' && Array.isArray(copy.events)) {
+        copy.events = copy.events.slice(0, 4).map(function (ev, idx) {
+          const e = Object.assign({}, ev);
+          if (e.label && String(e.label).split(/\s+/).length > 4) {
+            e.label = String(e.label).replace(/^[^:]+:\s*/, '').split(/\s+/).slice(0, 4).join(' ');
+          }
+          if (e.position == null) e.position = 14 + idx * (72 / Math.max(Math.min(copy.events.length, 4) - 1, 1));
+          return e;
+        });
+      }
+      return copy;
+    });
+
+    if (!steps.length) {
+      steps.push({ kind: 'hook', question: 'What should you understand about ' + (item.title || 'this topic') + '?', subtitle: item.title || 'Lesson' });
+      steps.push({ kind: 'baseline', title: item.title || 'Overview', paragraphs: ['This section is still loading content.'], imageQuery: topic });
+    } else if (steps[0].kind !== 'hook') {
+      steps.unshift({
+        kind: 'hook',
+        question: 'What makes ' + (item.title || 'this topic') + ' worth understanding?',
+        subtitle: item.title || 'Your lesson'
+      });
+    }
+
+    // Ensure the two visual diagrams exist (timeline + two-phase synthesis = image 5)
+    const kinds = steps.map(function (s) { return s && s.kind; });
+    if (kinds.indexOf('consequence') === -1) {
+      const insertAt = Math.max(1, steps.length - 1);
+      steps.splice(insertAt, 0, {
+        kind: 'consequence',
+        title: 'How the pieces connect',
+        paragraphs: [
+          'Follow the flow from the starting idea through the two shaping forces to the outcome.',
+          'Each box is a short label — the arrow shows what leads to what.'
+        ],
+        chartTitle: 'How ' + (item.title || 'this topic') + ' fits together',
+        flow: {
+          title: 'How ' + (item.title || 'this topic') + ' fits together',
+          top: 'Core process',
+          middle: ['Shaping force A', 'Shaping force B'],
+          bottom: 'Resulting outcome'
+        },
+        events: [
+          { label: 'Core process' },
+          { label: 'Shaping force A' },
+          { label: 'Shaping force B' },
+          { label: 'Resulting outcome' }
+        ]
+      });
+    }
+    if (kinds.indexOf('synthesis') === -1) {
+      steps.push({
+        kind: 'synthesis',
+        title: 'Why this matters',
+        paragraphs: [
+          'Put the two phases side by side. What looked like one event was a before-and-after shift.'
+        ],
+        comparison: {
+          label: 'Two phases of our story',
+          before: { title: 'Before', items: ['Limited scale', 'Old assumptions', 'Local effects'] },
+          after: { title: 'After', items: ['Full mobilization', 'New strategy', 'Global impact'] },
+          shared: 'Same stakes, different ways of organizing'
+        }
+      });
+    }
+    if (kinds.indexOf('table') === -1) {
+      steps.push({
+        kind: 'table',
+        title: 'Choice, context, and conclusion',
+        paragraphs: [
+          'The same choice can look rational or irrational depending on what someone lived through.'
+        ],
+        tableLabel: 'Choice, context, and conclusion',
+        table: {
+          headers: ['Choice', 'Shaping experience', 'Why it is rational'],
+          rows: [
+            ['Acting early', 'Seeing a sudden threat', 'Waiting felt costlier than moving'],
+            ['Scaling up', 'Watching demand explode', 'Half-measures would fail'],
+            ['Holding course', 'Past shocks in memory', 'Consistency beat panic']
+          ]
+        }
+      });
+    }
+
+    return { title: item.title, flow: { steps: steps } };
+  }
+
+  let lfMounted = false;
+  function ensureLessonFlow() {
+    if (!lfMounted && window.LessonFlow) {
+      LessonFlow.mount('lfRoot');
+      lfMounted = true;
+    }
+    return window.LessonFlow;
+  }
+
+  function playSection(idx, item) {
+    player.style.display = 'none';
+    const LF = ensureLessonFlow();
+    if (!LF) {
+      showToast('Lesson reader failed to load');
+      renderOverview();
+      return;
+    }
+    const data = buildSectionFlow(item);
+    const total = data.flow.steps.length;
+    // Resume where the user left off (e.g. page 3); otherwise start on intro
+    const saved = state.progress[idx];
+    const openAt = (typeof saved === 'number' && saved >= 0)
+      ? Math.min(saved, Math.max(total - 1, 0))
+      : 0;
+
+    LF.open(data, {
+      emoji: topicEmojiFor(item.title || title),
+      startStep: openAt,
+      onClose: function () {
+        renderOverview();
+      },
+      onComplete: function () {
+        markDone(idx);
+        delete state.progress[idx];
+        saveState();
+        renderOverview();
+      },
+      onStep: function (step) {
+        state.progress[idx] = step;
+        saveState();
+      }
+    });
   }
 
   // ── Checkpoint quiz ──
   function playCheckpoint(idx, item) {
+    document.body.classList.remove('section-reading');
+    document.body.classList.remove('lf-active');
+    const lfPlayer = document.getElementById('lfPlayer');
+    if (lfPlayer) lfPlayer.classList.remove('open');
+    player.style.display = 'block';
     const plTop = document.querySelector('.pl-top');
     if (plTop) plTop.style.display = 'flex';
     if (plScore) plScore.hidden = true;
@@ -2947,57 +3184,59 @@
   // ── Study Brief ─────────────────────────────────────────────
   // A focused pre-study brief for the current lesson topic. Six fixed
   // sections, generated once and cached alongside the lesson.
-  function getTopicLordicon(topic, subj) {
+  function getTopicLottie(topic, subj) {
     const rawT = (String(topic || '')).toLowerCase();
     const rawS = (String(subj || '')).toLowerCase();
     const sClean = rawS === 'general' ? '' : rawS;
     const t = (rawT + ' ' + sClean).trim();
 
-    // History / WWII / War / D-Day / Military / Holocaust / Revolution / Empire / Ancient / Europe / Battle
-    if (t.includes('history') || t.includes('war') || t.includes('d-day') || t.includes('dday') || t.includes('theater') || t.includes('past') || t.includes('revolution') || t.includes('ancient') || t.includes('empire') || t.includes('holocaust') || t.includes('wwii') || t.includes('ww2') || t.includes('military') || t.includes('invasion') || t.includes('allied') || t.includes('nazi') || t.includes('hitler') || t.includes('battle'))
-      return { json: 'https://cdn.lordicon.com/lupuorrc.json', img: 'https://img.icons8.com/3d-fluency/180/scroll.png' };
+    // 1. History, Warfare, Battles, Revolutions, Empires
+    if (/\b(history|war|wars|battle|battles|revolution|empire|empires|ancient|feudal|dynasty|d-day|stalingrad|normandy|wwi|wwii|world war|past|civilization|monarch|law|civic|politi)\b/i.test(t))
+      return '/assets/lottie/history.json';
 
-    // Biology / Cell / Membrane / Genetics / Organelles / DNA (using word boundaries for gene so General never matches)
-    if (t.includes('cell') || t.includes('membrane') || t.includes('biology') || t.includes('organelle') || t.includes('mitochondria') || t.includes('dna') || /\bgenetics?\b/.test(t) || /\bgenes?\b/.test(t) || t.includes('protein') || t.includes('eukaryot') || t.includes('prokaryot') || t.includes('virus') || t.includes('bacteri'))
-      return { json: 'https://cdn.lordicon.com/mrdiiocb.json', img: 'https://img.icons8.com/3d-fluency/180/microscope.png' };
+    // 2. Biology, Cells, Genetics, Medicine, Anatomy, Nursing
+    if (/\b(biology|cell|cells|membrane|organelle|organelles|mitochondria|chloroplast|dna|gene|genes|genetics|protein|proteins|eukaryote|prokaryote|virus|bacteria|anatomy|nursing|medicine|photosynthesis|respiration|organism)\b/i.test(t))
+      return '/assets/lottie/biology.json';
 
-    // Physics / Chemistry / Science / Atom / Molecule
-    if (t.includes('physic') || t.includes('chem') || t.includes('atom') || t.includes('molecule') || t.includes('reaction') || t.includes('quantum') || t.includes('force') || t.includes('motion') || t.includes('gravity'))
-      return { json: 'https://cdn.lordicon.com/kthelypq.json', img: 'https://img.icons8.com/3d-fluency/180/molecule.png' };
+    // 3. Physics, Chemistry, Engineering, Electronics, Quantum, Energy
+    if (/\b(physics|chemistry|chem|atom|atoms|atomic|molecule|molecules|quantum|thermodynamics|gravity|electromagnetism|force|forces|motion|kinetic|potential|energy|reaction|reactions|element|elements|engine|electr)\b/i.test(t))
+      return '/assets/lottie/physics.json';
 
-    // Mathematics / Algebra / Geometry / Calculus / Numbers / Equation / Venn
-    if (t.includes('math') || t.includes('algeb') || t.includes('geomet') || t.includes('calculus') || t.includes('number') || t.includes('equation') || t.includes('venn') || t.includes('trig'))
-      return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/calculator.png' };
+    // 4. Business, Economics, Finance, Accounting, Management, Marketing, Commerce
+    if (/\b(business|economics|econ|finance|financial|market|markets|stock|stocks|accounting|accountancy|commerce|management|marketing|entrepreneurship|trade|money|capital|inflation|gdp|audit)\b/i.test(t))
+      return '/assets/lottie/economics.json';
 
-    // Computer Science / Coding / Tech
-    if (t.includes('computer') || t.includes('code') || t.includes('program') || t.includes('tech') || t.includes('algorithm') || t.includes('python') || t.includes('java') || t.includes('data'))
-      return { json: 'https://cdn.lordicon.com/qhgjhxev.json', img: 'https://img.icons8.com/3d-fluency/180/laptop.png' };
+    // 5. Computer Science, Programming, Coding, Software, Data Science, AI
+    if (/\b(computer|programming|coding|code|developer|software|algorithm|algorithms|python|javascript|java|c\+\+|html|css|database|sql|cybersecurity|machine learning|ai|cs)\b/i.test(t))
+      return '/assets/lottie/cs.json';
 
-    // Microeconomics / Macroeconomics / Finance / Market / Money
-    if (t.includes('econ') || t.includes('micro') || t.includes('macro') || t.includes('finance') || t.includes('market') || t.includes('money') || t.includes('trade') || t.includes('stock') || t.includes('price'))
-      return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/bar-chart.png' };
+    // 6. Mathematics, Algebra, Geometry, Calculus, Statistics, Trigonometry
+    if (/\b(math|mathematics|algebra|geometry|calculus|trigonometry|arithmetic|equation|equations|statistics|probability|stats|matrix|vectors|fractions|decimals)\b/i.test(t))
+      return '/assets/lottie/math.json';
 
-    // Geography / Earth / Planet / Environment
-    if (t.includes('geography') || t.includes('earth') || t.includes('planet') || t.includes('map') || t.includes('climate') || t.includes('ocean'))
-      return { json: 'https://cdn.lordicon.com/oaflahpk.json', img: 'https://img.icons8.com/3d-fluency/180/globe.png' };
+    // 7. Geography, Earth Science, Environment, Climate, Maps
+    if (/\b(geography|earth|globe|continent|continents|ocean|oceans|map|maps|climate|weather|tectonic|geology|ecosystem|biome|volcano)\b/i.test(t))
+      return '/assets/lottie/geography.json';
 
-    // Psychology / Brain / Mind / Neuroscience / Philosophy
-    if (t.includes('psych') || t.includes('brain') || t.includes('mind') || t.includes('thought') || t.includes('philosoph') || t.includes('logic'))
-      return { json: 'https://cdn.lordicon.com/gqdnbgzi.json', img: 'https://img.icons8.com/3d-fluency/180/brain.png' };
+    if (rawS.includes('history') || rawS.includes('war')) return '/assets/lottie/history.json';
+    if (rawS.includes('bio')) return '/assets/lottie/biology.json';
+    if (rawS.includes('phys') || rawS.includes('chem')) return '/assets/lottie/physics.json';
+    if (rawS.includes('econ') || rawS.includes('bus')) return '/assets/lottie/economics.json';
+    if (rawS.includes('cs') || rawS.includes('comp')) return '/assets/lottie/cs.json';
 
-    // Literature / Writing / Essay / Book / Reading
-    if (t.includes('literat') || t.includes('write') || t.includes('essay') || t.includes('book') || t.includes('read') || t.includes('english') || t.includes('novel'))
-      return { json: 'https://cdn.lordicon.com/lupuorrc.json', img: 'https://img.icons8.com/3d-fluency/180/open-book.png' };
+    return '/assets/lottie/biology.json';
+  }
 
-    // Default: Graduation Cap for general topics
-    return { json: 'https://cdn.lordicon.com/qhviklyi.json', img: 'https://img.icons8.com/3d-fluency/180/graduation-cap.png' };
+  function getTopicLordicon(topic, subj) {
+    const url = getTopicLottie(topic, subj);
+    return { lottie: url, img: url };
   }
 
   function renderTopicIllustration(targetEl, topic, subj) {
     if (!targetEl) return;
-    const item = getTopicLordicon(topic, subj);
-    targetEl.innerHTML = '<div class="topic-illu-wrap" style="display:flex;align-items:center;justify-content:center;width:120px;height:120px;margin-bottom:12px;">' +
-      '<img src="' + item.img + '" alt="' + esc(topic) + '" style="width:110px;height:110px;object-fit:contain;filter:none;animation:float 4s ease-in-out infinite;" class="topic-illu-img">' +
+    const lottieUrl = getTopicLottie(topic, subj);
+    targetEl.innerHTML = '<div class="topic-illu-wrap" style="display:flex;align-items:center;justify-content:flex-start;width:185px;height:185px;margin-bottom:16px;">' +
+      '<lottie-player src="' + lottieUrl + '" background="transparent" speed="1" style="width:180px;height:180px;" loop autoplay></lottie-player>' +
       '</div>';
   }
 
@@ -3040,17 +3279,20 @@
   // and bullets rather than a grid of cards.
   function renderBrief() {
     const formatBullet = text => {
-      const s = esc(text);
+      let s = esc(text);
+      if (s.includes('**')) {
+        return s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+      }
       if (s.includes('&lt;b&gt;') || s.includes('&lt;strong&gt;')) return s;
       const colonIdx = s.indexOf(':');
-      if (colonIdx > 0 && colonIdx < 50) {
+      if (colonIdx > 0 && colonIdx < 60) {
         return '<b>' + s.slice(0, colonIdx + 1) + '</b>' + s.slice(colonIdx + 1);
       }
       const words = s.split(' ');
-      if (words.length > 4) {
+      if (words.length >= 4) {
         return '<b>' + words.slice(0, 3).join(' ') + '</b> ' + words.slice(3).join(' ');
       }
-      return '<b>' + s + '</b>';
+      return s;
     };
 
     const li = arr => '<ul>' + arr.map(x => '<li>' + formatBullet(x) + '</li>').join('') + '</ul>';
@@ -3072,13 +3314,24 @@
 
     const formatExample = text => {
       let s = esc(text);
+      if (s.includes('**')) {
+        s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+      }
       return s.replace(/\(([^)]+)\)/g, '<b>($1)</b>');
+    };
+
+    const formatBigIdea = text => {
+      let s = esc(text);
+      if (s.includes('**')) {
+        s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+      }
+      return s;
     };
 
     brBody.innerHTML =
       '<div class="br-doc">' +
         '<div class="br-sub">Study Brief note</div>' +
-        '<div class="br-callout"><div class="br-callout-title">Big Idea</div>' + esc(brief.bigIdea) + '</div>' +
+        '<div class="br-callout"><div class="br-callout-title">Big Idea</div>' + formatBigIdea(brief.bigIdea) + '</div>' +
         '<h2>Key concepts</h2>' + li(brief.keyConcepts) +
         '<h2>Must-know terms</h2>' + termsTable +
         '<h2>Simple example</h2><div class="br-example-box">' + formatExample(brief.example) + '</div>' +
@@ -3110,12 +3363,16 @@
     if (!title || title === 'Your lesson') { renderBriefEmpty(); return; }
     if (brief && !force) { renderBrief(); return; }
     if (!force) {
-      try { const c = JSON.parse(localStorage.getItem(BRIEF_KEY) || 'null'); if (validBrief(c)) { brief = plainMathDeep(c); renderBrief(); return; } } catch (e) {}
+      try {
+        const c = JSON.parse(localStorage.getItem(BRIEF_KEY) || 'null');
+        if (validBrief(c)) { brief = plainMathDeep(c); renderBrief(); return; }
+        else { localStorage.removeItem(BRIEF_KEY); }
+      } catch (e) { localStorage.removeItem(BRIEF_KEY); }
     }
     if (briefBusy) return;
     briefBusy = true;
     const prog = renderBriefLoading();
-    const system = 'You are Noura, a study tutor writing a short pre-study brief. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"bigIdea": string (1-2 sentences), "keyConcepts": [string x3-6] (each under 20 words), "terms": [{"term": string, "definition": string (under 18 words)} x3-6], "example": string (one concrete example, mini scenario or analogy, 2-3 sentences), "mistakes": [string x2-4] (each a specific misunderstanding students have, under 22 words), "explainGoals": [string x2-4] (each starting with a verb, something the student must be able to say in their own words)}. Be concise and concrete - no filler, no repetition of the title. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
+    const system = 'You are Noura, a study tutor writing a short pre-study brief. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"bigIdea": string (1-2 sentences), "keyConcepts": [string x3-6] (each in format "Concept Name: 1-sentence concise description", under 22 words), "terms": [{"term": string, "definition": string (under 18 words)} x3-6], "example": string (one concrete example, mini scenario or analogy, 2-3 sentences), "mistakes": [string x2-4] (each a specific misunderstanding students have, under 22 words), "explainGoals": [string x2-4] (each starting with a verb, something the student must be able to say in their own words)}. Be concise and concrete - no filler, no repetition of the title. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
     const user = 'Write the StudyBrief for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
@@ -4257,8 +4514,21 @@
   const statusLines = ['Getting started', 'Planning the sections', 'Writing explanations and examples', 'Building your checkpoints', 'Polishing your lesson'];
   let statusIdx = 0;
 
+  function sectionPageCount(item) {
+    if (!item) return 0;
+    if (Array.isArray(item.steps) && item.steps.length) return item.steps.length;
+    if (item.flow && Array.isArray(item.flow.steps) && item.flow.steps.length) return item.flow.steps.length;
+    if (Array.isArray(item.pages)) return item.pages.length;
+    return 0;
+  }
+
   function okItem(it) {
-    return (it && it.type === 'section' && it.title && Array.isArray(it.pages) && it.pages.length) ||
+    const hasPages = it && it.type === 'section' && it.title && (
+      (Array.isArray(it.pages) && it.pages.length) ||
+      (Array.isArray(it.steps) && it.steps.length) ||
+      (it.flow && Array.isArray(it.flow.steps) && it.flow.steps.length)
+    );
+    return hasPages ||
       (it && it.type === 'checkpoint' && it.title && Array.isArray(it.questions) && it.questions.length &&
         it.questions.every(qq => qq && qq.q && Array.isArray(qq.options) && qq.options.length >= 2 && typeof qq.answer === 'number'));
   }
@@ -4364,13 +4634,25 @@
     } else {
       state = { done: [], scores: {} }; saveState();
     }
+    if (window.NouraCredits && window.NouraCredits.requireCredits) {
+      const ok = await window.NouraCredits.requireCredits();
+      if (!ok) {
+        show('load');
+        loadStatus.hidden = true;
+        document.getElementById('loadProgress').style.display = 'none';
+        loadError.hidden = false;
+        loadError.textContent = 'You are out of credits. Purchase more to generate a lesson.';
+        retryBtn.hidden = false;
+        return;
+      }
+    }
     show('load');
     loadError.hidden = true; retryBtn.hidden = true; loadStatus.hidden = false;
     statusIdx = 0;
     const fill = document.getElementById('loadProgressFill');
     document.getElementById('loadProgress').style.display = 'block';
     // A full lesson runs ~9000 characters of JSON; the bar tracks that.
-    const LESSON_CHARS = 9000;
+    const LESSON_CHARS = 14000;
     const prog = driveBar(fill, null, LESSON_CHARS, 'lesson');
     // Status line advances with real output, not a stopwatch.
     let lastIdx = -1;
@@ -4383,12 +4665,12 @@
     }
     setStatus(0);
 
-    const system = 'You are Noura, an expert study tutor who builds comprehensive, structured interactive lessons. Reply with ONLY a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "items": [ {"type":"checkpoint","title":"Warm-up","questions":[{"q":string,"options":[string,string,string,string],"answer":number (0-based index),"explain":string} x4]} , {"type":"section","title":string,"pages":[string x3-5],"quiz":{"q":string,"options":[string,string,string],"answer":number,"explain":string}} x5 , {"type":"checkpoint","title":"Mid Checkpoint","questions":[... x4]} , {"type":"section","title":string,"pages":[string x3-5],"quiz":{...}} x5 , {"type":"checkpoint","title":"Final Quiz","questions":[... x4]} ]. Build 6-8 full sections (20-30 total content pages) plus 3 interactive checkpoints (Warm-up, Mid Checkpoint, Final Quiz), giving 10-12 items total in the lesson syllabus. The FIRST item must be the Warm-up checkpoint. Each section module MUST have 3-5 pages. Each page is GitHub-flavored Markdown, 100-140 words, starting with a ## heading, using **bold** key terms, short paragraphs or bullets, one concrete example. Include an inline section quiz on key pages where appropriate. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message.';
+            const system = 'You are Noura, an expert study tutor who builds rich interactive lessons for a visual reader UI. Reply with ONLY a valid JSON object - no markdown fences, no commentary. Schema: {"title":string,"items":[ {"type":"checkpoint","title":"Warm-up","questions":[{"q":string,"options":[string,string,string,string],"answer":number,"explain":string} x4]} , {"type":"section","title":string,"steps":[ STEP x8-9 ],"quiz":{"q":string,"options":[string,string,string],"answer":number,"explain":string}} x4-6 , {"type":"checkpoint","title":"Mid Checkpoint","questions":[...x4]} , more sections , {"type":"checkpoint","title":"Final Quiz","questions":[...x4]} ]}. FIRST item must be Warm-up. CRITICAL pacing: each content page must feel light — 1-2 short paragraphs only (each paragraph 18-35 words). Never pack a page with dense walls of text. Spread ideas across more steps so the reader is never overwhelmed. Each SECTION must use structured steps in this order: (1) ONLY ONE hook as step 1: {"kind":"hook","question":string,"subtitle":string}. (2) baseline: {"kind":"baseline","title":string,"paragraphs":[string x1-2],"highlightTerms":[{"term":string,"def":string under 14 words} x2-4],"imageQuery":string,"imageCaption":string,"closing":string optional}. imageQuery MUST be a short 3-6 word phrase naming the main object (e.g. \"mitochondria labeled structure\"). imageCaption MUST list the 3-5 part names that should appear as labels on the diagram. Diagrams must stay simple — never ask for dense or unlabeled figures. (3) context: {"kind":"context","title":string,"paragraphs":[string x1-2],"callout":{"title":string,"body":string under 28 words},"highlightTerms":[{"term":string,"def":string}] optional} (4) compare: {"kind":"compare","title":string,"paragraphs":[string x1],"compareLabel":string,"oldLabel":string,"evidenceLabel":string,"oldPicture":[string x3 short],"evidence":[string x3 short],"insight":string} (5) turning: {"kind":"turning","title":string,"paragraphs":[string x1-2],"timelineLabel":string,"milestones":[{"num":number,"title":string under 6 words,"description":string under 18 words} x3-4]} (6) consequence: {"kind":"consequence","title":string,"paragraphs":[string x1-2],"chartTitle":string,"flow":{"title":string,"top":string under 5 words,"middle":[string under 5 words,string under 5 words],"bottom":string under 5 words},"events":[{"label":string} exactly 4]} — vertical flowchart: cream top pill, two blue mid boxes, purple outcome. Prefer flow fields; events[0]=top, events[1-2]=middle, events[3]=bottom. (7) synthesis: {"kind":"synthesis","title":string,"paragraphs":[string x1-2],"comparison":{"label":string,"before":{"title":string,"items":[string x3 SHORT under 8 words]},"after":{"title":string,"items":[string x3 SHORT under 8 words]},"shared":string}} (8) table: {"kind":"table","title":string,"paragraphs":[string x1-2],"highlightTerms":[{"term":string,"def":string}],"table":{"headers":[string,string,string],"rows":[[string,string,string] x3]}} — clean 3-column table. Every section MUST include consequence + synthesis + table. MATHS PLAIN TEXT only.';
     const user = 'Build the interactive lesson titled: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
 
     try {
       const raw = (await streamChat(
-        { model: 'claude-3-5-haiku-20241022', max_tokens: 8000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-3-5-haiku-20241022', max_tokens: 12000, system: system, messages: [{ role: 'user', content: user }] },
         n => { prog.report(n); setStatus(n); }
       )).trim();
       const parsed = cleanLesson(readLessonJSON(raw));

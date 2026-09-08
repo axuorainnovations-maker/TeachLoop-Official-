@@ -213,9 +213,15 @@
       const go = (page) => { window.location.href = page; };
       const saveLocal = (email) => {
         try {
-          const acc = { email: email || '', method: 'email' };
+          let derivedName = '';
+          if (email) {
+            const raw = email.split('@')[0].replace(/[._-]+/g, ' ');
+            derivedName = raw.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          }
+          const acc = { email: email || '', name: derivedName || 'Account', method: 'email' };
           localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
           if (email) localStorage.setItem('NOURA_EMAIL', email);
+          if (derivedName) localStorage.setItem('TEACHLOOP_NAME', derivedName);
         } catch (e) {}
       };
 
@@ -236,13 +242,32 @@
             submit.textContent = 'Signing in…';
             const { data, error } = await sb.auth.signInWithPassword({ email, password });
             if (error) { submit.disabled = false; submit.textContent = 'Log in'; showMsg(error.message || 'Sign-in failed.', true); return; }
+            if (data && data.user) {
+              const meta = data.user.user_metadata || {};
+              const gName = (meta.full_name || meta.name || '').trim();
+              const uEmail = (data.user.email || email || '').trim();
+              const uName = gName || (uEmail ? uEmail.split('@')[0] : 'Account');
+              localStorage.setItem('NOURA_EMAIL', uEmail);
+              localStorage.setItem('TEACHLOOP_NAME', uName);
+              const acc = { email: uEmail, name: uName, avatar: meta.avatar_url || meta.picture || '', method: 'email' };
+              localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
+            }
             go('chatbot.html');
           } else {
             submit.textContent = 'Creating account…';
             const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
             if (error) { submit.disabled = false; submit.textContent = 'Create account'; showMsg(error.message || 'Sign-up failed.', true); return; }
             if (data && data.session) {
-              // Confirmations OFF → signed in immediately; onboarding already done.
+              if (data.user) {
+                const meta = data.user.user_metadata || {};
+                const gName = (meta.full_name || meta.name || '').trim();
+                const uEmail = (data.user.email || email || '').trim();
+                const uName = gName || (uEmail ? uEmail.split('@')[0] : 'Account');
+                localStorage.setItem('NOURA_EMAIL', uEmail);
+                localStorage.setItem('TEACHLOOP_NAME', uName);
+                const acc = { email: uEmail, name: uName, avatar: meta.avatar_url || meta.picture || '', method: 'email' };
+                localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
+              }
               go('chatbot.html');
             } else {
               // Confirmations ON → verify by email first.
@@ -263,7 +288,13 @@
         if (!sb) { go(dest); return; }
         const redirectTo = window.location.href.replace(/login\.html.*$/, dest);
         try {
-          const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+          const { error } = await sb.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo,
+              queryParams: { prompt: 'select_account' }
+            }
+          });
           if (error) throw error;
         } catch (e) { showMsg('Google sign-in error: ' + (e.message || e), true); }
       }
