@@ -1774,7 +1774,7 @@
           // Stash onboarding answers so the dashboard attaches them to the
           // account once the session exists (now, or after email confirmation).
           try { localStorage.setItem('NOURA_PENDING_PROFILE', JSON.stringify(profilePayload(email))); } catch (e) { }
-          const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'chatbot.html');
+          const redirectTo = window.location.origin + '/chatbot.html';
           try {
             const { data, error } = await sb.auth.signUp({
               email, password,
@@ -1812,7 +1812,7 @@
             try { localStorage.setItem('NOURA_PENDING_PROFILE', JSON.stringify(profilePayload(null))); } catch (e) { }
             try { localStorage.setItem('TEACHLOOP_ONBOARDED', '1'); } catch (e) { }
             try { window.NouraCredits && window.NouraCredits.claimWelcome(); } catch (e) { }
-            const redirectTo = window.location.href.replace(/onboarding\.html.*$/, 'chatbot.html');
+            const redirectTo = window.location.origin + '/chatbot.html';
             try {
               const { error } = await sb.auth.signInWithOAuth({
                 provider: 'google',

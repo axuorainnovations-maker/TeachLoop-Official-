@@ -235,7 +235,7 @@
         if (!sb) { go('chatbot.html'); return; }
 
         submit.disabled = true;
-        const redirectTo = window.location.href.replace(/login\.html.*$/, 'chatbot.html');
+        const redirectTo = window.location.origin + '/chatbot.html';
 
         try {
           if (mode === 'login') {
@@ -286,7 +286,7 @@
         saveLocal(null);
         const dest = 'chatbot.html';
         if (!sb) { go(dest); return; }
-        const redirectTo = window.location.href.replace(/login\.html.*$/, dest);
+        const redirectTo = window.location.origin + '/chatbot.html';
         try {
           const { error } = await sb.auth.signInWithOAuth({
             provider: 'google',

@@ -1,0 +1,89 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/config.js",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/supabase-config.js",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/v1/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/create-checkout-session",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/create-portal-session",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/webhook",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/chatbot",
+      "dest": "/chatbot.html"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/dashboard.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/pricing",
+      "dest": "/pricing.html"
+    },
+    {
+      "src": "/lesson",
+      "dest": "/lesson.html"
+    },
+    {
+      "src": "/onboarding",
+      "dest": "/onboarding.html"
+    },
+    {
+      "src": "/teachroom",
+      "dest": "/teachroom.html"
+    },
+    {
+      "src": "/teachstudio",
+      "dest": "/teachstudio.html"
+    },
+    {
+      "src": "/course",
+      "dest": "/course.html"
+    },
+    {
+      "src": "/new-subject",
+      "dest": "/new-subject.html"
+    },
+    {
+      "src": "/notes",
+      "dest": "/notes.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/voice-diagnostic",
+      "dest": "/voice-diagnostic.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}

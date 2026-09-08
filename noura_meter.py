@@ -17,8 +17,12 @@ import threading
 import time
 from datetime import datetime, timezone
 
-LEDGER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_ledger.jsonl')
-USERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_users.json')
+if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME') or not os.access(os.path.dirname(os.path.abspath(__file__)), os.W_OK):
+    LEDGER_PATH = os.path.join('/tmp', 'usage_ledger.jsonl')
+    USERS_PATH = os.path.join('/tmp', 'usage_users.json')
+else:
+    LEDGER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_ledger.jsonl')
+    USERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_users.json')
 
 # ── Pricing, USD per million tokens ──────────────────────────────────────
 # Keyed by model so a model switch is a one-line change. Cache read is ~0.1x
