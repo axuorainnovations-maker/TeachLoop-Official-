@@ -532,6 +532,7 @@
 
   window.NouraCredits = {
     accountEmail: accountEmail,
+    isUnlimited: function () { return isUnlimitedEmail(accountEmail()); },
     mountPill: mountPill,
     refresh: refresh,
     refreshStatus: refreshStatus,

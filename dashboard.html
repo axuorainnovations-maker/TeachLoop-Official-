@@ -775,17 +775,22 @@
             try { localStorage.setItem('TEACHLOOP_NAME', gName); } catch (e) { }
             renderGreeting();
           }
-          var pending = {};
-          try { pending = JSON.parse(localStorage.getItem('NOURA_PENDING_PROFILE') || '{}') || {}; } catch (e) { }
+          var userEmail = user.email || pending.email || null;
+          if (userEmail) {
+            try { localStorage.setItem('NOURA_EMAIL', userEmail); } catch (e) { }
+          }
           var profile = {
             id: user.id,
-            email: user.email || pending.email || null,
+            email: userEmail,
             name: (localStorage.getItem('TEACHLOOP_NAME') || pending.name || gName || null),
             motivation: pending.motivation || null, improve: pending.improve || null,
             age: pending.age || null, level: pending.level || null,
             goal: pending.goal || null, subject: pending.subject || null,
           };
           try { localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(Object.assign({ provider: 'google' }, profile))); } catch (e) { }
+          if (window.NouraCredits && window.NouraCredits.refresh) {
+            try { window.NouraCredits.refresh(); } catch (e) { }
+          }
           sb.from('profiles').upsert(profile, { onConflict: 'id' }).then(function (r) {
             if (r && r.error) console.warn('Supabase profile save failed:', r.error.message);
             try { localStorage.removeItem('NOURA_PENDING_PROFILE'); } catch (e) { }

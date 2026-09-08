@@ -7454,7 +7454,25 @@ body.light-mode .aset-member .nm { color:#16151c; }
       // Language label + flag
       syncLangLabel();
       // Plan
-      setTxt('asetPlanSub', 'You are currently on the free plan');
+      const isUnlim = (em.toLowerCase() === 'prorkrff@gmail.com') || (window.NouraCredits && window.NouraCredits.isUnlimited && window.NouraCredits.isUnlimited());
+      const upgBtn = document.getElementById('asetUpgrade');
+      if (isUnlim) {
+        setTxt('asetPlanSub', 'You are currently on the Unlimited Plan (Unlimited Credits)');
+        if (upgBtn) {
+          upgBtn.textContent = 'Unlimited Plan Active';
+          upgBtn.disabled = true;
+          upgBtn.style.opacity = '0.7';
+          upgBtn.style.cursor = 'default';
+        }
+      } else {
+        setTxt('asetPlanSub', 'You are currently on the free plan');
+        if (upgBtn) {
+          upgBtn.textContent = 'Upgrade Plan';
+          upgBtn.disabled = false;
+          upgBtn.style.opacity = '';
+          upgBtn.style.cursor = 'pointer';
+        }
+      }
     }
 
     function selectTab(name) {
