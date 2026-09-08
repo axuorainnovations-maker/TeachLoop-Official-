@@ -261,51 +261,36 @@ function getWikiLabel(page) {
   async function fetchAIResponse(userText) {
     appendThinking();
 
-    // Add user msg to context in OpenAI format
+    // Add user msg to context
     chatContext.push({ role: 'user', content: userText });
 
-    let apiKey = '';
     try {
-      const envRes = await fetch('.env.local', { cache: 'no-store' });
-      if (envRes.ok) {
-        const envText = await envRes.text();
-        const match = envText.match(/OPENROUTER_API_KEY\s*=\s*['"]?(.*?)['"]?\s*(?:\n|$)/);
-        if (match) apiKey = match[1].trim();
-      }
-    } catch (e) {
-      console.warn('Could not fetch .env.local', e);
-    }
-
-    if (!apiKey || apiKey.includes('YOUR_OPENROUTER')) {
-      appendAIMsg('Please add your OpenRouter API key to the <code>.env.local</code> file as <code>OPENROUTER_API_KEY=sk-or-...</code>');
-      return;
-    }
-
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'HTTP-Referer': window.location.href,
-          'X-Title': 'Axoura AI'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'cohere/north-mini-code:free',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...chatContext
-          ]
+          model: 'claude-haiku-4-5-20251001',
+          system: typeof SYSTEM_PROMPT !== 'undefined' ? SYSTEM_PROMPT : 'You are Noura, a supportive study assistant.',
+          messages: chatContext
         })
       });
 
       if (!response.ok) {
-        const errBody = await response.text();
-        throw new Error(`OpenRouter Error ${response.status}: ${errBody}`);
+        throw new Error('AI assistant is temporarily unavailable. Please try again shortly.');
       }
 
       const data = await response.json();
-      const aiText = data.choices?.[0]?.message?.content || 'No response received.';
+      let aiText = '';
+      if (Array.isArray(data.content)) {
+        aiText = data.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+      } else if (data.choices && data.choices[0] && data.choices[0].message) {
+        aiText = data.choices[0].message.content || '';
+      } else if (typeof data.text === 'string') {
+        aiText = data.text;
+      }
+      if (!aiText) aiText = 'I am here to help you study! What would you like to explore?';
 
       // Add AI response to context
       chatContext.push({ role: 'assistant', content: aiText });

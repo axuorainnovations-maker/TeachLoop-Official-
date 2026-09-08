@@ -559,14 +559,6 @@
       <span class="tr-elapsed" id="trElapsed" aria-label="Session time">0:00</span>
     </div>
     <div class="tr-top-controls" id="trTopControls" role="group" aria-label="Session controls">
-      <button type="button" id="trHistoryBtn" title="History" aria-label="History">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3.5 12a8.5 8.5 0 1 0 1.2-4.3"/>
-          <path d="M3 4.5v4h4"/>
-          <circle cx="12" cy="12" r="5"/>
-          <path d="M12 9.5v2.5l1.8 1.2"/>
-        </svg>
-      </button>
       <button type="button" id="trListBtn" title="Session transcript" aria-label="Session transcript">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="3"/>
@@ -675,28 +667,41 @@
     sessionData = JSON.parse(localStorage.getItem('NOURA_TS_LIVE') || localStorage.getItem('NOURA_TS_DRAFT') || '{}');
   } catch(e) { sessionData = {}; }
 
-  const topic = sessionData.topic || 'General Overview';
+  const topic = String(sessionData.topic || 'this topic').trim() || 'this topic';
+  const subject = String(sessionData.subject || '').trim();
   const level = (sessionData.level || 'intermediate').toLowerCase();
+  const topicLabel = topic;
+
+  function buildOpening(lvl) {
+    // Instant student-voice openings — no LLM delay
+    if (lvl === 'beginner') {
+      return "I need help with " + topicLabel + ". I don't get it at all — can you explain what it is?";
+    }
+    if (lvl === 'advanced') {
+      return "I need help with " + topicLabel + ". I think I know it, but I'm probably wrong — can you explain the hard part?";
+    }
+    return "I don't get " + topicLabel + ". I keep mixing it up — can you help me understand how it works?";
+  }
 
   const STUDENTS = {
     beginner: {
       name: 'Alex',
-      opening: "Hey! Ready whenever you are. What are we starting with today?",
+      opening: buildOpening('beginner'),
       prompt: () => window.BEGINNER_SYSTEM_PROMPT
     },
     intermediate: {
       name: 'Taylor',
-      opening: "Hey! I'm ready. Where should we kick off?",
+      opening: buildOpening('intermediate'),
       prompt: () => window.INTERMEDIATE_SYSTEM_PROMPT
     },
     advanced: {
       name: 'Sam',
-      opening: "I'm your Advanced student. State the claim you want defended — I'll pressure-test it.",
+      opening: buildOpening('advanced'),
       prompt: () => window.ADVANCED_SYSTEM_PROMPT
     }
   };
   const currentStudent = STUDENTS[level] || STUDENTS.intermediate;
-  // ── Pre-fetch Opening TTS Audio for Instant Playback ─────────────────────
+  // Prefetch opening TTS immediately (no LLM wait)
   let prefetchedOpeningAudio = null;
   const openingText = currentStudent.opening;
   fetch('/api/tts', {
@@ -1250,6 +1255,41 @@
     return text.replace(/^\{\s*"message"\s*:\s*"/i, '').replace(/",?\s*"move"[\s\S]*$/, '').replace(/"\s*\}\s*$/, '').trim();
   }
 
+  // If the model slips into tutor/facilitator voice, rewrite as a stuck student.
+  function ensureStudentVoice(msg) {
+    const text = String(msg || '').trim();
+    if (!text) {
+      return "I still don't get " + topicLabel + ". Can you explain it simply?";
+    }
+    const lower = text.toLowerCase();
+    const teacherPatterns = [
+      /^great[!.,\s]/i,
+      /^awesome[!.,\s]/i,
+      /^perfect[!.,\s]/i,
+      /^nice[!.,\s]/i,
+      /^excellent[!.,\s]/i,
+      /what part .+ confus/i,
+      /what (would you|do you) (like|want) to (focus|cover|start|teach)/i,
+      /where (should|do) we start/i,
+      /what confuses you/i,
+      /what are you confused/i,
+      /tell me what you('d| would)? (like|want)/i,
+      /how would you (like|want) to (explain|start)/i,
+      /which (part|topic|area) (should|do|would) (we|you)/i
+    ];
+    if (teacherPatterns.some(re => re.test(text) || re.test(lower))) {
+      console.warn('[TeachRoom] Rewrote teacher-toned reply:', text);
+      if (level === 'beginner') {
+        return "I still don't get " + topicLabel + " at all. Can you just explain what it is?";
+      }
+      if (level === 'advanced') {
+        return "I need help with " + topicLabel + ". Can you explain the hard part more clearly?";
+      }
+      return "I'm still confused about " + topicLabel + ". Can you explain how it works?";
+    }
+    return text;
+  }
+
   // ── Handle Human Turn ─────────────────────────────────────────────────────
     // ── Speaker Echo Detection ───────────────────────────────────────────────
   function isSpeakerEcho(text) {
@@ -1291,12 +1331,22 @@ async function handleHumanTurn(text) {
     setState('processing_turn');
 
     try {
-      const basePrompt = (typeof currentStudent.prompt === 'function' ? currentStudent.prompt() : '') || window.BEGINNER_SYSTEM_PROMPT || '';
+      const basePromptRaw = (typeof currentStudent.prompt === 'function' ? currentStudent.prompt() : '') || window.BEGINNER_SYSTEM_PROMPT || '';
+      const basePrompt = String(basePromptRaw)
+        .replace(/\[topic\]/gi, topic)
+        .replace(/the selected topic/gi, topicLabel)
+        .replace(/this topic/gi, topic);
       const isAdvanced = level === 'advanced';
+      const isBeginner = level === 'beginner';
+      const antiTeacherVoiceLaw = `\n\nVOICE ROOM HARD OVERRIDE (highest priority — beats any earlier instruction):\nYou are a struggling STUDENT who needs help. The human is the Teacher.\n\nBANNED (sounds like a teacher / facilitator — never do these):\n- Opening with praise: "Great!", "Awesome!", "Nice!", "Perfect!", "Okay so…"\n- Coaching the Teacher: "So what part confuses you most…", "What would you like to focus on…", "Where should we start…", "Tell me what you want to cover…"\n- Offering the Teacher a menu of options about what to teach\n- Asking the Teacher what THEY are confused about\n- Guiding, scaffolding, or running the lesson for them\n\nREQUIRED voice:\n- Speak as a learner: "I need help…", "I don't get it…", "I'm confused…", "can you explain…"\n- Ask THEM to teach YOU one concrete piece of ${topicLabel}\n- If their reply is vague/short ("sure", "okay", "yeah"), stay stuck and beg for a real explanation — do NOT facilitate\n\nBAD: "Great! So what part of cells confuses you most — how they work, or what's inside?"\nGOOD: "I still don't get ${topicLabel}. Can you just explain what it is in simple words?"\nGOOD: "Wait I'm lost — I need help with the basics of ${topicLabel}. Start from the beginning?"`;
+
+      const sessionContext = `\n\nSESSION CONTEXT (from Teach Studio setup):\n- Subject: ${subject || 'General'}\n- Topic: ${topic}\n- Difficulty mode: ${isBeginner ? 'Easy / Beginner' : isAdvanced ? 'Hard / Advanced' : 'Medium / Intermediate'}\n- Stay on this subject and topic only.\n- You are the STUDENT needing help with ${topicLabel}.`;
       const voiceRules = isAdvanced
-        ? `\n\nREAL-TIME VOICE ROOM RULES (ADVANCED — STRICT):\n- Topic: ${topic}\n- Your Name (AI Student): ${currentStudent.name}\n- Role: You are the Advanced student (${currentStudent.name}). The human is the Teacher. Never reverse roles.\n- Tone: demanding, precise, and a bit strict — like a tough seminar peer. Fair, never rude or sarcastic.\n- Do NOT sound casual, soft, or overly agreeable. Do NOT say "cool", "awesome", "no worries", or empty praise.\n- Default stance: "I follow the claim, but I'm not convinced yet." Push for precision, evidence, assumptions, edge cases, or working.\n- If the Teacher is vague, incomplete, or hand-wavy: say so plainly and ask for a tighter defense.\n- Accept a point only when it earns it; otherwise keep the pressure on the weakest link.\n- Address the human as "Teacher" sparingly — lead with the challenge, not niceties.\n- CRITICAL OUTPUT FORMAT: Return ONLY a JSON object: {"message": "your response here"}. No other fields.\n- Keep response under 35 words as 1–2 short spoken sentences with exactly one primary challenge question.`
-        : `\n\nREAL-TIME VOICE ROOM RULES:\n- Topic: ${topic}\n- Your Name (AI Student): ${currentStudent.name}\n- Role: You are the student (${currentStudent.name}) learning from the human Teacher.\n- Address the human as "Teacher" or by their topic. Never call the teacher Jordan.\n- Speak completely naturally, casually, and conversationally.\n- CRITICAL OUTPUT FORMAT: Return ONLY a JSON object: {"message": "your response here"}. No other fields.\n- Keep response under 20 words as 1 short natural spoken sentence.`;
-      const sysPrompt = basePrompt + voiceRules;
+        ? `\n\nREAL-TIME VOICE ROOM RULES (ADVANCED — STUDENT):\n- Name: ${currentStudent.name}. You almost get ${topic}, but something still doesn't click.\n- Push for a clearer defense from the Teacher, as a confused learner — never as a lecturer.\n- CRITICAL OUTPUT FORMAT: Return ONLY JSON: {"message": "your response here"}.\n- Keep under 35 words as 1–2 spoken sentences with one ask for help about ${topic}.`
+        : isBeginner
+        ? `\n\nREAL-TIME VOICE ROOM RULES (BEGINNER / EASY):\n- Name: ${currentStudent.name}. You know almost nothing about ${topic}.\n- Beg for a simple explanation. Do NOT lecture or facilitate.\n- CRITICAL OUTPUT FORMAT: Return ONLY JSON: {"message": "your response here"}.\n- Keep under 20 words as 1 short spoken sentence.`
+        : `\n\nREAL-TIME VOICE ROOM RULES (INTERMEDIATE / MEDIUM):\n- Name: ${currentStudent.name}. You know a bit about ${topic} but keep mixing it up.\n- Sound stuck and ask them to untangle it. Do NOT lecture or facilitate.\n- CRITICAL OUTPUT FORMAT: Return ONLY JSON: {"message": "your response here"}.\n- Keep under 22 words as 1 short spoken sentence.`;
+      const sysPrompt = basePrompt + sessionContext + voiceRules + antiTeacherVoiceLaw;
       const messages = turns.slice(-8).map(t => ({ role: t.role === 'user' ? 'user' : 'assistant', content: t.content }));
 
       const rawReply = await chat({
@@ -1306,7 +1356,7 @@ async function handleHumanTurn(text) {
         messages: messages
       });
 
-      const aiReply = parseAiReply(rawReply);
+      const aiReply = ensureStudentVoice(parseAiReply(rawReply));
       console.log('[TeachRoom] AI reply:', aiReply);
 
       if (aiReply) {
@@ -1698,7 +1748,6 @@ async function handleHumanTurn(text) {
     ov.setAttribute('aria-hidden', 'true');
   }
 
-  $('trHistoryBtn').addEventListener('click', openTranscriptPanel);
   $('trListBtn').addEventListener('click', openTranscriptPanel);
   $('trTranscriptCloseBtn').addEventListener('click', closeTranscriptPanel);
   $('trTranscriptOverlay').addEventListener('click', (e) => {
@@ -2358,7 +2407,7 @@ async function handleHumanTurn(text) {
       <button type="button" id="tsReportBackBtn" onclick="window.location.href='teachstudio.html';" style="min-width: 150px; background-color: #27272A; border: 1px solid #3F3F46; border-bottom: 3px solid #3F3F46; border-radius: 12px; padding: 14px 18px; font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif; font-size: 15px; letter-spacing: -0.1px; text-transform: none; color: #E4E4E7; font-weight: 600; cursor: pointer; line-height: 1; text-align: center; transition: all 0.15s ease;">
         Teach again
       </button>
-      <button type="button" id="tsReportActionBtn" onclick="window.location.reload();" style="flex: 1; background-color: #8B5CF6; border: 1px solid #7C3AED; border-bottom: 3px solid #6D28D9; border-radius: 12px; padding: 14px 18px; font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif; font-size: 15px; letter-spacing: -0.1px; text-transform: none; color: #FFFFFF; font-weight: 600; cursor: pointer; line-height: 1; text-align: center; transition: all 0.15s ease;">
+      <button type="button" id="tsReportActionBtn" onclick="window.location.href='teachstudio.html';" style="flex: 1; background-color: #8B5CF6; border: 1px solid #7C3AED; border-bottom: 3px solid #6D28D9; border-radius: 12px; padding: 14px 18px; font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif; font-size: 15px; letter-spacing: -0.1px; text-transform: none; color: #FFFFFF; font-weight: 600; cursor: pointer; line-height: 1; text-align: center; transition: all 0.15s ease;">
         Continue
       </button>
     </div>

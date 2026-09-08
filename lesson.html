@@ -1537,220 +1537,231 @@
   .pl-next:hover { background:#6d28d9; border-color:#7c3aed; color:#fff; }
   .pl-next:active { border-bottom-width:2px; transform:translateY(3px) scaleY(0.98); box-shadow:0 2px 8px rgba(109,40,217,0.3); }
 
-  /* Checkpoint quiz */
-  /* ── Quiz / Checkpoint layout (raised-key option cards) ────── */
-  .qz-opt, .cp-opt {
-    display:flex; align-items:center; gap:12px; text-align:left; width:100%;
-    background:#1c1c1c; border:1px solid #2e2e2e;
-    border-radius:18px; padding:14px 18px; color:#d0d0d0;
-    font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em; cursor:pointer;
-    box-shadow:none;
-    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  /* ── Sleek Modern Style for Quizzes and Checkpoints ── */
+  .player { max-width: 760px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+  .pl-top {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 18px 0 0 0; margin-bottom: 24px; gap: 16px;
   }
-  .qz-opts, .cp-opts { gap:14px; }
-  /* The browser's default focus ring rendered white/blue outside the card.
-     Keep keyboard focus visible, but in the same purple outline. */
-  .qz-opt:focus, .cp-opt:focus { outline:none; }
-  .qz-opt:focus-visible, .cp-opt:focus-visible { outline:none; border-color:#8b5cf6; }
-  .qz-opt:hover, .cp-opt:hover { border-color:#3a3a3a; }
-  /* Letter marker replaces the boxed number */
-  .qz-opt .num, .cp-opt .num {
-    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
-    display:inline-flex; align-items:center; justify-content:flex-start;
-    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
+  .pl-close {
+    background: transparent; border: none; color: #a1a1aa;
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border-radius: 50%; transition: all 0.15s ease; flex-shrink: 0;
   }
-  /* Selected: vibrant progress bar purple outline — NO GLOW */
-  .qz-opt.sel, .cp-opt.sel {
-    border: 2px solid #a78bfa !important;
-    background: #1b1728 !important;
+  .pl-close:hover { background: rgba(255,255,255,0.08); color: #ffffff; }
+  .pl-bar, .cp-bar {
+    flex: 1 !important; max-width: 580px !important; height: 10px !important; background-color: #27272a !important;
+    border-radius: 100px !important; overflow: hidden !important; position: relative !important; margin: 0 auto !important;
     box-shadow: none !important;
   }
-  .qz-opt.sel .num, .cp-opt.sel .num { color: #a78bfa !important; }
-  .qz-opt.correct, .cp-opt.correct {
-    background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none;
+  .pl-bar i, .cp-bar i {
+    display: block !important; height: 100% !important; background: linear-gradient(90deg, #7c3aed, #a78bfa) !important;
+    border-radius: 100px !important; transition: width 0.3s ease-out !important;
+    box-shadow: none !important; position: relative !important;
   }
-  .qz-opt.correct .num, .cp-opt.correct .num { color:#2ec06a; }
-  .qz-opt.wrong, .cp-opt.wrong {
-    background:#1c1c1c; border:2px solid #ef4444; box-shadow:none;
-  }
-  .qz-opt.wrong .num, .cp-opt.wrong .num { color:#ef4444; }
-  /* Question + progress, matching the reference proportions */
-  .qz-q, .cp-q {
-    font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif; font-size:23px; font-weight:700; line-height:1.4; letter-spacing:-.02em;
-    color:#ffffff; margin-bottom:32px; text-align:left;
-  }
-  /* Progress bars across quiz, recall & lesson: exact same Flux progress bar as generation */
-  .cp-bar, .rc-bar, .pl-bar {
-    width: 100%;
-    height: 6px;
-    border-radius: 999px;
-    background: #1c1c20;
-    overflow: hidden;
-    box-shadow: inset 0 2px 3px rgba(0,0,0,0.45), inset 0 -1px 2px rgba(255,255,255,0.05);
-    margin-bottom: 24px;
-  }
-  .cp-bar i, .rc-bar i, .pl-bar i {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #7c3aed 0%, #9d7bf5 35%, #c4b5fd 55%, #9d7bf5 78%, #7c3aed 100%);
-    box-shadow: 0 0 18px rgba(139,92,246,0.55), 0 0 32px rgba(196,181,253,0.35),
-               inset 0 1.5px 0 rgba(255,255,255,0.45), inset 0 -2px 3px rgba(60,20,120,0.35);
-    transition: width 0.3s ease;
-  }
-  .cp-bar i::after, .rc-bar i::after, .pl-bar i::after {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0; left: 0; width: 50%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
-    mix-blend-mode: screen;
-    animation: fluxSheen 1.6s linear infinite;
-  }
-  .cp-count, .cp-score { font-size:14px; font-weight:600; color:#7a7a7a; font-variant-numeric:tabular-nums; }
-  .cp-card { background:transparent; border:none; padding:0; }
-  .qz-q { font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-.015em; line-height:1.3; color:#fff; margin-bottom:30px; }
-  .qz-opts { display:flex; flex-direction:column; gap:14px; }
-  .qz-opt { display:flex; align-items:center; gap:16px; text-align:left; padding:20px 22px; background:#161618; border:1.5px solid #2a2a2e; border-radius:16px; color:#e4e4e5; font-size:16.5px; line-height:1.45; cursor:pointer; transition:border-color .12s, background .12s; }
-  .qz-opt:hover { border-color:#3a3a40; }
-  .qz-opt .num { width:30px; height:30px; flex-shrink:0; border-radius:8px; border:1.5px solid #3a3a40; display:flex; align-items:center; justify-content:center; font-size:13.5px; font-weight:700; color:#9a9aa2; }
-  .qz-opt.sel { border-color:#8b5cf6; background:#1d1730; }
-  .qz-opt.sel .num { border-color:#8b5cf6; color:#c9b6ef; }
-  .qz-opt.correct { border-color:#2ec06a !important; background:#122319 !important; box-shadow:none !important; }
-  .qz-opt.correct .num { border-color:#2ec06a !important; color:#2ec06a !important; }
-  .qz-opt.wrong { border-color:#ef4444 !important; background:#271618 !important; box-shadow:none !important; }
-  .qz-opt.wrong .num { border-color:#ef4444 !important; color:#ef4444 !important; }
-  .qz-opt.disabled { pointer-events:none; }
-  /* Same raised-key treatment as the Checkpoint tab. Declared after the
-     original .qz-* rules so it actually wins the cascade. */
-  .qz-opt {
-    gap:12px; padding:14px 18px; background:#1c1c1c;
-    border:1px solid #2e2e2e; border-radius:18px;
-    color:#d0d0d0; font-size:15px; font-weight:400; line-height:1.4; letter-spacing:-.01em;
-    box-shadow:none;
-    transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
-  }
-  .cp-fb-actions {
-    margin-top: 24px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-  /* Checkpoint Action Row — Right aligned Check button */
-  .cp-action-row {
-    margin-top: 28px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-  }
-  /* Input & Textarea Styling — Auto Expanding */
-  .cp-input {
-    width:100%; min-height:110px; resize:none; overflow-y:hidden; background:#1b1b1f;
-    border:1px solid #2c2c30; border-radius:16px; padding:16px 18px;
-    color:#ffffff; font-size:15px; line-height:1.55; font-family:'Plus Jakarta Sans','Inter',sans-serif;
-    outline:none; transition:border-color 0.18s ease, background 0.18s ease, height 0.1s ease; box-shadow:none !important;
-  }
-  .cp-input:focus { border-color:#8b5cf6; background:#1f1f25; box-shadow:0 0 0 3.5px rgba(139,92,246,0.22); }
-  .cp-input::placeholder { color:#6a6a78; }
-  .qz-opts { gap:14px; }
-  .qz-opt:hover { border-color:#3a3a3a; }
-  .qz-opt .num {
-    width:auto; height:auto; min-width:22px; border:none; background:none; border-radius:0;
-    display:inline-flex; align-items:center; justify-content:flex-start;
-    font-size:15px; font-weight:500; line-height:1; color:#7a7a7a;
-  }
-  .qz-opt.sel { background:#1f1a2b; border-color:#8b5cf6; box-shadow:none; }
-  .qz-opt.sel .num { color:#c9b6ef; }
-  .qz-opt.correct { background:#1c1c1c; border:2px solid #2ec06a; box-shadow:none; }
-  .qz-opt.correct .num { color:#2ec06a; }
-  .qz-opt.wrong { background:#1c1c1c; border:2px solid #ef4444; box-shadow:none; }
-  .qz-opt.wrong .num { color:#ef4444; }
-  .qz-q { font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif !important; font-size:24px !important; font-weight:700 !important; line-height:1.4 !important; letter-spacing:-.02em !important; color:#ffffff !important; margin-bottom:28px !important; text-align:left !important; }
-  .qz-explain { margin-top:20px; font-size:15px; line-height:1.6; color:#2ec06a; background:rgba(46,192,106,0.12); border:1px solid rgba(46,192,106,0.35); border-radius:14px; padding:16px 20px; display:none; }
-  .qz-explain.bad, .qz-explain.wrong { color:#f87171 !important; background:rgba(239,68,68,0.12) !important; border:1px solid rgba(239,68,68,0.35) !important; }
-  .qz-wrap { max-width:680px; margin:95px auto 0; width:100%; box-sizing:border-box; }
-  .qz-actions { display:flex; justify-content:flex-end; margin-top:30px; }
-  /* Unified 3D PopButton style for Check, Next, Continue, and Practice buttons — Sleek & Compact */
-  .qz-check, .cp-submit-btn, .cps-btn-continue, .pl-next, .flow-btn, .flow-btn-top, .rc-restart {
-    padding: 0 26px;
-    height: 44px;
-    min-width: 110px;
-    border: 2px solid #a78bfa;
-    border-bottom: 4px solid #4c1d95;
-    border-radius: 12px;
-    background: #7c3aed;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: none !important;
-    transition: all 0.1s ease;
-    transform-origin: bottom;
-    user-select: none;
-    flex: initial;
-    text-decoration: none;
-  }
-  .qz-check[disabled], .cp-submit-btn[disabled], .rc-restart[disabled] {
-    opacity: 0.4;
-    pointer-events: none;
-    box-shadow: none;
-    transform: none;
-  }
-  .qz-check:hover:not([disabled]), .cp-submit-btn:hover:not([disabled]), .cps-btn-continue:hover, .pl-next:hover, .flow-btn:hover, .flow-btn-top:hover, .rc-restart:hover {
-    background: #8b5cf6;
-    border-color: #c4b5fd;
-    color: #ffffff;
-  }
-  .qz-check:active, .cp-submit-btn:active, .cps-btn-continue:active, .pl-next:active, .flow-btn:active, .flow-btn-top:active, .rc-restart:active {
-    border-bottom-width: 2px;
-    transform: translateY(3px) scaleY(0.98);
+  .pl-bar i::after, .cp-bar i::after { display: none !important; }
+  .pl-spacer {
+    width: 36px; height: 36px; flex-shrink: 0;
   }
 
-  /* Fill-in-the-blank Slot & Option Pill Styling — NO GLOW */
-  .fill-blank-slot {
-    display: inline-block;
-    min-width: 130px;
-    padding: 3px 14px;
-    margin: 0 4px;
-    border: 1.5px solid #8b5cf6;
-    color: #c4b5fd;
-    font-weight: 700;
-    text-align: center;
-    border-radius: 8px;
-    background: #1b1728;
-    box-shadow: none !important;
+  .qz-wrap, .cp-card-wrap {
+    width: 100%; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column;
+    box-sizing: border-box;
+  }
+  .qz-q, .cp-q {
+    font-size: 20px !important; line-height: 1.6 !important; color: #ffffff !important;
+    letter-spacing: -0.01em !important; max-width: 700px; margin: 32px 0 24px !important;
+    font-weight: 600 !important; font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
+    text-align: left !important;
+  }
+
+  .qz-opts, .cp-opts {
+    display: flex; flex-direction: column; gap: 12px; width: 100%; margin-bottom: 12px;
+  }
+  .qz-opt, .cp-opt {
+    width: 100%; text-align: left;
+    border: 1.5px solid #27272a !important;
+    background-color: #18181c !important;
+    border-radius: 14px !important;
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    color: #f4f4f5 !important;
+    cursor: pointer;
     transition: all 0.15s ease;
-  }
-  .fill-blank-slot.empty {
-    color: #71717a;
-    border-color: #52525b;
-    background: #18181b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: flex-start;
     box-shadow: none !important;
+    box-sizing: border-box;
+    margin-bottom: 0 !important;
   }
-  .fill-blank-slot.filled {
-    color: #ffffff;
-    border-color: #a78bfa;
-    background: #231b36;
-    box-shadow: none !important;
+  .qz-opt:hover:not(.disabled), .cp-opt:hover:not(.locked) {
+    border-color: #3f3f46 !important;
+    background-color: #222228 !important;
+    color: #ffffff !important;
+  }
+  .qz-opt.sel, .cp-opt.sel {
+    border-color: #8b5cf6 !important;
+    background-color: rgba(139, 92, 246, 0.12) !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+  }
+  .qz-opt.correct, .cp-opt.correct {
+    border-color: #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.14) !important;
+    color: #a7f3d0 !important;
+    font-weight: 600 !important;
+  }
+  .qz-opt.wrong, .cp-opt.wrong {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.14) !important;
+    color: #fca5a5 !important;
+    font-weight: 600 !important;
+  }
+  .qz-opt.disabled, .cp-opt.locked {
+    cursor: default;
+  }
+
+  /* Fill in the blank slots */
+  .dashed-blank, .fill-blank-slot.empty {
+    display: inline-flex; min-width: 56px; height: 26px;
+    border: 1.5px dashed #3f3f46; background-color: #1f1f23;
+    border-radius: 8px; vertical-align: middle; margin: 0 6px;
+    align-items: center; justify-content: center; color: #a1a1aa;
+    font-size: 13.5px;
+  }
+  .filled-blank, .fill-blank-slot.filled {
+    background-color: #7c3aed; padding: 3px 12px; border-radius: 8px;
+    font-size: 15.5px; color: #ffffff; border: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 6px; vertical-align: middle; line-height: 1.4;
+    cursor: pointer; font-weight: 600;
   }
   .fill-blank-slot.correct {
-    color: #ffffff;
-    border: 2px solid #2ec06a !important;
-    background: #122319 !important;
-    box-shadow: none !important;
+    background-color: #10b981 !important; color: #ffffff !important;
+    border: none !important; padding: 3px 12px; border-radius: 8px;
+    display: inline-flex; vertical-align: middle; font-weight: 600;
   }
   .fill-blank-slot.wrong {
-    color: #ffffff;
-    border: 2px solid #ef4444 !important;
-    background: #271618 !important;
+    background-color: #ef4444 !important; color: #ffffff !important;
+    border: none !important; padding: 3px 12px; border-radius: 8px;
+    display: inline-flex; vertical-align: middle; font-weight: 600;
+  }
+
+  /* Word pool pills */
+  .word-pool-label {
+    font-size: 14px; color: #a1a1aa; margin-bottom: 10px; font-weight: 500;
+  }
+  .word-pool-pills {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+  }
+  .word-pool-pill {
+    border: 1.5px solid #27272a; background-color: #18181c;
+    border-radius: 12px; padding: 10px 18px; font-size: 15px;
+    font-weight: 600; color: #e4e4e7; cursor: pointer;
+    transition: all 0.15s ease; font-family: inherit;
+  }
+  .word-pool-pill:hover:not(:disabled) {
+    border-color: #8b5cf6; color: #ffffff; background-color: #222228;
+  }
+  .word-pool-pill:disabled {
+    opacity: 0.3; cursor: default;
+  }
+
+  /* 3D Purple Check Button (Learned 3D style) */
+  .qz-check, .cp-submit-btn {
+    width: 100% !important; height: 52px !important;
+    border-radius: 16px !important;
+    font-size: 16px !important; font-weight: 700 !important;
+    letter-spacing: 0.02em !important; text-transform: none !important;
+    margin-top: 24px !important; margin-bottom: 12px !important;
+    cursor: pointer; transition: all 0.1s ease !important; font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
+    display: flex; align-items: center; justify-content: center;
+    transform-origin: bottom;
+    background: #7c3aed !important;
+    border: 2px solid #a78bfa !important;
+    border-bottom: 5px solid #4c1d95 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35) !important;
+  }
+  .qz-check:hover:not(:disabled), .cp-submit-btn:hover:not(:disabled) {
+    background: #8b5cf6 !important;
+    border-color: #c4b5fd !important;
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.45) !important;
+  }
+  .qz-check:active:not(:disabled), .cp-submit-btn:active:not(:disabled) {
+    border-bottom-width: 2px !important;
+    transform: translateY(3px) scaleY(0.98) !important;
+  }
+  .qz-check:disabled, .cp-submit-btn:disabled {
+    background: #1e1e24 !important;
+    border: 2px solid #2e2e38 !important;
+    border-bottom: 5px solid #141418 !important;
+    color: #71717a !important;
     box-shadow: none !important;
+    cursor: default !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Bottom Feedback Card (Image 3 style) */
+  .qz-footer-feedback, .cp-footer-feedback {
+    background-color: #18181c; border: 1px solid #27272a;
+    padding: 22px 24px; margin-top: 24px; border-radius: 18px;
+    width: 100%; box-sizing: border-box;
+    animation: qzFeedbackIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes qzFeedbackIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .qz-fb-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .qz-fb-title {
+    font-weight: 700; font-size: 18px; color: #ffffff; letter-spacing: -0.01em;
+  }
+  .qz-fb-explain {
+    font-size: 15.5px; line-height: 1.65; color: #d4d4d8; max-width: 700px;
+    margin-bottom: 22px;
+  }
+  .qz-fb-explain .green-chip {
+    background-color: #10b981; color: #022c22; font-weight: 700; padding: 2px 8px;
+    border-radius: 6px; font-size: 15px; display: inline-flex;
+    margin: 0 4px; line-height: 1.35; vertical-align: middle;
+  }
+  .qz-fb-actions {
+    display: flex; gap: 12px; width: 100%;
+  }
+  /* 3D Vibrant Green Continue Button (Image 3) */
+  .qz-fb-continue {
+    width: 100% !important; flex: 1; height: 52px;
+    background: #2ec06a !important;
+    border: 2px solid #6ee7b7 !important;
+    border-bottom: 5px solid #059669 !important;
+    border-radius: 16px !important;
+    color: #042f1e !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.02em !important;
+    text-transform: none !important;
+    cursor: pointer !important;
+    transition: all 0.1s ease !important;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(46, 192, 106, 0.3) !important;
+    transform-origin: bottom;
+  }
+  .qz-fb-continue:hover {
+    background: #3ce07b !important;
+    border-color: #a7f3d0 !important;
+    box-shadow: 0 6px 18px rgba(46, 192, 106, 0.4) !important;
+  }
+  .qz-fb-continue:active {
+    border-bottom-width: 2px !important;
+    transform: translateY(3px) scaleY(0.98) !important;
   }
 
   .qz-opts.horizontal, .cp-opts.horizontal {
@@ -2134,16 +2145,17 @@
     <div id="rcBody"></div>
   </div>
 
-  <!-- Player (checkpoints keep classic chrome) -->
+  <!-- Player (checkpoints & quizzes modern style) -->
   <div class="player" id="player">
     <div class="pl-top">
       <button class="pl-close" id="plClose" type="button" title="Back to overview">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
       </button>
-      <div class="pl-label" id="plLabel"></div>
-      <div class="pl-score" id="plScore" hidden><span id="plScoreN">0</span>/4</div>
+      <div class="pl-bar"><i id="plBarFill"></i></div>
+      <div class="pl-spacer"></div>
+      <div class="pl-label" id="plLabel" style="display:none;"></div>
+      <div class="pl-score" id="plScore" style="display:none;" hidden><span id="plScoreN">0</span></div>
     </div>
-    <div class="pl-bar"><i id="plBarFill"></i></div>
     <div id="plBody"></div>
   </div>
 </div>
@@ -2772,7 +2784,7 @@
     });
   }
 
-  // ── Checkpoint quiz ──
+  // ── Checkpoint quiz (Modern React Artifact Style) ──
   function playCheckpoint(idx, item) {
     document.body.classList.remove('section-reading');
     document.body.classList.remove('lf-active');
@@ -2782,159 +2794,236 @@
     const plTop = document.querySelector('.pl-top');
     if (plTop) plTop.style.display = 'flex';
     if (plScore) plScore.hidden = true;
-    if (plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
+    if (plBarFill && plBarFill.parentElement) plBarFill.parentElement.style.display = 'block';
 
     const isReview = isDone(idx);
     let q = 0, score = state.scores[idx] || 0, picked = -1, checked = false;
-    const baseScore = totalScore() - (state.scores[idx] || 0);   // score from other checkpoints
+    let filledBlanks = [null, null];
+    const baseScore = totalScore() - (state.scores[idx] || 0);
     if (plScoreN) plScoreN.textContent = String(baseScore + (isReview ? (state.scores[idx] || 0) : 0));
 
     function render() {
       const question = item.questions[q];
-      if (plLabel) {
-        plLabel.innerHTML = '<span class="star">★</span><span>' + (isReview ? 'Reviewing Checkpoint' : 'Checkpoint') + '</span><span class="dim">· ' + escapeHtml(item.title) + ' · Question ' + (q + 1) + ' of ' + item.questions.length + '</span>';
-      }
-      if (plBarFill) plBarFill.style.width = Math.round(((q + 1) / item.questions.length) * 100) + '%';
+      const totalQ = item.questions.length;
+      if (plBarFill) plBarFill.style.width = Math.round(((q + 1) / totalQ) * 100) + '%';
       if (plBody) plBody.innerHTML = '';
       picked = -1; checked = isReview;
+      filledBlanks = [null, null];
+
+      const wrap = document.createElement('div');
+      wrap.className = 'qz-wrap';
 
       // Detect Fill-in-the-blank questions
-      const blankMatch = (question.q.indexOf('___________') !== -1 || question.q.indexOf('___') !== -1 || question.q.indexOf('[blank]') !== -1 || question.type === 'fill_in_blank');
+      const isFill = (question.type === 'fill' || question.type === 'fill_in_blank' || question.q.indexOf('___') !== -1 || question.q.indexOf('___________') !== -1 || question.q.indexOf('[blank]') !== -1);
       let blankTarget = '___________';
       if (question.q.indexOf('___________') !== -1) blankTarget = '___________';
       else if (question.q.indexOf('___') !== -1) blankTarget = '___';
       else if (question.q.indexOf('[blank]') !== -1) blankTarget = '[blank]';
 
-      const h = document.createElement('div'); h.className = 'qz-q';
-      if (blankMatch && question.q.indexOf(blankTarget) !== -1) {
-        const parts = question.q.split(blankTarget);
-        h.innerHTML = escapeHtml(parts[0]) + '<span class="fill-blank-slot empty" id="qzBlankSlot">___________</span>' + escapeHtml(parts[1] || '');
-      } else {
-        h.textContent = question.q;
-      }
-      plBody.appendChild(h);
+      const h = document.createElement('div');
+      h.className = 'qz-q';
 
       const savedPick = (state.answers && state.answers[idx]) ? state.answers[idx][q] : undefined;
 
       const checkBtn = document.createElement('button');
-      checkBtn.type = 'button'; checkBtn.className = 'qz-check'; checkBtn.textContent = 'Check'; checkBtn.disabled = true;
+      checkBtn.type = 'button';
+      checkBtn.className = 'qz-check';
+      checkBtn.textContent = 'Check';
+      checkBtn.disabled = true;
 
-      const opts = document.createElement('div');
-      opts.className = 'qz-opts' + (blankMatch ? ' horizontal' : '');
-      question.options.forEach((opt, oi) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'qz-opt' + (blankMatch ? ' pill' : '');
-        b.innerHTML = '<span class="opt-num-badge">' + (oi + 1) + '</span><span class="txt"></span>';
-        b.querySelector('.txt').textContent = opt;
+      const optsWrap = document.createElement('div');
+      optsWrap.className = 'qz-opts';
 
-        if (isReview) {
-          b.classList.add('disabled');
-          if (oi === question.answer) b.classList.add('correct');
-          if (oi === savedPick && oi !== question.answer) b.classList.add('wrong');
-          if (oi === savedPick && oi === question.answer) b.classList.add('sel');
-        } else {
-          b.addEventListener('click', () => {
+      if (isFill && question.q.indexOf(blankTarget) !== -1) {
+        const parts = question.q.split(blankTarget);
+        h.innerHTML = escapeHtml(parts[0]) + '<span class="fill-blank-slot empty" id="qzBlankSlot0">___</span>' + escapeHtml(parts[1] || '');
+
+        const poolLabel = document.createElement('div');
+        poolLabel.className = 'word-pool-label';
+        poolLabel.textContent = 'Click an option to fill the blank:';
+
+        const poolWrap = document.createElement('div');
+        poolWrap.className = 'word-pool-pills';
+
+        const poolOptions = question.options || [];
+        poolOptions.forEach((w) => {
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.className = 'word-pool-pill';
+          pill.textContent = w;
+          pill.addEventListener('click', () => {
             if (checked) return;
-            picked = oi;
-            opts.querySelectorAll('.qz-opt').forEach(o => o.classList.remove('sel'));
-            b.classList.add('sel');
-            const slot = document.getElementById('qzBlankSlot');
+            const slot = document.getElementById('qzBlankSlot0');
             if (slot) {
-              slot.textContent = opt;
+              slot.textContent = w;
               slot.className = 'fill-blank-slot filled';
+              filledBlanks[0] = w;
+              picked = poolOptions.indexOf(w);
+              checkBtn.disabled = false;
             }
-            checkBtn.disabled = false;
           });
-        }
-        opts.appendChild(b);
-      });
-
-      const explain = document.createElement('div'); explain.className = 'qz-explain';
-
-      const actions = document.createElement('div'); actions.className = 'qz-actions';
-
-      if (isReview) {
-        const right = savedPick === question.answer;
-        if (blankMatch) {
-          const slot = document.getElementById('qzBlankSlot');
-          if (slot) {
-            slot.className = 'fill-blank-slot ' + (right ? 'correct' : 'wrong');
-            if (savedPick !== undefined && question.options[savedPick]) {
-              slot.textContent = question.options[savedPick];
-            } else {
-              slot.textContent = question.options[question.answer];
-            }
-          }
-        }
-        explain.style.display = 'block';
-        explain.classList.toggle('bad', !right);
-        explain.textContent = (savedPick !== undefined ? (right ? 'Correct! ' : 'You selected an incorrect option. ') : '') + (question.explain || '');
-
-        actions.style.justifyContent = 'space-between';
-        const prevBtn = document.createElement('button'); prevBtn.type = 'button'; prevBtn.className = 'tl-review'; prevBtn.textContent = '← Previous';
-        if (q === 0) prevBtn.disabled = true;
-        prevBtn.addEventListener('click', () => { if (q > 0) { q--; render(); } });
-
-        const nextBtn = document.createElement('button'); nextBtn.type = 'button'; nextBtn.className = 'start-btn'; nextBtn.textContent = q === item.questions.length - 1 ? 'Done reviewing' : 'Next →';
-        nextBtn.addEventListener('click', () => {
-          if (q === item.questions.length - 1) renderOverview();
-          else { q++; render(); }
+          poolWrap.appendChild(pill);
         });
 
-        actions.appendChild(prevBtn);
-        actions.appendChild(nextBtn);
+        optsWrap.appendChild(poolLabel);
+        optsWrap.appendChild(poolWrap);
       } else {
-        actions.appendChild(checkBtn);
+        h.textContent = question.q;
+        (question.options || []).forEach((opt, oi) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'qz-opt';
+          b.dataset.index = oi;
+          b.textContent = opt;
 
-        checkBtn.addEventListener('click', () => {
-          if (!checked) {
-            checked = true;
-            state.answers = state.answers || {};
-            state.answers[idx] = state.answers[idx] || {};
-            state.answers[idx][q] = picked;
-            saveState();
-
-            const optEls = opts.querySelectorAll('.qz-opt');
-            optEls.forEach((o, oi) => {
-              o.classList.add('disabled');
-              if (oi === question.answer) o.classList.add('correct');
-              else if (oi === picked) o.classList.add('wrong');
-            });
-            const right = picked === question.answer;
-            if (blankMatch) {
-              const slot = document.getElementById('qzBlankSlot');
-              if (slot) {
-                slot.className = 'fill-blank-slot ' + (right ? 'correct' : 'wrong');
-                if (!right && question.options[question.answer]) {
-                  slot.textContent = question.options[question.answer];
-                }
-              }
+          if (isReview) {
+            b.classList.add('disabled');
+            if (oi === question.answer) {
+              b.classList.add('correct');
+              b.textContent = '✓ ' + opt;
+            } else if (oi === savedPick) {
+              b.classList.add('wrong');
             }
-            if (right) { score++; if (plScoreN) plScoreN.textContent = String(baseScore + score); }
-            explain.style.display = 'block';
-            explain.classList.toggle('bad', !right);
-            explain.textContent = (right ? 'Correct! ' : 'Not quite. ') + (question.explain || '');
-            checkBtn.textContent = q === item.questions.length - 1 ? 'Finish' : 'Continue';
           } else {
-            if (q === item.questions.length - 1) {
-              state.scores[idx] = score; saveState();
-              markDone(idx);
-              renderDone();
-              return;
-            } else { q++; render(); }
+            b.addEventListener('click', () => {
+              if (checked) return;
+              picked = oi;
+              optsWrap.querySelectorAll('.qz-opt').forEach((o, idxO) => {
+                o.classList.remove('sel');
+                o.textContent = question.options[idxO];
+              });
+              b.classList.add('sel');
+              b.textContent = '✓ ' + opt;
+              checkBtn.disabled = false;
+            });
           }
+          optsWrap.appendChild(b);
         });
       }
 
-      const wrap = document.createElement('div');
-      wrap.className = 'qz-wrap';
       wrap.appendChild(h);
-      wrap.appendChild(opts);
-      wrap.appendChild(explain);
-      wrap.appendChild(actions);
-      plBody.appendChild(wrap);
+      wrap.appendChild(optsWrap);
 
+      // Feedback footer builder (Clean Image 3 style)
+      function createFeedbackFooter(isCorrect, isLastQuestion, isReviewMode) {
+        const fb = document.createElement('div');
+        fb.className = 'qz-footer-feedback';
+
+        const fbTop = document.createElement('div');
+        fbTop.className = 'qz-fb-top';
+
+        const fbTitle = document.createElement('div');
+        fbTitle.className = 'qz-fb-title';
+        fbTitle.textContent = isCorrect ? "That's right!" : "Not quite";
+        fbTop.appendChild(fbTitle);
+        fb.appendChild(fbTop);
+
+        const fbExp = document.createElement('div');
+        fbExp.className = 'qz-fb-explain';
+        let explainText = question.explain || '';
+        if (isCorrect) {
+          fbExp.innerHTML = escapeHtml(explainText);
+        } else {
+          const correctAnsText = (question.options && question.options[question.answer]) ? question.options[question.answer] : '';
+          fbExp.innerHTML = (correctAnsText ? ('The correct answer is: <span class="green-chip">' + escapeHtml(correctAnsText) + '</span>. ') : '') + escapeHtml(explainText);
+        }
+        fb.appendChild(fbExp);
+
+        const fbActions = document.createElement('div');
+        fbActions.className = 'qz-fb-actions';
+
+        if (isReviewMode) {
+          const prevBtn = document.createElement('button');
+          prevBtn.type = 'button';
+          prevBtn.className = 'rc-prev';
+          prevBtn.textContent = '← Previous';
+          if (q === 0) prevBtn.disabled = true;
+          prevBtn.addEventListener('click', () => { if (q > 0) { q--; render(); } });
+
+          const nextBtn = document.createElement('button');
+          nextBtn.type = 'button';
+          nextBtn.className = 'qz-fb-continue';
+          nextBtn.textContent = q === totalQ - 1 ? 'Done reviewing' : 'Next →';
+          nextBtn.addEventListener('click', () => {
+            if (q === totalQ - 1) renderOverview();
+            else { q++; render(); }
+          });
+
+          fbActions.appendChild(prevBtn);
+          fbActions.appendChild(nextBtn);
+        } else {
+          const continueBtn = document.createElement('button');
+          continueBtn.type = 'button';
+          continueBtn.className = 'qz-fb-continue';
+          continueBtn.textContent = isLastQuestion ? 'Finish' : 'Continue';
+          continueBtn.addEventListener('click', () => {
+            if (isLastQuestion) {
+              state.scores[idx] = score;
+              saveState();
+              markDone(idx);
+              renderDone();
+            } else {
+              q++;
+              render();
+            }
+          });
+
+          fbActions.appendChild(continueBtn);
+        }
+
+        fb.appendChild(fbActions);
+        return fb;
+      }
+
+      if (isReview) {
+        const right = savedPick === question.answer;
+        const fbFooter = createFeedbackFooter(right, q === totalQ - 1, true);
+        wrap.appendChild(fbFooter);
+      } else {
+        wrap.appendChild(checkBtn);
+
+        checkBtn.addEventListener('click', () => {
+          if (checked) return;
+          checked = true;
+          state.answers = state.answers || {};
+          state.answers[idx] = state.answers[idx] || {};
+          state.answers[idx][q] = picked;
+          saveState();
+
+          const right = picked === question.answer;
+          if (right) {
+            score++;
+            if (plScoreN) plScoreN.textContent = String(baseScore + score);
+          }
+
+          optsWrap.querySelectorAll('.qz-opt').forEach((o, oi) => {
+            o.classList.add('disabled');
+            if (oi === question.answer) {
+              o.classList.add('correct');
+              o.textContent = '✓ ' + question.options[oi];
+            } else if (oi === picked) {
+              o.classList.add('wrong');
+            }
+          });
+
+          if (isFill) {
+            const slot = document.getElementById('qzBlankSlot0');
+            if (slot) {
+              slot.className = 'fill-blank-slot ' + (right ? 'correct' : 'wrong');
+              if (!right && question.options && question.options[question.answer]) {
+                slot.textContent = question.options[question.answer];
+              }
+            }
+          }
+
+          checkBtn.style.display = 'none';
+          const fbFooter = createFeedbackFooter(right, q === totalQ - 1, false);
+          wrap.appendChild(fbFooter);
+          fbFooter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      }
+
+      plBody.appendChild(wrap);
       window.scrollTo(0, 0);
     }
     function renderDone() {
@@ -3708,24 +3797,24 @@
     let picked = -1;
 
     cpBody.innerHTML =
-      '<div class="pl-top" style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-        '<div class="pl-label" style="font-size:14px; font-weight:600; color:#d4d4d8; display:flex; align-items:center; gap:7px;">' +
-          '<span class="star" style="color:#f0a500;">★</span>' +
-          '<span>Checkpoint</span>' +
-          '<span class="dim" style="color:#8a8a93; font-weight:500;">· ' + (item.concept ? escapeHtml(item.concept) : 'Understanding Check') + ' · Question ' + (cpIndex + 1) + ' of ' + total + '</span>' +
-        '</div>' +
+      '<div class="pl-top">' +
+        '<button class="pl-close" id="cpCloseBtn" type="button" title="Back to overview">' +
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>' +
+        '</button>' +
+        '<div class="pl-bar"><i style="width:' + Math.round(((cpIndex + 1) / total) * 100) + '%;"></i></div>' +
+        '<div class="pl-spacer"></div>' +
       '</div>' +
-      '<div class="pl-bar" style="width:100%; margin-bottom:28px;"><i style="width:' + Math.round(((cpIndex + 1) / total) * 100) + '%;"></i></div>' +
-      '<div class="cp-card-wrap" style="width:100%; margin-top:0;">' +
-        '<div class="cp-card" style="width:100%; max-width:100%;">' +
-          '<div class="cp-q"></div>' +
-          '<div id="cpAnswerArea"></div>' +
-          '<div class="cp-action-row" id="cpActionRow">' +
-            '<button class="cp-submit-btn" id="cpSubmit" type="button" disabled>Check</button>' +
-          '</div>' +
-          '<div id="cpFeedback"></div>' +
+      '<div class="qz-wrap">' +
+        '<div class="cp-q qz-q"></div>' +
+        '<div id="cpAnswerArea"></div>' +
+        '<div class="cp-action-row" id="cpActionRow">' +
+          '<button class="qz-check cp-submit-btn" id="cpSubmit" type="button" disabled>Check</button>' +
         '</div>' +
+        '<div id="cpFeedback"></div>' +
       '</div>';
+
+    const closeBtn = document.getElementById('cpCloseBtn');
+    if (closeBtn) closeBtn.addEventListener('click', () => renderOverview());
 
     cpBody.querySelector('.cp-q').textContent = item.q;
 
@@ -3734,22 +3823,21 @@
 
     if (item.type === 'mc') {
       const wrap = document.createElement('div');
-      wrap.className = 'cp-opts';
+      wrap.className = 'qz-opts cp-opts';
       item.options.forEach((opt, oi) => {
         const b = document.createElement('button');
-        b.type = 'button'; b.className = 'cp-opt';
-        b.innerHTML =
-          '<div class="opt-left">' +
-            '<span class="opt-radio"></span>' +
-            '<span class="txt"></span>' +
-          '</div>' +
-          '<span class="cp-opt-icon"></span>';
-        b.querySelector('.txt').textContent = opt;
+        b.type = 'button'; b.className = 'qz-opt cp-opt';
+        b.dataset.index = oi;
+        b.textContent = opt;
         b.addEventListener('click', () => {
-          if (b.classList.contains('locked')) return;
+          if (b.classList.contains('locked') || b.classList.contains('disabled')) return;
           picked = oi;
-          wrap.querySelectorAll('.cp-opt').forEach(o => o.classList.remove('sel'));
+          wrap.querySelectorAll('.cp-opt').forEach((o, idxO) => {
+            o.classList.remove('sel');
+            o.textContent = item.options[idxO];
+          });
           b.classList.add('sel');
+          b.textContent = '✓ ' + opt;
           submit.disabled = false;
         });
         wrap.appendChild(b);
@@ -3775,16 +3863,13 @@
         correct = picked === item.answer;
         feedback = correct ? item.why : (item.whyWrong || item.why);
         area.querySelectorAll('.cp-opt').forEach((o, oi) => {
+          o.classList.add('disabled');
           o.classList.add('locked');
-          const iconEl = o.querySelector('.cp-opt-icon');
           if (oi === item.answer) {
-            o.classList.remove('sel');
             o.classList.add('correct');
-            if (iconEl) iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            o.textContent = '✓ ' + item.options[oi];
           } else if (oi === picked) {
-            o.classList.remove('sel');
             o.classList.add('wrong');
-            if (iconEl) iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
           }
         });
       } else {
@@ -3826,30 +3911,28 @@
   function showFeedback(item, correct, feedback, total) {
     const host = document.getElementById('cpFeedback');
     const good = correct === true;
+    const isLastQuestion = cpIndex === total - 1;
 
-    let html = '<div class="cp-fb ' + (good ? 'correct' : 'incorrect') + '">' +
-      '<div class="cp-fb-hd">' +
-        (good
-          ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><h4 class="cp-fb-title">Correct</h4>'
-          : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg><h4 class="cp-fb-title">Incorrect</h4>') +
-      '</div>' +
-      '<p class="cp-fb-text">' + esc(feedback || item.why) + '</p>';
-
-    if (!good && item.type !== 'mc' && item.ideal) {
-      html += '<div class="cp-ideal-card">' +
-        '<div class="cp-ideal-hd">' +
-          '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>' +
-          '<span>Model Answer</span>' +
-        '</div>' +
-        '<p class="cp-ideal-text">' + esc(item.ideal) + '</p>' +
-      '</div>';
+    let explainText = feedback || item.why || '';
+    let formattedExplain = escapeHtml(explainText);
+    if (!good && item.type === 'mc' && item.options && item.options[item.answer]) {
+      formattedExplain = 'The correct answer is: <span class="green-chip">' + escapeHtml(item.options[item.answer]) + '</span>. ' + escapeHtml(explainText);
     }
 
-    html += '<div class="cp-fb-actions">' +
-      '<button class="cp-submit-btn" id="cpContinueBtn" type="button">Continue</button>' +
-    '</div></div>';
+    if (!good && item.type !== 'mc' && item.ideal) {
+      formattedExplain += '<div style="margin-top:12px; padding:12px 14px; background:rgba(255,255,255,0.04); border:1px solid #27272a; border-radius:10px;"><div style="font-size:13px; font-weight:700; color:#a1a1aa; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Model Answer</div><div>' + escapeHtml(item.ideal) + '</div></div>';
+    }
 
-    host.innerHTML = html;
+    host.innerHTML =
+      '<div class="qz-footer-feedback">' +
+        '<div class="qz-fb-top">' +
+          '<div class="qz-fb-title">' + (good ? "That's right!" : "Not quite") + '</div>' +
+        '</div>' +
+        '<div class="qz-fb-explain">' + formattedExplain + '</div>' +
+        '<div class="qz-fb-actions">' +
+          '<button class="qz-fb-continue" id="cpContinueBtn" type="button">' + (isLastQuestion ? 'Finish' : 'Continue') + '</button>' +
+        '</div>' +
+      '</div>';
 
     const contBtn = document.getElementById('cpContinueBtn');
     if (contBtn) {
@@ -3859,7 +3942,7 @@
       });
     }
 
-    host.scrollIntoView({ block: 'nearest' });
+    host.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function renderCheckSummary() {

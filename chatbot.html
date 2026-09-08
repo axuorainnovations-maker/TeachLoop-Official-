@@ -7025,58 +7025,97 @@ body.light-mode .aset-member .nm { color:#16151c; }
     searchNav.addEventListener('click', function (e) { e.preventDefault(); open(); });
   })();
 
-  // Dashboard & Chat nav — manage active states and dashboard iframe overlay.
+  // Dashboard / Teach Studio / Chat nav — same sidebar, swap main panel via iframe overlay.
   (function () {
     var dashBtn = document.getElementById('dashboardNav');
     var chatBtn = document.getElementById('chatNav');
+    var teachBtn = document.getElementById('aiStudentsNav');
     var overlay = document.getElementById('dashIframeOverlay');
-    if (!dashBtn || !chatBtn || !overlay) return;
+    if (!chatBtn || !overlay) return;
 
     var mainContent = document.getElementById('mainContent');
+    var activeView = 'chat'; // chat | dash | teach
 
-    function openDash() {
-      overlay.innerHTML = '<iframe src="dashboard.html" id="dashIframe"></iframe>';
+    function setActive(which) {
+      activeView = which;
+      if (dashBtn) dashBtn.classList.toggle('active', which === 'dash');
+      chatBtn.classList.toggle('active', which === 'chat');
+      if (teachBtn) teachBtn.classList.toggle('active', which === 'teach');
+    }
+
+    function openOverlay(src, which) {
+      overlay.innerHTML = '<iframe src="' + src + '" id="dashIframe" title="' + which + '"></iframe>';
       overlay.classList.add('open');
       if (mainContent) mainContent.style.display = 'none';
-      dashBtn.classList.add('active');
-      chatBtn.classList.remove('active');
+      setActive(which);
 
       var iframe = document.getElementById('dashIframe');
       iframe.addEventListener('load', function () {
         try {
           var doc = iframe.contentDocument || iframe.contentWindow.document;
-          if (document.body.classList.contains('light-mode')) {
+          if (document.body.classList.contains('light-mode') && doc.body) {
             doc.body.classList.add('light-mode');
           }
-          var topbar = doc.querySelector('.topbar');
-          if (topbar) topbar.style.display = 'none';
-          var wrap = doc.querySelector('.wrap');
-          if (wrap) wrap.style.paddingTop = '24px';
+          if (which === 'dash') {
+            var topbar = doc.querySelector('.topbar');
+            if (topbar) topbar.style.display = 'none';
+            var wrap = doc.querySelector('.wrap');
+            if (wrap) wrap.style.paddingTop = '24px';
+          }
         } catch (e) {}
       });
     }
 
-    function closeDash() {
+    function closeOverlay() {
       overlay.classList.remove('open');
       overlay.innerHTML = '';
       if (mainContent) mainContent.style.display = '';
-      dashBtn.classList.remove('active');
-      chatBtn.classList.add('active');
+      setActive('chat');
     }
 
-    dashBtn.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (overlay.classList.contains('open')) {
-        closeDash();
-      } else {
-        openDash();
-      }
-    });
+    function openDash() { openOverlay('dashboard.html', 'dash'); }
+    function openTeach() { openOverlay('teachstudio.html', 'teach'); }
+
+    if (dashBtn) {
+      dashBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (activeView === 'dash') closeOverlay();
+        else openDash();
+      });
+    }
 
     chatBtn.addEventListener('click', function (e) {
       e.preventDefault();
-      closeDash();
+      closeOverlay();
     });
+
+    if (teachBtn) {
+      teachBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (activeView === 'teach') closeOverlay();
+        else openTeach();
+      });
+    }
+
+    window.addEventListener('message', function (ev) {
+      var data = ev && ev.data;
+      if (!data) return;
+      if (data.type === 'noura-close-teach' || data.type === 'noura-close-dash') {
+        closeOverlay();
+      }
+    });
+
+    // Deep-link: chatbot.html?view=teachstudio (also used when visiting /teachstudio.html)
+    try {
+      var params = new URLSearchParams(location.search);
+      var view = (params.get('view') || '').toLowerCase();
+      if (view === 'teachstudio' || view === 'teach' || location.hash === '#teachstudio') {
+        openTeach();
+        if (history.replaceState) {
+          history.replaceState({}, '', location.pathname);
+        }
+      }
+    } catch (e) {}
   })();
 
   // Upgrade Plan — opens the pricing modal from the profile popup.

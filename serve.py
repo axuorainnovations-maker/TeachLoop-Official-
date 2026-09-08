@@ -895,13 +895,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # ── admin surface ───────────────────────────────────────────────────
     def _admin_ok(self):
-        """Token via header or ?key=. Defaults to noura123 if token in env is empty."""
-        token = ADMIN_TOKEN or env_vars.get('NOURA_ADMIN_TOKEN', '') or 'noura123'
+        """Token via header or ?key=. Requires valid configured NOURA_ADMIN_TOKEN."""
+        token = (ADMIN_TOKEN or env_vars.get('NOURA_ADMIN_TOKEN', '')).strip()
+        if not token:
+            return False
         supplied = self.headers.get('X-Noura-Admin') or ''
         if not supplied and '?' in self.path:
             from urllib.parse import urlparse, parse_qs
             supplied = (parse_qs(urlparse(self.path).query).get('key') or [''])[0]
-        return secrets.compare_digest(supplied, token)
+        return bool(supplied and secrets.compare_digest(supplied, token))
 
     def do_GET(self):
         path = self.path.split('?')[0]
@@ -1027,6 +1029,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.path = '/dashboard.html'
             else:
                 rel = path.lstrip('/')
+                # Block direct downloads of secrets and internal state files
+                rel_lower = rel.lower()
+                if (rel_lower.startswith('.env') or rel_lower.startswith('usage_ledger') or 
+                    rel_lower.startswith('usage_users') or rel_lower.endswith('.log') or 
+                    rel_lower.endswith('.sql') or rel_lower.endswith('.db') or rel_lower.endswith('.backup')):
+                    self._json(404, {"error": "Not found"})
+                    return
                 if rel and not os.path.exists(rel) and not os.path.isdir(rel):
                     if os.path.exists(rel + '.html'):
                         self.path = '/' + rel + '.html'
@@ -1045,7 +1054,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Noura-Admin, X-Noura-Surface, X-Noura-Email, X-Sample-Rate, X-Language')
         self.end_headers()
 
     def log_message(self, format, *args):
@@ -1055,6 +1064,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
+        self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
         super().end_headers()
 
 class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):

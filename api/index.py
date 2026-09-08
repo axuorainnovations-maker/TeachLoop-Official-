@@ -7,6 +7,7 @@ import urllib.error
 import urllib.parse
 import secrets
 import time
+import threading
 from http.server import BaseHTTPRequestHandler
 
 # Add root directory to sys.path so noura_meter can be imported
@@ -46,7 +47,11 @@ if stripe and STRIPE_SECRET_KEY:
 
 NVIDIA_API_KEY = env_vars.get('NVIDIA_API_KEY', '')
 ANTHROPIC_API_KEY = env_vars.get('ANTHROPIC_API_KEY', '')
-ADMIN_TOKEN = env_vars.get('NOURA_ADMIN_TOKEN', '') or 'noura123'
+ADMIN_TOKEN = env_vars.get('NOURA_ADMIN_TOKEN', '').strip()
+ANTHROPIC_ADMIN_KEY = env_vars.get('ANTHROPIC_ADMIN_KEY', '').strip()
+MONTHLY_BUDGET_USD = float(env_vars.get('NOURA_MONTHLY_BUDGET_USD', '') or 0) or None
+BUDGET_WARN_PCT = float(env_vars.get('NOURA_BUDGET_WARN_PCT', '') or 80)
+CREDIT_ENFORCEMENT = (env_vars.get('NOURA_CREDIT_ENFORCEMENT', '') or 'log_only').lower()
 
 _SECRET_HINTS = ('KEY', 'SECRET', 'TOKEN', 'PASSWORD')
 public_env = {k: v for k, v in env_vars.items() if not any(h in k.upper() for h in _SECRET_HINTS)}
@@ -70,14 +75,65 @@ elif not sb_url and sb_anon:
         pass
 
 
+class RateLimiter:
+    """In-memory sliding window rate limiter for abuse prevention."""
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._buckets = {}
+
+    def is_allowed(self, key: str, max_requests: int, window_seconds: int = 60):
+        now = time.time()
+        with self._lock:
+            timestamps = self._buckets.get(key, [])
+            cutoff = now - window_seconds
+            valid = [t for t in timestamps if t > cutoff]
+            if len(valid) >= max_requests:
+                retry_after = max(1, int(cutoff + window_seconds - now))
+                self._buckets[key] = valid
+                return False, retry_after
+            valid.append(now)
+            self._buckets[key] = valid
+            if len(self._buckets) > 5000:
+                self._buckets = {k: v for k, v in self._buckets.items() if v and v[-1] > cutoff}
+            return True, 0
+
+
+RATE_LIMITER = RateLimiter()
+
+
 class handler(BaseHTTPRequestHandler):
+    def _client_ip(self):
+        xff = self.headers.get('X-Forwarded-For')
+        if xff:
+            return xff.split(',')[0].strip()
+        return self.headers.get('X-Real-IP') or (self.client_address[0] if hasattr(self, 'client_address') and self.client_address else 'unknown')
+
+    def _allowed_origin(self):
+        origin = (self.headers.get('Origin') or '').strip()
+        if not origin:
+            return '*'
+        try:
+            parsed = urllib.parse.urlparse(origin)
+            host = (parsed.hostname or '').lower()
+            if host in ('localhost', '127.0.0.1') or host.endswith('.vercel.app') or host.endswith('.teachloop.app') or host.endswith('.noura.ai'):
+                return origin
+        except Exception:
+            pass
+        return '*'
+
+    def _security_headers(self):
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
+        self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
+
     def _json(self, code, payload, headers=None):
         body = json.dumps(payload).encode('utf-8')
         self.send_response(code)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Origin', self._allowed_origin())
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Noura-Admin, X-Noura-Surface, X-Noura-Email, X-Sample-Rate, X-Language')
+        self._security_headers()
         self.send_header('Content-Length', str(len(body)))
         if headers:
             for k, v in headers.items():
@@ -89,21 +145,31 @@ class handler(BaseHTTPRequestHandler):
         body = js_content.encode('utf-8')
         self.send_response(code)
         self.send_header('Content-Type', 'application/javascript; charset=utf-8')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Origin', self._allowed_origin())
         self.send_header('Cache-Control', 'no-cache')
+        self._security_headers()
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 
     def _cors(self):
         self.send_response(204)
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Origin', self._allowed_origin())
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Noura-Admin, X-Noura-Surface, X-Noura-Email, X-Sample-Rate, X-Language')
+        self._security_headers()
         self.end_headers()
 
     def do_OPTIONS(self):
         self._cors()
+
+    def _admin_ok(self):
+        if not ADMIN_TOKEN:
+            return False
+        supplied = self.headers.get('X-Noura-Admin') or ''
+        if not supplied and '?' in self.path:
+            supplied = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get('key') or [''])[0]
+        return bool(supplied and secrets.compare_digest(supplied, ADMIN_TOKEN))
 
     def _identify(self, body_dict=None):
         email = (self.headers.get('X-Noura-Email') or '').strip().lower()
@@ -127,12 +193,29 @@ class handler(BaseHTTPRequestHandler):
             return noura_meter.new_user_id()
         return 'usr_' + secrets.token_hex(8)
 
+    def _check_credit_gate(self, uid, data=None):
+        if not LEDGER:
+            return True, 500
+        surface = self.headers.get('X-Noura-Surface') or (data.get('_noura_surface') if isinstance(data, dict) else None) or (data.get('surface') if isinstance(data, dict) else None) or (data.get('reason') if isinstance(data, dict) else None) or 'unknown'
+        u = LEDGER.user(uid)
+        email = (self.headers.get('X-Noura-Email') or (data.get('email') if isinstance(data, dict) else None) or u.get('email') or '').strip().lower()
+        unlimited = (email == 'prorkrff@gmail.com') or (noura_meter.is_unlimited(u) if noura_meter else False)
+        if unlimited:
+            return True, 999999
+        cost = noura_meter.credit_cost(surface) if noura_meter else 100
+        if cost == 0:
+            return True, 500
+        w = LEDGER.wallet(uid)
+        bal = w.get('balance', 500)
+        if bal < cost and w.get('spent', 0) > 0:
+            return False, bal
+        return True, bal
+
     def do_GET(self):
         try:
             parsed = urllib.parse.urlparse(self.path)
             path = parsed.path
 
-            # Strip .html / normalize
             if path == '/config.js':
                 self._js(200, f'const ENV = {json.dumps(public_env)};\n')
                 return
@@ -180,15 +263,48 @@ class handler(BaseHTTPRequestHandler):
                 self._json(200, {"status": "ok", "app": "Noura", "time": int(time.time())})
                 return
 
+            if path == '/api/admin/summary':
+                if not self._admin_ok():
+                    self._json(403, {"error": "admin token required or NOURA_ADMIN_TOKEN not configured"})
+                    return
+                if not LEDGER:
+                    self._json(500, {"error": "Ledger unavailable"})
+                    return
+                since = noura_meter.period_start() if noura_meter else None
+                org = LEDGER.org_totals(since)
+                spend = org['usd']
+                self._json(200, {
+                    "users": LEDGER.all_users(since),
+                    "org": org,
+                    "daily": LEDGER.daily_usd(30),
+                    "budget": {
+                        "ceiling_usd": MONTHLY_BUDGET_USD,
+                        "spend_usd": spend,
+                        "remaining_usd": (None if not MONTHLY_BUDGET_USD else round(MONTHLY_BUDGET_USD - spend, 4)),
+                        "warn_pct": BUDGET_WARN_PCT,
+                        "source": "local_ledger_against_configured_ceiling",
+                    },
+                    "config": {
+                        "enforcement": CREDIT_ENFORCEMENT,
+                        "admin_api_configured": bool(ANTHROPIC_ADMIN_KEY),
+                        "period_start": since.isoformat(timespec='seconds').replace('+00:00', 'Z') if since else None,
+                        "cost_per_action": noura_meter.CREDIT_COST if noura_meter else 100,
+                        "signup_grant": noura_meter.SIGNUP_GRANT if noura_meter else 500,
+                        "free_surfaces": sorted(noura_meter.FREE_SURFACES) if noura_meter else [],
+                    },
+                })
+                return
+
             self._json(404, {"error": "Not found", "path": path})
         except Exception as e:
-            self._json(500, {"error": {"message": str(e)}})
+            self._json(500, {"error": {"message": "An internal server error occurred."}})
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         length = int(self.headers.get('Content-Length', 0))
         raw_body = self.rfile.read(length) if length > 0 else b'{}'
+        ip = self._client_ip()
         
         try:
             data = json.loads(raw_body.decode('utf-8')) if raw_body else {}
@@ -198,7 +314,12 @@ class handler(BaseHTTPRequestHandler):
             except Exception:
                 data = {}
 
-        if path == '/create-checkout-session':
+        if path in ('/create-checkout-session', '/api/create-checkout-session'):
+            allowed, retry = RATE_LIMITER.is_allowed(f"checkout_{ip}", max_requests=8, window_seconds=60)
+            if not allowed:
+                self._json(429, {"error": "rate_limit_exceeded", "message": "Too many checkout requests. Please wait a moment."}, headers={'Retry-After': str(retry)})
+                return
+
             if not stripe:
                 self._json(500, {'error': {'message': 'Stripe library not initialized'}})
                 return
@@ -255,7 +376,7 @@ class handler(BaseHTTPRequestHandler):
                 checkout_session = stripe.checkout.Session.create(**session_params)
                 self._json(200, {'url': checkout_session.url, 'id': checkout_session.id})
             except Exception as e:
-                self._json(400, {'error': {'message': str(e)}})
+                self._json(400, {'error': {'message': 'Checkout session creation failed. Please try again.'}})
             return
 
         elif path == '/create-portal-session':
@@ -284,7 +405,7 @@ class handler(BaseHTTPRequestHandler):
                 )
                 self._json(200, {'url': portal_session.url})
             except Exception as e:
-                self._json(400, {'error': {'message': str(e)}})
+                self._json(400, {'error': {'message': 'Billing portal could not be loaded.'}})
             return
 
         elif path == '/webhook':
@@ -295,10 +416,9 @@ class handler(BaseHTTPRequestHandler):
                     event = stripe.Webhook.construct_event(raw_body, sig_header, webhook_secret)
                 else:
                     event = json.loads(raw_body.decode('utf-8') or '{}')
-                print(f"[Stripe Webhook] Event: {event.get('type') if isinstance(event, dict) else getattr(event, 'type', '')}")
                 self._json(200, {'status': 'success'})
             except Exception as e:
-                self._json(400, {'error': f'Webhook verification failed: {str(e)}'})
+                self._json(400, {'error': 'Webhook signature verification failed'})
             return
 
         elif path == '/api/welcome':
@@ -363,6 +483,22 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif path in ('/api/chat', '/v1/messages', '/api/messages'):
+            uid = self._identify(data)
+            rate_key = f"chat_{uid}_{ip}"
+            allowed, retry = RATE_LIMITER.is_allowed(rate_key, max_requests=30, window_seconds=60)
+            if not allowed:
+                self._json(429, {"error": "rate_limit_exceeded", "message": "Too many requests. Please wait a moment before sending another message."}, headers={'Retry-After': str(retry)})
+                return
+
+            credit_ok, current_bal = self._check_credit_gate(uid, data)
+            if not credit_ok:
+                self._json(402, {
+                    "error": "insufficient_credits",
+                    "message": "You have exhausted your available study credits. Please upgrade your plan to continue.",
+                    "balance": current_bal
+                })
+                return
+
             anthropic_key = env_vars.get('ANTHROPIC_API_KEY', '') or ANTHROPIC_API_KEY
             nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
 
@@ -377,9 +513,8 @@ class handler(BaseHTTPRequestHandler):
             elif not model_req.startswith('claude-'):
                 data['model'] = 'claude-haiku-4-5-20251001'
 
-            # Clean client-specific tool fields Anthropic rejects unless headers match
+            # Clean client-specific tool fields
             if 'tools' in data and isinstance(data['tools'], list):
-                # Filter to standard tools or remove web_search if not using beta
                 data['tools'] = [t for t in data['tools'] if t.get('type') != 'web_search_20250305']
                 if not data['tools']:
                     del data['tools']
@@ -387,7 +522,6 @@ class handler(BaseHTTPRequestHandler):
             # Try Anthropic Claude
             if anthropic_key:
                 try:
-                    # Clean system prompt format for clean Anthropic API ingestion
                     if 'system' in data and data['system']:
                         if isinstance(data['system'], list):
                             data['system'] = "\n\n".join([x.get('text', '') if isinstance(x, dict) else str(x) for x in data['system']])
@@ -402,16 +536,17 @@ class handler(BaseHTTPRequestHandler):
                             'Content-Type': 'application/json',
                         }
                     )
-                    with urllib.request.urlopen(anth_req, timeout=15) as resp:
+                    with urllib.request.urlopen(anth_req, timeout=18) as resp:
                         resp_bytes = resp.read()
                         self.send_response(200)
                         self.send_header('Content-Type', resp.headers.get('Content-Type', 'application/json'))
-                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.send_header('Access-Control-Allow-Origin', self._allowed_origin())
+                        self._security_headers()
                         self.end_headers()
                         self.wfile.write(resp_bytes)
                         return
                 except Exception as e:
-                    print(f"[chat] Anthropic error, trying fallback: {e}")
+                    print(f"[chat] Anthropic fallback: {e}")
 
             # Fallback response if Anthropic unavailable
             if nv_key:
@@ -445,7 +580,7 @@ class handler(BaseHTTPRequestHandler):
                                     'Content-Type': 'application/json'
                                 }
                             )
-                            with urllib.request.urlopen(req, timeout=8) as resp:
+                            with urllib.request.urlopen(req, timeout=12) as resp:
                                 resp_data = json.loads(resp.read().decode('utf-8'))
                                 reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
                                 if reply:
@@ -464,11 +599,26 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif path == '/api/tts':
-            # Signal client to use high quality native SpeechSynthesis
             self._json(503, {"fallback": "speechSynthesis", "message": "Use client Web Speech API"})
             return
 
         elif path == '/api/generate-image':
+            uid = self._identify(data)
+            rate_key = f"img_{uid}_{ip}"
+            allowed, retry = RATE_LIMITER.is_allowed(rate_key, max_requests=8, window_seconds=60)
+            if not allowed:
+                self._json(429, {"error": "rate_limit_exceeded", "message": "Image generation rate limit reached. Please wait a moment."}, headers={'Retry-After': str(retry)})
+                return
+
+            credit_ok, current_bal = self._check_credit_gate(uid, data)
+            if not credit_ok:
+                self._json(402, {
+                    "error": "insufficient_credits",
+                    "message": "You have exhausted your credits. Please upgrade your plan to generate images.",
+                    "balance": current_bal
+                })
+                return
+
             nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
             prompt = (data.get('prompt') or '').strip()
             if not prompt:
@@ -513,6 +663,12 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif path == '/api/stt':
+            rate_key = f"stt_{ip}"
+            allowed, retry = RATE_LIMITER.is_allowed(rate_key, max_requests=20, window_seconds=60)
+            if not allowed:
+                self._json(429, {"error": "rate_limit_exceeded", "message": "Voice transcription limit reached. Please wait a moment."}, headers={'Retry-After': str(retry)})
+                return
+
             nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
             if nv_key:
                 try:
