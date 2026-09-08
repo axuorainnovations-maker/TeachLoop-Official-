@@ -181,6 +181,17 @@
         ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
 
       let mode = 'login'; // 'login' | 'signup'
+      try {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get('mode') === 'signup' || window.location.pathname.indexOf('signup') !== -1) {
+          mode = 'signup';
+        }
+        if (window.location.pathname.endsWith('.html')) {
+          const cleanPath = mode === 'signup' ? '/signup' : '/login';
+          window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+        }
+      } catch (e) {}
+
       const $ = (id) => document.getElementById(id);
       const title = $('authTitle'), submit = $('submitBtn'), foot = $('authFoot'),
             googleLabel = $('googleLabel'), pwd = $('passwordInput'), msg = $('authMsg');
@@ -232,10 +243,10 @@
         if (password.length < 6) { showMsg('Password must be at least 6 characters.', true); return; }
 
         saveLocal(email);
-        if (!sb) { go('chatbot.html'); return; }
+        if (!sb) { go('/chat'); return; }
 
         submit.disabled = true;
-        const redirectTo = window.location.origin + '/chatbot.html';
+        const redirectTo = window.location.origin + '/chat';
 
         try {
           if (mode === 'login') {
@@ -252,7 +263,7 @@
               const acc = { email: uEmail, name: uName, avatar: meta.avatar_url || meta.picture || '', method: 'email' };
               localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
             }
-            go('chatbot.html');
+            go('/chat');
           } else {
             submit.textContent = 'Creating account…';
             const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
@@ -268,7 +279,7 @@
                 const acc = { email: uEmail, name: uName, avatar: meta.avatar_url || meta.picture || '', method: 'email' };
                 localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
               }
-              go('chatbot.html');
+              go('/chat');
             } else {
               // Confirmations ON → verify by email first.
               submit.textContent = 'Confirmation sent';
@@ -284,9 +295,9 @@
 
       async function submitGoogle() {
         saveLocal(null);
-        const dest = 'chatbot.html';
+        const dest = '/chat';
         if (!sb) { go(dest); return; }
-        const redirectTo = window.location.origin + '/chatbot.html';
+        const redirectTo = window.location.origin + '/chat';
         try {
           const { error } = await sb.auth.signInWithOAuth({
             provider: 'google',

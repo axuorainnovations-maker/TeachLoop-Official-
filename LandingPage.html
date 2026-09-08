@@ -62,9 +62,12 @@
                     <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
                     <a href="#study-plan" class="hover:text-white transition-colors">Study Plan</a>
                 </div>
-                <div class="flex items-center gap-6">
-                    <a href="https://nouraofficial.vercel.app/" id="start-teaching-btn" class="bg-white text-black text-[14px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#E5E5E5] transition-all" style="text-decoration:none;">
-                        Join the waitlist →
+                <div class="flex items-center gap-3">
+                    <a href="/login" class="text-[14px] font-medium text-[#A1A1AA] hover:text-white px-3.5 py-2 transition-colors" style="text-decoration:none;">
+                        Log in
+                    </a>
+                    <a href="/login?mode=signup" id="start-teaching-btn" class="bg-white text-black text-[14px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#E5E5E5] transition-all shadow-md" style="text-decoration:none;">
+                        Sign up →
                     </a>
                 </div>
             </div>
@@ -96,19 +99,17 @@
                 </div>
 
                 <!-- CTAs -->
-                <div class="flex items-start justify-center px-8 sm:px-24 pb-12">
-                    <div class="flex w-full max-w-[80vw] flex-col items-center justify-start md:!max-w-[392px]">
-                        <a href="#how-it-works" class="cursor-pointer w-full" style="text-decoration:none;">
-                            <div class="!h-14 flex flex-col items-center justify-center rounded-none !text-base flex w-full !bg-transparent transition-colors duration-150 hover:!bg-white/5 text-[#a1a1aa] hover:text-white">
-                                Learn how it works
-                            </div>
-                        </a>
-                        <a href="https://nouraofficial.vercel.app/" class="cursor-pointer w-full" style="text-decoration:none;">
-                            <div class="text-white !h-14 flex flex-col items-center justify-center rounded-none !text-base flex w-full border-[1.2px] border-white/5 bg-gradient-to-tr from-purple-800 via-purple-700 to-purple-400 font-semibold shadow-[0_8px_24px_rgba(124,58,237,0.35)] transition-all hover:brightness-110">
-                                Join the waitlist
-                            </div>
-                        </a>
-                    </div>
+                <div class="flex items-center justify-center gap-3.5 px-8 sm:px-24 pb-12 flex-wrap">
+                    <a href="/login?mode=signup" class="cursor-pointer" style="text-decoration:none;">
+                        <div class="text-white h-12 px-7 flex items-center justify-center rounded-full text-[15px] font-semibold bg-gradient-to-tr from-purple-800 via-purple-700 to-purple-500 shadow-[0_8px_24px_rgba(124,58,237,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] hover:brightness-110">
+                            Start learning free →
+                        </div>
+                    </a>
+                    <a href="/login" class="cursor-pointer" style="text-decoration:none;">
+                        <div class="h-12 px-6 flex items-center justify-center rounded-full text-[15px] font-medium border border-white/15 bg-white/5 backdrop-blur-md transition-colors duration-150 hover:bg-white/10 text-white">
+                            Log in
+                        </div>
+                    </a>
                 </div>
             </div>
             
@@ -292,12 +293,17 @@
                     <!-- Content -->
                     <div class="relative z-10 flex flex-col items-center justify-center">
                         <h2 class="text-[38px] sm:text-[54px] md:text-[68px] font-[600] tracking-[-0.035em] leading-[1.05] text-white mb-7 select-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">Try Noura today.</h2>
-                        <a href="https://nouraofficial.vercel.app/" class="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full bg-white text-[#121212] text-[14px] font-[600] hover:bg-[#F0F0F0] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl" style="text-decoration:none;">
-                            <span>Join the waitlist</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                        <div class="flex items-center gap-3.5 flex-wrap justify-center">
+                            <a href="/login?mode=signup" class="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-white text-[#121212] text-[15px] font-[700] hover:bg-[#F0F0F0] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl" style="text-decoration:none;">
+                                <span>Get Started Free</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                            <a href="/login" class="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white/10 border border-white/20 text-white text-[15px] font-[600] hover:bg-white/20 transition-all backdrop-blur-md" style="text-decoration:none;">
+                                Log in
+                            </a>
+                        </div>
                     </div>
                 </div>
 

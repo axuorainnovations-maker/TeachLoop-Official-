@@ -30,55 +30,71 @@
       "dest": "/api/index.py"
     },
     {
-      "src": "/chatbot",
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/LandingPage(\\.html)?",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/chat",
       "dest": "/chatbot.html"
     },
     {
-      "src": "/dashboard",
-      "dest": "/dashboard.html"
+      "src": "/chatbot(\\.html)?",
+      "dest": "/chatbot.html"
     },
     {
-      "src": "/login",
+      "src": "/signup",
       "dest": "/login.html"
     },
     {
-      "src": "/pricing",
+      "src": "/login(\\.html)?",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/pricing(\\.html)?",
       "dest": "/pricing.html"
     },
     {
-      "src": "/lesson",
+      "src": "/dashboard(\\.html)?",
+      "dest": "/dashboard.html"
+    },
+    {
+      "src": "/lesson(\\.html)?",
       "dest": "/lesson.html"
     },
     {
-      "src": "/onboarding",
+      "src": "/onboarding(\\.html)?",
       "dest": "/onboarding.html"
     },
     {
-      "src": "/teachroom",
+      "src": "/teachroom(\\.html)?",
       "dest": "/teachroom.html"
     },
     {
-      "src": "/teachstudio",
+      "src": "/teachstudio(\\.html)?",
       "dest": "/teachstudio.html"
     },
     {
-      "src": "/course",
+      "src": "/course(\\.html)?",
       "dest": "/course.html"
     },
     {
-      "src": "/new-subject",
+      "src": "/new-subject(\\.html)?",
       "dest": "/new-subject.html"
     },
     {
-      "src": "/notes",
+      "src": "/notes(\\.html)?",
       "dest": "/notes.html"
     },
     {
-      "src": "/admin",
+      "src": "/admin(\\.html)?",
       "dest": "/admin.html"
     },
     {
-      "src": "/voice-diagnostic",
+      "src": "/voice-diagnostic(\\.html)?",
       "dest": "/voice-diagnostic.html"
     },
     {

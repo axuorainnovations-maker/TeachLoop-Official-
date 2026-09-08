@@ -11,12 +11,18 @@
  */
 (function () {
   'use strict';
-  // Automatically remove .html from browser URL address bar across all pages
+  // Automatically remove .html from browser URL address bar and clean routes (/chat, /)
   try {
-    if (window.location.pathname.endsWith('.html')) {
-      var cleanPath = window.location.pathname.slice(0, -5);
-      if (cleanPath === '/index') cleanPath = '/';
+    var p = window.location.pathname;
+    if (p.endsWith('.html')) {
+      var cleanPath = p.slice(0, -5);
+      if (cleanPath === '/index' || cleanPath === '/LandingPage') cleanPath = '/';
+      if (cleanPath === '/chatbot') cleanPath = '/chat';
       window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+    } else if (p === '/chatbot') {
+      window.history.replaceState(null, '', '/chat' + window.location.search + window.location.hash);
+    } else if (p === '/LandingPage' || p === '/index') {
+      window.history.replaceState(null, '', '/' + window.location.search + window.location.hash);
     }
   } catch (e) {}
 
