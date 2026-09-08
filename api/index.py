@@ -303,7 +303,7 @@ class handler(BaseHTTPRequestHandler):
             })
             return
 
-        elif path in ('/v1/messages', '/api/messages'):
+        elif path in ('/api/chat', '/v1/messages', '/api/messages'):
             anthropic_key = env_vars.get('ANTHROPIC_API_KEY', '') or ANTHROPIC_API_KEY
             nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
 
@@ -446,6 +446,30 @@ class handler(BaseHTTPRequestHandler):
 
             # Fallback illustration
             self._json(200, {"image_url": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%2318181b' rx='16'/><text x='300' y='200' fill='%23a855f7' font-family='sans-serif' font-size='18' text-anchor='middle'>Noura Concept Diagram</text></svg>"})
+            return
+
+        elif path == '/api/stt':
+            nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
+            if nv_key:
+                try:
+                    req = urllib.request.Request(
+                        'https://integrate.api.nvidia.com/v1/audio/transcriptions',
+                        data=raw_body,
+                        headers={
+                            'Authorization': 'Bearer ' + nv_key,
+                            'Content-Type': self.headers.get('Content-Type', 'audio/wav'),
+                            'NV-Model-Name': 'parakeet-1.1b-rnnt-multilingual-asr'
+                        },
+                        method='POST'
+                    )
+                    with urllib.request.urlopen(req, timeout=15) as resp:
+                        res_data = json.loads(resp.read().decode('utf-8'))
+                        txt = res_data.get('text') or res_data.get('transcript') or ''
+                        self._json(200, {"transcript": txt.strip(), "model": "parakeet-1.1b-rnnt-multilingual-asr"})
+                        return
+                except Exception as e:
+                    print(f"[stt] Error: {e}")
+            self._json(200, {"transcript": "", "model": "none"})
             return
 
         self._json(404, {"error": "Not found", "path": path})
