@@ -6,6 +6,45 @@
     <title>Noura — Learn by Teaching an AI Student</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter+Tight:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        (function () {
+            try {
+                var p = new URLSearchParams(window.location.search);
+                if (p.get('stay') === '1' || p.get('landing') === '1' || p.get('logged_out') === '1') {
+                    return;
+                }
+                var localEmail = localStorage.getItem('NOURA_EMAIL');
+                var localAcc = null;
+                try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch (e) { }
+                var hasLocalAuth = (localEmail && localEmail.includes('@')) || (localAcc && localAcc.email);
+
+                if (hasLocalAuth) {
+                    window.location.replace('/chat');
+                    return;
+                }
+
+                if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase) {
+                    var sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+                    sb.auth.getSession().then(function (res) {
+                        if (res && res.data && res.data.session && res.data.session.user) {
+                            var u = res.data.session.user;
+                            var meta = u.user_metadata || {};
+                            var email = u.email || '';
+                            var name = (meta.full_name || meta.name || (email ? email.split('@')[0] : 'Account')).trim();
+                            try {
+                                localStorage.setItem('NOURA_EMAIL', email);
+                                localStorage.setItem('TEACHLOOP_NAME', name);
+                                localStorage.setItem('NOURA_ACCOUNT', JSON.stringify({ email: email, name: name, avatar: meta.avatar_url || meta.picture || '', provider: 'google' }));
+                            } catch (e) { }
+                            window.location.replace('/chat');
+                        }
+                    }).catch(function () { });
+                }
+            } catch (err) { }
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -527,6 +566,22 @@
             window.addEventListener('resize', onScroll, { passive: true });
             onScroll();
         })();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                var localEmail = localStorage.getItem('NOURA_EMAIL');
+                var localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}');
+                if ((localEmail && localEmail.includes('@')) || (localAcc && localAcc.email)) {
+                    var loginLink = document.getElementById('nav-login-link');
+                    var startBtn = document.getElementById('start-teaching-btn');
+                    if (loginLink) loginLink.style.display = 'none';
+                    if (startBtn) {
+                        startBtn.textContent = 'Open App →';
+                        startBtn.href = '/chat';
+                    }
+                }
+            } catch (e) { }
+        });
     </script>
 </body>
 </html>

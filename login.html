@@ -180,6 +180,41 @@
       const sb = (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase)
         ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
 
+      // Auto-redirect if already logged in (unless explicitly logging out or forcing login)
+      try {
+        const p = new URLSearchParams(window.location.search);
+        const forceLogin = p.get('logout') === 'true' || p.get('force') === '1' || p.get('logged_out') === '1';
+        if (!forceLogin) {
+          const localEmail = localStorage.getItem('NOURA_EMAIL');
+          let localAcc = null;
+          try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
+          const hasLocalAuth = (localEmail && localEmail.includes('@')) || (localAcc && localAcc.email);
+
+          if (sb) {
+            sb.auth.getSession().then(({ data }) => {
+              if (data && data.session && data.session.user) {
+                const u = data.session.user;
+                const meta = u.user_metadata || {};
+                const email = u.email || '';
+                const name = (meta.full_name || meta.name || (email ? email.split('@')[0] : 'Account')).trim();
+                try {
+                  localStorage.setItem('NOURA_EMAIL', email);
+                  localStorage.setItem('TEACHLOOP_NAME', name);
+                  localStorage.setItem('NOURA_ACCOUNT', JSON.stringify({ email, name, avatar: meta.avatar_url || meta.picture || '', method: 'session' }));
+                } catch(e){}
+                window.location.replace('/chat');
+              } else if (hasLocalAuth) {
+                window.location.replace('/chat');
+              }
+            }).catch(() => {
+              if (hasLocalAuth) window.location.replace('/chat');
+            });
+          } else if (hasLocalAuth) {
+            window.location.replace('/chat');
+          }
+        }
+      } catch (e) {}
+
       let mode = 'login'; // 'login' | 'signup'
       try {
         const p = new URLSearchParams(window.location.search);
