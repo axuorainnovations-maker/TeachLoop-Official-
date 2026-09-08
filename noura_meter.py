@@ -337,17 +337,10 @@ class Ledger:
 
     def balance(self, user_id):
         """Granted minus spent, over all time. Credits never expire."""
-        granted = spent = 0
-        for e in self._events:
-            if e.get('user_id') != user_id:
-                continue
-            if e.get('kind') == 'grant':
-                granted += e.get('credits', 0)
-            elif e.get('ok', True):
-                spent += e.get('credits', 0)
-        return max(0, granted - spent)
+        return self.wallet(user_id)['balance']
 
     def wallet(self, user_id):
+        self.ensure_user(user_id)
         granted = spent = 0
         for e in self._events:
             if e.get('user_id') != user_id:
@@ -356,6 +349,8 @@ class Ledger:
                 granted += e.get('credits', 0)
             elif e.get('ok', True):
                 spent += e.get('credits', 0)
+        if granted == 0:
+            granted = SIGNUP_GRANT
         return {'granted': granted, 'spent': spent, 'balance': max(0, granted - spent)}
 
     # ── enforcement ──────────────────────────────────────────────────────

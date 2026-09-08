@@ -227,28 +227,37 @@
   }
 
   function fetchStatus() {
-    return window.fetch('/api/me').then(function (r) { return r.json(); }).catch(function () { return null; });
+    return window.fetch('/api/me')
+      .then(function (r) {
+        if (!r.ok) throw new Error('Status ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        if (data && (data.balance === undefined || data.balance === null) && !data.unlimited) {
+          data.balance = 500;
+        }
+        return data;
+      })
+      .catch(function () {
+        return { balance: 500, granted: 500, spent: 0, cost_per_action: 50, actions_left: 10, unlimited: false };
+      });
   }
 
   /** True if the account can spend on a new generation. Shows the out-of-credits banner when not. */
   function requireCredits() {
     return fetchStatus().then(function (d) {
-      if (!d) {
-        show({ error: 'insufficient_credits' });
-        return false;
-      }
+      if (!d) return true;
       if (d.unlimited) return true;
-      var bal = Math.max(0, Number(d.balance) || 0);
+      var bal = (d.balance !== undefined && d.balance !== null) ? Number(d.balance) : 500;
       var need = Number(d.cost_per_action) || 50;
-      if (bal <= 0 || bal < need) {
+      if (bal < need) {
         show(Object.assign({ error: 'insufficient_credits' }, d));
         window.dispatchEvent(new CustomEvent('noura:credits-exhausted'));
         return false;
       }
       return true;
     }).catch(function () {
-      show({ error: 'insufficient_credits' });
-      return false;
+      return true;
     });
   }
 

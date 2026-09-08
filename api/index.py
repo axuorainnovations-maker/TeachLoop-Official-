@@ -137,22 +137,30 @@ class handler(BaseHTTPRequestHandler):
 
         if path in ('/api/me', '/api/credits'):
             uid = self._identify()
-            w = LEDGER.wallet(uid) if LEDGER else {'balance': 500, 'unlimited': False, 'total_granted': 500, 'total_spent': 0}
-            u = LEDGER.user(uid) if LEDGER else {}
+            if LEDGER:
+                LEDGER.ensure_user(uid)
+                w = LEDGER.wallet(uid)
+                u = LEDGER.user(uid)
+            else:
+                w = {'balance': 500, 'granted': 500, 'spent': 0}
+                u = {}
             cost = noura_meter.CREDIT_COST if noura_meter else 50
             unlimited = noura_meter.is_unlimited(u) if (noura_meter and u) else False
             bal = w.get('balance', 500)
+            if bal == 0 and w.get('spent', 0) == 0:
+                bal = 500
             
             self._json(200, {
                 "user_id": uid,
                 "email": u.get('email') or None,
                 "tier": u.get('tier', 'free'),
-                "balance": bal,
+                "balance": None if unlimited else bal,
                 "unlimited": unlimited,
                 "actions_left": 999999 if unlimited else (bal // cost if cost else 0),
                 "cost_per_action": cost,
-                "total_granted": w.get('total_granted', 500),
-                "total_spent": w.get('total_spent', 0),
+                "granted": max(w.get('granted', 500), 500),
+                "spent": w.get('spent', 0),
+                "expires": None,
             })
             return
 
