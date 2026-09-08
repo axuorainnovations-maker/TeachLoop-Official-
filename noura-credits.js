@@ -167,7 +167,7 @@
       'font-size:13.5px;font-weight:700;cursor:pointer;user-select:none;line-height:1;' +
       'transition:all .15s ease;box-shadow:0 2px 8px rgba(0,0,0,0.2)}' +
       '.noura-credit-pill:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.07)}' +
-      '.noura-credit-pill .sparkle-ic{color:#ffffff;flex-shrink:0}' +
+      '.noura-credit-pill .sparkle-ic{color:#c084fc;fill:#c084fc;flex-shrink:0}' +
       '.noura-credit-pill.low{border-color:rgba(227,160,8,.55)}' +
       '.noura-credit-pill.out{border-color:rgba(239,68,68,.55);color:#ff9f9a}' +
       '.noura-credit-pill .n{font-variant-numeric:tabular-nums;color:#ffffff;font-weight:700;letter-spacing:-0.2px}' +
@@ -175,7 +175,7 @@
       '.noura-credit-pill.unlimited .n{font-size:15px;line-height:1}' +
       'body.light-mode .noura-credit-pill{background:#ffffff;border-color:rgba(0,0,0,0.14);color:#111827}' +
       'body.light-mode .noura-credit-pill .n{color:#111827}' +
-      'body.light-mode .noura-credit-pill .sparkle-ic{color:#111827}' +
+      'body.light-mode .noura-credit-pill .sparkle-ic{color:#9333ea;fill:#9333ea}' +
 
       /* Dropdown Popup styling matching Noura purple theme */
       '.nc-dropdown{position:absolute;top:44px;right:0;width:330px;background:#18181b;' +
@@ -397,7 +397,7 @@
     el.className = 'noura-credit-pill';
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
-    el.innerHTML = '<svg class="sparkle-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c0 4.5-3.5 8-8 8 4.5 0 8 3.5 8 8 0-4.5 3.5-8 8-8-4.5 0-8-3.5-8-8z"/><path d="M19 3c0 1.5-1 2.5-2.5 2.5 1.5 0 2.5 1 2.5 2.5 0-1.5 1-2.5 2.5-2.5-1.5 0-2.5-1-2.5-2.5z" stroke-width="1.5"/></svg><span class="n">500</span>';
+    el.innerHTML = '<svg class="sparkle-ic" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span class="n">500</span>';
 
     var drop = document.createElement('div');
     drop.id = 'nouraCreditDropdown';
@@ -411,7 +411,7 @@
       '<div class="nc-stat-row">' +
         '<div class="nc-stat-header">' +
           '<div class="nc-stat-title-group">' +
-            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c0 4.5-3.5 8-8 8 4.5 0 8 3.5 8 8 0-4.5 3.5-8 8-8-4.5 0-8-3.5-8-8z"/></svg>' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' +
             '<span>Credits</span>' +
             '<span class="nc-q-icon" title="Your total credit balance">?</span>' +
           '</div>' +
