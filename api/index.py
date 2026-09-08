@@ -307,16 +307,23 @@ class handler(BaseHTTPRequestHandler):
             anthropic_key = env_vars.get('ANTHROPIC_API_KEY', '') or ANTHROPIC_API_KEY
             nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
 
-            # Model normalization
+            # Model normalization to official production IDs
             model_req = str(data.get('model') or '')
             if 'haiku' in model_req.lower():
-                data['model'] = 'claude-haiku-4-5-20251001'
+                data['model'] = 'claude-3-5-haiku-20241022'
             elif 'sonnet' in model_req.lower():
-                data['model'] = 'claude-sonnet-4-5-20250929'
+                data['model'] = 'claude-3-5-sonnet-20241022'
             elif 'opus' in model_req.lower():
-                data['model'] = 'claude-opus-4-5-20251101'
-            elif not model_req:
-                data['model'] = 'claude-haiku-4-5-20251001'
+                data['model'] = 'claude-3-opus-20240229'
+            else:
+                data['model'] = 'claude-3-5-haiku-20241022'
+
+            # Clean client-specific tool fields Anthropic rejects unless headers match
+            if 'tools' in data and isinstance(data['tools'], list):
+                # Filter to standard tools or remove web_search if not using beta
+                data['tools'] = [t for t in data['tools'] if t.get('type') != 'web_search_20250305']
+                if not data['tools']:
+                    del data['tools']
 
             # Try Anthropic Claude
             if anthropic_key:
@@ -342,7 +349,7 @@ class handler(BaseHTTPRequestHandler):
                     with urllib.request.urlopen(anth_req, timeout=60) as resp:
                         resp_bytes = resp.read()
                         self.send_response(200)
-                        self.send_header('Content-Type', 'application/json')
+                        self.send_header('Content-Type', resp.headers.get('Content-Type', 'application/json'))
                         self.send_header('Access-Control-Allow-Origin', '*')
                         self.end_headers()
                         self.wfile.write(resp_bytes)
@@ -368,8 +375,9 @@ class handler(BaseHTTPRequestHandler):
                         formatted_msgs.append({"role": m.get("role", "user"), "content": content_str})
 
                     candidate_models = [
-                        'meta/llama-3.2-11b-vision-instruct',
+                        'meta/llama-3.3-70b-instruct',
                         'nvidia/nemotron-3.5-lightning-30b-a3b',
+                        'meta/llama-3.2-11b-vision-instruct',
                         'meta/llama-3.2-90b-vision-instruct'
                     ]
                     for chosen_model in candidate_models:
@@ -402,6 +410,17 @@ class handler(BaseHTTPRequestHandler):
                     return
 
             self._json(500, {"error": {"message": "No valid LLM API key available (configure ANTHROPIC_API_KEY or NVIDIA_API_KEY in Vercel settings)."}})
+            return
+
+        elif path == '/api/tts':
+            # Audio WAV fallback response
+            wav_silence = b'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80>\x00\x00\x00}\x00\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
+            self.send_response(200)
+            self.send_header('Content-Type', 'audio/wav')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(wav_silence)))
+            self.end_headers()
+            self.wfile.write(wav_silence)
             return
 
         elif path == '/api/generate-image':

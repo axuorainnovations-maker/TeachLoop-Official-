@@ -287,7 +287,7 @@
     el.className = 'noura-credit-pill';
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
-    el.innerHTML = '<svg class="sparkle-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c0 4.5-3.5 8-8 8 4.5 0 8 3.5 8 8 0-4.5 3.5-8 8-8-4.5 0-8-3.5-8-8z"/><path d="M19 3c0 1.5-1 2.5-2.5 2.5 1.5 0 2.5 1 2.5 2.5 0-1.5 1-2.5 2.5-2.5-1.5 0-2.5-1-2.5-2.5z" stroke-width="1.5"/></svg><span class="n">--</span>';
+    el.innerHTML = '<svg class="sparkle-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c0 4.5-3.5 8-8 8 4.5 0 8 3.5 8 8 0-4.5 3.5-8 8-8-4.5 0-8-3.5-8-8z"/><path d="M19 3c0 1.5-1 2.5-2.5 2.5 1.5 0 2.5 1 2.5 2.5 0-1.5 1-2.5 2.5-2.5-1.5 0-2.5-1-2.5-2.5z" stroke-width="1.5"/></svg><span class="n">500</span>';
 
     var drop = document.createElement('div');
     drop.id = 'nouraCreditDropdown';
@@ -305,7 +305,7 @@
             '<span>Credits</span>' +
             '<span class="nc-q-icon" title="Your total credit balance">?</span>' +
           '</div>' +
-          '<span class="nc-stat-val-big" id="ncDropBalVal">--</span>' +
+          '<span class="nc-stat-val-big" id="ncDropBalVal">500</span>' +
         '</div>' +
         '<div class="nc-stat-sub-group">' +
           '<span>Free credits</span>' +
