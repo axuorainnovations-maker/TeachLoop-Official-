@@ -144,7 +144,7 @@ class handler(BaseHTTPRequestHandler):
             else:
                 w = {'balance': 500, 'granted': 500, 'spent': 0}
                 u = {}
-            cost = noura_meter.CREDIT_COST if noura_meter else 50
+            cost = noura_meter.CREDIT_COST if noura_meter else 100
             unlimited = noura_meter.is_unlimited(u) if (noura_meter and u) else False
             bal = w.get('balance', 500)
             if bal == 0 and w.get('spent', 0) == 0:
@@ -291,7 +291,7 @@ class handler(BaseHTTPRequestHandler):
             uid = self._identify(data)
             first = LEDGER.claim_welcome(uid) if LEDGER else True
             w = LEDGER.wallet(uid) if LEDGER else {'balance': 500}
-            cost = noura_meter.CREDIT_COST if noura_meter else 50
+            cost = noura_meter.CREDIT_COST if noura_meter else 100
             grant = noura_meter.SIGNUP_GRANT if noura_meter else 500
             bal = w.get('balance', 500)
             self._json(200, {
@@ -300,6 +300,49 @@ class handler(BaseHTTPRequestHandler):
                 "balance": bal,
                 "actions_left": bal // cost if cost else 0,
                 "cost_per_action": cost,
+            })
+            return
+
+        elif path in ('/api/spend', '/api/deduct'):
+            uid = self._identify(data)
+            cost = int(data.get('amount') or data.get('cost') or 100)
+            reason = str(data.get('reason') or data.get('surface') or 'lesson_generation')
+            if LEDGER:
+                LEDGER.ensure_user(uid)
+                u = LEDGER.user(uid)
+                unlimited = noura_meter.is_unlimited(u) if (noura_meter and u) else False
+                if not unlimited:
+                    LEDGER.append(
+                        user_id=uid,
+                        kind='spend',
+                        surface=reason,
+                        provider='app',
+                        model=None,
+                        input_tokens=0,
+                        cache_read=0,
+                        cache_write=0,
+                        output_tokens=0,
+                        usd_cost=0.0,
+                        credits=cost,
+                        reason=reason
+                    )
+                w = LEDGER.wallet(uid)
+                bal = w.get('balance', 500)
+            else:
+                bal = max(0, 500 - cost)
+                w = {'balance': bal, 'granted': 500, 'spent': cost}
+                unlimited = False
+
+            self._json(200, {
+                "success": True,
+                "user_id": uid,
+                "deducted": cost,
+                "balance": None if unlimited else bal,
+                "unlimited": unlimited,
+                "granted": w.get('granted', 500),
+                "spent": w.get('spent', 0),
+                "actions_left": 999999 if unlimited else (bal // 100 if bal >= 0 else 0),
+                "cost_per_action": 100
             })
             return
 

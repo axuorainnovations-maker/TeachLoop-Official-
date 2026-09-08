@@ -53,8 +53,8 @@ STT_USD_PER_MINUTE = 0.006
 # Every user-initiated action costs a flat CREDIT_COST. Internal sub-calls
 # that serve the same action are free, so one "generate a study plan" is one
 # charge even though it fires several API calls underneath.
-CREDIT_COST = 50          # per billable action
-SIGNUP_GRANT = 500        # 10 actions to try the product before buying
+CREDIT_COST = 100         # per lesson / billable action (Study Brief, Learn, Checkpoint, Recall, Audio Recap)
+SIGNUP_GRANT = 500        # 5 full study packages to try before buying
 
 # Surfaces that are internal machinery, not something the user asked for.
 # Anything NOT listed here is billable. That is deliberate: a surface someone

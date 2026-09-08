@@ -3357,6 +3357,23 @@
     document.getElementById('brRegen').hidden = false;
   }
 
+  const CHARGED_KEY = 'NOURA_LESSON_CHARGED_' + slug;
+
+  async function ensureLessonCharged(force) {
+    if (!title || title === 'Your lesson') return true;
+    if (localStorage.getItem(CHARGED_KEY) && !force) return true;
+
+    if (window.NouraCredits && window.NouraCredits.requireCredits) {
+      const allowed = await window.NouraCredits.requireCredits(100);
+      if (!allowed) return false;
+      if (window.NouraCredits.deduct) {
+        await window.NouraCredits.deduct(100, 'lesson_package');
+      }
+    }
+    try { localStorage.setItem(CHARGED_KEY, 'true'); } catch (e) {}
+    return true;
+  }
+
   async function openBrief(force) {
     show('brief');
     // No topic/material yet → empty state, never invent content.
@@ -3370,13 +3387,20 @@
       } catch (e) { localStorage.removeItem(BRIEF_KEY); }
     }
     if (briefBusy) return;
+
+    const ok = await ensureLessonCharged(force);
+    if (!ok) {
+      renderBriefError('You need 100 credits to generate a study package. Tap Upgrade Plan to continue.');
+      return;
+    }
+
     briefBusy = true;
     const prog = renderBriefLoading();
     const system = 'You are Noura, a study tutor writing a short pre-study brief. Reply with ONLY a valid JSON object, no markdown fences, no commentary. Schema: {"bigIdea": string (1-2 sentences), "keyConcepts": [string x3-6] (each in format "Concept Name: 1-sentence concise description", under 22 words), "terms": [{"term": string, "definition": string (under 18 words)} x3-6], "example": string (one concrete example, mini scenario or analogy, 2-3 sentences), "mistakes": [string x2-4] (each a specific misunderstanding students have, under 22 words), "explainGoals": [string x2-4] (each starting with a verb, something the student must be able to say in their own words)}. Be concise and concrete - no filler, no repetition of the title. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
     const user = 'Write the StudyBrief for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-3-5-haiku-20241022', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 2000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
@@ -3624,7 +3648,7 @@
     const user = 'Write the Recall cards for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-3-5-haiku-20241022', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 4000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
@@ -3786,7 +3810,7 @@
       const user = 'Question: ' + item.q + '\nIdeal answer: ' + item.ideal + '\nStudent answer: ' + answer;
       const r = await fetch('/api/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-3-5-haiku-20241022', max_tokens: 400, system: system, messages: [{ role: 'user', content: user }] })
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 400, system: system, messages: [{ role: 'user', content: user }] })
       });
       const data = await r.json();
       const raw = Array.isArray(data.content) ? data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim() : '';
@@ -4043,7 +4067,7 @@
     const user = 'Write the Checkpoint questions for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-3-5-haiku-20241022', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(n)
       )).trim();
       const a = raw.indexOf('['), b = raw.lastIndexOf(']');
@@ -4416,7 +4440,7 @@
       answer.innerHTML = '<div class="pc-loading"><span class="grad-logo"></span><span>Answering from recap…</span></div>';
       try {
         const text = await streamChat({
-          model: 'claude-3-5-haiku-20241022', max_tokens: 700,
+          model: 'claude-haiku-4-5-20251001', max_tokens: 700,
           system: "You are Noura, answering a learner's question about an audio recap. Answer in 2-4 plain sentences. MATHS MUST BE PLAIN READABLE TEXT.\n\nRECAP:\n" + castScript(cast),
           messages: [{ role: 'user', content: q }]
         });
@@ -4460,7 +4484,7 @@
     const user = 'Write the 2-person co-hosted podcast for the topic: "' + title + '".' + (subject ? (' It is part of the subject "' + subject + '".') : '') + ' Depth: motivated high-school / intro-college student unless the title implies otherwise.';
     try {
       const raw = (await streamChat(
-        { model: 'claude-3-5-haiku-20241022', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 3000, system: system, messages: [{ role: 'user', content: user }] },
         n => prog.report(Math.round(n * 0.65))
       )).trim();
       let clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -4634,17 +4658,15 @@
     } else {
       state = { done: [], scores: {} }; saveState();
     }
-    if (window.NouraCredits && window.NouraCredits.requireCredits) {
-      const ok = await window.NouraCredits.requireCredits();
-      if (!ok) {
-        show('load');
-        loadStatus.hidden = true;
-        document.getElementById('loadProgress').style.display = 'none';
-        loadError.hidden = false;
-        loadError.textContent = 'You are out of credits. Purchase more to generate a lesson.';
-        retryBtn.hidden = false;
-        return;
-      }
+    const ok = await ensureLessonCharged(force);
+    if (!ok) {
+      show('load');
+      loadStatus.hidden = true;
+      document.getElementById('loadProgress').style.display = 'none';
+      loadError.hidden = false;
+      loadError.textContent = 'You need 100 credits to generate a study lesson. Purchase more to continue.';
+      retryBtn.hidden = false;
+      return;
     }
     show('load');
     loadError.hidden = true; retryBtn.hidden = true; loadStatus.hidden = false;
@@ -4670,7 +4692,7 @@
 
     try {
       const raw = (await streamChat(
-        { model: 'claude-3-5-haiku-20241022', max_tokens: 12000, system: system, messages: [{ role: 'user', content: user }] },
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 12000, system: system, messages: [{ role: 'user', content: user }] },
         n => { prog.report(n); setStatus(n); }
       )).trim();
       const parsed = cleanLesson(readLessonJSON(raw));

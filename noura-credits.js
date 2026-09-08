@@ -208,9 +208,28 @@
     document.head.appendChild(s);
   }
 
+  var LOCAL_CREDITS_KEY = 'NOURA_CREDITS_DATA_V1';
+
+  function getLocalData() {
+    try {
+      var s = localStorage.getItem(LOCAL_CREDITS_KEY);
+      if (s) {
+        var p = JSON.parse(s);
+        if (p && typeof p.balance === 'number') return p;
+      }
+    } catch (e) {}
+    var init = { balance: 500, granted: 500, spent: 0, cost_per_action: 100, actions_left: 5, unlimited: false };
+    try { localStorage.setItem(LOCAL_CREDITS_KEY, JSON.stringify(init)); } catch (e) {}
+    return init;
+  }
+
+  function setLocalData(d) {
+    try { localStorage.setItem(LOCAL_CREDITS_KEY, JSON.stringify(d)); } catch (e) {}
+  }
+
   function paint(el, d) {
     if (!el || !d) return;
-    var per = d.cost_per_action || 50;
+    var per = d.cost_per_action || 100;
     var bal = Math.max(0, Number(d.balance) || 0);
     var dropBal = document.getElementById('ncDropBalVal');
 
@@ -222,42 +241,51 @@
       return;
     }
 
-    el.className = 'noura-credit-pill' + (bal < per ? ' out' : bal < per * 3 ? ' low' : '');
+    el.className = 'noura-credit-pill' + (bal < per ? ' out' : bal < per * 2 ? ' low' : '');
     var formatted = bal.toLocaleString();
     el.querySelector('.n').textContent = formatted;
     if (dropBal) dropBal.textContent = formatted;
 
     el.title = bal < per
       ? 'Out of credits. Top up to keep studying.'
-      : Math.floor(bal / per) + ' study actions left (' + per + ' credits each)';
+      : Math.floor(bal / per) + ' study packages left (' + per + ' credits each)';
   }
 
   function fetchStatus() {
+    var local = getLocalData();
     return window.fetch('/api/me')
       .then(function (r) {
         if (!r.ok) throw new Error('Status ' + r.status);
         return r.json();
       })
       .then(function (data) {
-        if (data && (data.balance === undefined || data.balance === null) && !data.unlimited) {
-          data.balance = 500;
+        if (!data || data.unlimited) return data;
+        // Merge server & local so spends in browser persist
+        if (typeof data.balance === 'number') {
+          var effectiveBal = Math.min(data.balance, local.balance);
+          var effectiveSpent = Math.max(data.spent || 0, local.spent || 0);
+          data.balance = effectiveBal;
+          data.spent = effectiveSpent;
+          data.cost_per_action = 100;
+          data.actions_left = Math.floor(effectiveBal / 100);
+          setLocalData(data);
         }
         return data;
       })
       .catch(function () {
-        return { balance: 500, granted: 500, spent: 0, cost_per_action: 50, actions_left: 10, unlimited: false };
+        return local;
       });
   }
 
   /** True if the account can spend on a new generation. Shows the out-of-credits banner when not. */
-  function requireCredits() {
+  function requireCredits(neededAmount) {
+    var need = typeof neededAmount === 'number' ? neededAmount : 100;
     return fetchStatus().then(function (d) {
       if (!d) return true;
       if (d.unlimited) return true;
       var bal = (d.balance !== undefined && d.balance !== null) ? Number(d.balance) : 500;
-      var need = Number(d.cost_per_action) || 50;
       if (bal < need) {
-        show(Object.assign({ error: 'insufficient_credits' }, d));
+        show(Object.assign({ error: 'insufficient_credits', cost_per_action: need }, d));
         window.dispatchEvent(new CustomEvent('noura:credits-exhausted'));
         return false;
       }
@@ -265,6 +293,48 @@
     }).catch(function () {
       return true;
     });
+  }
+
+  /** Deduct credits for an action (e.g. 100 credits for generating a full study package). */
+  async function deduct(amount, reason) {
+    var cost = typeof amount === 'number' ? amount : 100;
+    var res = strReason(reason || 'lesson_generation');
+    var cur = getLocalData();
+
+    if (cur.unlimited) return true;
+    if (cur.balance < cost) {
+      show(Object.assign({ error: 'insufficient_credits', cost_per_action: cost }, cur));
+      window.dispatchEvent(new CustomEvent('noura:credits-exhausted'));
+      return false;
+    }
+
+    cur.balance = Math.max(0, cur.balance - cost);
+    cur.spent = (cur.spent || 0) + cost;
+    cur.actions_left = Math.floor(cur.balance / 100);
+    setLocalData(cur);
+
+    // Repaint all pills immediately
+    var pill = document.getElementById('nouraCreditPill');
+    if (pill) paint(pill, cur);
+    var dropBal = document.getElementById('ncDropBalVal');
+    if (dropBal) dropBal.textContent = cur.balance.toLocaleString();
+
+    window.dispatchEvent(new CustomEvent('noura:credits-updated', { detail: cur }));
+
+    // Notify backend
+    try {
+      window.fetch('/api/spend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: cost, reason: res })
+      }).catch(function () {});
+    } catch (e) {}
+
+    return true;
+  }
+
+  function strReason(r) {
+    return typeof r === 'string' ? r : 'lesson_generation';
   }
 
   function refreshStatus() {
@@ -367,13 +437,14 @@
   function refresh() {
     var el = document.getElementById('nouraCreditPill');
     if (!el) return Promise.resolve(null);
-    return window.fetch('/api/me').then(function (r) { return r.json(); })
+    return fetchStatus()
       .then(function (d) { paint(el, d); return d; })
       .catch(function () { return null; });
   }
 
   // Spending changes the balance, so repaint after any /api call settles.
   window.addEventListener('noura:credits-exhausted', refresh);
+  window.addEventListener('noura:credits-updated', refresh);
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) refresh();
   });
@@ -397,8 +468,8 @@
         '<div style="font-size:15px;font-weight:800;letter-spacing:-.01em">' +
           d.credits.toLocaleString() + ' credits added</div></div>' +
       '<div style="font-size:12.5px;color:#9a9aa2;margin-top:8px;line-height:1.55">' +
-        'Welcome to Noura. That is ' + (d.actions_left || 10) + ' study actions to get started. ' +
-        'Credits never expire, and each action costs ' + (d.cost_per_action || 50) + '.</div>';
+        'Welcome to Noura. That is ' + (d.actions_left || 5) + ' study packages to get started. ' +
+        'Credits never expire, and each study package costs ' + (d.cost_per_action || 100) + '.</div>';
     document.body.appendChild(w);
     requestAnimationFrame(function () { w.style.opacity = '1'; w.style.transform = 'none'; });
     setTimeout(function () {
@@ -425,10 +496,11 @@
     refresh: refresh,
     refreshStatus: refreshStatus,
     requireCredits: requireCredits,
+    deduct: deduct,
+    spend: deduct,
     claimWelcome: claimWelcome,
     async status() {
-      try { return await (await window.fetch('/api/me')).json(); }
-      catch (e) { return null; }
+      return fetchStatus();
     }
   };
 })();
