@@ -307,16 +307,16 @@ class handler(BaseHTTPRequestHandler):
             anthropic_key = env_vars.get('ANTHROPIC_API_KEY', '') or ANTHROPIC_API_KEY
             nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
 
-            # Model normalization to official production IDs
+            # Model normalization to working production IDs
             model_req = str(data.get('model') or '')
             if 'haiku' in model_req.lower():
-                data['model'] = 'claude-3-5-haiku-20241022'
+                data['model'] = 'claude-haiku-4-5-20251001'
             elif 'sonnet' in model_req.lower():
-                data['model'] = 'claude-3-5-sonnet-20241022'
+                data['model'] = 'claude-sonnet-4-5-20250929'
             elif 'opus' in model_req.lower():
-                data['model'] = 'claude-3-opus-20240229'
-            else:
-                data['model'] = 'claude-3-5-haiku-20241022'
+                data['model'] = 'claude-opus-4-5-20251101'
+            elif not model_req.startswith('claude-'):
+                data['model'] = 'claude-haiku-4-5-20251001'
 
             # Clean client-specific tool fields Anthropic rejects unless headers match
             if 'tools' in data and isinstance(data['tools'], list):
@@ -328,12 +328,10 @@ class handler(BaseHTTPRequestHandler):
             # Try Anthropic Claude
             if anthropic_key:
                 try:
+                    # Clean system prompt format for clean Anthropic API ingestion
                     if 'system' in data and data['system']:
-                        if isinstance(data['system'], str):
-                            data['system'] = [{"type": "text", "text": data['system'], "cache_control": {"type": "ephemeral"}}]
-                        elif isinstance(data['system'], list) and len(data['system']) > 0:
-                            if "cache_control" not in data['system'][-1]:
-                                data['system'][-1]["cache_control"] = {"type": "ephemeral"}
+                        if isinstance(data['system'], list):
+                            data['system'] = "\n\n".join([x.get('text', '') if isinstance(x, dict) else str(x) for x in data['system']])
 
                     req_data = json.dumps(data).encode('utf-8')
                     anth_req = urllib.request.Request(
@@ -342,11 +340,10 @@ class handler(BaseHTTPRequestHandler):
                         headers={
                             'x-api-key': anthropic_key,
                             'anthropic-version': '2023-06-01',
-                            'anthropic-beta': 'prompt-caching-2024-07-31',
                             'Content-Type': 'application/json',
                         }
                     )
-                    with urllib.request.urlopen(anth_req, timeout=60) as resp:
+                    with urllib.request.urlopen(anth_req, timeout=15) as resp:
                         resp_bytes = resp.read()
                         self.send_response(200)
                         self.send_header('Content-Type', resp.headers.get('Content-Type', 'application/json'))
@@ -355,72 +352,61 @@ class handler(BaseHTTPRequestHandler):
                         self.wfile.write(resp_bytes)
                         return
                 except Exception as e:
-                    print(f"[chat] Anthropic error, trying NVIDIA fallback: {e}")
+                    print(f"[chat] Anthropic error, trying fallback: {e}")
 
-            # Fallback to NVIDIA NIM
+            # Fallback response if Anthropic unavailable
             if nv_key:
                 try:
                     sys_prompt = data.get("system", "")
                     msgs = data.get("messages", [])
                     formatted_msgs = []
                     if sys_prompt:
-                        if isinstance(sys_prompt, list):
-                            sys_str = "\n\n".join([x.get('text', '') if isinstance(x, dict) else str(x) for x in sys_prompt])
-                        else:
-                            sys_str = str(sys_prompt)
-                        formatted_msgs.append({"role": "system", "content": sys_str})
+                        formatted_msgs.append({"role": "system", "content": str(sys_prompt)})
                     for m in msgs:
                         content = m.get("content", "")
                         content_str = content if isinstance(content, str) else "\n\n".join([c.get("text", "") for c in content if isinstance(c, dict)])
                         formatted_msgs.append({"role": m.get("role", "user"), "content": content_str})
 
                     candidate_models = [
-                        'meta/llama-3.3-70b-instruct',
-                        'nvidia/nemotron-3.5-lightning-30b-a3b',
-                        'meta/llama-3.2-11b-vision-instruct',
-                        'meta/llama-3.2-90b-vision-instruct'
+                        'deepseek-ai/deepseek-v4-flash-0731',
+                        'meta/llama-3.1-8b-instruct'
                     ]
                     for chosen_model in candidate_models:
-                        req_body = json.dumps({
-                            "model": chosen_model,
-                            "messages": formatted_msgs,
-                            "max_tokens": min(data.get("max_tokens", 800) or 800, 8000)
-                        }).encode('utf-8')
-                        req = urllib.request.Request(
-                            'https://integrate.api.nvidia.com/v1/chat/completions',
-                            data=req_body,
-                            headers={
-                                'Authorization': f'Bearer {nv_key}',
-                                'Content-Type': 'application/json'
-                            }
-                        )
                         try:
-                            with urllib.request.urlopen(req, timeout=30) as resp:
+                            req_body = json.dumps({
+                                "model": chosen_model,
+                                "messages": formatted_msgs,
+                                "max_tokens": min(data.get("max_tokens", 800) or 800, 4000)
+                            }).encode('utf-8')
+                            req = urllib.request.Request(
+                                'https://integrate.api.nvidia.com/v1/chat/completions',
+                                data=req_body,
+                                headers={
+                                    'Authorization': f'Bearer {nv_key}',
+                                    'Content-Type': 'application/json'
+                                }
+                            )
+                            with urllib.request.urlopen(req, timeout=8) as resp:
                                 resp_data = json.loads(resp.read().decode('utf-8'))
                                 reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
-                                self._json(200, {
-                                    "reply": reply,
-                                    "content": [{"type": "text", "text": reply}]
-                                })
-                                return
+                                if reply:
+                                    self._json(200, {
+                                        "id": f"msg_{secrets.token_hex(8)}",
+                                        "role": "assistant",
+                                        "content": [{"type": "text", "text": reply}]
+                                    })
+                                    return
                         except Exception:
                             continue
                 except Exception as e:
-                    self._json(500, {"error": {"message": f"NVIDIA NIM Chat Error: {e}"}})
-                    return
+                    print(f"[chat] NVIDIA fallback error: {e}")
 
-            self._json(500, {"error": {"message": "No valid LLM API key available (configure ANTHROPIC_API_KEY or NVIDIA_API_KEY in Vercel settings)."}})
+            self._json(500, {"error": {"message": "AI assistant is temporarily busy. Please retry in a few seconds."}})
             return
 
         elif path == '/api/tts':
-            # Audio WAV fallback response
-            wav_silence = b'RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80>\x00\x00\x00}\x00\x00\x02\x00\x10\x00data\x00\x00\x00\x00'
-            self.send_response(200)
-            self.send_header('Content-Type', 'audio/wav')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Content-Length', str(len(wav_silence)))
-            self.end_headers()
-            self.wfile.write(wav_silence)
+            # Signal client to use high quality native SpeechSynthesis
+            self._json(503, {"fallback": "speechSynthesis", "message": "Use client Web Speech API"})
             return
 
         elif path == '/api/generate-image':

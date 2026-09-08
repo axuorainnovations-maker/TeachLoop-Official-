@@ -2684,19 +2684,55 @@
   function stopSpeech() {
     if (currentAudio) { try { currentAudio.pause(); } catch (e) {} currentAudio = null; }
     if (currentAudioUrl) { URL.revokeObjectURL(currentAudioUrl); currentAudioUrl = null; }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
   }
   async function speak(text) {
     stopSpeech();
     if (!text || textMode) return;
+
+    // Clean text of markdown/tags for spoken audio
+    const cleanText = text
+      .replace(/\[\[.*?\]\]/g, '')
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/[*_#~]/g, '')
+      .trim();
+    if (!cleanText) return;
+
     try {
       const r = await fetch('/api/tts', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text: cleanText })
       });
-      if (!r.ok) throw new Error('tts unavailable');
-      const blob = await r.blob();
-      currentAudioUrl = URL.createObjectURL(blob);
-      currentAudio = new Audio(currentAudioUrl);
+      if (r.ok) {
+        const blob = await r.blob();
+        if (blob && blob.size > 100) {
+          currentAudioUrl = URL.createObjectURL(blob);
+          currentAudio = new Audio(currentAudioUrl);
+          await new Promise((resolve) => {
+            let finished = false;
+            const done = () => {
+              if (finished) return;
+              finished = true;
+              speak._interrupt = null;
+              resolve();
+            };
+            currentAudio.onended = done;
+            currentAudio.onerror = done;
+            speak._interrupt = done;
+            currentAudio.play().catch(done);
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Server TTS fallback to SpeechSynthesis:', e);
+    }
+
+    // High quality Web Speech Synthesis fallback
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       await new Promise((resolve) => {
         let finished = false;
         const done = () => {
@@ -2705,21 +2741,18 @@
           speak._interrupt = null;
           resolve();
         };
-        currentAudio.onended = done;
-        currentAudio.onerror = err => {
-          console.warn('TTS playback error:', err);
-          done();
-        };
         speak._interrupt = done;
-        currentAudio.play().catch(err => {
-          console.warn('TTS play autoplay blocked:', err);
-          done();
-        });
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Victoria') || v.name.includes('Karen') || v.lang.startsWith('en')) && !v.name.includes('Bad'));
+        if (preferred) utterance.voice = preferred;
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.onend = done;
+        utterance.onerror = done;
+        window.speechSynthesis.speak(utterance);
       });
-    } catch (e) {
-      console.warn('speak exception:', e);
-    } finally {
-      stopSpeech();
     }
   }
   function interruptSpeech() {
