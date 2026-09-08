@@ -149,10 +149,13 @@ class Ledger:
             self._users = {}
 
     def _save_users(self):
-        tmp = self.users_path + '.tmp'
-        with open(tmp, 'w', encoding='utf-8') as f:
-            json.dump(self._users, f, indent=2)
-        os.replace(tmp, self.users_path)
+        try:
+            tmp = self.users_path + '.tmp'
+            with open(tmp, 'w', encoding='utf-8') as f:
+                json.dump(self._users, f, indent=2)
+            os.replace(tmp, self.users_path)
+        except Exception as e:
+            pass
 
     # ── users ────────────────────────────────────────────────────────────
     def find_user_by_email(self, email):

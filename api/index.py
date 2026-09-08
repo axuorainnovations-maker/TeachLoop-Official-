@@ -128,56 +128,61 @@ class handler(BaseHTTPRequestHandler):
         return 'usr_' + secrets.token_hex(8)
 
     def do_GET(self):
-        parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
+        try:
+            parsed = urllib.parse.urlparse(self.path)
+            path = parsed.path
 
-        # Strip .html / normalize
-        if path == '/config.js':
-            self._js(200, f'const ENV = {json.dumps(public_env)};\n')
-            return
+            # Strip .html / normalize
+            if path == '/config.js':
+                self._js(200, f'const ENV = {json.dumps(public_env)};\n')
+                return
 
-        if path == '/supabase-config.js':
-            self._js(200, f'window.SUPABASE_URL = "{sb_url}";\nwindow.SUPABASE_ANON_KEY = "{sb_anon}";\n')
-            return
+            if path == '/supabase-config.js':
+                self._js(200, f'window.SUPABASE_URL = "{sb_url}";\nwindow.SUPABASE_ANON_KEY = "{sb_anon}";\n')
+                return
 
-        if path in ('/api/me', '/api/credits'):
-            email = (self.headers.get('X-Noura-Email') or '').strip().lower()
-            uid = self._identify()
-            if LEDGER:
-                LEDGER.ensure_user(uid, email=email)
-                w = LEDGER.wallet(uid)
-                u = LEDGER.user(uid)
-                if email and not u.get('email'):
-                    u['email'] = email
-            else:
-                w = {'balance': 500, 'granted': 500, 'spent': 0}
-                u = {'email': email}
-            cost = noura_meter.CREDIT_COST if noura_meter else 100
-            user_email = (u.get('email') or email or '').strip().lower()
-            unlimited = (user_email == 'prorkrff@gmail.com') or (noura_meter.is_unlimited(u) if noura_meter else False)
-            bal = w.get('balance', 500)
-            if bal == 0 and w.get('spent', 0) == 0:
-                bal = 500
-            
-            self._json(200, {
-                "user_id": uid,
-                "email": user_email or None,
-                "tier": "unlimited" if unlimited else u.get('tier', 'free'),
-                "balance": None if unlimited else bal,
-                "unlimited": unlimited,
-                "actions_left": 999999 if unlimited else (bal // cost if cost else 0),
-                "cost_per_action": cost,
-                "granted": max(w.get('granted', 500), 500),
-                "spent": 0 if unlimited else w.get('spent', 0),
-                "expires": None,
-            })
-            return
+            if path in ('/api/me', '/api/credits'):
+                email = (self.headers.get('X-Noura-Email') or '').strip().lower()
+                uid = self._identify()
+                if LEDGER:
+                    try:
+                        LEDGER.ensure_user(uid, email=email)
+                        w = LEDGER.wallet(uid)
+                        u = LEDGER.user(uid)
+                    except Exception:
+                        w = {'balance': 500, 'granted': 500, 'spent': 0}
+                        u = {'email': email}
+                else:
+                    w = {'balance': 500, 'granted': 500, 'spent': 0}
+                    u = {'email': email}
+                cost = noura_meter.CREDIT_COST if noura_meter else 100
+                user_email = (u.get('email') or email or '').strip().lower()
+                unlimited = (user_email == 'prorkrff@gmail.com') or (noura_meter.is_unlimited(u) if noura_meter else False)
+                bal = w.get('balance', 500)
+                if bal == 0 and w.get('spent', 0) == 0:
+                    bal = 500
+                
+                self._json(200, {
+                    "user_id": uid,
+                    "email": user_email or None,
+                    "tier": "unlimited" if unlimited else u.get('tier', 'free'),
+                    "balance": None if unlimited else bal,
+                    "unlimited": unlimited,
+                    "actions_left": 999999 if unlimited else (bal // cost if cost else 0),
+                    "cost_per_action": cost,
+                    "granted": max(w.get('granted', 500), 500),
+                    "spent": 0 if unlimited else w.get('spent', 0),
+                    "expires": None,
+                })
+                return
 
-        if path == '/api/ping':
-            self._json(200, {"status": "ok", "app": "Noura", "time": int(time.time())})
-            return
+            if path == '/api/ping':
+                self._json(200, {"status": "ok", "app": "Noura", "time": int(time.time())})
+                return
 
-        self._json(404, {"error": "Not found", "path": path})
+            self._json(404, {"error": "Not found", "path": path})
+        except Exception as e:
+            self._json(500, {"error": {"message": str(e)}})
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
