@@ -3482,6 +3482,9 @@
   }
   function renderBriefError(msg) {
     brBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>' + esc(msg) + '</p></div>';
+    document.getElementById('brRegen').hidden = false;
+  }
+
   async function chargeFeatureCredits(featureKey, cost) {
     if (!title || title === 'Your lesson') return true;
     const chargedKey = 'NOURA_CHARGED_' + featureKey + '_' + slug;
@@ -3765,6 +3768,7 @@
       try { const c = JSON.parse(localStorage.getItem(RECALL_KEY) || 'null'); if (validRecall(c)) { recall = plainMathDeep(c); renderRecallCard(); return; } } catch (e) {}
     } else {
       rcState = { conf: {}, answers: {}, why: {} }; saveRcState(); rcIndex = 0;
+    }
     if (recallBusy) return;
 
     const ok = await chargeFeatureCredits('recall', 10);
@@ -4184,6 +4188,7 @@
     if (check && !force) { renderCheckQuestion(); return; }
     if (!force) {
       try { const c = JSON.parse(localStorage.getItem(CHECK_KEY) || 'null'); if (validCheck(c)) { check = plainMathDeep(c); cpIndex = 0; cpResults = []; renderCheckQuestion(); return; } } catch (e) {}
+    }
     if (checkBusy) return;
 
     const ok = await chargeFeatureCredits('checkpoint', 10);
