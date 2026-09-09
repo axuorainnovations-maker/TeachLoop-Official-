@@ -287,10 +287,10 @@
         if (password.length < 6) { showMsg('Password must be at least 6 characters.', true); return; }
 
         saveLocal(email);
-        if (!sb) { go('/chat'); return; }
+        if (!sb) { go('/teachstudio'); return; }
 
         submit.disabled = true;
-        const redirectTo = window.location.origin + '/chat';
+        const redirectTo = window.location.origin + '/teachstudio';
 
         try {
           if (mode === 'login') {
@@ -307,7 +307,7 @@
               const acc = { email: uEmail, name: uName, avatar: meta.avatar_url || meta.picture || '', method: 'email' };
               localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
             }
-            go('/chat');
+            go('/teachstudio');
           } else {
             submit.textContent = 'Creating account…';
             const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
@@ -323,7 +323,7 @@
                 const acc = { email: uEmail, name: uName, avatar: meta.avatar_url || meta.picture || '', method: 'email' };
                 localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(acc));
               }
-              go('/chat');
+              go('/teachstudio');
             } else {
               // Confirmations ON → verify by email first.
               submit.textContent = 'Confirmation sent';
@@ -339,9 +339,9 @@
 
       async function submitGoogle() {
         saveLocal(null);
-        const dest = '/chat';
+        const dest = '/teachstudio';
         if (!sb) { go(dest); return; }
-        const redirectTo = window.location.origin + '/chat';
+        const redirectTo = window.location.origin + '/teachstudio';
         try {
           const { error } = await sb.auth.signInWithOAuth({
             provider: 'google',

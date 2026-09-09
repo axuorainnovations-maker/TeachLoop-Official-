@@ -688,7 +688,7 @@ function render(){
   $('#description').textContent=data[step][1];
   $('#back').style.visibility=step===1?'hidden':'visible';
   $('#next').className='next'+(step===5?' is-final':'');
-  $('#next').innerHTML=step===5?'Start Review Session':'Next <span>›</span>';
+  $('#next').innerHTML=step===5?(state.length==='Quick Review'?'Start Quick Review':'Start Teaching Session'):'Next <span>›</span>';
   let html='';
   if(step===1){
     const subjects=['Biology','Chemistry','Physics','Mathematics','English','Economics','Psychology','History','Computer Science'];
@@ -847,10 +847,17 @@ $('#next').onclick=function advance(){
     createdAt:Date.now()
   };
   try{ localStorage.setItem('NOURA_TS_DRAFT',JSON.stringify(draft)); localStorage.removeItem('NOURA_TS_LIVE'); }catch(e){}
+  if(state.length==='Quick Review'){
+    const topicParam=encodeURIComponent(draft.topic);
+    const subjParam=encodeURIComponent(draft.subject||'');
+    const url=`lesson.html?title=${topicParam}${subjParam?'&subject='+subjParam:''}&from=teachstudio`;
+    try{ (window.top||window).location.href=url; }catch(e){ location.href=url; }
+    return;
+  }
   try{ (window.top||window).location.href='teachroom.html'; }catch(e){ location.href='teachroom.html'; }
 };
 
-function close(){ if(typeof window.__tsShowLanding==='function' && document.getElementById('tsLanding')){ window.__tsShowLanding(); return; } stopMic(); try{ if(window.parent && window.parent!==window){ window.parent.postMessage({type:'noura-close-teach'},'*'); return; } }catch(e){} location.href='chatbot.html'; }
+function close(){ if(typeof window.__tsShowLanding==='function' && document.getElementById('tsLanding')){ window.__tsShowLanding(); return; } stopMic(); try{ if(window.parent && window.parent!==window){ window.parent.postMessage({type:'noura-close-teach'},'*'); return; } }catch(e){} location.href='chatbot.html?view=teachstudio'; }
 $('.close').onclick=close;
 addEventListener('keydown',e=>{
   if(e.key==='Escape') close();

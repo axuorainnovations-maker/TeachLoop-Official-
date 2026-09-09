@@ -2042,7 +2042,7 @@
 
 <div class="topbar">
   <div class="crumb">
-    <a href="chatbot.html">
+    <a href="teachstudio.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
       Home
     </a>
@@ -3156,6 +3156,13 @@
   function allCoreDone() { return CORE.every(k => flow[k]); }
   // Continue button only appears at the top right of Audio Recap page
   function flowFooter(currentKey) {
+    const isFromTS = (new URLSearchParams(location.search).get('from') || '').toLowerCase() === 'teachstudio';
+    if (currentKey === 'brief' && isFromTS) {
+      return '<div class="flow-foot" style="margin-top:28px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">' +
+        '<a href="teachroom.html" class="flow-btn" style="background:#8b5cf6; color:#ffffff; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(139,92,246,0.4); font-weight:600; padding:12px 28px; border-radius:999px;">Ready to Teach → Go to Teach Room</a>' +
+        '<button class="flow-btn" data-flow="learn" type="button" style="background:transparent; border:1px solid rgba(255,255,255,0.15); color:#a1a1aa;">Explore Full Lesson</button>' +
+        '</div>';
+    }
     // Checkpoint and Audio Recap ship their own actions, so they get nothing.
     if (currentKey !== 'brief' && currentKey !== 'learn') return '';
     // On Learn the button only appears once every section is finished, and it
@@ -3176,7 +3183,7 @@
   function wireFlow(host) {
     host.querySelectorAll('[data-flow]').forEach(b => b.addEventListener('click', () => {
       const k = b.dataset.flow;
-      if (k === 'teach') { window.location.href = 'chatbot.html'; return; }
+      if (k === 'teach') { window.location.href = 'teachstudio.html'; return; }
       if (k === 'learn') { renderOverview(); return; }
       if (k === 'brief') { openBrief(); return; }
       if (k === 'check') { openCheck(); return; }
@@ -3473,9 +3480,21 @@
       return s;
     };
 
+    const isFromTS = (new URLSearchParams(location.search).get('from') || '').toLowerCase() === 'teachstudio';
+    const topBanner = isFromTS ?
+      '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding:14px 20px; border-radius:16px; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); gap:16px; flex-wrap:wrap;">' +
+        '<div style="font-size:14.5px; color:#e9d5ff; font-weight:500;">' +
+          '⚡ <b>Quick Review ready:</b> Read the key essentials below, then launch your teaching session.' +
+        '</div>' +
+        '<a href="teachroom.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:999px; background:#8b5cf6; color:#ffffff; font-weight:600; font-size:13.5px; text-decoration:none; box-shadow:0 2px 10px rgba(139,92,246,0.4); white-space:nowrap;">' +
+          'Start Teaching in Teach Room →' +
+        '</a>' +
+      '</div>' : '';
+
     brBody.innerHTML =
+      topBanner +
       '<div class="br-doc">' +
-        '<div class="br-sub">Study Brief note</div>' +
+        '<div class="br-sub">' + (isFromTS ? 'Quick Review note' : 'Study Brief note') + (subject ? ' · <b>' + esc(subject) + '</b>' : '') + '</div>' +
         '<div class="br-callout"><div class="br-callout-title">Big Idea</div>' + formatBigIdea(brief.bigIdea) + '</div>' +
         '<h2>Key concepts</h2>' + li(brief.keyConcepts) +
         '<h2>Must-know terms</h2>' + termsTable +
@@ -4690,7 +4709,7 @@
   document.getElementById('scRegen').addEventListener('click', () => openCast(true));
   if (document.getElementById('castContinueBtn')) {
     document.getElementById('castContinueBtn').addEventListener('click', () => {
-      window.location.href = 'chatbot.html';
+      window.location.href = 'teachstudio.html';
     });
   }
 

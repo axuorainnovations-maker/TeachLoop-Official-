@@ -284,7 +284,7 @@
       <span class="brand-logo"></span>
       <span>Noura</span>
     </a>
-    <a href="chatbot.html" class="back-btn">← Back to study</a>
+    <a href="teachstudio.html" class="back-btn">← Back to Teach Studio</a>
   </div>
 
   <div class="header">
@@ -325,7 +325,7 @@
           </li>
         </ul>
       </div>
-      <div id="starterAction"><a href="chatbot.html" class="btn" id="btnStarter">Current Plan</a></div>
+      <div id="starterAction"><a href="teachstudio.html" class="btn" id="btnStarter">Current Plan</a></div>
     </div>
 
     <!-- Pro -->
@@ -446,15 +446,15 @@
       const uAct = document.getElementById('unlimitedAction');
 
       if (currentPlan === 'unlimited') {
-        if (sAct) sAct.innerHTML = '<a href="chatbot.html" class="btn" style="border-color:#27272a;color:#71717a;">Free Tier</a>';
+        if (sAct) sAct.innerHTML = '<a href="teachstudio.html" class="btn" style="border-color:#27272a;color:#71717a;">Free Tier</a>';
         if (pAct) pAct.innerHTML = '<button class="btn" type="button" disabled style="border-color:#27272a;color:#71717a;cursor:default;width:100%;">Included in Unlimited</button>';
         if (uAct) uAct.innerHTML = '<button class="btn" type="button" disabled style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;width:100%;font-weight:700;">Current Plan</button>';
       } else if (currentPlan === 'pro') {
-        if (sAct) sAct.innerHTML = '<a href="chatbot.html" class="btn" style="border-color:#27272a;color:#71717a;">Free Tier</a>';
+        if (sAct) sAct.innerHTML = '<a href="teachstudio.html" class="btn" style="border-color:#27272a;color:#71717a;">Free Tier</a>';
         if (pAct) pAct.innerHTML = '<button class="btn" type="button" disabled style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;width:100%;font-weight:700;">Current Plan</button>';
         if (uAct) uAct.innerHTML = '<button class="btn btn-primary" id="btnUnlimited" type="button" onclick="checkout(\'unlimited\')">Upgrade to Unlimited</button>';
       } else {
-        if (sAct) sAct.innerHTML = '<a href="chatbot.html" class="btn" style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;font-weight:700;">Current Plan</a>';
+        if (sAct) sAct.innerHTML = '<a href="teachstudio.html" class="btn" style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;font-weight:700;">Current Plan</a>';
         if (pAct) pAct.innerHTML = '<button class="btn btn-primary" id="btnPro" type="button" onclick="checkout(\'pro\')">Upgrade to Pro</button>';
         if (uAct) uAct.innerHTML = '<button class="btn" id="btnUnlimited" type="button" onclick="checkout(\'unlimited\')">Upgrade to Unlimited</button>';
       }
