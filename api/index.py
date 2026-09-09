@@ -58,6 +58,77 @@ public_env = {k: v for k, v in env_vars.items() if not any(h in k.upper() for h 
 
 sb_url = env_vars.get('SUPABASE_URL', '').strip()
 sb_anon = (env_vars.get('SUPABASE_ANON_KEY', '') or env_vars.get('SUPABASE_KEY', '')).strip()
+
+# ── NVIDIA Riva TTS Setup ──────────────────────────────────────────────
+try:
+    import riva.client
+    RIVA_AVAILABLE = True
+except Exception:
+    RIVA_AVAILABLE = False
+
+RIVA_URI = 'grpc.nvcf.nvidia.com:443'
+TTS_FUNCTION_IDS = {
+    'magpie-tts-multilingual': '877104f7-e885-42b9-8de8-f6e4c6303969',
+    'chatterbox-multilingual-tts': env_vars.get('NVIDIA_TTS_FUNCTION_ID', '') or 'ddacc747-1269-4fab-bfd9-8f593dead106',
+}
+TTS_DEFAULT_VOICES = {
+    'magpie-tts-multilingual': 'Magpie-Multilingual.EN-US.Sofia',
+    'chatterbox-multilingual-tts': 'Chatterbox-Multilingual.en-US.Male',
+}
+TTS_DEFAULT_RATES = {
+    'magpie-tts-multilingual': 44100,
+    'chatterbox-multilingual-tts': 24000,
+}
+TTS_DEFAULT_LIMITS = {
+    'magpie-tts-multilingual': 700,
+    'chatterbox-multilingual-tts': 350,
+}
+TTS_LOCK = threading.Lock()
+LAST_TTS_TIME = 0.0
+
+def _riva_auth(function_id, api_key):
+    return riva.client.Auth(None, True, RIVA_URI,
+                            [['function-id', function_id],
+                             ['authorization', 'Bearer ' + api_key]])
+
+def pcm_to_wav(pcm, rate, channels=1, bits=16):
+    byte_rate = rate * channels * bits // 8
+    block_align = channels * bits // 8
+    data_len = len(pcm)
+    header = (b'RIFF' + struct.pack('<I', 36 + data_len) + b'WAVE'
+              + b'fmt ' + struct.pack('<IHHIIHH', 16, 1, channels, rate, byte_rate, block_align, bits)
+              + b'data' + struct.pack('<I', data_len))
+    return header + pcm
+
+def _split_for_tts(text, limit=350):
+    text = ' '.join(str(text).split())
+    if len(text) <= limit:
+        return [text]
+    parts, cur = [], ''
+    import re as _re
+    for sentence in _re.split(r'(?<=[.!?])\s+', text):
+        if len(cur) + len(sentence) + 1 > limit and cur:
+            parts.append(cur.strip())
+            cur = sentence
+        else:
+            cur = (cur + ' ' + sentence).strip()
+    if cur:
+        parts.append(cur.strip())
+    out = []
+    for p in parts:
+        p = p.strip()
+        if not p:
+            continue
+        while len(p) > limit:
+            cut = p.rfind(' ', 0, limit)
+            if cut <= 0:
+                cut = limit
+            out.append(p[:cut].strip())
+            p = p[cut:].strip()
+        if p:
+            out.append(p)
+    return out
+
 if 'dashboard/project/' in sb_url:
     import re
     m = re.search(r'dashboard/project/([a-zA-Z0-9_-]+)', sb_url)
@@ -200,7 +271,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             parsed = urllib.parse.urlparse(origin)
             host = (parsed.hostname or '').lower()
-            if host in ('localhost', '127.0.0.1') or host.endswith('.vercel.app') or host.endswith('.teachloop.app') or host.endswith('.noura.ai'):
+            if host in ('localhost', '127.0.0.1', 'noura.study') or host.endswith('.vercel.app') or host.endswith('.teachloop.app') or host.endswith('.noura.ai') or host.endswith('.noura.study'):
                 return origin
         except Exception:
             pass
@@ -226,16 +297,16 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _js(self, code, js_content):
-        body = js_content.encode('utf-8')
-        self.send_response(code)
-        self.send_header('Content-Type', 'application/javascript; charset=utf-8')
+    def _audio_wav(self, wav_bytes):
+        self.send_response(200)
+        self.send_header('Content-Type', 'audio/wav')
         self.send_header('Access-Control-Allow-Origin', self._allowed_origin())
-        self.send_header('Cache-Control', 'no-cache')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Noura-Admin, X-Noura-Surface, X-Noura-Email')
         self._security_headers()
-        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Content-Length', str(len(wav_bytes)))
         self.end_headers()
-        self.wfile.write(body)
+        self.wfile.write(wav_bytes)
 
     def _cors(self):
         self.send_response(204)
@@ -841,8 +912,70 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif path == '/api/tts':
-            self._json(503, {"fallback": "speechSynthesis", "message": "Use client Web Speech API"})
-            return
+            nv_key = env_vars.get('NVIDIA_API_KEY', '') or NVIDIA_API_KEY
+            if not nv_key:
+                self._json(503, {"error": "NVIDIA_API_KEY not configured"})
+                return
+            if not RIVA_AVAILABLE:
+                self._json(503, {"error": "nvidia-riva-client not installed"})
+                return
+
+            text = (data.get('text') or '').strip()
+            if not text:
+                self._json(400, {"error": "missing text"})
+                return
+
+            req_model = data.get('model') or 'chatterbox-multilingual-tts'
+            req_func_id = TTS_FUNCTION_IDS.get(req_model) or TTS_FUNCTION_IDS['chatterbox-multilingual-tts']
+            req_voice = data.get('voice') or TTS_DEFAULT_VOICES.get(req_model) or TTS_DEFAULT_VOICES['chatterbox-multilingual-tts']
+            req_rate = int(data.get('sample_rate') or TTS_DEFAULT_RATES.get(req_model) or 24000)
+            req_limit = TTS_DEFAULT_LIMITS.get(req_model, 350)
+            language = data.get('language') or 'en-US'
+
+            try:
+                chunks = _split_for_tts(text, req_limit)
+
+                def _say(part):
+                    global LAST_TTS_TIME
+                    with TTS_LOCK:
+                        now = time.time()
+                        elapsed = now - LAST_TTS_TIME
+                        if elapsed < 0.2:
+                            time.sleep(0.2 - elapsed)
+                        LAST_TTS_TIME = time.time()
+
+                    delay = 0.3
+                    for attempt in range(6):
+                        try:
+                            svc = riva.client.SpeechSynthesisService(_riva_auth(req_func_id, nv_key))
+                            return svc.synthesize(
+                                text=part,
+                                voice_name=req_voice,
+                                language_code=language,
+                                sample_rate_hz=req_rate,
+                                encoding=riva.client.AudioEncoding.LINEAR_PCM
+                            ).audio
+                        except Exception as err:
+                            err_str = str(err).lower()
+                            if ('exceeded rate limit' in err_str or 'resource_exhausted' in err_str or '429' in err_str) and attempt < 5:
+                                time.sleep(delay)
+                                delay *= 1.5
+                                continue
+                            raise
+                    raise RuntimeError('TTS retries exhausted')
+
+                pcm_chunks = []
+                for c in chunks:
+                    pcm_chunks.append(_say(c))
+                pcm = b''.join(pcm_chunks)
+                wav = pcm_to_wav(pcm, req_rate, 1)
+
+                self._audio_wav(wav)
+                return
+            except Exception as e:
+                print(f"[tts] NVIDIA Riva error: {e}")
+                self._json(500, {"error": f"TTS synthesis failed: {str(e)}"})
+                return
 
         elif path == '/api/generate-image':
             uid = self._identify(data)
