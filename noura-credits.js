@@ -110,6 +110,7 @@
       var q = new URLSearchParams(location.search).get('email');
       if (q && q.indexOf('@') !== -1) {
         localStorage.setItem('NOURA_EMAIL', q.trim());
+        return q.trim();
       }
       var e = localStorage.getItem('NOURA_EMAIL');
       if (e && e.indexOf('@') !== -1) return e.trim();
@@ -117,9 +118,37 @@
       if (acct) {
         try {
           var o = JSON.parse(acct);
-          if (o && o.email) return String(o.email).trim();
+          if (o && o.email) {
+            localStorage.setItem('NOURA_EMAIL', String(o.email).trim());
+            return String(o.email).trim();
+          }
         } catch (e2) {
-          if (acct.indexOf('@') !== -1) return acct.trim();
+          if (acct.indexOf('@') !== -1) {
+            localStorage.setItem('NOURA_EMAIL', acct.trim());
+            return acct.trim();
+          }
+        }
+      }
+      // Check Supabase session keys in localStorage
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && (k.indexOf('sb-') !== -1 || k.indexOf('auth-token') !== -1 || k.indexOf('supabase') !== -1)) {
+          var raw = localStorage.getItem(k);
+          if (raw && raw.indexOf('@') !== -1) {
+            try {
+              var parsed = JSON.parse(raw);
+              if (parsed && parsed.user && parsed.user.email) {
+                var em = String(parsed.user.email).trim();
+                localStorage.setItem('NOURA_EMAIL', em);
+                return em;
+              }
+              if (parsed && parsed.email) {
+                var em2 = String(parsed.email).trim();
+                localStorage.setItem('NOURA_EMAIL', em2);
+                return em2;
+              }
+            } catch (err) {}
+          }
         }
       }
     } catch (e3) {}
@@ -259,8 +288,9 @@
     var formatted = bal.toLocaleString();
     el.querySelector('.n').textContent = formatted;
     if (dropBal) dropBal.textContent = formatted;
-    if (dropTitle) dropTitle.textContent = 'Free';
-    if (upgradeBtn) upgradeBtn.style.display = '';
+    var isPro = (d.tier === 'pro');
+    if (dropTitle) dropTitle.textContent = (isPro ? 'Pro Plan' : 'Free');
+    if (upgradeBtn) upgradeBtn.style.display = (isPro ? 'none' : '');
 
     el.title = bal < per
       ? 'Out of credits. Top up to keep studying.'
@@ -283,7 +313,6 @@
       });
     }
 
-    var local = getLocalData();
     return window.fetch('/api/me')
       .then(function (r) {
         if (!r.ok) throw new Error('Status ' + r.status);
@@ -294,20 +323,16 @@
           if (data) data.unlimited = true;
           return data;
         }
-        // Merge server & local so spends in browser persist
+        // Authoritative server balance
         if (typeof data.balance === 'number') {
-          var effectiveBal = Math.min(data.balance, local.balance);
-          var effectiveSpent = Math.max(data.spent || 0, local.spent || 0);
-          data.balance = effectiveBal;
-          data.spent = effectiveSpent;
           data.cost_per_action = 100;
-          data.actions_left = Math.floor(effectiveBal / 100);
+          data.actions_left = Math.floor(data.balance / 100);
           setLocalData(data);
         }
         return data;
       })
       .catch(function () {
-        return local;
+        return getLocalData();
       });
   }
 
