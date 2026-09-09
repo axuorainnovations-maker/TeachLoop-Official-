@@ -101,6 +101,54 @@ class RateLimiter:
 RATE_LIMITER = RateLimiter()
 
 
+def fetch_supabase_auth_users():
+    """Fetch registered users from Supabase Auth admin API if key is available."""
+    sb_url_raw = env_vars.get('SUPABASE_URL', '').strip()
+    if 'dashboard/project/' in sb_url_raw:
+        import re
+        m = re.search(r'dashboard/project/([a-zA-Z0-9_-]+)', sb_url_raw)
+        if m:
+            sb_url_raw = f'https://{m.group(1)}.supabase.co'
+    sb_url = sb_url_raw.rstrip('/')
+    service_key = (
+        env_vars.get('SUPABASE_SERVICE_ROLE_KEY', '') or 
+        env_vars.get('SUPABASE_SERVICE_KEY', '') or 
+        env_vars.get('SUPABASE_SECRET_KEY', '') or 
+        env_vars.get('SUPABASE_ADMIN_KEY', '') or
+        env_vars.get('SUPABASE_ANON_KEY', '')
+    ).strip()
+
+    if not sb_url or not service_key:
+        return [], False, "SUPABASE_SERVICE_ROLE_KEY not configured in .env.local / environment."
+
+    try:
+        url = f'{sb_url}/auth/v1/admin/users?per_page=1000'
+        req = urllib.request.Request(url, headers={
+            'apikey': service_key,
+            'Authorization': f'Bearer {service_key}',
+            'Content-Type': 'application/json'
+        })
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            raw_users = data.get('users', [])
+            result = []
+            for u in raw_users:
+                email = (u.get('email') or '').strip().lower()
+                meta = u.get('user_metadata') or {}
+                name = (meta.get('full_name') or meta.get('name') or (email.split('@')[0] if email else 'User')).strip()
+                result.append({
+                    'supabase_id': u.get('id'),
+                    'email': email,
+                    'name': name,
+                    'created_at': u.get('created_at'),
+                    'last_sign_in_at': u.get('last_sign_in_at'),
+                    'provider': u.get('app_metadata', {}).get('provider', 'email')
+                })
+            return result, True, None
+    except Exception as e:
+        return [], False, str(e)
+
+
 class handler(BaseHTTPRequestHandler):
     def _client_ip(self):
         xff = self.headers.get('X-Forwarded-For')
@@ -270,6 +318,17 @@ class handler(BaseHTTPRequestHandler):
                 if not LEDGER:
                     self._json(500, {"error": "Ledger unavailable"})
                     return
+                
+                # Sync Supabase registered users into Ledger if available
+                sb_users, sb_ok, sb_note = fetch_supabase_auth_users()
+                if sb_users:
+                    for sbu in sb_users:
+                        if sbu.get('email'):
+                            existing_uid = LEDGER.find_user_by_email(sbu['email'])
+                            if not existing_uid:
+                                uid = sbu.get('supabase_id') or ('usr_' + secrets.token_hex(8))
+                                LEDGER.ensure_user(uid, email=sbu['email'])
+
                 since = noura_meter.period_start() if noura_meter else None
                 org = LEDGER.org_totals(since)
                 spend = org['usd']
@@ -277,6 +336,11 @@ class handler(BaseHTTPRequestHandler):
                     "users": LEDGER.all_users(since),
                     "org": org,
                     "daily": LEDGER.daily_usd(30),
+                    "supabase_sync": {
+                        "active": sb_ok,
+                        "count": len(sb_users),
+                        "note": sb_note
+                    },
                     "budget": {
                         "ceiling_usd": MONTHLY_BUDGET_USD,
                         "spend_usd": spend,
@@ -314,7 +378,53 @@ class handler(BaseHTTPRequestHandler):
             except Exception:
                 data = {}
 
-        if path in ('/create-checkout-session', '/api/create-checkout-session'):
+        if path == '/api/admin/grant':
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            target = (data.get('user_id') or data.get('email') or '').strip()
+            try:
+                amount = int(data.get('credits', 0))
+            except Exception:
+                amount = 0
+            reason = (data.get('reason') or 'admin').strip()
+            if not target or amount <= 0:
+                self._json(400, {"error": "user_id or email, and a positive credit amount are required"})
+                return
+            if not LEDGER:
+                self._json(500, {"error": "Ledger unavailable"})
+                return
+            res = LEDGER.grant(target, amount, reason=reason, by='admin', note=data.get('note'))
+            if not res:
+                self._json(400, {"error": "Grant failed"})
+                return
+            self._json(200, res)
+            return
+
+        elif path == '/api/admin/deduct':
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            target = (data.get('user_id') or data.get('email') or '').strip()
+            try:
+                amount = int(data.get('credits', 0))
+            except Exception:
+                amount = 0
+            reason = (data.get('reason') or 'admin_deduct').strip()
+            if not target or amount <= 0:
+                self._json(400, {"error": "user_id or email, and a positive credit amount are required"})
+                return
+            if not LEDGER:
+                self._json(500, {"error": "Ledger unavailable"})
+                return
+            res = LEDGER.deduct(target, amount, reason=reason, by='admin', note=data.get('note'))
+            if not res:
+                self._json(400, {"error": "Deduct failed"})
+                return
+            self._json(200, res)
+            return
+
+        elif path in ('/create-checkout-session', '/api/create-checkout-session'):
             allowed, retry = RATE_LIMITER.is_allowed(f"checkout_{ip}", max_requests=8, window_seconds=60)
             if not allowed:
                 self._json(429, {"error": "rate_limit_exceeded", "message": "Too many checkout requests. Please wait a moment."}, headers={'Retry-After': str(retry)})

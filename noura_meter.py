@@ -314,17 +314,44 @@ class Ledger:
         return rows
 
     # ── wallet ───────────────────────────────────────────────────────────
+    def _resolve_uid(self, user_id_or_email):
+        if not user_id_or_email:
+            return None
+        s = str(user_id_or_email).strip()
+        if '@' in s:
+            existing = self.find_user_by_email(s)
+            if existing:
+                return existing
+            uid = 'usr_' + secrets.token_hex(8)
+            self.ensure_user(uid, email=s)
+            return uid
+        return s
+
     def grant(self, user_id, credits, reason='admin', by=None, note=None):
         """Award credits. Recorded as a ledger event so every grant is auditable."""
         credits = int(credits)
         if credits <= 0 or reason not in GRANT_REASONS:
             return None
+        user_id = self._resolve_uid(user_id)
         self.ensure_user(user_id)
         ev = self.append(user_id=user_id, kind='grant', surface='grant',
                          provider='none', model=None, input_tokens=0, cache_read=0,
                          cache_write=0, output_tokens=0, usd_cost=0.0,
                          credits=credits, reason=reason, granted_by=by, note=note)
-        return {'granted': credits, 'balance': self.balance(user_id), 'event': ev['id']}
+        return {'granted': credits, 'balance': self.balance(user_id), 'event': ev['id'], 'user_id': user_id}
+
+    def deduct(self, user_id, credits, reason='admin_deduct', by=None, note=None):
+        """Remove/deduct credits. Recorded as a ledger spend event."""
+        credits = int(credits)
+        if credits <= 0:
+            return None
+        user_id = self._resolve_uid(user_id)
+        self.ensure_user(user_id)
+        ev = self.append(user_id=user_id, kind='spend', surface='admin_adjustment',
+                         provider='admin', model=None, input_tokens=0, cache_read=0,
+                         cache_write=0, output_tokens=0, usd_cost=0.0,
+                         credits=credits, reason=reason, granted_by=by, note=note)
+        return {'deducted': credits, 'balance': self.balance(user_id), 'event': ev['id'], 'user_id': user_id}
 
     def claim_welcome(self, user_id):
         """Ensure the signup grant exists and report whether this is the first

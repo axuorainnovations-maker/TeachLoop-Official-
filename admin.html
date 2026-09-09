@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Noura Admin</title>
+<title>Noura Admin — User & Credit Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -16,11 +16,11 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
        -webkit-font-smoothing:antialiased;padding:28px 22px 60px}
-  .wrap{max-width:1240px;margin:0 auto}
+  .wrap{max-width:1280px;margin:0 auto}
   h1{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:11px}
   h1 .logo{width:26px;height:26px;background:var(--grad);
     -webkit-mask:url('logo.png') center/contain no-repeat;mask:url('logo.png') center/contain no-repeat}
-  h2{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:30px 0 12px}
+  h2{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:30px 0 12px;display:flex;align-items:center;justify-content:space-between}
   .sub{color:var(--faint);font-size:13px;margin-top:5px}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
@@ -36,7 +36,7 @@
   th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
      color:var(--faint);padding:0 12px 6px;cursor:pointer;user-select:none;white-space:nowrap}
   th:hover{color:var(--text)}
-  td{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:11px 12px}
+  td{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:11px 12px;vertical-align:middle}
   td:first-child{border-left:1px solid var(--line);border-radius:11px 0 0 11px}
   td:last-child{border-right:1px solid var(--line);border-radius:0 11px 11px 0}
   tr.flag td{background:#1f1512;border-color:rgba(239,68,68,.35)}
@@ -45,33 +45,39 @@
   .pill.scholar{color:#b79df5;background:rgba(139,92,246,.16)}
   .pill.unlimited{color:#7ee2a8;background:rgba(63,185,80,.14)}
   .pill.beta{color:#ffd37a;background:rgba(227,160,8,.13)}
-  .mini{height:6px;border-radius:99px;background:#1c1c20;overflow:hidden;min-width:74px}
-  .mini i{display:block;height:100%;background:var(--violet)}
-  .mini i.warn{background:var(--warn)} .mini i.bad{background:var(--bad)}
+  .pill.supabase{color:#6ee7b7;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.3)}
   .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   input,select,button{font-family:inherit}
-  input[type=search],select{background:var(--panel2);border:1px solid #2a2a2e;border-radius:9px;
+  input[type=search],input[type=text],input[type=number],select{background:var(--panel2);border:1px solid #2a2a2e;border-radius:9px;
     padding:8px 11px;color:var(--text);font-size:13px;outline:none}
-  input[type=search]:focus,select:focus{border-color:var(--violet)}
+  input:focus,select:focus{border-color:var(--violet)}
   button{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px;
-    color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer}
+    color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s ease}
   button:hover{border-color:var(--violet)}
+  .btn-primary{background:var(--grad);border:none;color:#fff}
+  .btn-primary:hover{opacity:.9}
+  .action-group{display:flex;gap:6px;align-items:center}
+  .btn-award{background:rgba(63,185,80,.14);color:#7ee2a8;border:1px solid rgba(63,185,80,.3);border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer}
+  .btn-award:hover{background:rgba(63,185,80,.26);border-color:#3fb950;color:#fff}
+  .btn-deduct{background:rgba(239,68,68,.12);color:#ff9f9a;border:1px solid rgba(239,68,68,.28);border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer}
+  .btn-deduct:hover{background:rgba(239,68,68,.24);border-color:#ef4444;color:#fff}
   .note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--violet);
     border-radius:0 10px 10px 0;padding:11px 14px;font-size:12.5px;color:var(--dim);line-height:1.6;margin-top:10px}
   .note.warn{border-left-color:var(--warn)}
+  .note.good{border-left-color:var(--ok);background:rgba(63,185,80,.06);color:#bbf7d0}
   .spark{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:10px}
   .spark i{flex:1;background:var(--violet);border-radius:2px 2px 0 0;min-height:2px;opacity:.85}
   .rows{display:flex;flex-direction:column;gap:7px;margin-top:8px}
   .row{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;
     background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
   .row b{color:var(--dim);font-weight:600}
-  .err{color:#ff9f9a;font-size:13px;margin-top:14px}
+  .err{color:#ff9f9a;font-size:13px;margin-top:14px;background:#1f1512;padding:14px;border-radius:10px;border:1px solid rgba(239,68,68,.3)}
   .muted{color:var(--faint)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1><span class="logo"></span>Noura Admin</h1>
+  <h1><span class="logo"></span>Noura Admin — User & Credit Manager</h1>
   <div class="sub" id="periodLine">Loading…</div>
   <div id="stage"></div>
 </div>
@@ -92,65 +98,65 @@
     if (m < 1440) return Math.floor(m / 60) + 'h';
     return Math.floor(m / 1440) + 'd';
   };
-  // Subscription price per tier, so we can flag users who cost more than they pay.
-  const TIER_PRICE = { starter: 18, scholar: 30, unlimited: 120, beta: 0 };
 
-  let DATA = null, sortKey = 'usd', sortDir = -1;
+  let DATA = null, sortKey = 'balance', sortDir = -1;
 
   async function load() {
-    const r = await fetch('/api/admin/summary?key=' + encodeURIComponent(KEY));
-    if (!r.ok) {
-      $('stage').innerHTML = '<div class="err">Admin token rejected. Open '
-        + '<code>/admin.html?key=YOUR_NOURA_ADMIN_TOKEN</code>, and make sure '
-        + 'NOURA_ADMIN_TOKEN is set in .env.local.</div>';
-      $('periodLine').textContent = '';
-      return;
+    try {
+      const r = await fetch('/api/admin/summary?key=' + encodeURIComponent(KEY));
+      if (!r.ok) {
+        $('stage').innerHTML = '<div class="err"><b>Admin access denied.</b><br>Please open with your secret admin key: '
+          + '<code>/admin.html?key=YOUR_NOURA_ADMIN_TOKEN</code><br>And ensure <code>NOURA_ADMIN_TOKEN</code> is configured.</div>';
+        $('periodLine').textContent = '';
+        return;
+      }
+      DATA = await r.json();
+      render();
+      reconcile();
+    } catch (e) {
+      $('stage').innerHTML = '<div class="err">Failed to connect to admin API: ' + esc(e.message) + '</div>';
     }
-    DATA = await r.json();
-    render();
-    reconcile();
   }
 
   function render() {
-    const { org, budget, config, daily } = DATA;
+    const { org, budget, config, daily, users, supabase_sync } = DATA;
     const pct = budget.ceiling_usd ? Math.min(100, budget.spend_usd / budget.ceiling_usd * 100) : 0;
     const cls = pct >= 100 ? 'bad' : pct >= budget.warn_pct ? 'warn' : '';
-    const now = new Date(), end = new Date(config.period_end);
+    const now = new Date(), end = new Date(config.period_end || Date.now() + 86400000 * 30);
     const daysLeft = Math.max(0, Math.ceil((end - now) / 86400000));
-    const elapsed = Math.max(1, (now - new Date(config.period_start)) / 86400000);
+    const elapsed = Math.max(1, (now - new Date(config.period_start || Date.now() - 86400000)) / 86400000);
     const projected = budget.spend_usd / elapsed * (elapsed + daysLeft);
 
     $('periodLine').textContent =
-      'Billing period ' + config.period_start.slice(0, 10) + ' to ' + config.period_end.slice(0, 10)
+      'Billing period ' + (config.period_start || '').slice(0, 10) + ' to ' + (config.period_end || '').slice(0, 10)
       + '  ·  ' + daysLeft + ' days left  ·  enforcement: ' + config.enforcement;
 
+    let syncBanner = '';
+    if (supabase_sync && supabase_sync.active) {
+      syncBanner = '<div class="note good">✓ <b>Supabase Auth Synced</b>: ' + supabase_sync.count + ' registered database accounts loaded and linked with credit wallets.</div>';
+    } else {
+      syncBanner = '<div class="note">⚡ <b>Supabase Integration</b>: To automatically import all registered authentication users from Supabase, set <code>SUPABASE_SERVICE_ROLE_KEY</code> in your environment / <code>.env.local</code>. You can also award or deduct credits directly for any email below.</div>';
+    }
+
     $('stage').innerHTML =
+      syncBanner +
       '<h2>Organisation spend</h2>' +
       '<div class="cards">' +
         card('Spend this period', usd(org.usd), 'Across ' + org.calls + ' metered calls', 'hl') +
         card('Budget ceiling', budget.ceiling_usd ? usd(budget.ceiling_usd) : 'not set',
-             budget.ceiling_usd ? 'Our own figure, not an API balance' : 'Set NOURA_MONTHLY_BUDGET_USD') +
+             budget.ceiling_usd ? 'Our configured ceiling' : 'Set NOURA_MONTHLY_BUDGET_USD') +
         card('Remaining', budget.remaining_usd == null ? '—' : usd(budget.remaining_usd),
              'Ceiling minus spend to date', cls === 'bad' ? 'bad' : cls === 'warn' ? 'warn' : 'good') +
-        card('Projected', usd(projected), 'At the current burn rate',
+        card('Projected', usd(projected), 'At current burn rate',
              budget.ceiling_usd && projected > budget.ceiling_usd ? 'bad' : '') +
-        card('Cache hit rate', (org.cache_hit_rate * 100).toFixed(1) + '%', 'Cached reads over billed input') +
-        card('Rejected calls', String(org.rejected || 0), '402 responses this period',
-             org.rejected ? 'warn' : '') +
-        card('Credits outstanding', String(DATA.users.reduce((a, u) => a + u.balance, 0)),
-             'Granted and not yet spent, across all users', 'hl') +
+        card('Registered Users', String(users.length), 'Accounts in ledger & Supabase') +
+        card('Credits Outstanding', String(users.reduce((a, u) => a + (u.balance || 0), 0)),
+             'Total active credit balance across users', 'hl') +
         card('Cost per action', usd(org.calls ? org.usd / org.calls : 0),
-             'What one metered call costs us on average') +
+             'Average cost per metered call') +
       '</div>' +
       (budget.ceiling_usd
         ? '<div class="bar"><i class="' + cls + '" style="width:' + pct.toFixed(1) + '%"></i></div>' : '') +
-      '<div class="note">There is no Anthropic endpoint that returns a remaining credit balance. '
-        + '<b>Remaining</b> above is our configured ceiling minus what this ledger has recorded, '
-        + 'not a figure reported by Anthropic.</div>' +
-      (config.enforcement === 'log_only'
-        ? '<div class="note warn">Enforcement is <b>log_only</b>. Usage is recorded and limits are '
-          + 'evaluated, but nothing is blocked. Set NOURA_CREDIT_ENFORCEMENT=on when the numbers look right.</div>'
-        : '') +
       '<div id="recon"></div>' +
 
       '<h2>Last 30 days</h2>' + spark(daily) +
@@ -161,21 +167,25 @@
         '<div><div class="card"><div class="k">By model</div>' + rows(org.by_model) + '</div></div>' +
       '</div>' +
 
-      '<h2>Users (' + DATA.users.length + ')</h2>' +
+      '<h2><span>Authentication Users & Credits (' + users.length + ')</span></h2>' +
       '<div class="toolbar">' +
-        '<input type="search" id="q" placeholder="Search email or id">' +
-        '<select id="tierF"><option value="">All users</option>' +
-          '<option value="low">Out of credits</option>' +
-          '<option value="has">Has credits</option></select>' +
-        '<button id="topBtn">Top 10 by cost</button>' +
+        '<input type="search" id="q" placeholder="Search by email, name or ID…">' +
+        '<select id="tierF">' +
+          '<option value="">All users</option>' +
+          '<option value="low">Out of credits (0)</option>' +
+          '<option value="has">Has credits (>0)</option>' +
+        '</select>' +
+        '<button id="customActionBtn" class="btn-primary">+ Award / Deduct Any User</button>' +
+        '<button id="topBtn">Sort by balance</button>' +
         '<button id="csvBtn">Export CSV</button>' +
-        '<span class="muted" style="font-size:12px" id="count"></span>' +
+        '<span class="muted" style="font-size:12px;margin-left:auto" id="count"></span>' +
       '</div>' +
       '<div id="tableWrap"></div>';
 
     $('q').addEventListener('input', table);
     $('tierF').addEventListener('change', table);
-    $('topBtn').addEventListener('click', () => { sortKey = 'usd'; sortDir = -1; table(10); });
+    $('customActionBtn').addEventListener('click', () => promptQuickAction());
+    $('topBtn').addEventListener('click', () => { sortKey = 'balance'; sortDir = -1; table(); });
     $('csvBtn').addEventListener('click', csv);
     table();
   }
@@ -200,11 +210,11 @@
   }
 
   function filtered() {
-    const q = ($('q').value || '').toLowerCase();
+    const q = ($('q').value || '').toLowerCase().trim();
     const tf = $('tierF').value;
-    return DATA.users.filter(u =>
+    return (DATA.users || []).filter(u =>
       (!tf || (tf === 'low' ? u.low : !u.low)) &&
-      (!q || (u.email || '').toLowerCase().includes(q) || u.id.toLowerCase().includes(q))
+      (!q || (u.email || '').toLowerCase().includes(q) || (u.id || '').toLowerCase().includes(q))
     );
   }
 
@@ -217,58 +227,120 @@
       return (x > y ? 1 : x < y ? -1 : 0) * sortDir;
     });
     if (limit) rows = rows.slice(0, limit);
-    $('count').textContent = rows.length + ' shown';
+    $('count').textContent = rows.length + ' users shown';
 
-    const cols = [['email','User'],['balance','Balance'],['actions','Actions left'],
-                  ['granted','Granted'],['spent','Spent'],['usd','Cost to us'],
-                  ['calls','Calls'],['last_seen','Active']];
-    const perAction = DATA.config.cost_per_action || 50;
+    const cols = [
+      ['email','User / Email'],
+      ['balance','Balance'],
+      ['actions','Actions left'],
+      ['granted','Granted'],
+      ['spent','Spent'],
+      ['usd','Cost to us'],
+      ['calls','Calls'],
+      ['last_seen','Last active']
+    ];
+    const perAction = DATA.config.cost_per_action || 100;
     $('tableWrap').innerHTML = '<table><thead><tr>' +
       cols.map(c => '<th data-k="' + c[0] + '">' + c[1] + '</th>').join('') +
-      '<th>Award</th></tr></thead><tbody>' +
+      '<th style="text-align:right">Actions</th></tr></thead><tbody>' +
       (rows.length ? rows.map(u => {
-        const left = Math.floor(u.balance / perAction);
+        const left = Math.floor((u.balance || 0) / perAction);
+        const userIdentifier = u.email || u.id;
         return '<tr class="' + (u.low ? 'flag' : '') + '">' +
-          '<td>' + esc(u.email || u.id) + (u.email ? '' : ' <span class="muted">(anon)</span>') +
+          '<td><b>' + esc(u.email || u.id) + '</b>' + (u.email ? '' : ' <span class="muted">(anon ID)</span>') +
             (u.unlimited ? ' <span class="pill unlimited">unlimited</span>' : '') + '</td>' +
-          '<td><b>' + (u.unlimited ? '\u221E' : u.balance) + '</b></td>' +
-          '<td>' + (u.unlimited ? '\u221E' : (left > 0 ? left : '<span class="muted">out</span>')) + '</td>' +
+          '<td><b style="color:' + (u.balance > 0 ? '#7ee2a8' : '#ff9f9a') + '">' + (u.unlimited ? '\u221E' : u.balance) + '</b></td>' +
+          '<td>' + (u.unlimited ? '\u221E' : (left > 0 ? left : '<span class="muted">0</span>')) + '</td>' +
           '<td class="muted">' + u.granted + '</td>' +
           '<td class="muted">' + u.spent + '</td>' +
           '<td>' + usd(u.usd) + '</td>' +
           '<td>' + u.calls + '</td>' +
           '<td class="muted">' + ago(u.last_seen) + '</td>' +
-          '<td><button class="grantBtn" data-u="' + esc(u.id) + '">Award</button></td>' +
+          '<td style="text-align:right">' +
+            '<div class="action-group" style="justify-content:flex-end">' +
+              '<button class="btn-award" data-target="' + esc(userIdentifier) + '">+ Award</button>' +
+              '<button class="btn-deduct" data-target="' + esc(userIdentifier) + '">- Deduct</button>' +
+            '</div>' +
+          '</td>' +
         '</tr>';
       }).join('')
-       : '<tr><td colspan="9" class="muted">No users yet. Use the app once, then reload.</td></tr>') +
+       : '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No users found. Use the "+ Award / Deduct Any User" button to initialize credits for any account.</td></tr>') +
       '</tbody></table>' +
-      '<div class="note">Credits never expire. Every billable action costs <b>' + perAction
-      + '</b>; internal sub-calls (' + (DATA.config.free_surfaces || []).join(', ')
-      + ') are free so one study action is charged once. Rows in red are out of credits. '
-      + 'Speech costs are estimated from a configured rate, not an invoiced figure.</div>';
+      '<div class="note">Credits are real-time. Every standard study action costs <b>' + perAction
+      + ' credits</b>. Internal sub-calls (' + (DATA.config.free_surfaces || []).join(', ')
+      + ') are free. You can grant or remove credits for any user instantly.</div>';
 
-    $('tableWrap').querySelectorAll('.grantBtn').forEach(b => b.addEventListener('click', async () => {
-      const amount = prompt('Award how many credits to ' + b.dataset.u + '?', '2000');
-      if (!amount) return;
-      const reason = prompt('Reason (purchase, promo, referral, admin, refund)', 'purchase');
-      if (!reason) return;
+    // Hook up Award buttons
+    $('tableWrap').querySelectorAll('.btn-award').forEach(b => b.addEventListener('click', async () => {
+      const target = b.dataset.target;
+      const amountStr = prompt('Award how many credits to ' + target + '?\n(e.g., 500 = 5 actions, 1000 = 10 actions, 2000 = 20 actions)', '1000');
+      if (!amountStr) return;
+      const amount = parseInt(amountStr, 10);
+      if (isNaN(amount) || amount <= 0) { alert('Please enter a valid positive number'); return; }
+      const reason = prompt('Reason for grant (purchase, promo, referral, admin, refund):', 'admin') || 'admin';
+      
       const r = await fetch('/api/admin/grant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
-        body: JSON.stringify({ user_id: b.dataset.u, credits: Number(amount), reason: reason.trim() })
+        body: JSON.stringify({ user_id: target, credits: amount, reason: reason.trim() })
       });
       const d = await r.json();
       if (!r.ok) { alert(d.error || 'Grant failed'); return; }
+      alert('✓ Successfully awarded ' + amount + ' credits to ' + target + '!\nNew balance: ' + d.balance);
       load();
     }));
 
-    $('tableWrap').querySelectorAll('th').forEach(th => th.addEventListener('click', () => {
+    // Hook up Deduct buttons
+    $('tableWrap').querySelectorAll('.btn-deduct').forEach(b => b.addEventListener('click', async () => {
+      const target = b.dataset.target;
+      const amountStr = prompt('Remove/deduct how many credits from ' + target + '?', '500');
+      if (!amountStr) return;
+      const amount = parseInt(amountStr, 10);
+      if (isNaN(amount) || amount <= 0) { alert('Please enter a valid positive number'); return; }
+      const reason = prompt('Reason for deduction (admin_deduct, refund, adjustment):', 'admin_deduct') || 'admin_deduct';
+      
+      const r = await fetch('/api/admin/deduct', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+        body: JSON.stringify({ user_id: target, credits: amount, reason: reason.trim() })
+      });
+      const d = await r.json();
+      if (!r.ok) { alert(d.error || 'Deduction failed'); return; }
+      alert('✓ Successfully deducted ' + amount + ' credits from ' + target + '.\nNew balance: ' + d.balance);
+      load();
+    }));
+
+    $('tableWrap').querySelectorAll('th[data-k]').forEach(th => th.addEventListener('click', () => {
       const k = th.dataset.k;
       sortDir = (sortKey === k) ? -sortDir : -1;
       sortKey = k;
       table(limit);
     }));
+  }
+
+  async function promptQuickAction() {
+    const userEmail = prompt('Enter user Email or User ID:');
+    if (!userEmail || !userEmail.trim()) return;
+    const actionType = prompt('Type "award" to add credits or "deduct" to remove credits:', 'award');
+    if (!actionType) return;
+    const isAward = actionType.toLowerCase().trim() === 'award';
+    const amountStr = prompt(isAward ? 'How many credits to award?' : 'How many credits to deduct?', '1000');
+    if (!amountStr) return;
+    const amount = parseInt(amountStr, 10);
+    if (isNaN(amount) || amount <= 0) { alert('Invalid credit amount'); return; }
+    
+    const endpoint = isAward ? '/api/admin/grant' : '/api/admin/deduct';
+    const reason = isAward ? 'admin' : 'admin_deduct';
+    
+    const r = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+      body: JSON.stringify({ user_id: userEmail.trim(), credits: amount, reason: reason })
+    });
+    const d = await r.json();
+    if (!r.ok) { alert(d.error || 'Operation failed'); return; }
+    alert('✓ Success! ' + (isAward ? 'Awarded ' : 'Deducted ') + amount + ' credits for ' + userEmail.trim() + '.\nNew balance: ' + d.balance);
+    load();
   }
 
   function csv() {
@@ -277,7 +349,7 @@
     const blob = new Blob([head.join(',') + '\n' + body.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'noura-usage.csv';
+    a.download = 'noura-users-credits.csv';
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
@@ -300,7 +372,7 @@
           + '. Delta ' + usd(d.delta_usd) + '.'
           + (drift ? ' <b>That gap suggests a provider call is not being metered.</b>' : '') + '</div>';
       }
-    } catch (e) { /* reconciliation is optional */ }
+    } catch (e) { }
   }
 
   load();

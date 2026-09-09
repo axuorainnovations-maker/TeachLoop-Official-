@@ -63,6 +63,53 @@ if sb_url and sb_anon:
         f.write(f'window.SUPABASE_URL = "{sb_url}";\nwindow.SUPABASE_ANON_KEY = "{sb_anon}";\n')
     print(f'[Supabase] Configured client with URL: {sb_url}')
 
+def fetch_supabase_auth_users():
+    """Fetch registered users from Supabase Auth admin API if service key is available."""
+    sb_url_raw = env_vars.get('SUPABASE_URL', '').strip()
+    if 'dashboard/project/' in sb_url_raw:
+        import re
+        m = re.search(r'dashboard/project/([a-zA-Z0-9_-]+)', sb_url_raw)
+        if m:
+            sb_url_raw = f'https://{m.group(1)}.supabase.co'
+    resolved_sb_url = sb_url_raw.rstrip('/')
+    service_key = (
+        env_vars.get('SUPABASE_SERVICE_ROLE_KEY', '') or 
+        env_vars.get('SUPABASE_SERVICE_KEY', '') or 
+        env_vars.get('SUPABASE_SECRET_KEY', '') or 
+        env_vars.get('SUPABASE_ADMIN_KEY', '') or
+        env_vars.get('SUPABASE_ANON_KEY', '')
+    ).strip()
+
+    if not resolved_sb_url or not service_key:
+        return [], False, "SUPABASE_SERVICE_ROLE_KEY not configured in .env.local / environment."
+
+    try:
+        url = f'{resolved_sb_url}/auth/v1/admin/users?per_page=1000'
+        req = urllib.request.Request(url, headers={
+            'apikey': service_key,
+            'Authorization': f'Bearer {service_key}',
+            'Content-Type': 'application/json'
+        })
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            raw_users = data.get('users', [])
+            result = []
+            for u in raw_users:
+                email = (u.get('email') or '').strip().lower()
+                meta = u.get('user_metadata') or {}
+                name = (meta.get('full_name') or meta.get('name') or (email.split('@')[0] if email else 'User')).strip()
+                result.append({
+                    'supabase_id': u.get('id'),
+                    'email': email,
+                    'name': name,
+                    'created_at': u.get('created_at'),
+                    'last_sign_in_at': u.get('last_sign_in_at'),
+                    'provider': u.get('app_metadata', {}).get('provider', 'email')
+                })
+            return result, True, None
+    except Exception as e:
+        return [], False, str(e)
+
 PORT = 3006
 
 # ── Metering and credits ───────────────────────────────────────────────
@@ -680,23 +727,48 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 g = json.loads(raw or b'{}')
             except Exception:
                 g = {}
-            uid = (g.get('user_id') or '').strip()
+            target = (g.get('user_id') or g.get('email') or '').strip()
             try:
                 amount = int(g.get('credits', 0))
             except Exception:
                 amount = 0
             reason = (g.get('reason') or 'admin').strip()
-            if not uid or amount <= 0:
-                self._json(400, {"error": "user_id and a positive credits amount are required"})
+            if not target or amount <= 0:
+                self._json(400, {"error": "user_id or email, and a positive credits amount are required"})
                 return
             if reason not in noura_meter.GRANT_REASONS:
                 self._json(400, {"error": "unknown reason",
                                  "allowed": sorted(noura_meter.GRANT_REASONS)})
                 return
-            res = LEDGER.grant(uid, amount, reason=reason, by='admin',
+            res = LEDGER.grant(target, amount, reason=reason, by='admin',
                                note=(g.get('note') or None))
             if not res:
                 self._json(400, {"error": "grant rejected"})
+                return
+            self._json(200, res)
+        elif self.path == '/api/admin/deduct':
+            length = int(self.headers.get('Content-Length', 0))
+            raw = self.rfile.read(length)
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            try:
+                g = json.loads(raw or b'{}')
+            except Exception:
+                g = {}
+            target = (g.get('user_id') or g.get('email') or '').strip()
+            try:
+                amount = int(g.get('credits', 0))
+            except Exception:
+                amount = 0
+            reason = (g.get('reason') or 'admin_deduct').strip()
+            if not target or amount <= 0:
+                self._json(400, {"error": "user_id or email, and a positive credits amount are required"})
+                return
+            res = LEDGER.deduct(target, amount, reason=reason, by='admin',
+                                note=(g.get('note') or None))
+            if not res:
+                self._json(400, {"error": "deduct rejected"})
                 return
             self._json(200, res)
         elif self.path == '/api/tts':
@@ -912,6 +984,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not self._admin_ok():
                 self._json(403, {"error": "admin token required"})
                 return
+
+            # Sync Supabase registered users into Ledger if available
+            sb_users, sb_ok, sb_note = fetch_supabase_auth_users()
+            if sb_users:
+                for sbu in sb_users:
+                    if sbu.get('email'):
+                        existing_uid = LEDGER.find_user_by_email(sbu['email'])
+                        if not existing_uid:
+                            uid = sbu.get('supabase_id') or ('usr_' + secrets.token_hex(8))
+                            LEDGER.ensure_user(uid, email=sbu['email'])
+
             since = noura_meter.period_start()
             org = LEDGER.org_totals(since)
             spend = org['usd']
@@ -919,6 +1002,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 "users": LEDGER.all_users(since),
                 "org": org,
                 "daily": LEDGER.daily_usd(30),
+                "supabase_sync": {
+                    "active": sb_ok,
+                    "count": len(sb_users),
+                    "note": sb_note
+                },
                 "budget": {
                     # No API reports a remaining balance. This is OUR ceiling.
                     "ceiling_usd": MONTHLY_BUDGET_USD,
