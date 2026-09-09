@@ -2319,6 +2319,42 @@
   const railRecall = document.getElementById('railRecall');
   const railCheck = document.getElementById('railCheck');
   const railCast = document.getElementById('railCast');
+
+  function saveLessonRecentState(tabKey) {
+    try {
+      const lessonTitle = title || 'Your lesson';
+      const lessonSubject = subject || 'General';
+      const k = tabKey || 'learn';
+      const lessonUrl = 'lesson.html?title=' + encodeURIComponent(lessonTitle) + (lessonSubject ? '&subject=' + encodeURIComponent(lessonSubject) : '') + '&tab=' + encodeURIComponent(k);
+      const lessonId = 'lesson_' + encodeURIComponent(lessonTitle);
+
+      const raw = localStorage.getItem('TEACHLOOP_RECENTS');
+      let recents = [];
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) recents = parsed;
+        } catch(e) {}
+      }
+      recents = recents.filter(x => {
+        if (typeof x === 'object' && x) {
+          return (x.id !== lessonId && x.title !== lessonTitle);
+        }
+        return x !== lessonTitle;
+      });
+      recents.unshift({
+        id: lessonId,
+        title: lessonTitle,
+        subject: lessonSubject,
+        isLesson: true,
+        tab: k,
+        lessonUrl: lessonUrl
+      });
+      recents = recents.slice(0, 15);
+      localStorage.setItem('TEACHLOOP_RECENTS', JSON.stringify(recents));
+    } catch(e) {}
+  }
+
   function show(view) {
     document.body.classList.remove('section-reading');
     document.body.classList.remove('lf-active');
@@ -2337,6 +2373,9 @@
     railCast.classList.toggle('active', view === 'cast');
     railLearn.classList.toggle('active', ['brief','recall','check','cast'].indexOf(view) === -1);
     window.scrollTo(0, 0);
+
+    const activeTabKey = ['brief', 'check', 'recall', 'cast'].includes(view) ? view : 'learn';
+    saveLessonRecentState(activeTabKey);
   }
   // Tabs unlock in order: each one needs the previous step finished.
   const RAIL = [
@@ -4807,9 +4846,18 @@
 
   const briefDone = !!flow.brief;
   const hasProgress = state && ((state.done && state.done.length > 0) || Object.keys(state.progress || {}).length > 0);
-  const explicitLearn = params.get('tab') === 'learn';
+  const tabParam = params.get('tab');
 
-  if (briefDone || hasProgress || explicitLearn) {
+  if (tabParam === 'brief') {
+    show('brief');
+    openBrief();
+  } else if (tabParam === 'check') {
+    openCheck();
+  } else if (tabParam === 'recall') {
+    openRecall();
+  } else if (tabParam === 'cast') {
+    openCast();
+  } else if (tabParam === 'learn' || briefDone || hasProgress) {
     if (lesson) {
       renderOverview();
     } else {
