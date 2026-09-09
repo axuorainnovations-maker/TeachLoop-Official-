@@ -61,7 +61,9 @@ STT_USD_PER_MINUTE = 0.006
 # leaving 450, it refreshes back to 500, not 950).
 CREDIT_COST = 100         # per lesson / billable action (Study Brief, Learn, Checkpoint, Recall, Audio Recap)
 SIGNUP_GRANT = 500        # 5 full study packages to try before buying
-DAILY_ALLOWANCE = 500     # Daily reset target balance
+PRO_ALLOWANCE = 5000     # Pro plan allowance (50 lessons / actions)
+FREE_ALLOWANCE = 500     # Free plan allowance (5 lessons / actions)
+DAILY_ALLOWANCE = 500    # Default daily reset target balance
 
 # Surfaces that are internal machinery, not something the user asked for.
 FREE_SURFACES = {
@@ -88,6 +90,13 @@ def is_unlimited(user):
     email = (user.get('email') or '').strip().lower()
     tier = (user.get('tier') or '').strip().lower()
     return (email in UNLIMITED_EMAILS) or (tier == 'unlimited')
+
+
+def tier_allowance(tier):
+    t = str(tier or 'free').lower().strip()
+    if t == 'pro':
+        return PRO_ALLOWANCE
+    return FREE_ALLOWANCE
 
 
 def credit_cost(surface):
@@ -191,10 +200,12 @@ class Ledger:
     def find_user_by_email(self, email):
         if not email:
             return None
-        target = email.strip().lower()
+        target = str(email).strip().lower()
         with self._lock:
             for uid, u in self._users.items():
                 if (u.get('email') or '').strip().lower() == target:
+                    return uid
+                if uid.lower() == target:
                     return uid
         return None
 
@@ -210,14 +221,13 @@ class Ledger:
                 self._users[user_id] = u
                 new_user = True
             if email and u.get('email') != email:
-                u['email'] = email
+                u['email'] = str(email).strip().lower()
             if tier:
-                u['tier'] = tier
+                u['tier'] = str(tier).strip().lower()
             u['last_seen'] = _now_iso()
             self._save_users()
             snapshot = dict(u)
-        # Outside the lock: grant() takes it again. The signup gift is issued
-        # once per user id and recorded in the ledger like any other grant.
+        # Outside the lock: grant() takes it again.
         if new_user and not snapshot.get('signup_granted'):
             self._mark_signup(user_id)
             self.grant(user_id, SIGNUP_GRANT, reason='signup',
@@ -236,24 +246,28 @@ class Ledger:
 
     def _check_daily_refresh(self, user_id):
         """
-        Guarantees that each user gets 500 credits refreshed daily (UTC).
-        If user spent 50 credits and has 450 left, it tops up by 50 to reach 500 (not 950).
-        If user has 0 credits left, it tops up by 500.
-        If user has >= 500 credits, no top-up needed.
+        Guarantees that each user gets credits refreshed daily (UTC) based on tier:
+        - Free plan: refreshes to 500 credits.
+        - Pro plan: refreshes to 5,000 credits.
+        - Unlimited plan: bypassed.
+        If user spent 50 credits and has 450 left (Free), it tops up by 50 to reach 500 (not 950).
+        If user has >= target allowance, no top-up needed.
         """
         today_str = _today_utc()
         with self._lock:
             u = self._users.get(user_id)
             if not u:
                 return
+            if is_unlimited(u):
+                return
+            tier = (u.get('tier') or 'free').lower().strip()
             last_refresh = u.get('last_daily_refresh')
             if last_refresh == today_str:
                 return
-            # Mark refreshed for today before releasing lock to prevent race conditions
             u['last_daily_refresh'] = today_str
             self._save_users()
 
-        # Compute current wallet balance
+        target_allowance = tier_allowance(tier)
         granted = spent = 0
         for e in self._events:
             if e.get('user_id') != user_id:
@@ -264,23 +278,34 @@ class Ledger:
                 spent += e.get('credits', 0)
 
         current_bal = max(0, granted - spent)
-        if current_bal < DAILY_ALLOWANCE:
-            top_up = DAILY_ALLOWANCE - current_bal
+        if current_bal < target_allowance:
+            top_up = target_allowance - current_bal
             self.grant(user_id, top_up, reason='daily_reset', by='system',
-                       note=f'Daily 500 credits refresh for {today_str}')
+                       note=f'Daily {target_allowance} credits refresh ({today_str})')
 
     def set_tier(self, user_id, tier):
         user_id = self._resolve_uid(user_id)
+        tier_clean = str(tier).lower().strip()
+        if tier_clean not in ('free', 'pro', 'unlimited'):
+            tier_clean = 'free'
         with self._lock:
             u = self._users.get(user_id)
             if not u:
-                u = {'id': user_id, 'email': None, 'tier': tier,
+                u = {'id': user_id, 'email': None, 'tier': tier_clean,
                      'created': _now_iso(), 'last_seen': _now_iso(),
                      'signup_granted': False, 'last_daily_refresh': _today_utc()}
                 self._users[user_id] = u
-            u['tier'] = str(tier).lower().strip()
+            u['tier'] = tier_clean
             self._save_users()
-            return dict(u)
+
+        # If upgraded to Pro and balance < 5000, award credits to reach 5,000
+        if tier_clean == 'pro':
+            w = self.wallet(user_id)
+            if w['balance'] < PRO_ALLOWANCE:
+                top_up = PRO_ALLOWANCE - w['balance']
+                self.grant(user_id, top_up, reason='promo', by='admin',
+                           note='Pro Plan activation (5,000 credits)')
+        return dict(self._users.get(user_id) or {})
 
     def user(self, user_id):
         return dict(self._users.get(user_id) or {})
@@ -486,12 +511,15 @@ class Ledger:
         if not user_id_or_email:
             return None
         s = str(user_id_or_email).strip()
+        with self._lock:
+            if s in self._users:
+                return s
+        existing = self.find_user_by_email(s)
+        if existing:
+            return existing
         if '@' in s:
-            existing = self.find_user_by_email(s)
-            if existing:
-                return existing
             uid = 'usr_' + secrets.token_hex(8)
-            self.ensure_user(uid, email=s)
+            self.ensure_user(uid, email=s.lower())
             return uid
         return s
 

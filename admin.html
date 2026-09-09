@@ -172,9 +172,9 @@
         '<input type="search" id="q" placeholder="Search by email, name or ID…">' +
         '<select id="tierF">' +
           '<option value="">All tiers</option>' +
-          '<option value="free">Free Plan</option>' +
-          '<option value="pro">Pro Plan</option>' +
-          '<option value="unlimited">Unlimited Plan</option>' +
+          '<option value="free">Free Plan (500/day)</option>' +
+          '<option value="pro">Pro Plan (5,000 credits)</option>' +
+          '<option value="unlimited">Unlimited Plan (∞)</option>' +
           '<option value="low">Out of credits (0)</option>' +
           '<option value="has">Has credits (>0)</option>' +
         '</select>' +
@@ -242,7 +242,7 @@
     const cols = [
       ['email','User / Email'],
       ['tier','Subscription Plan'],
-      ['balance','Credits (500/day)'],
+      ['balance','Credits'],
       ['actions','Actions Left'],
       ['tokens_left','Tokens Left'],
       ['anthropic_usd','Anthropic Cost'],
@@ -257,22 +257,21 @@
       '<th style="text-align:right">Credit Actions</th></tr></thead><tbody>' +
       (rows.length ? rows.map(u => {
         const left = Math.floor((u.balance || 0) / perAction);
-        const userIdentifier = u.email || u.id;
+        const userIdentifier = u.id || u.email;
+        const userEmail = u.email || '';
         const currentTier = (u.tier || 'free').toLowerCase();
         const tokLeftStr = u.unlimited ? '\u221E' : (u.tokens_left ? u.tokens_left.toLocaleString() : '0');
         return '<tr class="' + (u.low ? 'flag' : '') + '">' +
           '<td><b>' + esc(u.email || u.id) + '</b>' + (u.email ? '' : ' <span class="muted">(anon ID)</span>') +
-            (u.unlimited ? ' <span class="pill unlimited" style="margin-left:6px">unlimited</span>' : '') + '</td>' +
+            (u.unlimited ? ' <span class="pill unlimited" style="margin-left:6px">unlimited</span>' : (currentTier === 'pro' ? ' <span class="pill pro" style="margin-left:6px">PRO</span>' : '')) + '</td>' +
           '<td>' +
-            '<select class="plan-select" data-target="' + esc(userIdentifier) + '">' +
-              '<option value="free"' + (currentTier === 'free' ? ' selected' : '') + '>Free Plan (500/d)</option>' +
-              '<option value="pro"' + (currentTier === 'pro' ? ' selected' : '') + '>Pro Plan ($8/mo)</option>' +
+            '<select class="plan-select" data-id="' + esc(u.id) + '" data-email="' + esc(userEmail) + '" data-target="' + esc(userIdentifier) + '">' +
+              '<option value="free"' + (currentTier === 'free' ? ' selected' : '') + '>Free Plan (500/day)</option>' +
+              '<option value="pro"' + (currentTier === 'pro' ? ' selected' : '') + '>Pro Plan (5,000 credits · $8/mo)</option>' +
               '<option value="unlimited"' + (currentTier === 'unlimited' ? ' selected' : '') + '>Unlimited Plan (∞)</option>' +
-              '<option value="scholar"' + (currentTier === 'scholar' ? ' selected' : '') + '>Scholar</option>' +
-              '<option value="beta"' + (currentTier === 'beta' ? ' selected' : '') + '>Beta</option>' +
             '</select>' +
           '</td>' +
-          '<td><b style="color:' + (u.balance > 0 ? '#7ee2a8' : '#ff9f9a') + '">' + (u.unlimited ? '\u221E' : u.balance) + '</b></td>' +
+          '<td><b style="color:' + (u.balance > 0 ? '#7ee2a8' : '#ff9f9a') + '">' + (u.unlimited ? '\u221E' : u.balance.toLocaleString()) + '</b></td>' +
           '<td>' + (u.unlimited ? '\u221E' : (left > 0 ? left : '<span class="muted">0</span>')) + '</td>' +
           '<td class="muted">' + tokLeftStr + '</td>' +
           '<td>' + usd(u.anthropic_usd || 0) + ' <span class="muted" style="font-size:11px">(' + (u.anthropic_calls || 0) + ')</span></td>' +
@@ -282,32 +281,40 @@
           '<td class="muted">' + ago(u.last_seen) + '</td>' +
           '<td style="text-align:right">' +
             '<div class="action-group" style="justify-content:flex-end">' +
-              '<button class="btn-award" data-target="' + esc(userIdentifier) + '">+ Award</button>' +
-              '<button class="btn-deduct" data-target="' + esc(userIdentifier) + '">- Deduct</button>' +
+              '<button class="btn-award" data-id="' + esc(u.id) + '" data-email="' + esc(userEmail) + '" data-target="' + esc(userIdentifier) + '">+ Award</button>' +
+              '<button class="btn-deduct" data-id="' + esc(u.id) + '" data-email="' + esc(userEmail) + '" data-target="' + esc(userIdentifier) + '">- Deduct</button>' +
             '</div>' +
           '</td>' +
         '</tr>';
       }).join('')
        : '<tr><td colspan="11" class="muted" style="text-align:center;padding:24px">No users found. Use the "+ Quick Adjust" button to initialize credits or plan for any account.</td></tr>') +
       '</tbody></table>' +
-      '<div class="note">Credits refresh to 500 automatically every day (UTC). Anthropic & NVIDIA provider calls and token spends are tracked in real-time. Switching a plan to <b>Unlimited</b> grants unlimited AI study actions.</div>';
+      '<div class="note"><b>Plans & Credits</b>: Free Plan refreshes to 500 credits daily (UTC). Selecting <b>Pro Plan</b> immediately grants 5,000 credits ($8/mo). Switching to <b>Unlimited</b> grants unlimited AI study sessions.</div>';
 
     // Hook up Subscription Plan selectors
     $('tableWrap').querySelectorAll('.plan-select').forEach(sel => sel.addEventListener('change', async () => {
-      const target = sel.dataset.target;
+      const target = sel.dataset.id || sel.dataset.target;
+      const email = sel.dataset.email;
       const newTier = sel.value;
       sel.disabled = true;
       try {
         const r = await fetch('/api/admin/set-tier', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
-          body: JSON.stringify({ user_id: target, tier: newTier })
+          body: JSON.stringify({ user_id: target, email: email, tier: newTier })
         });
         const d = await r.json();
         if (!r.ok) {
           alert(d.error || 'Failed to update subscription plan');
           sel.disabled = false;
           return;
+        }
+        if (newTier === 'pro') {
+          alert('✓ Plan updated to Pro! 5,000 monthly credits activated.');
+        } else if (newTier === 'unlimited') {
+          alert('✓ Plan updated to Unlimited (∞)!');
+        } else {
+          alert('✓ Plan updated to Free Plan (500 daily credits).');
         }
         load();
       } catch (e) {
@@ -318,42 +325,54 @@
 
     // Hook up Award buttons
     $('tableWrap').querySelectorAll('.btn-award').forEach(b => b.addEventListener('click', async () => {
-      const target = b.dataset.target;
-      const amountStr = prompt('Award how many credits to ' + target + '?\n(e.g., 500 = 5 actions, 1000 = 10 actions, 2000 = 20 actions)', '1000');
+      const target = b.dataset.id || b.dataset.target;
+      const email = b.dataset.email;
+      const displayName = email || target;
+      const amountStr = prompt('Award how many credits to ' + displayName + '?\n(e.g., 500 = 5 actions, 1000 = 10 actions, 5000 = 50 actions)', '1000');
       if (!amountStr) return;
       const amount = parseInt(amountStr, 10);
       if (isNaN(amount) || amount <= 0) { alert('Please enter a valid positive number'); return; }
       const reason = prompt('Reason for grant (purchase, promo, referral, admin, refund):', 'admin') || 'admin';
       
-      const r = await fetch('/api/admin/grant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
-        body: JSON.stringify({ user_id: target, credits: amount, reason: reason.trim() })
-      });
-      const d = await r.json();
-      if (!r.ok) { alert(d.error || 'Grant failed'); return; }
-      alert('✓ Successfully awarded ' + amount + ' credits to ' + target + '!\nNew balance: ' + d.balance);
-      load();
+      try {
+        const r = await fetch('/api/admin/grant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+          body: JSON.stringify({ user_id: target, email: email, credits: amount, reason: reason.trim() })
+        });
+        const d = await r.json();
+        if (!r.ok) { alert(d.error || 'Grant failed'); return; }
+        alert('✓ Successfully awarded ' + amount + ' credits to ' + displayName + '!\nNew balance: ' + (d.balance != null ? d.balance : 'Updated'));
+        load();
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
     }));
 
     // Hook up Deduct buttons
     $('tableWrap').querySelectorAll('.btn-deduct').forEach(b => b.addEventListener('click', async () => {
-      const target = b.dataset.target;
-      const amountStr = prompt('Remove/deduct how many credits from ' + target + '?', '500');
+      const target = b.dataset.id || b.dataset.target;
+      const email = b.dataset.email;
+      const displayName = email || target;
+      const amountStr = prompt('Remove/deduct how many credits from ' + displayName + '?', '500');
       if (!amountStr) return;
       const amount = parseInt(amountStr, 10);
       if (isNaN(amount) || amount <= 0) { alert('Please enter a valid positive number'); return; }
       const reason = prompt('Reason for deduction (admin_deduct, refund, adjustment):', 'admin_deduct') || 'admin_deduct';
       
-      const r = await fetch('/api/admin/deduct', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
-        body: JSON.stringify({ user_id: target, credits: amount, reason: reason.trim() })
-      });
-      const d = await r.json();
-      if (!r.ok) { alert(d.error || 'Deduction failed'); return; }
-      alert('✓ Successfully deducted ' + amount + ' credits from ' + target + '.\nNew balance: ' + d.balance);
-      load();
+      try {
+        const r = await fetch('/api/admin/deduct', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+          body: JSON.stringify({ user_id: target, email: email, credits: amount, reason: reason.trim() })
+        });
+        const d = await r.json();
+        if (!r.ok) { alert(d.error || 'Deduction failed'); return; }
+        alert('✓ Successfully deducted ' + amount + ' credits from ' + displayName + '.\nNew balance: ' + (d.balance != null ? d.balance : 'Updated'));
+        load();
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
     }));
 
     $('tableWrap').querySelectorAll('th[data-k]').forEach(th => th.addEventListener('click', () => {
@@ -372,16 +391,17 @@
     const act = action.toLowerCase().trim();
     
     if (act === 'plan') {
-      const plan = prompt('Enter new subscription plan:\n(free, pro, unlimited, scholar, beta)', 'pro');
+      const plan = prompt('Enter new subscription plan:\n(free, pro, unlimited)', 'pro');
       if (!plan) return;
+      const planClean = plan.trim().toLowerCase();
       const r = await fetch('/api/admin/set-tier', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
-        body: JSON.stringify({ user_id: userEmail.trim(), tier: plan.trim().toLowerCase() })
+        body: JSON.stringify({ user_id: userEmail.trim(), tier: planClean })
       });
       const d = await r.json();
       if (!r.ok) { alert(d.error || 'Plan update failed'); return; }
-      alert('✓ Successfully changed plan to "' + plan.trim() + '" for ' + userEmail.trim());
+      alert('✓ Successfully changed plan to "' + planClean + '" for ' + userEmail.trim() + (planClean === 'pro' ? ' (5,000 credits added)' : ''));
       load();
       return;
     }

@@ -433,7 +433,7 @@ class handler(BaseHTTPRequestHandler):
             if not target:
                 self._json(400, {"error": "user_id or email is required"})
                 return
-            valid_tiers = ('free', 'pro', 'unlimited', 'scholar', 'beta')
+            valid_tiers = ('free', 'pro', 'unlimited')
             if tier not in valid_tiers:
                 self._json(400, {"error": f"Invalid tier. Allowed: {valid_tiers}"})
                 return
