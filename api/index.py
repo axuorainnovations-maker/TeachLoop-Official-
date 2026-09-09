@@ -668,6 +668,25 @@ class handler(BaseHTTPRequestHandler):
                     )
                     with urllib.request.urlopen(anth_req, timeout=18) as resp:
                         resp_bytes = resp.read()
+                        if LEDGER and noura_meter:
+                            try:
+                                resp_obj = json.loads(resp_bytes.decode('utf-8'))
+                                u_data = resp_obj.get('usage', {})
+                                in_tok = int(u_data.get('input_tokens', 0) or 0)
+                                out_tok = int(u_data.get('output_tokens', 0) or 0)
+                                c_read = int(u_data.get('cache_read_input_tokens', 0) or 0)
+                                c_write = int(u_data.get('cache_creation_input_tokens', 0) or 0)
+                                m_name = data.get('model', 'claude-haiku-4-5-20251001')
+                                usd = noura_meter.token_cost(m_name, in_tok, c_read, c_write, out_tok)
+                                LEDGER.append(
+                                    user_id=uid, surface='chat', provider='anthropic',
+                                    model=m_name, input_tokens=in_tok,
+                                    cache_read=c_read, cache_write=c_write,
+                                    output_tokens=out_tok, usd_cost=usd,
+                                    credits=100
+                                )
+                            except Exception as rec_err:
+                                print(f"[chat] Metering record error: {rec_err}")
                         self.send_response(200)
                         self.send_header('Content-Type', resp.headers.get('Content-Type', 'application/json'))
                         self.send_header('Access-Control-Allow-Origin', self._allowed_origin())
@@ -714,6 +733,18 @@ class handler(BaseHTTPRequestHandler):
                                 resp_data = json.loads(resp.read().decode('utf-8'))
                                 reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
                                 if reply:
+                                    if LEDGER and noura_meter:
+                                        usage = resp_data.get('usage', {})
+                                        in_tok = int(usage.get('prompt_tokens') or (len(json.dumps(formatted_msgs)) // 4))
+                                        out_tok = int(usage.get('completion_tokens') or (len(reply) // 4))
+                                        usd = noura_meter.token_cost(chosen_model, in_tok, 0, 0, out_tok)
+                                        LEDGER.append(
+                                            user_id=uid, surface='chat', provider='nvidia',
+                                            model=chosen_model, input_tokens=in_tok,
+                                            cache_read=0, cache_write=0,
+                                            output_tokens=out_tok, usd_cost=usd,
+                                            credits=100
+                                        )
                                     self._json(200, {
                                         "id": f"msg_{secrets.token_hex(8)}",
                                         "role": "assistant",
@@ -782,6 +813,13 @@ class handler(BaseHTTPRequestHandler):
                             elif 'image' in resp_json:
                                 b64_str = resp_json['image']
                         if b64_str:
+                            if LEDGER:
+                                LEDGER.append(
+                                    user_id=uid, surface='generate-image', provider='nvidia',
+                                    model='black-forest-labs/flux-1-dev', input_tokens=0,
+                                    cache_read=0, cache_write=0, output_tokens=0,
+                                    usd_cost=0.025, credits=100
+                                )
                             img_url = b64_str if b64_str.startswith('data:') else f"data:image/png;base64,{b64_str}"
                             self._json(200, {"image_url": img_url})
                             return
@@ -815,6 +853,14 @@ class handler(BaseHTTPRequestHandler):
                     with urllib.request.urlopen(req, timeout=15) as resp:
                         res_data = json.loads(resp.read().decode('utf-8'))
                         txt = res_data.get('text') or res_data.get('transcript') or ''
+                        if LEDGER:
+                            uid = self._identify(data)
+                            LEDGER.append(
+                                user_id=uid, surface='stt', provider='nvidia',
+                                model='parakeet-1.1b-rnnt-multilingual-asr', input_tokens=0,
+                                cache_read=0, cache_write=0, output_tokens=0,
+                                usd_cost=0.002, credits=0
+                            )
                         self._json(200, {"transcript": txt.strip(), "model": "parakeet-1.1b-rnnt-multilingual-asr"})
                         return
                 except Exception as e:

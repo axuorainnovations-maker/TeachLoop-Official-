@@ -455,6 +455,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length)
 
+            uid = self._identify()
             nvidia_key = env_vars.get('NVIDIA_API_KEY', '')
             req = urllib.request.Request(
                 'https://integrate.api.nvidia.com/v1/images/generations',
@@ -468,6 +469,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             try:
                 with urllib.request.urlopen(req) as resp:
                     resp_body = resp.read()
+                LEDGER.append(user_id=uid, surface='diagram', provider='nvidia',
+                              model='black-forest-labs/flux-1-dev', input_tokens=0,
+                              cache_read=0, cache_write=0, output_tokens=0,
+                              usd_cost=0.025, credits=0)
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -659,6 +664,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         with urllib.request.urlopen(req, timeout=30) as resp:
                             resp_data = json.loads(resp.read().decode('utf-8'))
                             reply = resp_data.get('choices', [{}])[0].get('message', {}).get('content', '')
+                            usage = resp_data.get('usage', {})
+                            in_tok = int(usage.get('prompt_tokens') or (len(json.dumps(formatted_msgs)) // 4))
+                            out_tok = int(usage.get('completion_tokens') or (len(reply) // 4))
+                            usd = noura_meter.token_cost(chosen_model, in_tok, 0, 0, out_tok)
+                            LEDGER.append(
+                                user_id=uid, surface=surface, provider='nvidia',
+                                model=chosen_model, input_tokens=in_tok,
+                                cache_read=0, cache_write=0,
+                                output_tokens=out_tok, usd_cost=usd,
+                                credits=noura_meter.credit_cost(surface)
+                            )
                             out_payload = {
                                 "reply": reply,
                                 "content": [{"type": "text", "text": reply}]
@@ -902,6 +918,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     if r.results and r.results[0].alternatives:
                         txt = r.results[0].alternatives[0].transcript
                     if txt.strip():
+                        stt_uid = self._identify()
+                        LEDGER.append(user_id=stt_uid, surface='stt', provider='nvidia',
+                                      model=stt_model, input_tokens=0,
+                                      cache_read=0, cache_write=0, output_tokens=0,
+                                      usd_cost=0.002, credits=0)
                         self._json(200, {"transcript": txt.strip(), "model": stt_model})
                         return
                 except Exception as e:
@@ -922,6 +943,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     with urllib.request.urlopen(req, timeout=10) as resp:
                         res_data = json.loads(resp.read().decode('utf-8'))
                         txt = res_data.get('text') or res_data.get('transcript') or ''
+                        stt_uid = self._identify()
+                        LEDGER.append(user_id=stt_uid, surface='stt', provider='nvidia',
+                                      model=stt_model, input_tokens=0,
+                                      cache_read=0, cache_write=0, output_tokens=0,
+                                      usd_cost=0.002, credits=0)
                         self._json(200, {"transcript": txt.strip(), "model": stt_model})
                         return
                 except Exception as e:
@@ -975,6 +1001,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             b64_str = resp_json['image']
                     
                     if b64_str:
+                        img_uid = self._identify(data)
+                        LEDGER.append(user_id=img_uid, surface='generate-image', provider='nvidia',
+                                      model='black-forest-labs/flux-1-dev', input_tokens=0,
+                                      cache_read=0, cache_write=0, output_tokens=0,
+                                      usd_cost=0.025, credits=noura_meter.credit_cost('generate-image'))
                         img_url = b64_str if b64_str.startswith('data:') else f"data:image/png;base64,{b64_str}"
                         self._json(200, {"image_url": img_url})
                     else:

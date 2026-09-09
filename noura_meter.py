@@ -24,42 +24,46 @@ else:
     LEDGER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_ledger.jsonl')
     USERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'usage_users.json')
 
-# ── Pricing, USD per million tokens ──────────────────────────────────────
+# ── Pricing, USD per million tokens or per unit ─────────────────────────
 # Keyed by model so a model switch is a one-line change. Cache read is ~0.1x
 # input and cache write ~1.25x input, per Anthropic's caching pricing.
 PRICING = {
+    # Anthropic Claude Models ($ / M tokens)
     'claude-haiku-4-5-20251001': {'in': 1.00, 'out': 5.00},
     'claude-haiku-4-5':          {'in': 1.00, 'out': 5.00},
+    'claude-sonnet-4-5-20250929': {'in': 3.00, 'out': 15.00},
     'claude-sonnet-5':           {'in': 3.00, 'out': 15.00},
+    'claude-opus-4-5-20251101':   {'in': 5.00, 'out': 25.00},
     'claude-opus-5':             {'in': 5.00, 'out': 25.00},
+    # NVIDIA NIM LLM / Vision Models ($ / M tokens)
+    'meta/llama-3.2-11b-vision-instruct': {'in': 0.15, 'out': 0.15},
+    'nvidia/nemotron-3.5-lightning-30b-a3b': {'in': 0.20, 'out': 0.20},
+    'meta/llama-3.2-90b-vision-instruct': {'in': 0.70, 'out': 0.70},
+    'deepseek-ai/deepseek-v4-flash-0731': {'in': 0.14, 'out': 0.28},
+    'meta/llama-3.1-8b-instruct':         {'in': 0.15, 'out': 0.15},
+    'meta/llama-3.3-70b-instruct':        {'in': 0.70, 'out': 0.80},
+    # NVIDIA GenAI / Speech ($ per unit)
+    'black-forest-labs/flux-1-dev':       {'unit': 0.025},
+    'flux-1-dev':                         {'unit': 0.025},
+    'parakeet-1.1b-rnnt-multilingual-asr': {'unit': 0.002},
 }
 DEFAULT_PRICING = {'in': 1.00, 'out': 5.00}
 CACHE_READ_MULT = 0.10
 CACHE_WRITE_MULT = 1.25
 
-# NVIDIA speech has no token concept. Cost per unit is configurable; these are
-# placeholders until real invoiced rates are known, and are marked estimated
-# in the admin UI so nobody mistakes them for billed figures.
+# NVIDIA speech rates
 TTS_USD_PER_1K_CHARS = 0.015
 STT_USD_PER_MINUTE = 0.006
 
 # ── Credit model ─────────────────────────────────────────────────────────
-# A wallet, not an allowance. Credits are GRANTED (signup gift, purchase,
-# promo, manual award), they accumulate, and they are spent down.
-# They never expire and they never reset.
-#
-#     balance = sum(grants) - sum(spends)
-#
-# Every user-initiated action costs a flat CREDIT_COST. Internal sub-calls
-# that serve the same action are free, so one "generate a study plan" is one
-# charge even though it fires several API calls underneath.
+# A wallet, with a daily refresh policy.
+# Every user gets 500 credits refreshed daily (so if a user spends 50 credits,
+# leaving 450, it refreshes back to 500, not 950).
 CREDIT_COST = 100         # per lesson / billable action (Study Brief, Learn, Checkpoint, Recall, Audio Recap)
 SIGNUP_GRANT = 500        # 5 full study packages to try before buying
+DAILY_ALLOWANCE = 500     # Daily reset target balance
 
 # Surfaces that are internal machinery, not something the user asked for.
-# Anything NOT listed here is billable. That is deliberate: a surface someone
-# forgets to label gets charged and shows up in the dashboard, rather than
-# silently becoming a free hole in the wallet.
 FREE_SURFACES = {
     'source_card',            # prep step inside a Teach Studio session
     'teach_studio_verifier',  # hidden fact check inside a turn
@@ -69,13 +73,10 @@ FREE_SURFACES = {
     'tts',                    # speech out, part of the parent action
 }
 
-# Reasons a grant can appear in the ledger. Kept as a set so the admin
-# endpoint cannot invent categories that break later reporting.
-GRANT_REASONS = {'signup', 'purchase', 'promo', 'referral', 'admin', 'refund'}
+# Reasons a grant can appear in the ledger.
+GRANT_REASONS = {'signup', 'purchase', 'promo', 'referral', 'admin', 'refund', 'daily_reset'}
 
 # Accounts that bypass the wallet entirely: founders, demo accounts, support.
-# Usage is still metered and still costs us money, so these show up in the
-# admin dashboard like everyone else. They simply are never blocked.
 UNLIMITED_EMAILS = {
     'prorkrff@gmail.com',
 }
@@ -98,6 +99,10 @@ def _now_iso():
     return datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
 
 
+def _today_utc():
+    return datetime.now(timezone.utc).strftime('%Y-%m-%d')
+
+
 def period_start(ts=None):
     """Calendar month boundary. One place for the reset rule."""
     d = ts or datetime.now(timezone.utc)
@@ -111,12 +116,34 @@ def period_end(ts=None):
 
 
 def token_cost(model, input_tokens, cache_read, cache_write, output_tokens):
-    p = PRICING.get(model, DEFAULT_PRICING)
+    p = PRICING.get(model)
+    if not p:
+        m_lower = (model or '').lower()
+        if 'flux' in m_lower:
+            return 0.025
+        if 'parakeet' in m_lower or 'asr' in m_lower:
+            return 0.002
+        if 'deepseek' in m_lower:
+            p = {'in': 0.14, 'out': 0.28}
+        elif 'llama' in m_lower or 'nemotron' in m_lower:
+            p = {'in': 0.20, 'out': 0.20}
+        elif 'opus' in m_lower:
+            p = {'in': 5.00, 'out': 25.00}
+        elif 'sonnet' in m_lower:
+            p = {'in': 3.00, 'out': 15.00}
+        elif 'haiku' in m_lower:
+            p = {'in': 1.00, 'out': 5.00}
+        else:
+            p = DEFAULT_PRICING
+    
+    if 'unit' in p:
+        return float(p['unit'])
+
     return round(
-        (input_tokens / 1e6) * p['in']
-        + (cache_read / 1e6) * p['in'] * CACHE_READ_MULT
-        + (cache_write / 1e6) * p['in'] * CACHE_WRITE_MULT
-        + (output_tokens / 1e6) * p['out'],
+        (input_tokens / 1e6) * p.get('in', 1.0)
+        + (cache_read / 1e6) * p.get('in', 1.0) * CACHE_READ_MULT
+        + (cache_write / 1e6) * p.get('in', 1.0) * CACHE_WRITE_MULT
+        + (output_tokens / 1e6) * p.get('out', 5.0),
         8,
     )
 
@@ -172,13 +199,14 @@ class Ledger:
         return None
 
     def ensure_user(self, user_id, email=None, tier=None):
+        today_str = _today_utc()
         with self._lock:
             u = self._users.get(user_id)
             new_user = False
             if not u:
                 u = {'id': user_id, 'email': None, 'tier': 'free',
                      'created': _now_iso(), 'last_seen': _now_iso(),
-                     'signup_granted': False}
+                     'signup_granted': False, 'last_daily_refresh': today_str}
                 self._users[user_id] = u
                 new_user = True
             if email and u.get('email') != email:
@@ -194,6 +222,8 @@ class Ledger:
             self._mark_signup(user_id)
             self.grant(user_id, SIGNUP_GRANT, reason='signup',
                        note='Welcome credits')
+        else:
+            self._check_daily_refresh(user_id)
         return snapshot
 
     def _mark_signup(self, user_id):
@@ -201,7 +231,43 @@ class Ledger:
             u = self._users.get(user_id)
             if u:
                 u['signup_granted'] = True
+                u['last_daily_refresh'] = _today_utc()
                 self._save_users()
+
+    def _check_daily_refresh(self, user_id):
+        """
+        Guarantees that each user gets 500 credits refreshed daily (UTC).
+        If user spent 50 credits and has 450 left, it tops up by 50 to reach 500 (not 950).
+        If user has 0 credits left, it tops up by 500.
+        If user has >= 500 credits, no top-up needed.
+        """
+        today_str = _today_utc()
+        with self._lock:
+            u = self._users.get(user_id)
+            if not u:
+                return
+            last_refresh = u.get('last_daily_refresh')
+            if last_refresh == today_str:
+                return
+            # Mark refreshed for today before releasing lock to prevent race conditions
+            u['last_daily_refresh'] = today_str
+            self._save_users()
+
+        # Compute current wallet balance
+        granted = spent = 0
+        for e in self._events:
+            if e.get('user_id') != user_id:
+                continue
+            if e.get('kind') == 'grant':
+                granted += e.get('credits', 0)
+            elif e.get('ok', True):
+                spent += e.get('credits', 0)
+
+        current_bal = max(0, granted - spent)
+        if current_bal < DAILY_ALLOWANCE:
+            top_up = DAILY_ALLOWANCE - current_bal
+            self.grant(user_id, top_up, reason='daily_reset', by='system',
+                       note=f'Daily 500 credits refresh for {today_str}')
 
     def set_tier(self, user_id, tier):
         user_id = self._resolve_uid(user_id)
@@ -210,7 +276,7 @@ class Ledger:
             if not u:
                 u = {'id': user_id, 'email': None, 'tier': tier,
                      'created': _now_iso(), 'last_seen': _now_iso(),
-                     'signup_granted': False}
+                     'signup_granted': False, 'last_daily_refresh': _today_utc()}
                 self._users[user_id] = u
             u['tier'] = str(tier).lower().strip()
             self._save_users()
@@ -242,43 +308,130 @@ class Ledger:
         return [e for e in self._events if e.get('ts', '') >= cutoff]
 
     def totals_for(self, user_id, since=None):
-        t = {'credits': 0, 'usd': 0.0, 'calls': 0, 'input': 0,
-             'output': 0, 'cache_read': 0, 'cache_write': 0}
+        t = {
+            'credits': 0, 'usd': 0.0, 'calls': 0, 'input': 0,
+            'output': 0, 'cache_read': 0, 'cache_write': 0,
+            'anthropic_usd': 0.0, 'anthropic_calls': 0, 'anthropic_tokens': 0,
+            'nvidia_usd': 0.0, 'nvidia_calls': 0, 'nvidia_tokens': 0,
+        }
         for e in self._since(since):
             if e.get('user_id') != user_id or not e.get('ok', True):
                 continue
-            t['credits'] += e.get('credits', 0)
-            t['usd'] += e.get('usd_cost', 0.0)
+            usd = float(e.get('usd_cost', 0.0) or 0.0)
+            inp = int(e.get('input_tokens', 0) or 0)
+            out = int(e.get('output_tokens', 0) or 0)
+            c_read = int(e.get('cache_read', 0) or 0)
+            c_write = int(e.get('cache_write', 0) or 0)
+            kind = str(e.get('kind') or '').lower().strip()
+            surface = str(e.get('surface') or '').lower().strip()
+            provider = str(e.get('provider') or '').lower().strip()
+            model = str(e.get('model') or '').lower().strip()
+
+            t['credits'] += int(e.get('credits', 0) or 0)
+            t['usd'] += usd
+
+            # Do not count credit grant events as API calls
+            if kind == 'grant' or surface in ('grant', 'admin_adjustment') or provider in ('none', 'admin'):
+                continue
+
             t['calls'] += 1
-            t['input'] += e.get('input_tokens', 0)
-            t['output'] += e.get('output_tokens', 0)
-            t['cache_read'] += e.get('cache_read', 0)
-            t['cache_write'] += e.get('cache_write', 0)
+            t['input'] += inp
+            t['output'] += out
+            t['cache_read'] += c_read
+            t['cache_write'] += c_write
+
+            if provider == 'anthropic' or 'claude' in model:
+                t['anthropic_usd'] += usd
+                t['anthropic_calls'] += 1
+                t['anthropic_tokens'] += (inp + out)
+            elif (provider == 'nvidia' or 'nvidia' in model or 'llama' in model
+                  or 'flux' in model or 'parakeet' in model or 'nemotron' in model
+                  or 'deepseek' in model or 'chatterbox' in model or surface in ('stt', 'tts', 'diagram')):
+                t['nvidia_usd'] += usd
+                t['nvidia_calls'] += 1
+                t['nvidia_tokens'] += (inp + out)
+            else:
+                if 'anthropic' in provider:
+                    t['anthropic_usd'] += usd
+                    t['anthropic_calls'] += 1
+                    t['anthropic_tokens'] += (inp + out)
+                elif 'nvidia' in provider:
+                    t['nvidia_usd'] += usd
+                    t['nvidia_calls'] += 1
+                    t['nvidia_tokens'] += (inp + out)
+
         t['usd'] = round(t['usd'], 6)
+        t['anthropic_usd'] = round(t['anthropic_usd'], 6)
+        t['nvidia_usd'] = round(t['nvidia_usd'], 6)
         return t
 
     def org_totals(self, since=None):
-        t = {'usd': 0.0, 'calls': 0, 'input': 0, 'output': 0,
-             'cache_read': 0, 'cache_write': 0, 'by_model': {},
-             'by_surface': {}, 'errors': 0, 'rejected': 0}
+        t = {
+            'usd': 0.0, 'calls': 0, 'input': 0, 'output': 0,
+            'cache_read': 0, 'cache_write': 0, 'by_model': {},
+            'by_surface': {}, 'by_provider': {'anthropic': 0.0, 'nvidia': 0.0},
+            'anthropic_usd': 0.0, 'anthropic_calls': 0, 'anthropic_tokens': 0,
+            'nvidia_usd': 0.0, 'nvidia_calls': 0, 'nvidia_tokens': 0,
+            'errors': 0, 'rejected': 0
+        }
         for e in self._since(since):
             if not e.get('ok', True):
                 t['errors'] += 1
                 if e.get('error') == 'insufficient_credits':
                     t['rejected'] += 1
                 continue
-            usd = e.get('usd_cost', 0.0)
+            usd = float(e.get('usd_cost', 0.0) or 0.0)
+            inp = int(e.get('input_tokens', 0) or 0)
+            out = int(e.get('output_tokens', 0) or 0)
+            c_read = int(e.get('cache_read', 0) or 0)
+            c_write = int(e.get('cache_write', 0) or 0)
+            kind = str(e.get('kind') or '').lower().strip()
+            surface = str(e.get('surface') or '').lower().strip()
+            provider = str(e.get('provider') or '').lower().strip()
+            model = str(e.get('model') or '').lower().strip()
+
             t['usd'] += usd
+
+            if kind == 'grant' or surface in ('grant', 'admin_adjustment') or provider in ('none', 'admin'):
+                continue
+
             t['calls'] += 1
-            t['input'] += e.get('input_tokens', 0)
-            t['output'] += e.get('output_tokens', 0)
-            t['cache_read'] += e.get('cache_read', 0)
-            t['cache_write'] += e.get('cache_write', 0)
+            t['input'] += inp
+            t['output'] += out
+            t['cache_read'] += c_read
+            t['cache_write'] += c_write
             m = e.get('model') or e.get('provider') or 'unknown'
             s = e.get('surface') or 'unknown'
             t['by_model'][m] = round(t['by_model'].get(m, 0.0) + usd, 6)
             t['by_surface'][s] = round(t['by_surface'].get(s, 0.0) + usd, 6)
+
+            if provider == 'anthropic' or 'claude' in model:
+                t['anthropic_usd'] += usd
+                t['anthropic_calls'] += 1
+                t['anthropic_tokens'] += (inp + out)
+                t['by_provider']['anthropic'] = round(t['by_provider']['anthropic'] + usd, 6)
+            elif (provider == 'nvidia' or 'nvidia' in model or 'llama' in model
+                  or 'flux' in model or 'parakeet' in model or 'nemotron' in model
+                  or 'deepseek' in model or 'chatterbox' in model or surface in ('stt', 'tts', 'diagram')):
+                t['nvidia_usd'] += usd
+                t['nvidia_calls'] += 1
+                t['nvidia_tokens'] += (inp + out)
+                t['by_provider']['nvidia'] = round(t['by_provider']['nvidia'] + usd, 6)
+            else:
+                if 'anthropic' in provider:
+                    t['anthropic_usd'] += usd
+                    t['anthropic_calls'] += 1
+                    t['anthropic_tokens'] += (inp + out)
+                    t['by_provider']['anthropic'] = round(t['by_provider']['anthropic'] + usd, 6)
+                elif 'nvidia' in provider:
+                    t['nvidia_usd'] += usd
+                    t['nvidia_calls'] += 1
+                    t['nvidia_tokens'] += (inp + out)
+                    t['by_provider']['nvidia'] = round(t['by_provider']['nvidia'] + usd, 6)
+
         t['usd'] = round(t['usd'], 6)
+        t['anthropic_usd'] = round(t['anthropic_usd'], 6)
+        t['nvidia_usd'] = round(t['nvidia_usd'], 6)
         reads = t['cache_read']
         billed_in = t['input'] + reads
         t['cache_hit_rate'] = round(reads / billed_in, 4) if billed_in else 0.0
@@ -292,17 +445,19 @@ class Ledger:
                 continue
             day = (e.get('ts') or '')[:10]
             if day:
-                buckets[day] = round(buckets.get(day, 0.0) + e.get('usd_cost', 0.0), 6)
+                buckets[day] = round(buckets.get(day, 0.0) + float(e.get('usd_cost', 0.0) or 0.0), 6)
         return [{'date': d, 'usd': buckets[d]} for d in sorted(buckets)][-days:]
 
     def all_users(self, since=None):
-        """Wallet balances plus lifetime spend. Credits never expire, so the
-        balance is all-time; usd is what the user has actually cost us."""
+        """Wallet balances plus lifetime spend broken down by Anthropic and NVIDIA."""
         rows = []
         for uid, u in self._users.items():
             w = self.wallet(uid)
             t = self.totals_for(uid, None)
             tier = (u.get('tier') or 'free').lower().strip()
+            unlimited = is_unlimited(u)
+            # 1 credit = ~50 tokens capacity
+            tokens_left = 999999999 if unlimited else (w['balance'] * 50)
             rows.append({
                 'id': uid,
                 'email': u.get('email'),
@@ -310,13 +465,18 @@ class Ledger:
                 'granted': w['granted'],
                 'spent': w['spent'],
                 'balance': w['balance'],
-                'actions': w['spent'] // CREDIT_COST if CREDIT_COST else 0,
+                'actions': 999999 if unlimited else (w['balance'] // CREDIT_COST if CREDIT_COST else 0),
+                'tokens_left': tokens_left,
                 'usd': t['usd'],
+                'anthropic_usd': t['anthropic_usd'],
+                'nvidia_usd': t['nvidia_usd'],
+                'anthropic_calls': t['anthropic_calls'],
+                'nvidia_calls': t['nvidia_calls'],
                 'calls': t['calls'],
                 'created': u.get('created'),
                 'last_seen': u.get('last_seen'),
-                'low': w['balance'] < CREDIT_COST and not is_unlimited(u),
-                'unlimited': is_unlimited(u),
+                'low': w['balance'] < CREDIT_COST and not unlimited,
+                'unlimited': unlimited,
             })
         rows.sort(key=lambda r: r['usd'], reverse=True)
         return rows
@@ -341,7 +501,14 @@ class Ledger:
         if credits <= 0 or reason not in GRANT_REASONS:
             return None
         user_id = self._resolve_uid(user_id)
-        self.ensure_user(user_id)
+        with self._lock:
+            if user_id not in self._users:
+                self._users[user_id] = {
+                    'id': user_id, 'email': None, 'tier': 'free',
+                    'created': _now_iso(), 'last_seen': _now_iso(),
+                    'signup_granted': True, 'last_daily_refresh': _today_utc()
+                }
+                self._save_users()
         ev = self.append(user_id=user_id, kind='grant', surface='grant',
                          provider='none', model=None, input_tokens=0, cache_read=0,
                          cache_write=0, output_tokens=0, usd_cost=0.0,
@@ -354,7 +521,14 @@ class Ledger:
         if credits <= 0:
             return None
         user_id = self._resolve_uid(user_id)
-        self.ensure_user(user_id)
+        with self._lock:
+            if user_id not in self._users:
+                self._users[user_id] = {
+                    'id': user_id, 'email': None, 'tier': 'free',
+                    'created': _now_iso(), 'last_seen': _now_iso(),
+                    'signup_granted': True, 'last_daily_refresh': _today_utc()
+                }
+                self._save_users()
         ev = self.append(user_id=user_id, kind='spend', surface='admin_adjustment',
                          provider='admin', model=None, input_tokens=0, cache_read=0,
                          cache_write=0, output_tokens=0, usd_cost=0.0,
@@ -374,11 +548,11 @@ class Ledger:
             return True
 
     def balance(self, user_id):
-        """Granted minus spent, over all time. Credits never expire."""
+        """Granted minus spent, over all time."""
         return self.wallet(user_id)['balance']
 
     def wallet(self, user_id):
-        self.ensure_user(user_id)
+        self._check_daily_refresh(user_id)
         granted = spent = 0
         for e in self._events:
             if e.get('user_id') != user_id:

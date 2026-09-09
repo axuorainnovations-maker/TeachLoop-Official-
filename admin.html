@@ -142,20 +142,17 @@
 
     $('stage').innerHTML =
       syncBanner +
-      '<h2>Organisation spend</h2>' +
+      '<h2>Organisation spend & model breakdown</h2>' +
       '<div class="cards">' +
-        card('Spend this period', usd(org.usd), 'Across ' + org.calls + ' metered calls', 'hl') +
-        card('Budget ceiling', budget.ceiling_usd ? usd(budget.ceiling_usd) : 'not set',
-             budget.ceiling_usd ? 'Our configured ceiling' : 'Set NOURA_MONTHLY_BUDGET_USD') +
-        card('Remaining', budget.remaining_usd == null ? '—' : usd(budget.remaining_usd),
-             'Ceiling minus spend to date', cls === 'bad' ? 'bad' : cls === 'warn' ? 'warn' : 'good') +
-        card('Projected', usd(projected), 'At current burn rate',
-             budget.ceiling_usd && projected > budget.ceiling_usd ? 'bad' : '') +
+        card('Total Org Spend', usd(org.usd), 'Across ' + (org.calls || 0) + ' metered calls', 'hl') +
+        card('Anthropic Spend', usd(org.anthropic_usd || 0), (org.anthropic_calls || 0) + ' calls · ' + ((org.anthropic_tokens || 0)).toLocaleString() + ' tokens', 'hl') +
+        card('NVIDIA Spend', usd(org.nvidia_usd || 0), (org.nvidia_calls || 0) + ' calls · NIM / FLUX / Riva', 'hl') +
+        card('Total Sessions / Calls', String(org.calls || 0), 'Anthropic: ' + (org.anthropic_calls || 0) + ' · NVIDIA: ' + (org.nvidia_calls || 0)) +
+        card('Budget Remaining', budget.remaining_usd == null ? '—' : usd(budget.remaining_usd),
+             budget.ceiling_usd ? ('Ceiling: ' + usd(budget.ceiling_usd)) : 'Set ceiling in env', cls === 'bad' ? 'bad' : cls === 'warn' ? 'warn' : 'good') +
         card('Registered Users', String(users.length), 'Accounts in ledger & Supabase') +
-        card('Credits Outstanding', String(users.reduce((a, u) => a + (u.balance || 0), 0)),
+        card('Credits Outstanding', String(users.reduce((a, u) => a + (u.balance || 0), 0).toLocaleString()),
              'Total active credit balance across users', 'hl') +
-        card('Cost per action', usd(org.calls ? org.usd / org.calls : 0),
-             'Average cost per metered call') +
       '</div>' +
       (budget.ceiling_usd
         ? '<div class="bar"><i class="' + cls + '" style="width:' + pct.toFixed(1) + '%"></i></div>' : '') +
@@ -164,12 +161,13 @@
       '<h2>Last 30 days</h2>' + spark(daily) +
 
       '<h2>Where the money goes</h2>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">' +
-        '<div><div class="card"><div class="k">By surface</div>' + rows(org.by_surface) + '</div></div>' +
-        '<div><div class="card"><div class="k">By model</div>' + rows(org.by_model) + '</div></div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">' +
+        '<div><div class="card"><div class="k">By Provider</div>' + rows(org.by_provider || { 'Anthropic': org.anthropic_usd, 'NVIDIA': org.nvidia_usd }) + '</div></div>' +
+        '<div><div class="card"><div class="k">By Surface</div>' + rows(org.by_surface) + '</div></div>' +
+        '<div><div class="card"><div class="k">By Model</div>' + rows(org.by_model) + '</div></div>' +
       '</div>' +
 
-      '<h2><span>Authentication Users, Plans & Credits (' + users.length + ')</span></h2>' +
+      '<h2><span>Authentication Users, Plans & Provider Usage (' + users.length + ')</span></h2>' +
       '<div class="toolbar">' +
         '<input type="search" id="q" placeholder="Search by email, name or ID…">' +
         '<select id="tierF">' +
@@ -244,12 +242,14 @@
     const cols = [
       ['email','User / Email'],
       ['tier','Subscription Plan'],
-      ['balance','Balance'],
-      ['actions','Actions left'],
-      ['granted','Granted'],
-      ['spent','Spent'],
-      ['usd','Cost to us'],
-      ['last_seen','Last active']
+      ['balance','Credits (500/day)'],
+      ['actions','Actions Left'],
+      ['tokens_left','Tokens Left'],
+      ['anthropic_usd','Anthropic Cost'],
+      ['nvidia_usd','NVIDIA Cost'],
+      ['usd','Total Cost'],
+      ['calls','Calls / Sessions'],
+      ['last_seen','Last Active']
     ];
     const perAction = DATA.config.cost_per_action || 100;
     $('tableWrap').innerHTML = '<table><thead><tr>' +
@@ -259,12 +259,13 @@
         const left = Math.floor((u.balance || 0) / perAction);
         const userIdentifier = u.email || u.id;
         const currentTier = (u.tier || 'free').toLowerCase();
+        const tokLeftStr = u.unlimited ? '\u221E' : (u.tokens_left ? u.tokens_left.toLocaleString() : '0');
         return '<tr class="' + (u.low ? 'flag' : '') + '">' +
           '<td><b>' + esc(u.email || u.id) + '</b>' + (u.email ? '' : ' <span class="muted">(anon ID)</span>') +
             (u.unlimited ? ' <span class="pill unlimited" style="margin-left:6px">unlimited</span>' : '') + '</td>' +
           '<td>' +
             '<select class="plan-select" data-target="' + esc(userIdentifier) + '">' +
-              '<option value="free"' + (currentTier === 'free' ? ' selected' : '') + '>Free Plan</option>' +
+              '<option value="free"' + (currentTier === 'free' ? ' selected' : '') + '>Free Plan (500/d)</option>' +
               '<option value="pro"' + (currentTier === 'pro' ? ' selected' : '') + '>Pro Plan ($8/mo)</option>' +
               '<option value="unlimited"' + (currentTier === 'unlimited' ? ' selected' : '') + '>Unlimited Plan (∞)</option>' +
               '<option value="scholar"' + (currentTier === 'scholar' ? ' selected' : '') + '>Scholar</option>' +
@@ -273,9 +274,11 @@
           '</td>' +
           '<td><b style="color:' + (u.balance > 0 ? '#7ee2a8' : '#ff9f9a') + '">' + (u.unlimited ? '\u221E' : u.balance) + '</b></td>' +
           '<td>' + (u.unlimited ? '\u221E' : (left > 0 ? left : '<span class="muted">0</span>')) + '</td>' +
-          '<td class="muted">' + u.granted + '</td>' +
-          '<td class="muted">' + u.spent + '</td>' +
-          '<td>' + usd(u.usd) + '</td>' +
+          '<td class="muted">' + tokLeftStr + '</td>' +
+          '<td>' + usd(u.anthropic_usd || 0) + ' <span class="muted" style="font-size:11px">(' + (u.anthropic_calls || 0) + ')</span></td>' +
+          '<td>' + usd(u.nvidia_usd || 0) + ' <span class="muted" style="font-size:11px">(' + (u.nvidia_calls || 0) + ')</span></td>' +
+          '<td><b>' + usd(u.usd) + '</b></td>' +
+          '<td class="muted">' + (u.calls || 0) + '</td>' +
           '<td class="muted">' + ago(u.last_seen) + '</td>' +
           '<td style="text-align:right">' +
             '<div class="action-group" style="justify-content:flex-end">' +
@@ -285,9 +288,9 @@
           '</td>' +
         '</tr>';
       }).join('')
-       : '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No users found. Use the "+ Quick Adjust" button to initialize credits or plan for any account.</td></tr>') +
+       : '<tr><td colspan="11" class="muted" style="text-align:center;padding:24px">No users found. Use the "+ Quick Adjust" button to initialize credits or plan for any account.</td></tr>') +
       '</tbody></table>' +
-      '<div class="note">Credits and plans update in real time. Switching a plan to <b>Unlimited</b> grants unlimited AI study actions. You can grant, remove credits, or change tiers for any user instantly.</div>';
+      '<div class="note">Credits refresh to 500 automatically every day (UTC). Anthropic & NVIDIA provider calls and token spends are tracked in real-time. Switching a plan to <b>Unlimited</b> grants unlimited AI study actions.</div>';
 
     // Hook up Subscription Plan selectors
     $('tableWrap').querySelectorAll('.plan-select').forEach(sel => sel.addEventListener('change', async () => {
@@ -404,7 +407,7 @@
   }
 
   function csv() {
-    const head = ['id','email','tier','balance','granted','spent','usd','calls','created','last_seen'];
+    const head = ['id','email','tier','balance','actions','tokens_left','anthropic_usd','nvidia_usd','usd','anthropic_calls','nvidia_calls','calls','granted','spent','created','last_seen'];
     const body = filtered().map(u => head.map(h => JSON.stringify(u[h] == null ? '' : u[h])).join(','));
     const blob = new Blob([head.join(',') + '\n' + body.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
