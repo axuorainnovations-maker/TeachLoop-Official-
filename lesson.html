@@ -2320,6 +2320,22 @@
   const railCheck = document.getElementById('railCheck');
   const railCast = document.getElementById('railCast');
 
+  function getUserStoragePrefix() {
+    try {
+      const em = (localStorage.getItem('NOURA_EMAIL') || '').trim().toLowerCase();
+      if (em) return 'u_' + em.replace(/[^a-z0-9]/g, '_') + '_';
+      const accStr = localStorage.getItem('NOURA_ACCOUNT');
+      if (accStr) {
+        const acc = JSON.parse(accStr);
+        if (acc && acc.email) return 'u_' + String(acc.email).trim().toLowerCase().replace(/[^a-z0-9]/g, '_') + '_';
+      }
+    } catch(e) {}
+    return 'u_anon_';
+  }
+  function getScopedKey(baseKey) {
+    return getUserStoragePrefix() + baseKey;
+  }
+
   function saveLessonRecentState(tabKey) {
     try {
       const lessonTitle = title || 'Your lesson';
@@ -2328,7 +2344,8 @@
       const lessonUrl = 'lesson.html?title=' + encodeURIComponent(lessonTitle) + (lessonSubject ? '&subject=' + encodeURIComponent(lessonSubject) : '') + '&tab=' + encodeURIComponent(k);
       const lessonId = 'lesson_' + encodeURIComponent(lessonTitle);
 
-      const raw = localStorage.getItem('TEACHLOOP_RECENTS');
+      const scopedKey = getScopedKey('TEACHLOOP_RECENTS');
+      const raw = localStorage.getItem(scopedKey);
       let recents = [];
       if (raw) {
         try {
@@ -2351,7 +2368,7 @@
         lessonUrl: lessonUrl
       });
       recents = recents.slice(0, 15);
-      localStorage.setItem('TEACHLOOP_RECENTS', JSON.stringify(recents));
+      localStorage.setItem(scopedKey, JSON.stringify(recents));
     } catch(e) {}
   }
 

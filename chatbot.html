@@ -3384,24 +3384,34 @@ body.light-mode .aset-member .nm { color:#16151c; }
      are no longer loaded, but remain in the project folder. -->
 <script src="studyAssistantPrompt.js"></script>
 <script>
-  const RECENTS_KEY = 'TEACHLOOP_RECENTS';
+  function getUserStoragePrefix() {
+    try {
+      const em = (localStorage.getItem('NOURA_EMAIL') || '').trim().toLowerCase();
+      if (em) return 'u_' + em.replace(/[^a-z0-9]/g, '_') + '_';
+      const accStr = localStorage.getItem('NOURA_ACCOUNT');
+      if (accStr) {
+        const acc = JSON.parse(accStr);
+        if (acc && acc.email) return 'u_' + String(acc.email).trim().toLowerCase().replace(/[^a-z0-9]/g, '_') + '_';
+      }
+    } catch(e) {}
+    return 'u_anon_';
+  }
+  function getScopedKey(baseKey) {
+    return getUserStoragePrefix() + baseKey;
+  }
+  window.getUserStoragePrefix = getUserStoragePrefix;
+  window.getScopedKey = getScopedKey;
+
   function loadRecents() {
     try {
-      const raw = localStorage.getItem(RECENTS_KEY);
+      const scopedKey = getScopedKey('TEACHLOOP_RECENTS');
+      const raw = localStorage.getItem(scopedKey);
       if (raw !== null) {
         const a = JSON.parse(raw);
         if (Array.isArray(a)) return a;
       }
     } catch (e) {}
-    const defaults = [
-      { id: 'cell_bio', title: 'teach me cell biology', subject: 'biology' },
-      { id: 'math_venn', title: 'Exploring Venn Diagrams', subject: 'Maths' },
-      { id: 'cell_div', title: 'Flashcards and Quiz', subject: 'biology' },
-      { id: 'mktg_strat', title: 'Marketing Strategies', subject: 'Marketing' },
-      { id: 'biz_model', title: 'Business Model Canvas', subject: 'business' }
-    ];
-    try { localStorage.setItem(RECENTS_KEY, JSON.stringify(defaults)); } catch (e) {}
-    return defaults;
+    return [];
   }
   window.loadRecents = loadRecents;
 
@@ -3410,8 +3420,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const key = typeof item === 'object' ? (item.id || item.title) : item;
     let a = loadRecents().filter(x => (typeof x === 'object' ? (x.id || x.title) : x) !== key);
     a.unshift(item);
-    a = a.slice(0, 15);
-    try { localStorage.setItem(RECENTS_KEY, JSON.stringify(a)); } catch (e) {}
+    a = a.slice(0, 20);
+    try { localStorage.setItem(getScopedKey('TEACHLOOP_RECENTS'), JSON.stringify(a)); } catch (e) {}
     renderRecents();
     if (typeof updateSubjectChip === 'function') {
       const subj = typeof item === 'object' ? item.subject : item;
@@ -3424,8 +3434,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
   function deleteRecent(item) {
     const key = typeof item === 'object' ? (item.id || item.title) : item;
     let recents = loadRecents().filter(x => (typeof x === 'object' ? (x.id || x.title) : x) !== key);
-    try { localStorage.setItem(RECENTS_KEY, JSON.stringify(recents)); } catch (e) {}
-    try { localStorage.removeItem('NOURA_CHAT_' + key); } catch (e) {}
+    try { localStorage.setItem(getScopedKey('TEACHLOOP_RECENTS'), JSON.stringify(recents)); } catch (e) {}
+    try { localStorage.removeItem(getScopedKey('NOURA_CHAT_' + key)); } catch (e) {}
     renderRecents();
     if (recents[0]) {
       if (typeof restoreSubjectChat === 'function') restoreSubjectChat(recents[0]);
@@ -3434,6 +3444,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
       if (messagesCol) messagesCol.innerHTML = '';
       const chatTitleText = document.getElementById('chatTitleText');
       if (chatTitleText) chatTitleText.textContent = 'New Chat';
+      activeChatKey = null;
     }
   }
   window.deleteRecent = deleteRecent;
@@ -3824,7 +3835,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
   const CHAT_KEY = 'NOURA_CHAT_';
   function activeSubject() {
     try {
-      const r = JSON.parse(localStorage.getItem('TEACHLOOP_RECENTS') || '[]');
+      const r = loadRecents();
       if (Array.isArray(r) && r[0]) {
         return typeof r[0] === 'object' ? (r[0].subject || r[0].title) : String(r[0]);
       }
@@ -3839,7 +3850,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     if (html.length > 400000) html = '';
     const ctx = chatContext.filter(m => typeof m.content === 'string');
     try {
-      localStorage.setItem(CHAT_KEY + key, JSON.stringify({ html: html, ctx: ctx, at: Date.now() }));
+      localStorage.setItem(getScopedKey('NOURA_CHAT_' + key), JSON.stringify({ html: html, ctx: ctx, at: Date.now() }));
     } catch (e) {}
   }
   function restoreSubjectChat(target) {
@@ -3851,11 +3862,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
     if (typeof target === 'object' && target) {
       key = target.id || target.title;
       title = target.title || target.id;
-      subject = target.subject || 'biology';
+      subject = target.subject || 'General';
     } else if (typeof target === 'string') {
       key = target;
       title = target;
-      subject = activeSubject() || 'biology';
+      subject = activeSubject() || 'General';
     }
 
     if (!key) return false;
@@ -3871,30 +3882,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
 
     let p = null;
-    try { p = JSON.parse(localStorage.getItem(CHAT_KEY + key) || 'null'); } catch (e) {}
-
-    // Seed default sample chat for 'teach me cell biology' if not saved yet
-    if (!p && (key === 'cell_bio' || title.toLowerCase().indexOf('teach me cell biology') !== -1)) {
-      p = {
-        ctx: [],
-        html: '<div class="msg user"><div class="msg-bubble">teach me cell biology</div></div>' +
-          '<div class="msg ai"><div class="msg-bubble"><p>Great! Cell biology is a huge topic. To help you most, which part interests you most?</p>' +
-          '<div class="lesson-chips">' +
-            '<button class="lesson-chip">Cell structure & organelles</button>' +
-            '<button class="lesson-chip">Cell membrane & transport</button>' +
-            '<button class="lesson-chip">Cell division (mitosis & meiosis)</button>' +
-            '<button class="lesson-chip">Cellular respiration & energy</button>' +
-            '<button class="lesson-chip">Cell signaling & communication</button>' +
-          '</div></div></div>' +
-          '<div class="msg user"><div class="msg-bubble">Cell structure & organelles</div></div>' +
-          '<div class="msg ai"><div class="msg-bubble"><p>Perfect! Let\'s dive into how cells are organized and what each part does.</p>' +
-          '<div class="lesson-card"><div class="lesson-card-head"><div>' +
-            '<h4 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 12px;">Cell Structure & Organelles</h4>' +
-            '<button class="start-btn" style="padding:8px 18px;font-size:13px;" onclick="if(typeof saveSubjectChat===\'function\')saveSubjectChat(activeChatKey);if(typeof recordRecent===\'function\')recordRecent({id:\'lesson_cell_bio\',title:\'Cell Structure & Organelles\',subject:\'biology\',isLesson:true,tab:\'learn\',lessonUrl:\'lesson.html?title=Cell%20Structure%20%26%20Organelles&subject=biology&tab=learn\'});window.location.href=\'lesson.html?title=Cell%20Structure%20%26%20Organelles&subject=biology&tab=learn\'">Generate Lesson</button>' +
-          '</div></div></div></div></div>'
-      };
-      try { localStorage.setItem(CHAT_KEY + key, JSON.stringify(p)); } catch (e) {}
-    }
+    try { p = JSON.parse(localStorage.getItem(getScopedKey('NOURA_CHAT_' + key)) || 'null'); } catch (e) {}
 
     const has = !!(p && typeof p === 'object' && (p.html || (p.ctx && p.ctx.length)));
     chatContext = (has && Array.isArray(p.ctx)) ? p.ctx.slice() : [];
@@ -3910,7 +3898,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     restore: restoreSubjectChat,
     active: activeSubject,
     has: function (subject) {
-      try { return !!localStorage.getItem(CHAT_KEY + subject); } catch (e) { return false; }
+      try { return !!localStorage.getItem(getScopedKey('NOURA_CHAT_' + subject)); } catch (e) { return false; }
     }
   };
 
@@ -5665,6 +5653,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
           try { localStorage.setItem('NOURA_EMAIL', gEmail); } catch (e) { }
           try { localStorage.setItem('TEACHLOOP_NAME', updatedProfile.name); } catch (e) { }
           applyUserProfile(updatedProfile);
+          if (typeof renderRecents === 'function') {
+            renderRecents();
+          }
           if (window.NouraCredits && window.NouraCredits.refresh) {
             window.NouraCredits.refresh();
           }
@@ -6450,31 +6441,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
     const list = document.getElementById('subjectsList');
     if (!list) return;
     const heroGrid = document.getElementById('heroSubjectsGrid');
-    const KEY = 'TEACHLOOP_SUBJECTS';
+    const KEY = (window.getScopedKey ? window.getScopedKey('TEACHLOOP_SUBJECTS') : 'TEACHLOOP_SUBJECTS');
     const BOOK_ICON =
       '<path fill-rule="evenodd" clip-rule="evenodd" d="M6.27103 2.11151C5.46135 2.21816 5.03258 2.41324 4.72718 2.71244C4.42179 3.01165 4.22268 3.43172 4.11382 4.225C4.00176 5.04159 4 6.12387 4 7.67568V16.2442C4.38867 15.9781 4.82674 15.7756 5.29899 15.6517C5.82716 15.513 6.44305 15.5132 7.34563 15.5135L20 15.5135V7.67568C20 6.12387 19.9982 5.04159 19.8862 4.22499C19.7773 3.43172 19.5782 3.01165 19.2728 2.71244C18.9674 2.41324 18.5387 2.21816 17.729 2.11151C16.8955 2.00172 15.7908 2 14.2069 2H9.7931C8.2092 2 7.10452 2.00172 6.27103 2.11151ZM6.75862 6.59459C6.75862 6.1468 7.12914 5.78378 7.58621 5.78378H16.4138C16.8709 5.78378 17.2414 6.1468 17.2414 6.59459C17.2414 7.04239 16.8709 7.40541 16.4138 7.40541H7.58621C7.12914 7.40541 6.75862 7.04239 6.75862 6.59459ZM7.58621 9.56757C7.12914 9.56757 6.75862 9.93058 6.75862 10.3784C6.75862 10.8262 7.12914 11.1892 7.58621 11.1892H13.1034C13.5605 11.1892 13.931 10.8262 13.931 10.3784C13.931 9.93058 13.5605 9.56757 13.1034 9.56757H7.58621Z"/>' +
       '<path d="M8.68965 17.1351H7.47341C6.39395 17.1351 6.01657 17.1421 5.72738 17.218C4.93365 17.4264 4.30088 18.0044 4.02952 18.7558C4.0463 19.1382 4.07259 19.4746 4.11382 19.775C4.22268 20.5683 4.42179 20.9884 4.72718 21.2876C5.03258 21.5868 5.46135 21.7818 6.27103 21.8885C7.10452 21.9983 8.2092 22 9.7931 22H14.2069C15.7908 22 16.8955 21.9983 17.729 21.8885C18.5387 21.7818 18.9674 21.5868 19.2728 21.2876C19.5782 20.9884 19.7773 20.5683 19.8862 19.775C19.9776 19.1088 19.9956 18.2657 19.9991 17.1351H13.1034V20.1417C13.1034 20.4397 13.1034 20.5886 12.9988 20.6488C12.8941 20.709 12.751 20.6424 12.4647 20.5092L11.0939 19.8713C10.9971 19.8262 10.9486 19.8037 10.8966 19.8037C10.8445 19.8037 10.796 19.8262 10.6992 19.8713L9.32842 20.5092C9.04213 20.6424 8.89899 20.709 8.79432 20.6488C8.68965 20.5886 8.68965 20.4397 8.68965 20.1417V17.1351Z"/>';
 
-    const RECENTS_KEY = 'TEACHLOOP_RECENTS';
-    const recentsList = document.getElementById('recentsList');
-
     function loadRecents() {
-      try {
-        const raw = localStorage.getItem(RECENTS_KEY);
-        if (raw !== null) {
-          const a = JSON.parse(raw);
-          if (Array.isArray(a)) return a;
-        }
-      } catch (e) {}
-      const defaults = [
-        { id: 'cell_bio', title: 'teach me cell biology', subject: 'biology' },
-        { id: 'math_venn', title: 'Exploring Venn Diagrams', subject: 'Maths' },
-        { id: 'cell_div', title: 'Flashcards and Quiz', subject: 'biology' },
-        { id: 'mktg_strat', title: 'Marketing Strategies', subject: 'Marketing' },
-        { id: 'biz_model', title: 'Business Model Canvas', subject: 'business' }
-      ];
-      try { localStorage.setItem(RECENTS_KEY, JSON.stringify(defaults)); } catch (e) {}
-      return defaults;
+      return (typeof window.loadRecents === 'function') ? window.loadRecents() : [];
     }
 
     // Per-subject "last opened" timestamps → drives the "Opened X ago" subtitle.
