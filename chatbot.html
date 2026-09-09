@@ -3548,8 +3548,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
   async function sendMessage() {
     if (window.NouraCredits && window.NouraCredits.requireCredits) {
-      const ok = await window.NouraCredits.requireCredits();
+      const ok = await window.NouraCredits.requireCredits(1);
       if (!ok) return;
+      if (window.NouraCredits.deduct) {
+        await window.NouraCredits.deduct(1, 'chat_message');
+      }
     }
 
     const text = input ? input.value.trim() : '';
@@ -5288,8 +5291,11 @@ body.light-mode .aset-member .nm { color:#16151c; }
 
   async function sendChatMessage() {
     if (window.NouraCredits && window.NouraCredits.requireCredits) {
-      const ok = await window.NouraCredits.requireCredits();
+      const ok = await window.NouraCredits.requireCredits(1);
       if (!ok) return;
+      if (window.NouraCredits.deduct) {
+        await window.NouraCredits.deduct(1, 'chat_message');
+      }
     }
 
     const text = chatInput.value.trim();
@@ -5721,17 +5727,23 @@ body.light-mode .aset-member .nm { color:#16151c; }
     });
 
     // Log out → clear session and redirect to login
-    document.getElementById('pmLogout')?.addEventListener('click', function (e) {
+    document.getElementById('pmLogout')?.addEventListener('click', async function (e) {
       e.stopPropagation();
       try {
         if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase) {
-          window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY).auth.signOut();
+          const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+          await sb.auth.signOut();
         }
       } catch (err) { }
-      ['NOURA_ACCOUNT', 'NOURA_EMAIL', 'NOURA_PENDING_PROFILE', 'TEACHLOOP_NAME', 'TEACHLOOP_ONBOARDED'].forEach(function (k) {
-        try { localStorage.removeItem(k); } catch (err) { }
-      });
-      window.location.href = 'login.html';
+      // Clear all auth & profile data synchronously
+      try {
+        Object.keys(localStorage).forEach(function (k) {
+          if (k.startsWith('sb-') || k.includes('auth-token') || k.startsWith('NOURA_ACCOUNT') || k.startsWith('NOURA_EMAIL') || k.startsWith('NOURA_PENDING') || k.startsWith('TEACHLOOP_NAME') || k.startsWith('TEACHLOOP_ONBOARDED')) {
+            try { localStorage.removeItem(k); } catch (e) {}
+          }
+        });
+      } catch (err) { }
+      window.location.replace('login.html?logout=true&force=1');
     });
   })();
 
@@ -7529,10 +7541,17 @@ body.light-mode .aset-member .nm { color:#16151c; }
       <div class="aset-pane" data-pane="plan">
         <div class="aset-row" style="align-items:flex-start">
           <div class="aset-block-head">
-            <span class="aset-row-label">Upgrade</span>
+            <span class="aset-row-label">Plan &amp; Subscription</span>
             <span class="aset-block-sub" id="asetPlanSub">You are currently on the free plan</span>
           </div>
           <button class="aset-btn-white" id="asetUpgrade" type="button">Upgrade Plan</button>
+        </div>
+        <div class="aset-row" id="asetCancelRow" style="align-items:flex-start; margin-top:12px; display:none;">
+          <div class="aset-block-head">
+            <span class="aset-row-label">Manage Subscription</span>
+            <span class="aset-block-sub">Cancel your paid subscription and revert to the free plan.</span>
+          </div>
+          <button class="aset-btn-danger" id="asetCancelSub" type="button" style="border:1px solid rgba(239,68,68,0.4);color:#f87171;padding:6px 14px;border-radius:8px;cursor:pointer;">Cancel Subscription</button>
         </div>
       </div>
 
@@ -7585,8 +7604,15 @@ body.light-mode .aset-member .nm { color:#16151c; }
       // Language label + flag
       syncLangLabel();
       // Plan
-      const isUnlim = (em.toLowerCase() === 'prorkrff@gmail.com') || (window.NouraCredits && window.NouraCredits.isUnlimited && window.NouraCredits.isUnlimited());
+      const rawData = localStorage.getItem('NOURA_CREDITS_DATA_V1');
+      let parsedCredits = null;
+      try { parsedCredits = JSON.parse(rawData); } catch(e) {}
+      const isUnlim = (em.toLowerCase() === 'prorkrff@gmail.com') || (parsedCredits && (parsedCredits.unlimited || parsedCredits.tier === 'unlimited')) || (window.NouraCredits && window.NouraCredits.isUnlimited && window.NouraCredits.isUnlimited());
+      const isPro = parsedCredits && parsedCredits.tier === 'pro';
+
       const upgBtn = document.getElementById('asetUpgrade');
+      const cancelRow = document.getElementById('asetCancelRow');
+
       if (isUnlim) {
         setTxt('asetPlanSub', 'You are currently on the Unlimited Plan (Unlimited Credits)');
         if (upgBtn) {
@@ -7595,14 +7621,25 @@ body.light-mode .aset-member .nm { color:#16151c; }
           upgBtn.style.opacity = '0.7';
           upgBtn.style.cursor = 'default';
         }
+        if (cancelRow) cancelRow.style.display = 'flex';
+      } else if (isPro) {
+        setTxt('asetPlanSub', 'You are currently on the Pro Plan (5,000 Credits / month)');
+        if (upgBtn) {
+          upgBtn.textContent = 'Upgrade to Unlimited';
+          upgBtn.disabled = false;
+          upgBtn.style.opacity = '';
+          upgBtn.style.cursor = 'pointer';
+        }
+        if (cancelRow) cancelRow.style.display = 'flex';
       } else {
-        setTxt('asetPlanSub', 'You are currently on the free plan');
+        setTxt('asetPlanSub', 'You are currently on the free plan (500 Credits)');
         if (upgBtn) {
           upgBtn.textContent = 'Upgrade Plan';
           upgBtn.disabled = false;
           upgBtn.style.opacity = '';
           upgBtn.style.cursor = 'pointer';
         }
+        if (cancelRow) cancelRow.style.display = 'none';
       }
     }
 
@@ -7658,6 +7695,16 @@ body.light-mode .aset-member .nm { color:#16151c; }
     // Upgrade → open pricing
     const goPricing = () => { closeSettings(); const t = document.getElementById('upgradePlanTab'); if (t) t.click(); };
     document.getElementById('asetUpgrade')?.addEventListener('click', goPricing);
+
+    // Cancel Subscription
+    document.getElementById('asetCancelSub')?.addEventListener('click', async () => {
+      if (!window.confirm('Are you sure you want to cancel your subscription? Your account will return to the Free Plan.')) return;
+      if (window.NouraCredits && window.NouraCredits.cancelSubscription) {
+        await window.NouraCredits.cancelSubscription();
+      }
+      fill();
+      alert('Your subscription has been cancelled. Your account is now on the Free Plan.');
+    });
 
     // ── Language dropdown (searchable) ────────────────────────────────
     const LANGS = [

@@ -325,11 +325,11 @@
           </li>
         </ul>
       </div>
-      <a href="chatbot.html" class="btn">Current Plan</a>
+      <div id="starterAction"><a href="chatbot.html" class="btn" id="btnStarter">Current Plan</a></div>
     </div>
 
     <!-- Pro -->
-    <div class="card popular">
+    <div class="card popular" id="proCard">
       <span class="badge">Popular</span>
       <div>
         <div class="price-wrap">
@@ -342,7 +342,7 @@
         <ul class="features-list">
           <li>
             <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            1,500 learning tokens / month
+            5,000 learning tokens / month
           </li>
           <li>
             <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -358,11 +358,11 @@
           </li>
         </ul>
       </div>
-      <button class="btn btn-primary" type="button" onclick="checkout('pro')">Upgrade to Pro</button>
+      <div id="proAction"><button class="btn btn-primary" id="btnPro" type="button" onclick="checkout('pro')">Upgrade to Pro</button></div>
     </div>
 
     <!-- Unlimited -->
-    <div class="card">
+    <div class="card" id="unlimitedCard">
       <div>
         <div class="price-wrap">
           <div class="price">$<span class="amount" data-monthly="15" data-yearly="144">15</span><span class="per">/month</span></div>
@@ -386,7 +386,7 @@
           </li>
         </ul>
       </div>
-      <button class="btn" type="button" onclick="checkout('unlimited')">Upgrade to Unlimited</button>
+      <div id="unlimitedAction"><button class="btn" id="btnUnlimited" type="button" onclick="checkout('unlimited')">Upgrade to Unlimited</button></div>
     </div>
   </div>
 
@@ -421,6 +421,45 @@
       buttons.forEach(b => b.classList.toggle('active', b.dataset.period === period));
     }
 
+    async function updateCurrentPlanUI() {
+      let currentPlan = 'free';
+      try {
+        let email = localStorage.getItem('NOURA_EMAIL') || '';
+        if (email.toLowerCase() === 'prorkrff@gmail.com') currentPlan = 'unlimited';
+        const res = await fetch('/api/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.unlimited) currentPlan = 'unlimited';
+          else if (data && data.tier) currentPlan = data.tier.toLowerCase();
+        } else {
+          const raw = localStorage.getItem('NOURA_CREDITS_DATA_V1');
+          if (raw) {
+            const p = JSON.parse(raw);
+            if (p.unlimited) currentPlan = 'unlimited';
+            else if (p.tier) currentPlan = p.tier.toLowerCase();
+          }
+        }
+      } catch(e) {}
+
+      const sAct = document.getElementById('starterAction');
+      const pAct = document.getElementById('proAction');
+      const uAct = document.getElementById('unlimitedAction');
+
+      if (currentPlan === 'unlimited') {
+        if (sAct) sAct.innerHTML = '<a href="chatbot.html" class="btn" style="border-color:#27272a;color:#71717a;">Free Tier</a>';
+        if (pAct) pAct.innerHTML = '<button class="btn" type="button" disabled style="border-color:#27272a;color:#71717a;cursor:default;width:100%;">Included in Unlimited</button>';
+        if (uAct) uAct.innerHTML = '<button class="btn" type="button" disabled style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;width:100%;font-weight:700;">Current Plan</button>';
+      } else if (currentPlan === 'pro') {
+        if (sAct) sAct.innerHTML = '<a href="chatbot.html" class="btn" style="border-color:#27272a;color:#71717a;">Free Tier</a>';
+        if (pAct) pAct.innerHTML = '<button class="btn" type="button" disabled style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;width:100%;font-weight:700;">Current Plan</button>';
+        if (uAct) uAct.innerHTML = '<button class="btn btn-primary" id="btnUnlimited" type="button" onclick="checkout(\'unlimited\')">Upgrade to Unlimited</button>';
+      } else {
+        if (sAct) sAct.innerHTML = '<a href="chatbot.html" class="btn" style="background:#27272a;color:#a1a1aa;border-color:#3f3f46;cursor:default;font-weight:700;">Current Plan</a>';
+        if (pAct) pAct.innerHTML = '<button class="btn btn-primary" id="btnPro" type="button" onclick="checkout(\'pro\')">Upgrade to Pro</button>';
+        if (uAct) uAct.innerHTML = '<button class="btn" id="btnUnlimited" type="button" onclick="checkout(\'unlimited\')">Upgrade to Unlimited</button>';
+      }
+    }
+
     async function checkout(plan) {
       const btn = event?.target;
       const oldText = btn ? btn.textContent : '';
@@ -450,6 +489,8 @@
         if (btn) { btn.textContent = oldText; btn.disabled = false; }
       }
     }
+
+    try { updateCurrentPlanUI(); } catch(e){}
   </script>
 </body>
 </html>

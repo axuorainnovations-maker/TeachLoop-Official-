@@ -555,9 +555,31 @@
       .catch(function () { return null; });
   }
 
+  async function cancelSubscription() {
+    var em = accountEmail();
+    var cur = getLocalData();
+    cur.tier = 'free';
+    cur.unlimited = false;
+    setLocalData(cur);
+    try {
+      await window.fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: em })
+      });
+    } catch (e) {}
+    refresh();
+    window.dispatchEvent(new CustomEvent('noura:plan-changed', { detail: { tier: 'free' } }));
+    return true;
+  }
+
   window.NouraCredits = {
     accountEmail: accountEmail,
-    isUnlimited: function () { return isUnlimitedEmail(accountEmail()); },
+    isUnlimited: function () {
+      var em = accountEmail();
+      var d = getLocalData();
+      return isUnlimitedEmail(em) || (d && (d.unlimited || d.tier === 'unlimited'));
+    },
     mountPill: mountPill,
     refresh: refresh,
     refreshStatus: refreshStatus,
@@ -565,6 +587,7 @@
     deduct: deduct,
     spend: deduct,
     claimWelcome: claimWelcome,
+    cancelSubscription: cancelSubscription,
     async status() {
       return fetchStatus();
     }

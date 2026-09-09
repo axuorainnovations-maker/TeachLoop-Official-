@@ -136,10 +136,14 @@ def fetch_supabase_auth_users():
                 email = (u.get('email') or '').strip().lower()
                 meta = u.get('user_metadata') or {}
                 name = (meta.get('full_name') or meta.get('name') or (email.split('@')[0] if email else 'User')).strip()
+                tier = meta.get('tier') or meta.get('plan') or ('unlimited' if meta.get('unlimited') else 'free')
                 result.append({
                     'supabase_id': u.get('id'),
                     'email': email,
                     'name': name,
+                    'tier': tier,
+                    'credits': meta.get('credits'),
+                    'unlimited': bool(meta.get('unlimited') or tier == 'unlimited'),
                     'created_at': u.get('created_at'),
                     'last_sign_in_at': u.get('last_sign_in_at'),
                     'provider': u.get('app_metadata', {}).get('provider', 'email')
@@ -147,6 +151,39 @@ def fetch_supabase_auth_users():
             return result, True, None
     except Exception as e:
         return [], False, str(e)
+
+
+def update_supabase_user(user_id, metadata):
+    """Persist user tier/plan/credits permanently to Supabase auth user_metadata."""
+    sb_url_raw = env_vars.get('SUPABASE_URL', '').strip()
+    if 'dashboard/project/' in sb_url_raw:
+        import re
+        m = re.search(r'dashboard/project/([a-zA-Z0-9_-]+)', sb_url_raw)
+        if m:
+            sb_url_raw = f'https://{m.group(1)}.supabase.co'
+    sb_url = sb_url_raw.rstrip('/')
+    service_key = (
+        env_vars.get('SUPABASE_SERVICE_ROLE_KEY', '') or 
+        env_vars.get('SUPABASE_SERVICE_KEY', '') or 
+        env_vars.get('SUPABASE_SECRET_KEY', '') or 
+        env_vars.get('SUPABASE_ADMIN_KEY', '') or
+        env_vars.get('SUPABASE_ANON_KEY', '')
+    ).strip()
+
+    if not sb_url or not service_key or not user_id:
+        return False
+
+    try:
+        url = f'{sb_url}/auth/v1/admin/users/{user_id}'
+        req = urllib.request.Request(url, data=json.dumps({'user_metadata': metadata}).encode('utf-8'), headers={
+            'apikey': service_key,
+            'Authorization': f'Bearer {service_key}',
+            'Content-Type': 'application/json'
+        }, method='PUT')
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            return True
+    except Exception:
+        return False
 
 
 class handler(BaseHTTPRequestHandler):
@@ -280,6 +317,17 @@ class handler(BaseHTTPRequestHandler):
                         LEDGER.ensure_user(uid, email=email)
                         w = LEDGER.wallet(uid)
                         u = LEDGER.user(uid)
+                        # If tier is free in local LEDGER but Pro/Unlimited in Supabase metadata, restore it
+                        if u.get('tier', 'free') == 'free' and email:
+                            sb_users, _, _ = fetch_supabase_auth_users()
+                            for sbu in sb_users:
+                                if sbu.get('email') == email:
+                                    s_tier = sbu.get('tier') or ('unlimited' if sbu.get('unlimited') else None)
+                                    if s_tier and s_tier != 'free':
+                                        LEDGER.set_tier(uid, s_tier)
+                                        u = LEDGER.user(uid)
+                                        w = LEDGER.wallet(uid)
+                                    break
                     except Exception:
                         w = {'balance': 500, 'granted': 500, 'spent': 0}
                         u = {'email': email}
@@ -288,7 +336,7 @@ class handler(BaseHTTPRequestHandler):
                     u = {'email': email}
                 cost = noura_meter.CREDIT_COST if noura_meter else 100
                 user_email = (u.get('email') or email or '').strip().lower()
-                unlimited = (user_email == 'prorkrff@gmail.com') or (noura_meter.is_unlimited(u) if noura_meter else False)
+                unlimited = (user_email == 'prorkrff@gmail.com') or (u.get('tier') == 'unlimited') or (noura_meter.is_unlimited(u) if noura_meter else False)
                 bal = w.get('balance', 500)
                 if bal == 0 and w.get('spent', 0) == 0:
                     bal = 500
@@ -325,9 +373,11 @@ class handler(BaseHTTPRequestHandler):
                     for sbu in sb_users:
                         if sbu.get('email'):
                             existing_uid = LEDGER.find_user_by_email(sbu['email'])
-                            if not existing_uid:
-                                uid = sbu.get('supabase_id') or ('usr_' + secrets.token_hex(8))
-                                LEDGER.ensure_user(uid, email=sbu['email'])
+                            uid = existing_uid or sbu.get('supabase_id') or ('usr_' + secrets.token_hex(8))
+                            LEDGER.ensure_user(uid, email=sbu['email'])
+                            s_tier = sbu.get('tier') or ('unlimited' if sbu.get('unlimited') else None)
+                            if s_tier and s_tier != 'free':
+                                LEDGER.set_tier(uid, s_tier)
 
                 since = noura_meter.period_start() if noura_meter else None
                 org = LEDGER.org_totals(since)
@@ -441,7 +491,38 @@ class handler(BaseHTTPRequestHandler):
                 self._json(500, {"error": "Ledger unavailable"})
                 return
             res = LEDGER.set_tier(target, tier)
+            # Sync permanently to Supabase auth metadata
+            try:
+                sb_users, _, _ = fetch_supabase_auth_users()
+                for sbu in sb_users:
+                    if (sbu.get('email') == target.lower() or sbu.get('supabase_id') == target) and sbu.get('supabase_id'):
+                        update_supabase_user(sbu['supabase_id'], {
+                            'tier': tier,
+                            'plan': tier,
+                            'unlimited': (tier == 'unlimited')
+                        })
+            except Exception:
+                pass
             self._json(200, {"success": True, "user": res, "tier": tier})
+            return
+
+        elif path in ('/api/cancel-subscription', '/api/stripe/cancel'):
+            email = (data.get('email') or self.headers.get('X-Noura-Email') or '').strip().lower()
+            uid = self._identify(data)
+            if LEDGER:
+                try:
+                    LEDGER.set_tier(uid, 'free')
+                except Exception:
+                    pass
+            # Update Supabase user metadata permanently
+            try:
+                sb_users, _, _ = fetch_supabase_auth_users()
+                for sbu in sb_users:
+                    if (sbu.get('email') == email or sbu.get('supabase_id') == uid) and sbu.get('supabase_id'):
+                        update_supabase_user(sbu['supabase_id'], {'tier': 'free', 'plan': 'free', 'unlimited': False})
+            except Exception:
+                pass
+            self._json(200, {"success": True, "message": "Subscription cancelled. Reverted to Free plan.", "tier": "free"})
             return
 
         elif path in ('/create-checkout-session', '/api/create-checkout-session'):

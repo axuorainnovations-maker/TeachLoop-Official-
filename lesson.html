@@ -3482,23 +3482,20 @@
   }
   function renderBriefError(msg) {
     brBody.innerHTML = '<div class="br-empty"><span class="grad-logo"></span><p>' + esc(msg) + '</p></div>';
-    document.getElementById('brRegen').hidden = false;
-  }
-
-  const CHARGED_KEY = 'NOURA_LESSON_CHARGED_' + slug;
-
-  async function ensureLessonCharged(force) {
+  async function chargeFeatureCredits(featureKey, cost) {
     if (!title || title === 'Your lesson') return true;
-    if (localStorage.getItem(CHARGED_KEY) && !force) return true;
+    const chargedKey = 'NOURA_CHARGED_' + featureKey + '_' + slug;
+    if (localStorage.getItem(chargedKey)) return true;
 
+    const amount = cost || 10;
     if (window.NouraCredits && window.NouraCredits.requireCredits) {
-      const allowed = await window.NouraCredits.requireCredits(100);
+      const allowed = await window.NouraCredits.requireCredits(amount);
       if (!allowed) return false;
       if (window.NouraCredits.deduct) {
-        await window.NouraCredits.deduct(100, 'lesson_package');
+        await window.NouraCredits.deduct(amount, featureKey);
       }
     }
-    try { localStorage.setItem(CHARGED_KEY, 'true'); } catch (e) {}
+    try { localStorage.setItem(chargedKey, 'true'); } catch (e) {}
     return true;
   }
 
@@ -3516,9 +3513,9 @@
     }
     if (briefBusy) return;
 
-    const ok = await ensureLessonCharged(force);
+    const ok = await chargeFeatureCredits('study_brief', 10);
     if (!ok) {
-      renderBriefError('You need 100 credits to generate a study package. Tap Upgrade Plan to continue.');
+      renderBriefError('You need 10 credits to generate your StudyBrief. Tap Upgrade Plan to continue.');
       return;
     }
 
@@ -3768,8 +3765,14 @@
       try { const c = JSON.parse(localStorage.getItem(RECALL_KEY) || 'null'); if (validRecall(c)) { recall = plainMathDeep(c); renderRecallCard(); return; } } catch (e) {}
     } else {
       rcState = { conf: {}, answers: {}, why: {} }; saveRcState(); rcIndex = 0;
-    }
     if (recallBusy) return;
+
+    const ok = await chargeFeatureCredits('recall', 10);
+    if (!ok) {
+      renderRecallError('You need 10 credits to generate Recall cards. Tap Upgrade Plan to continue.');
+      return;
+    }
+
     recallBusy = true;
     const prog = renderRecallLoading();
     const system = 'You are Noura, a study tutor building ACTIVE RECALL prompts (not flashcards). Reply with ONLY a valid JSON array, no markdown fences, no commentary. Schema: [{"type": one of "define"|"explain"|"compare"|"example"|"mistake", "prompt": string (the question asked to the student, answerable from memory), "answer": string (the ideal answer, 1-3 sentences, concrete and complete)} x8]. Include a mix: at least one of each type. "define" asks for a key term, "explain" asks the student to explain an idea, "compare" asks them to contrast two concepts, "example" asks for a real-world example, "mistake" presents a common misconception to identify or correct. Prompts must be specific to the topic, never generic. No numbering in the prompt text. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
@@ -4181,8 +4184,14 @@
     if (check && !force) { renderCheckQuestion(); return; }
     if (!force) {
       try { const c = JSON.parse(localStorage.getItem(CHECK_KEY) || 'null'); if (validCheck(c)) { check = plainMathDeep(c); cpIndex = 0; cpResults = []; renderCheckQuestion(); return; } } catch (e) {}
-    }
     if (checkBusy) return;
+
+    const ok = await chargeFeatureCredits('checkpoint', 10);
+    if (!ok) {
+      renderCheckError('You need 10 credits to generate your Checkpoint. Tap Upgrade Plan to continue.');
+      return;
+    }
+
     checkBusy = true;
     const prog = renderCheckLoading();
     const system = 'You are Noura, a study tutor writing a short UNDERSTANDING CHECK (not a memorisation quiz). Reply with ONLY a valid JSON array, no markdown fences, no commentary. Schema: [{"type": one of "mc"|"short"|"reasoning"|"misconception"|"scenario", "concept": string (2-4 word label for the idea being tested, used to report strong/weak areas), "q": string (the question), "options": [string x4] (ONLY for type mc), "answer": number 0-based (ONLY for type mc), "ideal": string (the ideal answer, 1-2 sentences - required for every non-mc type), "why": string (1-2 sentences explaining why the correct answer is right), "whyWrong": string (ONLY for mc: 1 sentence naming the likely mistake), "followUp": string (REQUIRED for every question - one short follow-up question to ask if the student gets it wrong, pushing them to reason rather than recall)} x5]. EVERY object must include concept, why and followUp. Use FIVE questions covering five different types: one mc, one short, one reasoning (why/how), one misconception check, one scenario (apply it). Questions must test understanding of the topic, be concise, and be answerable in a sentence or two. No numbering in the question text. MATHS MUST BE PLAIN READABLE TEXT: never use LaTeX, never use dollar signs, backslash commands, \\frac, \\int, \\infty, ^{} or _{}. Write maths with ordinary letters, numbers and symbols the way a person types it in a message - for example "F(x) = the integral from negative infinity to x of f(t) dt", "x squared", "3/4", "the square root of 2", "pi", "<=". Spell out symbol names in words.';
@@ -4600,6 +4609,13 @@
       castAudio = null; castUrl = null; castGen = null;
     }
     if (castBusy) return;
+
+    const ok = await chargeFeatureCredits('audio_recap', 10);
+    if (!ok) {
+      renderCastError('You need 10 credits to generate Audio Recap. Tap Upgrade Plan to continue.');
+      return;
+    }
+
     castBusy = true;
     const prog = renderCastLoading();
     const system = 'You are producing an engaging 3-minute 2-person educational podcast co-hosted by Alex (male tutor) and Sofia (female co-host). They discuss the topic in an expressive, warm, highly human dialogue. Reply ONLY with a valid JSON object - no markdown fences, no commentary. Schema: {"title": string, "dialogue": [ {"speaker": "Alex"|"Sofia", "text": string (35-50 words spoken with natural warmth and expression)} x10-14 ]}. CRITICAL RULES:\n1. Alex and Sofia converse naturally back and forth, sharing insights, asking thoughtful questions, and using real-world analogies.\n2. Total script length MUST be around 450-500 words to yield an exact 3.0 minute podcast.\n3. Keep spoken phrasing natural, expressive, and human (no robotic jargon, no LaTeX, no $).';
@@ -4780,13 +4796,13 @@
     } else {
       state = { done: [], scores: {} }; saveState();
     }
-    const ok = await ensureLessonCharged(force);
+    const ok = await chargeFeatureCredits('learn_lesson', 10);
     if (!ok) {
       show('load');
       loadStatus.hidden = true;
       document.getElementById('loadProgress').style.display = 'none';
       loadError.hidden = false;
-      loadError.textContent = 'You need 100 credits to generate a study lesson. Purchase more to continue.';
+      loadError.textContent = 'You need 10 credits to generate your interactive lesson. Tap Upgrade Plan to continue.';
       retryBtn.hidden = false;
       return;
     }

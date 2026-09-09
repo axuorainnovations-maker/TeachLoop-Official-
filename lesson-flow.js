@@ -51,16 +51,18 @@
     return parts.slice(0, 6);
   }
 
-  // Real SVG text labels — never AI image gibberish
+  // Real topic-aware, high-contrast SVG diagrams with clean typography & domain-specific visuals
   function buildLabeledDiagramSvg(title, labels) {
     const w = 960;
     const h = 720;
-    const labs = (labels && labels.length ? labels : ['Key part']).slice(0, 6);
-    const left = labs.filter(function (_, i) { return i % 2 === 0; });
-    const right = labs.filter(function (_, i) { return i % 2 === 1; });
     const cx = 480;
     const cy = 360;
-    const colors = ['#A78BFA', '#7FC8FF', '#34D399', '#F5A623', '#E88A7A', '#C4B5FD'];
+    const labs = (labels && labels.length ? labels : ['Key concept', 'Structure', 'Function', 'Process']).slice(0, 6);
+    const left = labs.filter(function (_, i) { return i % 2 === 0; });
+    const right = labs.filter(function (_, i) { return i % 2 === 1; });
+
+    const rawTitle = String(title || 'Diagram').slice(0, 52);
+    const textForMatch = (rawTitle + ' ' + labs.join(' ')).toLowerCase();
 
     function escXml(s) {
       return String(s || '')
@@ -70,30 +72,152 @@
         .replace(/"/g, '&quot;');
     }
 
+    // Determine domain category
+    let domain = 'general';
+    if (/cell|bio|organelle|dna|gene|plant|animal|bacteria|virus|tissue|membrane|mitochondria|nucleus|cytoplasm|ribosome|protein|enzyme|respiration|photosynthesis/i.test(textForMatch)) {
+      domain = 'biology';
+    } else if (/war|battle|wwii|wwi|treaty|empire|revolution|military|army|nazi|soviet|cold war|theatre|front|reich|allies|axis|inva|conquest|monarch/i.test(textForMatch)) {
+      domain = 'history';
+    } else if (/physic|atom|molecule|quantum|gravity|planet|orbit|star|solar|electron|proton|neutron|nuclear|chem|force|circuit|energy|wave|magnetic|optics/i.test(textForMatch)) {
+      domain = 'physics';
+    } else if (/code|comput|algorithm|network|database|ai|neural|data|server|api|logic|software|cpu|memory|compiler|binary|cloud/i.test(textForMatch)) {
+      domain = 'tech';
+    }
+
+    let colors = ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#3B82F6'];
+    let bgFill = '#FAFAFA';
+    let cardStroke = '#E4E4E7';
+    let centerSvg = '';
+
+    if (domain === 'biology') {
+      colors = ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B', '#14B8A6', '#6366F1'];
+      // Detailed biological cell cross-section
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="180" ry="215" fill="#ECFDF5" stroke="#10B981" stroke-width="6" stroke-dasharray="8 4"/>';
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="164" ry="198" fill="#F0FDF4" stroke="#059669" stroke-width="4"/>';
+      // Cytoplasm subtle organelle texture
+      centerSvg += '<path d="M370 270 Q410 240 430 280 T390 320" fill="none" stroke="#6EE7B7" stroke-width="5" stroke-linecap="round"/>';
+      centerSvg += '<path d="M530 430 Q570 400 590 440 T550 480" fill="none" stroke="#6EE7B7" stroke-width="5" stroke-linecap="round"/>';
+      // Mitochondria capsules
+      centerSvg += '<rect x="360" y="380" width="70" height="36" rx="18" fill="#FDE68A" stroke="#D97706" stroke-width="3"/>';
+      centerSvg += '<path d="M375 398 Q395 385 415 398" fill="none" stroke="#B45309" stroke-width="2.5"/>';
+      centerSvg += '<rect x="530" y="270" width="65" height="32" rx="16" fill="#FDE68A" stroke="#D97706" stroke-width="3"/>';
+      centerSvg += '<path d="M545 286 Q562 276 580 286" fill="none" stroke="#B45309" stroke-width="2.5"/>';
+      // Large Nucleus with double membrane & nucleolus
+      centerSvg += '<circle cx="' + (cx + 10) + '" cy="' + (cy - 10) + '" r="68" fill="#EDE9FE" stroke="#7C3AED" stroke-width="5"/>';
+      centerSvg += '<circle cx="' + (cx + 10) + '" cy="' + (cy - 10) + '" r="46" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="3"/>';
+      centerSvg += '<circle cx="' + (cx + 15) + '" cy="' + (cy - 12) + '" r="22" fill="#6D28D9"/>';
+      // Ribosomes / micro dots
+      centerSvg += '<circle cx="450" cy="460" r="4" fill="#3B82F6"/><circle cx="465" cy="475" r="4" fill="#3B82F6"/><circle cx="485" cy="465" r="4" fill="#3B82F6"/>';
+      centerSvg += '<circle cx="400" cy="230" r="4" fill="#3B82F6"/><circle cx="420" cy="220" r="4" fill="#3B82F6"/>';
+    } else if (domain === 'history') {
+      colors = ['#DC2626', '#D97706', '#2563EB', '#475569', '#7C3AED', '#059669'];
+      // Strategic Theatre / Conflict Map & Alliance Grid
+      centerSvg += '<rect x="300" y="180" width="360" height="360" rx="20" fill="#FEF2F2" stroke="#DC2626" stroke-width="4"/>';
+      // Map grid lines
+      centerSvg += '<line x1="300" y1="270" x2="660" y2="270" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="300" y1="360" x2="660" y2="360" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="300" y1="450" x2="660" y2="450" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="390" y1="180" x2="390" y2="540" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="480" y1="180" x2="480" y2="540" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="570" y1="180" x2="570" y2="540" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      // Front lines & tactical arrows
+      centerSvg += '<path d="M340 480 Q430 380 470 330 Q510 280 620 230" fill="none" stroke="#DC2626" stroke-width="5" stroke-linecap="round"/>';
+      centerSvg += '<path d="M350 490 Q440 390 480 340 Q520 290 630 240" fill="none" stroke="#2563EB" stroke-width="3" stroke-dasharray="8 6"/>';
+      // Central Shield / Insignia
+      centerSvg += '<path d="M480 280 L530 310 V380 Q530 430 480 460 Q430 430 430 380 V310 Z" fill="#FFFFFF" stroke="#991B1B" stroke-width="4"/>';
+      centerSvg += '<path d="M480 300 L515 322 V375 Q515 412 480 438 Q445 412 445 375 V322 Z" fill="#FEE2E2"/>';
+      centerSvg += '<circle cx="480" cy="365" r="14" fill="#DC2626"/>';
+      // Compass Rose
+      centerSvg += '<g transform="translate(620, 220)">' +
+        '<circle cx="0" cy="0" r="22" fill="#FFFFFF" stroke="#475569" stroke-width="2"/>' +
+        '<polygon points="0,-18 4,-4 18,0 4,4 0,18 -4,4 -18,0 -4,-4" fill="#DC2626"/>' +
+        '<text x="0" y="-22" text-anchor="middle" font-size="10" font-weight="800" fill="#475569">N</text>' +
+      '</g>';
+    } else if (domain === 'physics') {
+      colors = ['#06B6D4', '#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EC4899'];
+      // Quantum / Atomic Planetary Orbits
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="200" ry="85" fill="none" stroke="#06B6D4" stroke-width="3.5" transform="rotate(30 ' + cx + ' ' + cy + ')"/>';
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="200" ry="85" fill="none" stroke="#3B82F6" stroke-width="3.5" transform="rotate(-30 ' + cx + ' ' + cy + ')"/>';
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="200" ry="85" fill="none" stroke="#8B5CF6" stroke-width="3.5" transform="rotate(90 ' + cx + ' ' + cy + ')"/>';
+      // Orbiting particles with glowing halos
+      centerSvg += '<circle cx="340" cy="270" r="10" fill="#06B6D4"/><circle cx="340" cy="270" r="16" fill="none" stroke="#06B6D4" stroke-width="2" stroke-opacity="0.5"/>';
+      centerSvg += '<circle cx="620" cy="270" r="10" fill="#3B82F6"/><circle cx="620" cy="270" r="16" fill="none" stroke="#3B82F6" stroke-width="2" stroke-opacity="0.5"/>';
+      centerSvg += '<circle cx="480" cy="540" r="10" fill="#8B5CF6"/><circle cx="480" cy="540" r="16" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-opacity="0.5"/>';
+      // Central Radiant Nucleus Cluster
+      centerSvg += '<circle cx="' + cx + '" cy="' + cy + '" r="52" fill="#FEF3C7" stroke="#F59E0B" stroke-width="4"/>';
+      centerSvg += '<circle cx="' + (cx - 14) + '" cy="' + (cy - 12) + '" r="20" fill="#EF4444"/>';
+      centerSvg += '<circle cx="' + (cx + 14) + '" cy="' + (cy - 10) + '" r="20" fill="#3B82F6"/>';
+      centerSvg += '<circle cx="' + (cx - 6) + '" cy="' + (cy + 14) + '" r="20" fill="#10B981"/>';
+      centerSvg += '<circle cx="' + (cx + 14) + '" cy="' + (cy + 12) + '" r="18" fill="#F59E0B"/>';
+    } else if (domain === 'tech') {
+      colors = ['#8B5CF6', '#06B6D4', '#10B981', '#3B82F6', '#F59E0B', '#6366F1'];
+      // Neural / System Architecture Pipeline Bus
+      centerSvg += '<rect x="310" y="210" width="340" height="300" rx="16" fill="#F5F3FF" stroke="#7C3AED" stroke-width="4"/>';
+      // PCB traces & connection lines
+      centerSvg += '<path d="M340 260 H420 V340 H460" fill="none" stroke="#8B5CF6" stroke-width="3"/>';
+      centerSvg += '<path d="M340 460 H420 V380 H460" fill="none" stroke="#8B5CF6" stroke-width="3"/>';
+      centerSvg += '<path d="M620 260 H540 V340 H500" fill="none" stroke="#06B6D4" stroke-width="3"/>';
+      centerSvg += '<path d="M620 460 H540 V380 H500" fill="none" stroke="#06B6D4" stroke-width="3"/>';
+      // Central Processing Core Module
+      centerSvg += '<rect x="440" y="320" width="80" height="80" rx="12" fill="#7C3AED" stroke="#5B21B6" stroke-width="3"/>';
+      centerSvg += '<circle cx="480" cy="360" r="18" fill="#FFFFFF"/>';
+      centerSvg += '<text x="480" y="365" text-anchor="middle" font-size="12" font-weight="900" fill="#7C3AED">CORE</text>';
+      // Stage nodes
+      centerSvg += '<circle cx="340" cy="260" r="12" fill="#10B981"/><circle cx="340" cy="460" r="12" fill="#10B981"/>';
+      centerSvg += '<circle cx="620" cy="260" r="12" fill="#06B6D4"/><circle cx="620" cy="460" r="12" fill="#06B6D4"/>';
+    } else {
+      // General Dynamic Conceptual System Diagram
+      colors = ['#4F46E5', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6'];
+      centerSvg += '<circle cx="' + cx + '" cy="' + cy + '" r="170" fill="#EEF2FF" stroke="#4F46E5" stroke-width="4" stroke-dasharray="6 4"/>';
+      centerSvg += '<circle cx="' + cx + '" cy="' + cy + '" r="120" fill="#E0E7FF" stroke="#6366F1" stroke-width="3"/>';
+      // Flow rings & connecting hubs
+      centerSvg += '<circle cx="' + (cx - 70) + '" cy="' + (cy - 60) + '" r="34" fill="#FFFFFF" stroke="#06B6D4" stroke-width="3"/>';
+      centerSvg += '<circle cx="' + (cx + 70) + '" cy="' + (cy - 60) + '" r="34" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>';
+      centerSvg += '<circle cx="' + cx + '" cy="' + (cy + 75) + '" r="34" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3"/>';
+      // Central focal icon
+      centerSvg += '<circle cx="' + cx + '" cy="' + (cy - 5) + '" r="42" fill="#4F46E5"/>';
+      centerSvg += '<circle cx="' + cx + '" cy="' + (cy - 5) + '" r="28" fill="#EEF2FF"/>';
+      centerSvg += '<circle cx="' + cx + '" cy="' + (cy - 5) + '" r="14" fill="#4F46E5"/>';
+    }
+
     let svg = '';
     svg += '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">';
-    svg += '<rect width="100%" height="100%" fill="#FAFAFA"/>';
-    svg += '<text x="' + cx + '" y="56" text-anchor="middle" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="28" font-weight="700" fill="#18181B">' + escXml(String(title || 'Diagram').slice(0, 48)) + '</text>';
+    svg += '<rect width="100%" height="100%" fill="' + bgFill + '"/>';
+    
+    // Header Title
+    svg += '<text x="' + cx + '" y="56" text-anchor="middle" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="26" font-weight="800" fill="#09090B" letter-spacing="-0.02em">' + escXml(rawTitle) + '</text>';
+    svg += '<text x="' + cx + '" y="84" text-anchor="middle" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#71717A" text-transform="uppercase" letter-spacing="0.08em">Interactive Concept Breakdown</text>';
 
-    // Central organelle-style blob (readable schematic, not a photo)
-    svg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="168" ry="210" fill="#EDE9FE" stroke="#7C3AED" stroke-width="8"/>';
-    svg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="118" ry="155" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="5"/>';
-    svg += '<path d="M400 280 C430 320, 430 400, 400 440 C460 400, 460 320, 400 280" fill="none" stroke="#6D28D9" stroke-width="6" stroke-linecap="round"/>';
-    svg += '<path d="M520 270 C490 315, 490 405, 520 450 C560 405, 560 315, 520 270" fill="none" stroke="#6D28D9" stroke-width="6" stroke-linecap="round"/>';
-    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="36" fill="#C4B5FD" stroke="#5B21B6" stroke-width="4"/>';
+    // Render central theme
+    svg += centerSvg;
 
+    // Draw Left & Right Callout Cards with Angled Pointers
     function drawSide(items, isLeft) {
       const n = Math.max(items.length, 1);
       items.forEach(function (lab, i) {
-        const y = 170 + i * Math.min(120, 420 / n);
+        const y = 175 + i * Math.min(130, 410 / n);
         const color = colors[i % colors.length];
-        const tx = isLeft ? 72 : 888;
-        const anchor = isLeft ? 'start' : 'end';
-        const lineX2 = isLeft ? cx - 170 : cx + 170;
-        svg += '<line x1="' + (isLeft ? 200 : 760) + '" y1="' + y + '" x2="' + lineX2 + '" y2="' + (cy - 40 + i * 28) + '" stroke="' + color + '" stroke-width="3"/>';
-        svg += '<circle cx="' + (isLeft ? 200 : 760) + '" cy="' + y + '" r="8" fill="' + color + '"/>';
-        svg += '<rect x="' + (isLeft ? 40 : 700) + '" y="' + (y - 28) + '" width="200" height="56" rx="14" fill="#FFFFFF" stroke="' + color + '" stroke-width="3"/>';
-        svg += '<text x="' + tx + '" y="' + (y + 6) + '" text-anchor="' + anchor + '" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="20" font-weight="700" fill="#18181B">' + escXml(lab) + '</text>';
+        const cardX = isLeft ? 40 : 710;
+        const cardW = 210;
+        const cardH = 58;
+        const pinX = isLeft ? (cardX + cardW) : cardX;
+        const targetX = isLeft ? (cx - 150 + (i * 15)) : (cx + 150 - (i * 15));
+        const targetY = cy - 60 + (i * 45);
+
+        // Connection Line & Glowing Anchor
+        svg += '<path d="M' + pinX + ' ' + (y + cardH / 2) + ' Q' + ((pinX + targetX) / 2) + ' ' + (y + cardH / 2) + ' ' + targetX + ' ' + targetY + '" fill="none" stroke="' + color + '" stroke-width="3" stroke-linecap="round"/>';
+        svg += '<circle cx="' + targetX + '" cy="' + targetY + '" r="7" fill="' + color + '" stroke="#FFFFFF" stroke-width="2"/>';
+
+        // Callout Card Box
+        svg += '<rect x="' + cardX + '" y="' + y + '" width="' + cardW + '" height="' + cardH + '" rx="14" fill="#FFFFFF" stroke="' + color + '" stroke-width="2.5" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.06))"/>';
+        
+        // Color Accent Indicator Pill
+        svg += '<circle cx="' + (isLeft ? (cardX + 22) : (cardX + 22)) + '" cy="' + (y + cardH / 2) + '" r="6" fill="' + color + '"/>';
+        
+        // Label Text
+        const textX = cardX + 38;
+        const maxTextW = cardW - 48;
+        svg += '<text x="' + textX + '" y="' + (y + cardH / 2 + 6) + '" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="16" font-weight="700" fill="#18181B">' + escXml(String(lab).slice(0, 24)) + '</text>';
       });
     }
 

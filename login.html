@@ -184,7 +184,16 @@
       try {
         const p = new URLSearchParams(window.location.search);
         const forceLogin = p.get('logout') === 'true' || p.get('force') === '1' || p.get('logged_out') === '1';
-        if (!forceLogin) {
+        if (forceLogin) {
+          if (sb) {
+            try { sb.auth.signOut(); } catch(e){}
+          }
+          Object.keys(localStorage).forEach(function (k) {
+            if (k.startsWith('sb-') || k.includes('auth-token') || k.startsWith('NOURA_ACCOUNT') || k.startsWith('NOURA_EMAIL') || k.startsWith('NOURA_PENDING') || k.startsWith('TEACHLOOP_NAME') || k.startsWith('TEACHLOOP_ONBOARDED')) {
+              try { localStorage.removeItem(k); } catch (e) {}
+            }
+          });
+        } else {
           const localEmail = localStorage.getItem('NOURA_EMAIL');
           let localAcc = null;
           try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
