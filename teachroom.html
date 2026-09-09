@@ -1257,36 +1257,12 @@
 
   // If the model slips into tutor/facilitator voice, rewrite as a stuck student.
   function ensureStudentVoice(msg) {
-    const text = String(msg || '').trim();
+    let text = String(msg || '').trim();
     if (!text) {
-      return "I still don't get " + topicLabel + ". Can you explain it simply?";
+      return "I'm curious about " + topicLabel + ". Can you explain how it works?";
     }
-    const lower = text.toLowerCase();
-    const teacherPatterns = [
-      /^great[!.,\s]/i,
-      /^awesome[!.,\s]/i,
-      /^perfect[!.,\s]/i,
-      /^nice[!.,\s]/i,
-      /^excellent[!.,\s]/i,
-      /what part .+ confus/i,
-      /what (would you|do you) (like|want) to (focus|cover|start|teach)/i,
-      /where (should|do) we start/i,
-      /what confuses you/i,
-      /what are you confused/i,
-      /tell me what you('d| would)? (like|want)/i,
-      /how would you (like|want) to (explain|start)/i,
-      /which (part|topic|area) (should|do|would) (we|you)/i
-    ];
-    if (teacherPatterns.some(re => re.test(text) || re.test(lower))) {
-      console.warn('[TeachRoom] Rewrote teacher-toned reply:', text);
-      if (level === 'beginner') {
-        return "I still don't get " + topicLabel + " at all. Can you just explain what it is?";
-      }
-      if (level === 'advanced') {
-        return "I need help with " + topicLabel + ". Can you explain the hard part more clearly?";
-      }
-      return "I'm still confused about " + topicLabel + ". Can you explain how it works?";
-    }
+    // Clean minor formatting artifacts without replacing the entire message
+    text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
     return text;
   }
 
