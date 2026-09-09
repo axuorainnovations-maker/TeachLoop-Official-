@@ -7240,11 +7240,137 @@ body.light-mode .aset-member .nm { color:#16151c; }
     setPeriod('monthly');   // initial per-day + labels
     window.addEventListener('resize', moveSlider);
 
-    function openPricing() {
+    function updatePricingModalUI() {
+      var em = '';
+      try {
+        var acc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}');
+        em = (acc.email || localStorage.getItem('NOURA_EMAIL') || '').trim().toLowerCase();
+      } catch (e) {}
+
+      var rawData = localStorage.getItem('NOURA_CREDITS_DATA_V1');
+      var parsedCredits = null;
+      try { parsedCredits = JSON.parse(rawData); } catch(e) {}
+
+      var isUnlim = (em === 'prorkrff@gmail.com') ||
+                    (parsedCredits && (parsedCredits.unlimited || parsedCredits.tier === 'unlimited')) ||
+                    (window.NouraCredits && window.NouraCredits.isUnlimited && window.NouraCredits.isUnlimited());
+      var isPro = parsedCredits && (parsedCredits.tier === 'pro');
+
+      var bStarter = document.getElementById('btnModalStarter');
+      var bPro = document.getElementById('btnModalPro');
+      var bUnlimited = document.getElementById('btnModalUnlimited');
+
+      if (isUnlim) {
+        if (bStarter) {
+          bStarter.textContent = 'Free Tier';
+          bStarter.className = 'pt-btn';
+          bStarter.disabled = true;
+          bStarter.style.opacity = '0.5';
+          bStarter.style.background = '';
+          bStarter.style.color = '';
+          bStarter.onclick = null;
+        }
+        if (bPro) {
+          bPro.textContent = 'Included in Unlimited';
+          bPro.className = 'pt-btn';
+          bPro.disabled = true;
+          bPro.style.opacity = '0.5';
+          bPro.style.background = '';
+          bPro.style.color = '';
+          bPro.onclick = null;
+        }
+        if (bUnlimited) {
+          bUnlimited.textContent = 'Current Plan';
+          bUnlimited.className = 'pt-btn';
+          bUnlimited.disabled = true;
+          bUnlimited.style.opacity = '1';
+          bUnlimited.style.background = '#27272a';
+          bUnlimited.style.color = '#a1a1aa';
+          bUnlimited.style.borderColor = '#3f3f46';
+          bUnlimited.style.fontWeight = '700';
+          bUnlimited.onclick = null;
+        }
+      } else if (isPro) {
+        if (bStarter) {
+          bStarter.textContent = 'Free Tier';
+          bStarter.className = 'pt-btn';
+          bStarter.disabled = true;
+          bStarter.style.opacity = '0.5';
+          bStarter.style.background = '';
+          bStarter.style.color = '';
+          bStarter.onclick = null;
+        }
+        if (bPro) {
+          bPro.textContent = 'Current Plan';
+          bPro.className = 'pt-btn';
+          bPro.disabled = true;
+          bPro.style.opacity = '1';
+          bPro.style.background = '#27272a';
+          bPro.style.color = '#a1a1aa';
+          bPro.style.borderColor = '#3f3f46';
+          bPro.style.fontWeight = '700';
+          bPro.onclick = null;
+        }
+        if (bUnlimited) {
+          bUnlimited.textContent = 'Upgrade to Unlimited';
+          bUnlimited.className = 'pt-btn primary';
+          bUnlimited.disabled = false;
+          bUnlimited.style.opacity = '1';
+          bUnlimited.style.background = '';
+          bUnlimited.style.color = '';
+          bUnlimited.style.borderColor = '';
+          bUnlimited.style.fontWeight = '';
+          bUnlimited.onclick = function() { startStripeCheckout('unlimited'); };
+        }
+      } else {
+        if (bStarter) {
+          bStarter.textContent = 'Current plan';
+          bStarter.className = 'pt-btn';
+          bStarter.disabled = false;
+          bStarter.style.opacity = '1';
+          bStarter.style.background = '';
+          bStarter.style.color = '';
+          bStarter.style.borderColor = '';
+          bStarter.style.fontWeight = '';
+          bStarter.onclick = function() { document.getElementById('pricingClose').click(); };
+        }
+        if (bPro) {
+          bPro.textContent = 'Upgrade to Pro';
+          bPro.className = 'pt-btn primary';
+          bPro.disabled = false;
+          bPro.style.opacity = '1';
+          bPro.style.background = '';
+          bPro.style.color = '';
+          bPro.style.borderColor = '';
+          bPro.style.fontWeight = '';
+          bPro.onclick = function() { startStripeCheckout('pro'); };
+        }
+        if (bUnlimited) {
+          bUnlimited.textContent = 'Upgrade to Unlimited';
+          bUnlimited.className = 'pt-btn';
+          bUnlimited.disabled = false;
+          bUnlimited.style.opacity = '1';
+          bUnlimited.style.background = '';
+          bUnlimited.style.color = '';
+          bUnlimited.style.borderColor = '';
+          bUnlimited.style.fontWeight = '';
+          bUnlimited.onclick = function() { startStripeCheckout('unlimited'); };
+        }
+      }
+    }
+
+    async function openPricing() {
       if (settingsMenu) settingsMenu.classList.remove('open');
       setPeriod('monthly');     // reset to monthly each time it opens
+      updatePricingModalUI();
       overlay.classList.add('open');
       requestAnimationFrame(moveSlider);   // position slider once visible
+      if (window.NouraCredits && window.NouraCredits.status) {
+        try {
+          await window.NouraCredits.status();
+          updatePricingModalUI();
+        } catch(e) {}
+      }
     }
     // If we arrived here just to show the paywall (from the dashboard),
     // closing it should return to the dashboard, not strand the user in the chat.
@@ -7380,7 +7506,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
             </ul>
           </div>
         </div>
-        <button class="pt-btn" type="button" onclick="document.getElementById('pricingClose').click()">Current plan</button>
+        <button class="pt-btn" id="btnModalStarter" type="button" onclick="document.getElementById('pricingClose').click()">Current plan</button>
       </div>
 
       <!-- Pro (popular, middle) -->
@@ -7394,14 +7520,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
           <div class="pt-includes">
             <h4 class="pt-inc-head">Everything in Starter, plus:</h4>
             <ul class="pt-list">
-              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>1,500 learning tokens / mo</li>
+              <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>5,000 learning tokens / mo</li>
               <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Priority AI student responses</li>
               <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Quiz &amp; exam-prep mode</li>
               <li><span class="pt-check"><svg viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg></span>Voice conversations &amp; Audio Recap</li>
             </ul>
           </div>
         </div>
-        <button class="pt-btn primary" type="button" onclick="startStripeCheckout('pro')">Upgrade to Pro</button>
+        <button class="pt-btn primary" id="btnModalPro" type="button" onclick="startStripeCheckout('pro')">Upgrade to Pro</button>
       </div>
 
       <!-- Unlimited -->
@@ -7420,7 +7546,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
             </ul>
           </div>
         </div>
-        <button class="pt-btn" type="button" onclick="startStripeCheckout('unlimited')">Upgrade to Unlimited</button>
+        <button class="pt-btn" id="btnModalUnlimited" type="button" onclick="startStripeCheckout('unlimited')">Upgrade to Unlimited</button>
       </div>
     </div>
     <div class="pricing-note">Secure payments powered by Stripe Checkout. Cancel anytime.</div>
@@ -7622,12 +7748,18 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
     tabs.forEach(t => t.addEventListener('click', () => selectTab(t.dataset.tab)));
 
-    function openSettings() {
+    async function openSettings() {
       const menu = document.getElementById('settingsMenu');
       if (menu) menu.classList.remove('open');
       fill();
       selectTab('account');
       overlay.classList.add('open');
+      if (window.NouraCredits && window.NouraCredits.status) {
+        try {
+          await window.NouraCredits.status();
+          fill();
+        } catch(e) {}
+      }
     }
     function closeSettings() { overlay.classList.remove('open'); }
     window.openNouraSettings = openSettings;
