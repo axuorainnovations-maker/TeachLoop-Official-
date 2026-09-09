@@ -180,6 +180,28 @@
       const sb = (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase)
         ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
 
+      function handleAuthSuccess(user, method) {
+        if (!user) return;
+        const meta = user.user_metadata || {};
+        const email = (user.email || '').trim().toLowerCase();
+        const name = (meta.full_name || meta.name || (email ? email.split('@')[0] : 'Account')).trim();
+        const avatar = meta.avatar_url || meta.picture || '';
+        try {
+          localStorage.setItem('NOURA_EMAIL', email);
+          localStorage.setItem('TEACHLOOP_NAME', name);
+          localStorage.setItem('NOURA_ACCOUNT', JSON.stringify({
+            email: email,
+            name: name,
+            avatar: avatar,
+            method: method || 'google'
+          }));
+          if (window.NouraCredits && window.NouraCredits.claimWelcome) {
+            window.NouraCredits.claimWelcome();
+          }
+        } catch(e){}
+        window.location.replace('/chat');
+      }
+
       // Auto-redirect if already logged in (unless explicitly logging out or forcing login)
       try {
         const p = new URLSearchParams(window.location.search);
@@ -194,32 +216,31 @@
             }
           });
         } else {
-          const localEmail = localStorage.getItem('NOURA_EMAIL');
-          let localAcc = null;
-          try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
-          const hasLocalAuth = (localEmail && localEmail.includes('@')) || (localAcc && localAcc.email);
-
           if (sb) {
+            sb.auth.onAuthStateChange(function(event, session) {
+              if (session && session.user) {
+                handleAuthSuccess(session.user, 'google');
+              }
+            });
             sb.auth.getSession().then(({ data }) => {
               if (data && data.session && data.session.user) {
-                const u = data.session.user;
-                const meta = u.user_metadata || {};
-                const email = u.email || '';
-                const name = (meta.full_name || meta.name || (email ? email.split('@')[0] : 'Account')).trim();
-                try {
-                  localStorage.setItem('NOURA_EMAIL', email);
-                  localStorage.setItem('TEACHLOOP_NAME', name);
-                  localStorage.setItem('NOURA_ACCOUNT', JSON.stringify({ email, name, avatar: meta.avatar_url || meta.picture || '', method: 'session' }));
-                } catch(e){}
-                window.location.replace('/chat');
-              } else if (hasLocalAuth) {
-                window.location.replace('/chat');
+                handleAuthSuccess(data.session.user, 'session');
+              } else {
+                const localEmail = localStorage.getItem('NOURA_EMAIL');
+                let localAcc = null;
+                try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
+                if ((localEmail && localEmail.includes('@')) || (localAcc && localAcc.email)) {
+                  window.location.replace('/chat');
+                }
               }
-            }).catch(() => {
-              if (hasLocalAuth) window.location.replace('/chat');
-            });
-          } else if (hasLocalAuth) {
-            window.location.replace('/chat');
+            }).catch(() => {});
+          } else {
+            const localEmail = localStorage.getItem('NOURA_EMAIL');
+            let localAcc = null;
+            try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
+            if ((localEmail && localEmail.includes('@')) || (localAcc && localAcc.email)) {
+              window.location.replace('/chat');
+            }
           }
         }
       } catch (e) {}
@@ -338,20 +359,25 @@
       }
 
       async function submitGoogle() {
-        saveLocal(null);
-        const dest = '/teachstudio';
-        if (!sb) { go(dest); return; }
-        const redirectTo = window.location.origin + '/teachstudio';
+        const dest = '/chat';
+        if (!sb) {
+          saveLocal('guest@noura.study');
+          go(dest);
+          return;
+        }
+        const redirectTo = window.location.origin + '/login';
         try {
           const { error } = await sb.auth.signInWithOAuth({
             provider: 'google',
             options: {
-              redirectTo,
+              redirectTo: redirectTo,
               queryParams: { prompt: 'select_account' }
             }
           });
           if (error) throw error;
-        } catch (e) { showMsg('Google sign-in error: ' + (e.message || e), true); }
+        } catch (e) {
+          showMsg('Google sign-in error: ' + (e.message || e), true);
+        }
       }
 
       $('submitBtn').addEventListener('click', submitEmail);
