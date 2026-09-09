@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/react": "^19.2.18"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
   }
 }

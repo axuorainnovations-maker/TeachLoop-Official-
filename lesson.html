@@ -4848,7 +4848,11 @@
   const hasProgress = state && ((state.done && state.done.length > 0) || Object.keys(state.progress || {}).length > 0);
   const tabParam = params.get('tab');
 
-  if (tabParam === 'brief') {
+  if (!briefDone && tabParam !== 'check' && tabParam !== 'recall' && tabParam !== 'cast') {
+    // Study Brief comes first — the lesson builds when Learn is opened after Study Brief
+    show('brief');
+    openBrief();
+  } else if (tabParam === 'brief') {
     show('brief');
     openBrief();
   } else if (tabParam === 'check') {
@@ -4857,7 +4861,7 @@
     openRecall();
   } else if (tabParam === 'cast') {
     openCast();
-  } else if (tabParam === 'learn' || briefDone || hasProgress) {
+  } else if (briefDone || hasProgress || tabParam === 'learn') {
     if (lesson) {
       renderOverview();
     } else {
