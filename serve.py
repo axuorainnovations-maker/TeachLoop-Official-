@@ -771,6 +771,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._json(400, {"error": "deduct rejected"})
                 return
             self._json(200, res)
+        elif self.path in ('/api/admin/set-tier', '/api/admin/plan'):
+            length = int(self.headers.get('Content-Length', 0))
+            raw = self.rfile.read(length)
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            try:
+                g = json.loads(raw or b'{}')
+            except Exception:
+                g = {}
+            target = (g.get('user_id') or g.get('email') or '').strip()
+            tier = str(g.get('tier') or g.get('plan') or 'free').strip().lower()
+            if not target:
+                self._json(400, {"error": "user_id or email is required"})
+                return
+            valid_tiers = ('free', 'pro', 'unlimited', 'scholar', 'beta')
+            if tier not in valid_tiers:
+                self._json(400, {"error": f"Invalid tier. Allowed: {valid_tiers}"})
+                return
+            res = LEDGER.set_tier(target, tier)
+            self._json(200, {"success": True, "user": res, "tier": tier})
         elif self.path == '/api/tts':
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length)

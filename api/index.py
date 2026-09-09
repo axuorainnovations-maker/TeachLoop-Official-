@@ -424,6 +424,26 @@ class handler(BaseHTTPRequestHandler):
             self._json(200, res)
             return
 
+        elif path in ('/api/admin/set-tier', '/api/admin/plan'):
+            if not self._admin_ok():
+                self._json(403, {"error": "admin token required"})
+                return
+            target = (data.get('user_id') or data.get('email') or '').strip()
+            tier = str(data.get('tier') or data.get('plan') or 'free').strip().lower()
+            if not target:
+                self._json(400, {"error": "user_id or email is required"})
+                return
+            valid_tiers = ('free', 'pro', 'unlimited', 'scholar', 'beta')
+            if tier not in valid_tiers:
+                self._json(400, {"error": f"Invalid tier. Allowed: {valid_tiers}"})
+                return
+            if not LEDGER:
+                self._json(500, {"error": "Ledger unavailable"})
+                return
+            res = LEDGER.set_tier(target, tier)
+            self._json(200, {"success": True, "user": res, "tier": tier})
+            return
+
         elif path in ('/create-checkout-session', '/api/create-checkout-session'):
             allowed, retry = RATE_LIMITER.is_allowed(f"checkout_{ip}", max_requests=8, window_seconds=60)
             if not allowed:

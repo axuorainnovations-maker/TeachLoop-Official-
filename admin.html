@@ -16,7 +16,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
        -webkit-font-smoothing:antialiased;padding:28px 22px 60px}
-  .wrap{max-width:1280px;margin:0 auto}
+  .wrap{max-width:1320px;margin:0 auto}
   h1{font-size:24px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:11px}
   h1 .logo{width:26px;height:26px;background:var(--grad);
     -webkit-mask:url('logo.png') center/contain no-repeat;mask:url('logo.png') center/contain no-repeat}
@@ -40,17 +40,19 @@
   td:first-child{border-left:1px solid var(--line);border-radius:11px 0 0 11px}
   td:last-child{border-right:1px solid var(--line);border-radius:0 11px 11px 0}
   tr.flag td{background:#1f1512;border-color:rgba(239,68,68,.35)}
-  .pill{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:99px}
-  .pill.starter{color:#c9c9ce;background:#26262b}
+  .pill{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:99px;display:inline-block}
+  .pill.free{color:#c9c9ce;background:#26262b}
+  .pill.pro{color:#93c5fd;background:rgba(59,130,246,.16);border:1px solid rgba(59,130,246,.3)}
+  .pill.unlimited{color:#7ee2a8;background:rgba(63,185,80,.14);border:1px solid rgba(63,185,80,.3)}
   .pill.scholar{color:#b79df5;background:rgba(139,92,246,.16)}
-  .pill.unlimited{color:#7ee2a8;background:rgba(63,185,80,.14)}
   .pill.beta{color:#ffd37a;background:rgba(227,160,8,.13)}
-  .pill.supabase{color:#6ee7b7;background:rgba(16,185,129,.16);border:1px solid rgba(16,185,129,.3)}
   .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   input,select,button{font-family:inherit}
   input[type=search],input[type=text],input[type=number],select{background:var(--panel2);border:1px solid #2a2a2e;border-radius:9px;
     padding:8px 11px;color:var(--text);font-size:13px;outline:none}
   input:focus,select:focus{border-color:var(--violet)}
+  .plan-select{background:#1a1a1f;border:1px solid #33333d;color:#e4e4e7;border-radius:8px;padding:5px 8px;font-size:11.5px;font-weight:700;outline:none;cursor:pointer;transition:all .15s ease}
+  .plan-select:focus, .plan-select:hover{border-color:var(--violet);background:#22222a}
   button{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px;
     color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s ease}
   button:hover{border-color:var(--violet)}
@@ -135,7 +137,7 @@
     if (supabase_sync && supabase_sync.active) {
       syncBanner = '<div class="note good">✓ <b>Supabase Auth Synced</b>: ' + supabase_sync.count + ' registered database accounts loaded and linked with credit wallets.</div>';
     } else {
-      syncBanner = '<div class="note">⚡ <b>Supabase Integration</b>: To automatically import all registered authentication users from Supabase, set <code>SUPABASE_SERVICE_ROLE_KEY</code> in your environment / <code>.env.local</code>. You can also award or deduct credits directly for any email below.</div>';
+      syncBanner = '<div class="note">⚡ <b>Supabase Integration</b>: To automatically import all registered authentication users from Supabase, set <code>SUPABASE_SERVICE_ROLE_KEY</code> in your environment / <code>.env.local</code>. You can also award, deduct, and change subscription plans for any email below.</div>';
     }
 
     $('stage').innerHTML =
@@ -167,15 +169,18 @@
         '<div><div class="card"><div class="k">By model</div>' + rows(org.by_model) + '</div></div>' +
       '</div>' +
 
-      '<h2><span>Authentication Users & Credits (' + users.length + ')</span></h2>' +
+      '<h2><span>Authentication Users, Plans & Credits (' + users.length + ')</span></h2>' +
       '<div class="toolbar">' +
         '<input type="search" id="q" placeholder="Search by email, name or ID…">' +
         '<select id="tierF">' +
-          '<option value="">All users</option>' +
+          '<option value="">All tiers</option>' +
+          '<option value="free">Free Plan</option>' +
+          '<option value="pro">Pro Plan</option>' +
+          '<option value="unlimited">Unlimited Plan</option>' +
           '<option value="low">Out of credits (0)</option>' +
           '<option value="has">Has credits (>0)</option>' +
         '</select>' +
-        '<button id="customActionBtn" class="btn-primary">+ Award / Deduct Any User</button>' +
+        '<button id="customActionBtn" class="btn-primary">+ Quick Adjust (Award / Deduct / Plan)</button>' +
         '<button id="topBtn">Sort by balance</button>' +
         '<button id="csvBtn">Export CSV</button>' +
         '<span class="muted" style="font-size:12px;margin-left:auto" id="count"></span>' +
@@ -212,10 +217,17 @@
   function filtered() {
     const q = ($('q').value || '').toLowerCase().trim();
     const tf = $('tierF').value;
-    return (DATA.users || []).filter(u =>
-      (!tf || (tf === 'low' ? u.low : !u.low)) &&
-      (!q || (u.email || '').toLowerCase().includes(q) || (u.id || '').toLowerCase().includes(q))
-    );
+    return (DATA.users || []).filter(u => {
+      const tier = (u.tier || 'free').toLowerCase();
+      if (tf === 'low') {
+        if (!u.low) return false;
+      } else if (tf === 'has') {
+        if (u.low) return false;
+      } else if (tf && tf !== tier) {
+        return false;
+      }
+      return (!q || (u.email || '').toLowerCase().includes(q) || (u.id || '').toLowerCase().includes(q));
+    });
   }
 
   function table(limit) {
@@ -231,30 +243,39 @@
 
     const cols = [
       ['email','User / Email'],
+      ['tier','Subscription Plan'],
       ['balance','Balance'],
       ['actions','Actions left'],
       ['granted','Granted'],
       ['spent','Spent'],
       ['usd','Cost to us'],
-      ['calls','Calls'],
       ['last_seen','Last active']
     ];
     const perAction = DATA.config.cost_per_action || 100;
     $('tableWrap').innerHTML = '<table><thead><tr>' +
       cols.map(c => '<th data-k="' + c[0] + '">' + c[1] + '</th>').join('') +
-      '<th style="text-align:right">Actions</th></tr></thead><tbody>' +
+      '<th style="text-align:right">Credit Actions</th></tr></thead><tbody>' +
       (rows.length ? rows.map(u => {
         const left = Math.floor((u.balance || 0) / perAction);
         const userIdentifier = u.email || u.id;
+        const currentTier = (u.tier || 'free').toLowerCase();
         return '<tr class="' + (u.low ? 'flag' : '') + '">' +
           '<td><b>' + esc(u.email || u.id) + '</b>' + (u.email ? '' : ' <span class="muted">(anon ID)</span>') +
-            (u.unlimited ? ' <span class="pill unlimited">unlimited</span>' : '') + '</td>' +
+            (u.unlimited ? ' <span class="pill unlimited" style="margin-left:6px">unlimited</span>' : '') + '</td>' +
+          '<td>' +
+            '<select class="plan-select" data-target="' + esc(userIdentifier) + '">' +
+              '<option value="free"' + (currentTier === 'free' ? ' selected' : '') + '>Free Plan</option>' +
+              '<option value="pro"' + (currentTier === 'pro' ? ' selected' : '') + '>Pro Plan ($8/mo)</option>' +
+              '<option value="unlimited"' + (currentTier === 'unlimited' ? ' selected' : '') + '>Unlimited Plan (∞)</option>' +
+              '<option value="scholar"' + (currentTier === 'scholar' ? ' selected' : '') + '>Scholar</option>' +
+              '<option value="beta"' + (currentTier === 'beta' ? ' selected' : '') + '>Beta</option>' +
+            '</select>' +
+          '</td>' +
           '<td><b style="color:' + (u.balance > 0 ? '#7ee2a8' : '#ff9f9a') + '">' + (u.unlimited ? '\u221E' : u.balance) + '</b></td>' +
           '<td>' + (u.unlimited ? '\u221E' : (left > 0 ? left : '<span class="muted">0</span>')) + '</td>' +
           '<td class="muted">' + u.granted + '</td>' +
           '<td class="muted">' + u.spent + '</td>' +
           '<td>' + usd(u.usd) + '</td>' +
-          '<td>' + u.calls + '</td>' +
           '<td class="muted">' + ago(u.last_seen) + '</td>' +
           '<td style="text-align:right">' +
             '<div class="action-group" style="justify-content:flex-end">' +
@@ -264,11 +285,33 @@
           '</td>' +
         '</tr>';
       }).join('')
-       : '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No users found. Use the "+ Award / Deduct Any User" button to initialize credits for any account.</td></tr>') +
+       : '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No users found. Use the "+ Quick Adjust" button to initialize credits or plan for any account.</td></tr>') +
       '</tbody></table>' +
-      '<div class="note">Credits are real-time. Every standard study action costs <b>' + perAction
-      + ' credits</b>. Internal sub-calls (' + (DATA.config.free_surfaces || []).join(', ')
-      + ') are free. You can grant or remove credits for any user instantly.</div>';
+      '<div class="note">Credits and plans update in real time. Switching a plan to <b>Unlimited</b> grants unlimited AI study actions. You can grant, remove credits, or change tiers for any user instantly.</div>';
+
+    // Hook up Subscription Plan selectors
+    $('tableWrap').querySelectorAll('.plan-select').forEach(sel => sel.addEventListener('change', async () => {
+      const target = sel.dataset.target;
+      const newTier = sel.value;
+      sel.disabled = true;
+      try {
+        const r = await fetch('/api/admin/set-tier', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+          body: JSON.stringify({ user_id: target, tier: newTier })
+        });
+        const d = await r.json();
+        if (!r.ok) {
+          alert(d.error || 'Failed to update subscription plan');
+          sel.disabled = false;
+          return;
+        }
+        load();
+      } catch (e) {
+        alert('Network error updating plan: ' + e.message);
+        sel.disabled = false;
+      }
+    }));
 
     // Hook up Award buttons
     $('tableWrap').querySelectorAll('.btn-award').forEach(b => b.addEventListener('click', async () => {
@@ -321,9 +364,26 @@
   async function promptQuickAction() {
     const userEmail = prompt('Enter user Email or User ID:');
     if (!userEmail || !userEmail.trim()) return;
-    const actionType = prompt('Type "award" to add credits or "deduct" to remove credits:', 'award');
-    if (!actionType) return;
-    const isAward = actionType.toLowerCase().trim() === 'award';
+    const action = prompt('Choose action:\n1. Type "award" to add credits\n2. Type "deduct" to remove credits\n3. Type "plan" to change subscription plan', 'award');
+    if (!action) return;
+    const act = action.toLowerCase().trim();
+    
+    if (act === 'plan') {
+      const plan = prompt('Enter new subscription plan:\n(free, pro, unlimited, scholar, beta)', 'pro');
+      if (!plan) return;
+      const r = await fetch('/api/admin/set-tier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Noura-Admin': KEY },
+        body: JSON.stringify({ user_id: userEmail.trim(), tier: plan.trim().toLowerCase() })
+      });
+      const d = await r.json();
+      if (!r.ok) { alert(d.error || 'Plan update failed'); return; }
+      alert('✓ Successfully changed plan to "' + plan.trim() + '" for ' + userEmail.trim());
+      load();
+      return;
+    }
+    
+    const isAward = act === 'award';
     const amountStr = prompt(isAward ? 'How many credits to award?' : 'How many credits to deduct?', '1000');
     if (!amountStr) return;
     const amount = parseInt(amountStr, 10);
@@ -344,7 +404,7 @@
   }
 
   function csv() {
-    const head = ['id','email','balance','granted','spent','usd','calls','created','last_seen'];
+    const head = ['id','email','tier','balance','granted','spent','usd','calls','created','last_seen'];
     const body = filtered().map(u => head.map(h => JSON.stringify(u[h] == null ? '' : u[h])).join(','));
     const blob = new Blob([head.join(',') + '\n' + body.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');

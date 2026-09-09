@@ -82,8 +82,11 @@ UNLIMITED_EMAILS = {
 
 
 def is_unlimited(user):
-    email = (user or {}).get('email') or ''
-    return email.strip().lower() in UNLIMITED_EMAILS
+    if not user:
+        return False
+    email = (user.get('email') or '').strip().lower()
+    tier = (user.get('tier') or '').strip().lower()
+    return (email in UNLIMITED_EMAILS) or (tier == 'unlimited')
 
 
 def credit_cost(surface):
@@ -201,12 +204,15 @@ class Ledger:
                 self._save_users()
 
     def set_tier(self, user_id, tier):
-        # Label only. It does not affect spending; the wallet does.
+        user_id = self._resolve_uid(user_id)
         with self._lock:
             u = self._users.get(user_id)
             if not u:
-                return None
-            u['tier'] = tier
+                u = {'id': user_id, 'email': None, 'tier': tier,
+                     'created': _now_iso(), 'last_seen': _now_iso(),
+                     'signup_granted': False}
+                self._users[user_id] = u
+            u['tier'] = str(tier).lower().strip()
             self._save_users()
             return dict(u)
 
@@ -296,9 +302,11 @@ class Ledger:
         for uid, u in self._users.items():
             w = self.wallet(uid)
             t = self.totals_for(uid, None)
+            tier = (u.get('tier') or 'free').lower().strip()
             rows.append({
                 'id': uid,
                 'email': u.get('email'),
+                'tier': tier,
                 'granted': w['granted'],
                 'spent': w['spent'],
                 'balance': w['balance'],
