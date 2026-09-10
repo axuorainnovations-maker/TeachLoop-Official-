@@ -117,7 +117,7 @@
             
             <!-- Hero Mockup Image -->
             <div class="relative max-w-[1200px] mx-auto px-4 md:px-8 mt-6 z-20">
-                <div class="relative cursor-pointer group" onclick="document.getElementById('video-modal').classList.remove('hidden'); document.getElementById('video-modal').classList.add('flex');">
+                <div class="relative cursor-pointer group" onclick="var m = document.getElementById('video-modal'); m.classList.remove('hidden'); m.classList.add('flex'); var f = document.getElementById('hero-video'); f.src = 'https://www.youtube.com/embed/yhxmaelsIEA?autoplay=1&rel=0&enablejsapi=1';">
                     <img
                         src="https://startup-template-sage.vercel.app/hero-dark.png"
                         alt="Hero Video"
@@ -136,13 +136,13 @@
             </div>
 
             <!-- Video Modal -->
-            <div id="video-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-md transition-opacity">
+            <div id="video-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-md transition-opacity" onclick="if(event.target===this){this.classList.remove('flex'); this.classList.add('hidden'); document.getElementById('hero-video').src='';}">
                 <div class="relative w-full max-w-[1200px] aspect-video mx-4 md:mx-0">
-                    <button onclick="document.getElementById('video-modal').classList.remove('flex'); document.getElementById('video-modal').classList.add('hidden'); let iframe = document.getElementById('hero-video'); iframe.src = iframe.src;" class="absolute -top-16 right-0 text-white text-xl bg-neutral-900/50 ring-1 ring-white/10 backdrop-blur-md rounded-full p-2 hover:bg-neutral-800 transition-colors">
+                    <button onclick="document.getElementById('video-modal').classList.remove('flex'); document.getElementById('video-modal').classList.add('hidden'); document.getElementById('hero-video').src = '';" class="absolute -top-16 right-0 text-white text-xl bg-neutral-900/50 ring-1 ring-white/10 backdrop-blur-md rounded-full p-2 hover:bg-neutral-800 transition-colors">
                         <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                     <div class="h-full w-full border border-white/20 rounded-2xl overflow-hidden isolate z-[1] relative shadow-2xl bg-black">
-                        <iframe id="hero-video" src="/launch-video.html" class="h-full w-full rounded-2xl" allowfullscreen></iframe>
+                        <iframe id="hero-video" src="https://www.youtube.com/embed/yhxmaelsIEA?rel=0&enablejsapi=1" class="h-full w-full rounded-2xl" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
