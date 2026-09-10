@@ -177,6 +177,8 @@
 
   <script>
     (function () {
+      window.SUPABASE_URL = window.SUPABASE_URL || "https://blchjqsgmmvrkwgecoyd.supabase.co";
+      window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsY2hqcXNnbW12cmt3Z2Vjb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzkyNDksImV4cCI6MjEwMjUxNTI0OX0.YpbyuZ4FwYmFvF6IvAQ3L-yt1G3kz_Q5woYbDAEE2J0";
       const sb = (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase)
         ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
 
@@ -216,6 +218,16 @@
             }
           });
         } else {
+          // Clean up any stale guest account
+          const existingEmail = localStorage.getItem('NOURA_EMAIL');
+          if (existingEmail === 'guest@noura.study') {
+            try {
+              localStorage.removeItem('NOURA_EMAIL');
+              localStorage.removeItem('NOURA_ACCOUNT');
+              localStorage.removeItem('TEACHLOOP_NAME');
+            } catch(e){}
+          }
+
           if (sb) {
             sb.auth.onAuthStateChange(function(event, session) {
               if (session && session.user) {
@@ -229,7 +241,7 @@
                 const localEmail = localStorage.getItem('NOURA_EMAIL');
                 let localAcc = null;
                 try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
-                if ((localEmail && localEmail.includes('@')) || (localAcc && localAcc.email)) {
+                if ((localEmail && localEmail.includes('@') && localEmail !== 'guest@noura.study') || (localAcc && localAcc.email && localAcc.email !== 'guest@noura.study')) {
                   window.location.replace('/chat');
                 }
               }
@@ -238,7 +250,7 @@
             const localEmail = localStorage.getItem('NOURA_EMAIL');
             let localAcc = null;
             try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || 'null'); } catch(e){}
-            if ((localEmail && localEmail.includes('@')) || (localAcc && localAcc.email)) {
+            if ((localEmail && localEmail.includes('@') && localEmail !== 'guest@noura.study') || (localAcc && localAcc.email && localAcc.email !== 'guest@noura.study')) {
               window.location.replace('/chat');
             }
           }
@@ -359,15 +371,16 @@
       }
 
       async function submitGoogle() {
-        const dest = '/chat';
-        if (!sb) {
-          saveLocal('guest@noura.study');
-          go(dest);
+        window.SUPABASE_URL = window.SUPABASE_URL || "https://blchjqsgmmvrkwgecoyd.supabase.co";
+        window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsY2hqcXNnbW12cmt3Z2Vjb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzkyNDksImV4cCI6MjEwMjUxNTI0OX0.YpbyuZ4FwYmFvF6IvAQ3L-yt1G3kz_Q5woYbDAEE2J0";
+        const client = sb || (window.supabase ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null);
+        if (!client) {
+          showMsg('Authentication client is initializing. Please try again in a moment.', true);
           return;
         }
         const redirectTo = window.location.origin + '/login';
         try {
-          const { error } = await sb.auth.signInWithOAuth({
+          const { error } = await client.auth.signInWithOAuth({
             provider: 'google',
             options: {
               redirectTo: redirectTo,

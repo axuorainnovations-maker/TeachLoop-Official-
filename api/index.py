@@ -59,6 +59,11 @@ public_env = {k: v for k, v in env_vars.items() if not any(h in k.upper() for h 
 sb_url = env_vars.get('SUPABASE_URL', '').strip()
 sb_anon = (env_vars.get('SUPABASE_ANON_KEY', '') or env_vars.get('SUPABASE_KEY', '')).strip()
 
+if not sb_anon:
+    sb_anon = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsY2hqcXNnbW12cmt3Z2Vjb3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzkyNDksImV4cCI6MjEwMjUxNTI0OX0.YpbyuZ4FwYmFvF6IvAQ3L-yt1G3kz_Q5woYbDAEE2J0"
+if not sb_url:
+    sb_url = "https://blchjqsgmmvrkwgecoyd.supabase.co"
+
 # ── NVIDIA Riva TTS Setup ──────────────────────────────────────────────
 try:
     import riva.client

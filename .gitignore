@@ -24,9 +24,6 @@ hero_test_artifact.html
 .serve_3006.py
 .serve_3006.log
 serve.log
-
-# Supabase keys (local only)
-supabase-config.js
 _fontpreview.html
 
 # Pitch deck and brand/marketing material (local only, not part of the app)
