@@ -261,11 +261,10 @@
       try {
         const p = new URLSearchParams(window.location.search);
         if (p.get('mode') === 'signup' || window.location.pathname.indexOf('signup') !== -1) {
-          mode = 'signup';
+          window.location.replace('/onboarding');
         }
         if (window.location.pathname.endsWith('.html')) {
-          const cleanPath = mode === 'signup' ? '/signup' : '/login';
-          window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+          window.history.replaceState(null, '', '/login' + window.location.search + window.location.hash);
         }
       } catch (e) {}
 
@@ -274,21 +273,12 @@
             googleLabel = $('googleLabel'), pwd = $('passwordInput'), msg = $('authMsg');
 
       function applyMode() {
-        if (mode === 'login') {
-          title.textContent = 'Log in';
-          submit.textContent = 'Log in';
-          googleLabel.textContent = 'Continue with Google';
-          pwd.setAttribute('autocomplete', 'current-password');
-          foot.innerHTML = "Don't have an account? <a id=\"modeToggle\">Create your account</a>";
-        } else {
-          title.textContent = 'Create your account';
-          submit.textContent = 'Create account';
-          googleLabel.textContent = 'Sign up with Google';
-          pwd.setAttribute('autocomplete', 'new-password');
-          foot.innerHTML = "Already have an account? <a id=\"modeToggle\">Log in</a>";
-        }
+        title.textContent = 'Log in';
+        submit.textContent = 'Log in';
+        googleLabel.textContent = 'Continue with Google';
+        pwd.setAttribute('autocomplete', 'current-password');
+        foot.innerHTML = "Don't have an account? <a id=\"modeToggle\" href=\"/onboarding\" style=\"cursor:pointer;\">Create your account</a>";
         hideMsg();
-        $('modeToggle').addEventListener('click', () => { mode = (mode === 'login') ? 'signup' : 'login'; applyMode(); });
       }
 
       function showMsg(text, isError) {

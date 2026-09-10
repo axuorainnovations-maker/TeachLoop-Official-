@@ -250,9 +250,13 @@ body.light-mode .nav-item svg.pen-icon, body.light-mode .nav-item svg.icon-book 
 .nav-item.active svg { stroke:#ffffff; }
 /* Dashboard iframe overlay */
 .dash-iframe-overlay {
-  display:none; flex:1; min-width:0; z-index:200; background:#141416;
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:5;
+  background:#141416;
   overflow-y:auto;
-  margin:12px 12px 12px 0;
+  margin:0 12px 12px 0;
   border-radius:18px;
   border:1px solid rgba(255, 255, 255, 0.05);
   box-shadow:0 4px 24px rgba(0, 0, 0, 0.25);
@@ -260,6 +264,36 @@ body.light-mode .nav-item svg.pen-icon, body.light-mode .nav-item svg.icon-book 
 .dash-iframe-overlay.open { display:flex; flex-direction:column; }
 .dash-iframe-overlay iframe {
   width:100%; flex:1; border:none; display:block;
+}
+
+/* Right column: reserved top account bar + content stage below */
+.content-column {
+  flex:1;
+  min-width:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:#0e0e11;
+}
+.app-topbar {
+  flex-shrink:0;
+  height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0 16px 0 18px;
+  position:relative;
+  z-index:80;
+  background:#0e0e11;
+  overflow:visible;
+}
+.content-stage {
+  flex:1;
+  min-height:0;
+  position:relative;
+  display:flex;
+  overflow:hidden;
 }
 .section { margin-top:20px; padding:0 6px; }
 .section-label { padding:6px 11px 9px; color:#8a8a8a; font-size:13px; font-weight:500; letter-spacing:-0.003em; user-select:none; }
@@ -343,12 +377,13 @@ body.light-mode .recents-empty { color:#9a9aa0; }
 /* ===== MAIN AREA ===== */
 .main {
   flex:1;
+  min-width:0;
   position:relative;
   display:flex;
   flex-direction:column;
   overflow:hidden;
   background:#141416;
-  margin:12px 12px 12px 0;
+  margin:0 12px 12px 0;
   border-radius:18px;
   border:1px solid rgba(255, 255, 255, 0.05);
   box-shadow:0 4px 24px rgba(0, 0, 0, 0.25);
@@ -2668,6 +2703,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
   }
 </script>
   <script src="noura-credits.js"></script>
+  <link rel="stylesheet" href="noura-topnav.css">
+  <script src="noura-topnav.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -2739,105 +2776,25 @@ body.light-mode .aset-member .nm { color:#16151c; }
       </div>
     </div>
 
-    <div class="yl-bottom">
-      <div class="yl-profile-wrap" id="userProfile">
-        <button class="yl-profile" type="button">
-          <span class="yl-avatar-box" id="ylAvatarBox" style="display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:50%;">
-            <span class="yl-avatar" id="ylAvatarText">A</span>
-          </span>
-          <span class="yl-name" id="ylName">Account</span>
-          <svg class="yl-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
-        </button>
-        <div class="settings-menu pm-menu" id="settingsMenu" style="width: 260px; background-color: #141415; border: 1px solid #27272A; border-radius: 16px; padding: 6px; box-sizing: border-box; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-          <div style="display: flex; align-items: center; padding: 10px 10px 12px 10px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: radial-gradient(110% 110% at 30% 20%, #9D8DF1 0%, #6B5CE7 18%, #4B3FC8 36%, #2A7FFF 62%, #20C6B8 92%); position: relative; display:flex; align-items:center; justify-content:center;" id="pmAvatar">
-                <span id="pmAvatarInitials" style="color:#ffffff; font-weight:700; font-size:14px; position:relative; z-index:3;">A</span>
-              </div>
-              <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                <span id="pmName" style="color: #F4F4F5; font-size: 15px; font-weight: 500; letter-spacing: -0.1px;">Account</span>
-                <span id="pmEmail" style="color: #A1A1AA; font-size: 13px; font-weight: 400;">Signed in</span>
-              </div>
-            </div>
-          </div>
-
-          <div style="height: 1px; background-color: #27272A; margin: 2px 10px 6px 10px;"></div>
-
-          <div style="display: flex; flex-direction: column; gap: 2px;">
-            <button id="upgradePlanTab" style="width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%); border: 1px solid rgba(168, 85, 247, 0.25); cursor: pointer; transition: all 0.15s ease; margin-bottom: 3px;" onmouseover="this.style.background='linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(168, 85, 247, 0.25) 100%)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)'">
-              <span style="display: flex; align-items: center; gap: 12px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                <span style="color: #F4F4F5; font-size: 14px; font-weight: 500;">Upgrade Plan</span>
-              </span>
-              <span style="font-size: 10.5px; font-weight: 700; color: #C084FC; background: rgba(168, 85, 247, 0.2); padding: 2px 7px; border-radius: 6px;">PRO</span>
-            </button>
-            <button id="pmProfile" style="width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Account</span>
-            </button>
-            <button id="pmSettings" style="width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
-              <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Settings</span>
-            </button>
-          </div>
-
-
-
-          <div style="display: flex; flex-direction: column; gap: 2px;">
-            <a href="index.html" style="width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease; text-decoration: none;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
-              <span style="display: flex; align-items: center; gap: 12px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Homepage</span>
-              </span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-            </a>
-            <a href="terms.html" target="_blank" rel="noopener" style="width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease; text-decoration: none;" onmouseover="this.style.backgroundColor='#27272A'" onmouseout="this.style.backgroundColor='transparent'">
-              <span style="display: flex; align-items: center; gap: 12px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                <span style="color: #E4E4E7; font-size: 14px; font-weight: 450;">Terms &amp; Policies</span>
-              </span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-            </a>
-          </div>
-
-          <div style="height: 1px; background-color: #27272A; margin: 6px 10px;"></div>
-
-          <div style="display: flex; flex-direction: column; gap: 2px;">
-            <button id="pmLogout" style="width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 0 10px; height: 38px; border-radius: 10px; background-color: transparent; border: none; cursor: pointer; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-              <span style="color: #EF4444; font-size: 14px; font-weight: 450;">Sign out</span>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="yl-bottom" style="display:none" aria-hidden="true">
+      <!-- Kept for existing account actions; profile UI moved to top nav -->
+      <button type="button" id="upgradePlanTab"></button>
+      <button type="button" id="pmProfile"></button>
+      <button type="button" id="pmSettings"></button>
+      <button type="button" id="pmLogout"></button>
+      <span id="ylName"></span>
+      <span id="pmName"></span>
+      <span id="pmEmail"></span>
+      <span id="ylAvatarBox"></span>
+      <span id="pmAvatar"></span>
     </div>
   </aside>
 
-  <div class="dash-iframe-overlay" id="dashIframeOverlay"></div>
-
-  <main class="main" id="mainContent" style="position:relative;">
-    <div class="topbar-actions">
-      <div class="streak-wrap">
-        <button class="streak-badge" id="streakBadge" title="Learning streak" type="button">
-          <svg class="streak-flame" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M20 15.0002C20 19.2547 17.3819 21.1216 15.3588 21.7512C14.9274 21.8854 14.6438 21.3825 14.9019 21.0116C15.7823 19.7464 16.8 17.8161 16.8 16.0002C16.8 14.0496 15.1559 11.7467 13.8721 10.3263C13.5786 10.0016 13.0667 10.2164 13.0507 10.6539C12.9976 12.1031 12.7689 14.042 11.7828 15.5616C11.6241 15.8062 11.2872 15.8264 11.1063 15.5977C10.7982 15.208 10.4901 14.7267 10.182 14.3464C10.016 14.1416 9.71604 14.1388 9.52461 14.32C8.77825 15.0267 7.73333 16.1288 7.73333 17.5002C7.73333 18.4301 8.0936 19.405 8.50007 20.1893C8.72368 20.6208 8.32607 21.1402 7.89573 20.9144C6.11307 19.9789 4 18.0838 4 15.0002C4 11.8538 8.31029 7.49503 9.95605 3.37712C10.2157 2.72733 11.0161 2.42199 11.5727 2.84603C14.9439 5.41409 20 10.3783 20 15.0002Z" fill="#e97604"></path></svg>
-          <span class="streak-count" id="streakCount">0</span>
-        </button>
-        <div class="streak-menu" id="streakMenu">
-          <button class="streak-viewall" id="streakViewAll" type="button">View activity</button>
-          <div class="streak-menu-top">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M20 15.0002C20 19.2547 17.3819 21.1216 15.3588 21.7512C14.9274 21.8854 14.6438 21.3825 14.9019 21.0116C15.7823 19.7464 16.8 17.8161 16.8 16.0002C16.8 14.0496 15.1559 11.7467 13.8721 10.3263C13.5786 10.0016 13.0667 10.2164 13.0507 10.6539C12.9976 12.1031 12.7689 14.042 11.7828 15.5616C11.6241 15.8062 11.2872 15.8264 11.1063 15.5977C10.7982 15.208 10.4901 14.7267 10.182 14.3464C10.016 14.1416 9.71604 14.1388 9.52461 14.32C8.77825 15.0267 7.73333 16.1288 7.73333 17.5002C7.73333 18.4301 8.0936 19.405 8.50007 20.1893C8.72368 20.6208 8.32607 21.1402 7.89573 20.9144C6.11307 19.9789 4 18.0838 4 15.0002C4 11.8538 8.31029 7.49503 9.95605 3.37712C10.2157 2.72733 11.0161 2.42199 11.5727 2.84603C14.9439 5.41409 20 10.3783 20 15.0002Z" fill="#e97604"></path></svg>
-            <span class="streak-big" id="streakBigCount">0</span>
-          </div>
-          <div class="streak-menu-title">This Week</div>
-          <div class="streak-menu-desc">
-            <span id="streakDesc">Study today to start your streak.</span>
-          </div>
-          <div class="streak-days" id="streakDays"></div>
-        </div>
-      </div>
-    </div>
+  <div class="content-column" id="contentColumn">
+    <header class="app-topbar" id="nouraTopNavHost" aria-label="Account navigation"></header>
+    <div class="content-stage" id="contentStage">
+      <div class="dash-iframe-overlay" id="dashIframeOverlay"></div>
+      <main class="main" id="mainContent" style="position:relative;">
     <div class="main-inner">
       <div class="chat-app">
         <!-- ===== Study Assistant intro: artifact-matched typebar, pills, subjects ===== -->
@@ -2945,7 +2902,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
           /* Fix: keep the whole hero reachable when it's taller than the viewport.
              align-items:center clipped the top so you couldn't scroll back up;
              margin auto keeps it centered when short but top-reachable when tall. */
-          .main-inner { align-items:flex-start; padding-top:max(56px, calc(50vh - 160px)); padding-bottom:96px; }
+          .main-inner { align-items:flex-start; padding-top:max(28px, calc(50vh - 200px)); padding-bottom:96px; }
 
           /* Gradient orbit logo (same purple gradient masked by logo.png as the login page). */
           .grad-logo {
@@ -3274,6 +3231,8 @@ body.light-mode .aset-member .nm { color:#16151c; }
       </div>
     </div>
   </main>
+    </div><!-- /.content-stage -->
+  </div><!-- /.content-column -->
 </div>
 
 <!-- CHAT VIEW OVERLAY (hidden until send is pressed) -->
@@ -5504,22 +5463,22 @@ body.light-mode .aset-member .nm { color:#16151c; }
   });
   document.addEventListener('click', ytCloseMenus);
 
-  // Settings Menu Logic
+  // Settings Menu Logic (sidebar profile removed — top nav owns account UI)
   const userProfile = document.getElementById('userProfile');
   const settingsMenu = document.getElementById('settingsMenu');
 
-  userProfile?.addEventListener('click', (e) => {
-    if (!settingsMenu.contains(e.target)) {
-      settingsMenu.classList.toggle('open');
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    if (userProfile && !userProfile.contains(e.target)) {
-      settingsMenu.classList.remove('open');
-    }
-  });
-
+  if (userProfile && settingsMenu) {
+    userProfile.addEventListener('click', (e) => {
+      if (!settingsMenu.contains(e.target)) {
+        settingsMenu.classList.toggle('open');
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!userProfile.contains(e.target)) {
+        settingsMenu.classList.remove('open');
+      }
+    });
+  }
   // Settings Menu - Appearance
   // ===== Appearance (theme) — global, persistent, works in both sidebars =====
   const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
@@ -5614,6 +5573,21 @@ body.light-mode .aset-member .nm { color:#16151c; }
       var asN = document.getElementById('asetName'); if (asN) asN.textContent = displayName;
       var asE = document.getElementById('asetEmail'); if (asE) asE.textContent = email || 'Signed in';
 
+      try {
+        localStorage.setItem('NOURA_NAME', displayName);
+        if (email) localStorage.setItem('NOURA_EMAIL', email);
+        if (avatarUrl) localStorage.setItem('NOURA_AVATAR', avatarUrl);
+        else localStorage.removeItem('NOURA_AVATAR');
+      } catch (e) {}
+      if (window.NouraTopNav && typeof window.NouraTopNav.syncProfile === 'function') {
+        window.NouraTopNav.syncProfile({
+          name: displayName,
+          email: email,
+          avatar: avatarUrl,
+          initials: initials
+        });
+      }
+
       // 6. Refresh user-scoped credits and streak
       if (window.NouraCredits && window.NouraCredits.refresh) {
         try { window.NouraCredits.refresh(); } catch (err) {}
@@ -5628,7 +5602,7 @@ body.light-mode .aset-member .nm { color:#16151c; }
     try { localAcc = JSON.parse(localStorage.getItem('NOURA_ACCOUNT') || '{}') || {}; } catch (e) { }
     var localName = localStorage.getItem('TEACHLOOP_NAME') || localAcc.name || '';
     var localEmail = localStorage.getItem('NOURA_EMAIL') || localAcc.email || '';
-    var localAvatar = localAcc.avatar || '';
+    var localAvatar = localStorage.getItem('NOURA_AVATAR') || localAcc.avatar || localAcc.picture || '';
     applyUserProfile({ name: localName, email: localEmail, avatar: localAvatar });
 
     // Live sync from Supabase OAuth user session (e.g. Google Sign-In)
@@ -5654,6 +5628,10 @@ body.light-mode .aset-member .nm { color:#16151c; }
           try { localStorage.setItem('NOURA_ACCOUNT', JSON.stringify(updatedProfile)); } catch (e) { }
           try { localStorage.setItem('NOURA_EMAIL', gEmail); } catch (e) { }
           try { localStorage.setItem('TEACHLOOP_NAME', updatedProfile.name); } catch (e) { }
+          try {
+            if (gAvatar) localStorage.setItem('NOURA_AVATAR', gAvatar);
+            else localStorage.removeItem('NOURA_AVATAR');
+          } catch (e) { }
           applyUserProfile(updatedProfile);
           if (typeof renderRecents === 'function') {
             renderRecents();
@@ -6857,13 +6835,9 @@ body.light-mode .aset-member .nm { color:#16151c; }
     document.addEventListener('click', () => { closeAllMenus(); closeHeroMenus(); closeSubjectPickers(); });
   })();
 
-  // Weekly learning streak — tracks which days (Mon–Sun) the student studied
-  // this week, shows progress toward a 2-day goal, and a tap-to-open breakdown.
+  // Weekly learning streak — power the top-nav streak metric + activity heatmap
   (function () {
-    const badge = document.getElementById('streakBadge');
-    const menu = document.getElementById('streakMenu');
-    const daysWrap = document.getElementById('streakDays');
-    if (!badge || !menu || !daysWrap) return;
+    const daysWrap = document.getElementById('streakDays'); // optional legacy
     const GOAL = 2;
     const LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -6872,16 +6846,14 @@ body.light-mode .aset-member .nm { color:#16151c; }
       return em ? ('TEACHLOOP_ACTIVE_DAYS_' + em) : 'TEACHLOOP_ACTIVE_DAYS';
     }
 
-    // Local calendar day as YYYY-MM-DD (avoids UTC off-by-one).
     function dayStr(d) {
       return d.getFullYear() + '-' +
         String(d.getMonth() + 1).padStart(2, '0') + '-' +
         String(d.getDate()).padStart(2, '0');
     }
-    // Monday of the week containing `d`.
     function weekStart(d) {
       const s = new Date(d);
-      const dow = (s.getDay() + 6) % 7;   // 0 = Monday
+      const dow = (s.getDay() + 6) % 7;
       s.setDate(s.getDate() - dow);
       s.setHours(0, 0, 0, 0);
       return s;
@@ -6899,26 +6871,32 @@ body.light-mode .aset-member .nm { color:#16151c; }
       if (!active.includes(todayStr)) active.push(todayStr);
       try { localStorage.setItem(KEY, JSON.stringify(active)); } catch (e) {}
 
-      // Build this week's 7 days and mark which were studied.
       const monday = weekStart(today);
       const activeSet = new Set(active);
       let studiedThisWeek = 0;
 
-      daysWrap.innerHTML = '';
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        const ds = dayStr(d);
-        const isActive = activeSet.has(ds);
-        if (isActive) studiedThisWeek++;
+      if (daysWrap) {
+        daysWrap.innerHTML = '';
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          const ds = dayStr(d);
+          const isActive = activeSet.has(ds);
+          if (isActive) studiedThisWeek++;
 
-        const cell = document.createElement('div');
-        cell.className = 'streak-day' + (isActive ? ' active' : '') + (ds === todayStr ? ' today' : '');
-        cell.innerHTML = '<div class="streak-dot"></div><div class="streak-day-label">' + LABELS[i] + '</div>';
-        daysWrap.appendChild(cell);
+          const cell = document.createElement('div');
+          cell.className = 'streak-day' + (isActive ? ' active' : '') + (ds === todayStr ? ' today' : '');
+          cell.innerHTML = '<div class="streak-dot"></div><div class="streak-day-label">' + LABELS[i] + '</div>';
+          daysWrap.appendChild(cell);
+        }
+      } else {
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(monday);
+          d.setDate(monday.getDate() + i);
+          if (activeSet.has(dayStr(d))) studiedThisWeek++;
+        }
       }
 
-      // Show a plain number: how many days studied this week.
       const sc = document.getElementById('streakCount');
       if (sc) sc.textContent = studiedThisWeek;
       const sbc = document.getElementById('streakBigCount');
@@ -6931,23 +6909,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
           descEl.textContent = "You've studied " + studiedThisWeek + ' day' + (studiedThisWeek === 1 ? '' : 's') + ' this week.';
         }
       }
+      if (window.NouraTopNav && typeof window.NouraTopNav.setStreak === 'function') {
+        window.NouraTopNav.setStreak(studiedThisWeek);
+      }
     }
 
     window.updateUserStreak = renderStreak;
     renderStreak();
-
-    // Tap the badge to toggle the dropdown.
-    badge.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const open = menu.classList.toggle('open');
-      badge.classList.toggle('open', open);
-    });
-    document.addEventListener('click', (e) => {
-      if (!menu.contains(e.target) && e.target !== badge) {
-        menu.classList.remove('open');
-        badge.classList.remove('open');
-      }
-    });
 
     // ---- Lifetime activity heatmap (GitHub-style, purple) ----
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -7010,20 +6978,23 @@ body.light-mode .aset-member .nm { color:#16151c; }
     }
 
     let activityWired = false;
+    function openNouraActivity() {
+      buildActivity();
+      const ov = document.getElementById('activityOverlay');
+      if (ov) ov.classList.add('open');
+      if (!activityWired && ov) {
+        activityWired = true;
+        document.getElementById('activityClose')?.addEventListener('click', () => ov.classList.remove('open'));
+        ov.addEventListener('click', (ev) => { if (ev.target === ov) ov.classList.remove('open'); });
+        document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') ov.classList.remove('open'); });
+      }
+    }
+    window.openNouraActivity = openNouraActivity;
     const viewBtn = document.getElementById('streakViewAll');
     if (viewBtn) {
       viewBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        buildActivity();
-        const ov = document.getElementById('activityOverlay');
-        if (ov) ov.classList.add('open');
-        menu.classList.remove('open'); badge.classList.remove('open');
-        if (!activityWired && ov) {
-          activityWired = true;
-          document.getElementById('activityClose')?.addEventListener('click', () => ov.classList.remove('open'));
-          ov.addEventListener('click', (ev) => { if (ev.target === ov) ov.classList.remove('open'); });
-          document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') ov.classList.remove('open'); });
-        }
+        openNouraActivity();
       });
     }
   })();
@@ -8530,11 +8501,13 @@ body.light-mode .aset-member .nm { color:#16151c; }
   })();
 </script>
   <script>
-    // .topbar-actions is a flex row; inserting before .streak-wrap puts the
-    // credit pill to the left of the streak badge.
     (function () {
       function go() {
-        if (window.NouraCredits) window.NouraCredits.mountPill('.topbar-actions .streak-wrap');
+        if (window.NouraCredits && window.NouraCredits.refresh) window.NouraCredits.refresh();
+        if (window.NouraTopNav) {
+          window.NouraTopNav.syncCredits();
+          window.NouraTopNav.syncProfile();
+        }
       }
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
       else go();

@@ -273,6 +273,10 @@
     var dropTitle = document.querySelector('.nc-drop-title');
     var upgradeBtn = document.querySelector('.nc-drop-upgrade');
 
+    if (window.NouraTopNav && typeof window.NouraTopNav.syncCredits === 'function') {
+      try { window.NouraTopNav.syncCredits(); } catch (e) {}
+    }
+
     if (isUnlim) {
       d.unlimited = true;
       el.className = 'noura-credit-pill unlimited';
@@ -501,7 +505,21 @@
 
   function refresh() {
     var el = document.getElementById('nouraCreditPill');
-    if (!el) return Promise.resolve(null);
+    if (!el) {
+      return fetchStatus()
+        .then(function (d) {
+          if (window.NouraTopNav && typeof window.NouraTopNav.syncCredits === 'function') {
+            try { window.NouraTopNav.syncCredits(); } catch (e) {}
+          }
+          return d;
+        })
+        .catch(function () {
+          if (window.NouraTopNav && typeof window.NouraTopNav.syncCredits === 'function') {
+            try { window.NouraTopNav.syncCredits(); } catch (e) {}
+          }
+          return null;
+        });
+    }
     return fetchStatus()
       .then(function (d) { paint(el, d); return d; })
       .catch(function () { return null; });

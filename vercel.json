@@ -69,8 +69,8 @@
       "dest": "/chatbot.html"
     },
     {
-      "src": "/signup",
-      "dest": "/login.html"
+      "src": "/signup(\\.html)?",
+      "dest": "/onboarding.html"
     },
     {
       "src": "/login(\\.html)?",

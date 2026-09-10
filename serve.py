@@ -1158,7 +1158,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if p_lower in ('/chat', '/chat.html', '/chatbot', '/chatbot.html'):
                 self.path = '/chatbot.html'
             elif p_lower in ('/signup', '/signup.html'):
-                self.path = '/login.html'
+                self.path = '/onboarding.html'
             elif p_lower in ('/landingpage', '/landingpage.html'):
                 self.path = '/index.html'
             elif p_lower in ('/create', '/create.html', '/create-course', '/create-course.html'):
