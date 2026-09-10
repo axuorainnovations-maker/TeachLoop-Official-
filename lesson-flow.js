@@ -57,11 +57,11 @@
     const h = 720;
     const cx = 480;
     const cy = 360;
-    const labs = (labels && labels.length ? labels : ['Key concept', 'Structure', 'Function', 'Process']).slice(0, 6);
+    const labs = (labels && labels.length ? labels : ['Key Concept', 'Structure', 'Mechanism', 'Application']).slice(0, 6);
     const left = labs.filter(function (_, i) { return i % 2 === 0; });
     const right = labs.filter(function (_, i) { return i % 2 === 1; });
 
-    const rawTitle = String(title || 'Diagram').slice(0, 52);
+    const rawTitle = String(title || 'Conceptual Diagram').slice(0, 52);
     const textForMatch = (rawTitle + ' ' + labs.join(' ')).toLowerCase();
 
     function escXml(s) {
@@ -72,121 +72,331 @@
         .replace(/"/g, '&quot;');
     }
 
-    // Determine domain category
+    // Determine domain category & visual archetype
     let domain = 'general';
-    if (/cell|bio|organelle|dna|gene|plant|animal|bacteria|virus|tissue|membrane|mitochondria|nucleus|cytoplasm|ribosome|protein|enzyme|respiration|photosynthesis/i.test(textForMatch)) {
-      domain = 'biology';
-    } else if (/war|battle|wwii|wwi|treaty|empire|revolution|military|army|nazi|soviet|cold war|theatre|front|reich|allies|axis|inva|conquest|monarch/i.test(textForMatch)) {
-      domain = 'history';
-    } else if (/physic|atom|molecule|quantum|gravity|planet|orbit|star|solar|electron|proton|neutron|nuclear|chem|force|circuit|energy|wave|magnetic|optics/i.test(textForMatch)) {
-      domain = 'physics';
-    } else if (/code|comput|algorithm|network|database|ai|neural|data|server|api|logic|software|cpu|memory|compiler|binary|cloud/i.test(textForMatch)) {
-      domain = 'tech';
-    }
-
-    let colors = ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#3B82F6'];
+    let subTitle = 'CONCEPTUAL ARCHITECTURE & SYSTEM MATRIX';
+    let colors = ['#6366F1', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6'];
     let bgFill = '#FAFAFA';
-    let cardStroke = '#E4E4E7';
     let centerSvg = '';
 
-    if (domain === 'biology') {
+    // 1. ECONOMICS / SPECIALIZATION / BUSINESS / PRODUCTION / MARKETS
+    if (/specializ|division of lab|roaster|barista|coffee|assembly|manufactur|product line|trade|firm|business|retail|supply chain/i.test(textForMatch)) {
+      domain = 'specialization';
+      subTitle = 'ECONOMIC SPECIALIZATION & PRODUCTION WORKFLOW';
+      colors = ['#059669', '#0284C7', '#7C3AED', '#D97706', '#2563EB', '#0D9488'];
+      
+      // Multi-stage specialized production & workflow pipeline
+      centerSvg += '<rect x="290" y="190" width="380" height="340" rx="24" fill="#F0FDF4" stroke="#059669" stroke-width="4"/>';
+      // Flow track pipes
+      centerSvg += '<path d="M340 260 H440 V360 H520 V460 H620" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>';
+      centerSvg += '<path d="M340 460 H440 V360 H520 V260 H620" fill="none" stroke="#0284C7" stroke-width="4" stroke-dasharray="8 6" stroke-linecap="round"/>';
+      
+      // Stage 1: Input / Sourcing Hub
+      centerSvg += '<rect x="310" y="230" width="65" height="65" rx="14" fill="#FFFFFF" stroke="#059669" stroke-width="3"/>';
+      centerSvg += '<circle cx="342" cy="262" r="14" fill="#D1FAE5"/>';
+      centerSvg += '<text x="342" y="267" text-anchor="middle" font-size="11" font-weight="900" fill="#047857">INPUT</text>';
+      
+      // Stage 2: Processing & Roasting Core (Gears & heat module)
+      centerSvg += '<rect x="440" y="320" width="80" height="80" rx="18" fill="#FFFFFF" stroke="#7C3AED" stroke-width="3.5"/>';
+      centerSvg += '<circle cx="480" cy="360" r="24" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>';
+      centerSvg += '<circle cx="480" cy="360" r="12" fill="#7C3AED"/>';
+      centerSvg += '<text x="480" y="415" text-anchor="middle" font-size="10" font-weight="800" fill="#5B21B6">SPECIALIZED CORE</text>';
+
+      // Stage 3: Extraction & Assembly Station
+      centerSvg += '<rect x="585" y="230" width="65" height="65" rx="14" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>';
+      centerSvg += '<circle cx="617" cy="262" r="14" fill="#E0F2FE"/>';
+      centerSvg += '<text x="617" y="267" text-anchor="middle" font-size="11" font-weight="900" fill="#0369A1">PROCESS</text>';
+
+      // Stage 4: Output / Value Terminal
+      centerSvg += '<rect x="585" y="425" width="65" height="65" rx="14" fill="#FFFFFF" stroke="#D97706" stroke-width="3"/>';
+      centerSvg += '<circle cx="617" cy="457" r="14" fill="#FEF3C7"/>';
+      centerSvg += '<text x="617" y="462" text-anchor="middle" font-size="11" font-weight="900" fill="#B45309">VALUE</text>';
+
+      // Pulse flow markers
+      centerSvg += '<circle cx="390" cy="260" r="6" fill="#10B981"/><circle cx="480" cy="310" r="6" fill="#7C3AED"/><circle cx="570" cy="460" r="6" fill="#D97706"/>';
+      
+    } else if (/supply|demand|equilibrium|elasticit|market|price|cost|monopol|surplus|shortage|macroeconom|microeconom|gdp|inflation/i.test(textForMatch)) {
+      domain = 'economics_market';
+      subTitle = 'MARKET EQUILIBRIUM & PRICE DYNAMICS';
+      colors = ['#2563EB', '#DC2626', '#059669', '#D97706', '#7C3AED', '#0284C7'];
+
+      // Coordinate axes for Price vs Quantity
+      centerSvg += '<rect x="290" y="190" width="380" height="340" rx="20" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="3"/>';
+      centerSvg += '<line x1="340" y1="480" x2="630" y2="480" stroke="#334155" stroke-width="3" stroke-linecap="round"/>';
+      centerSvg += '<line x1="340" y1="480" x2="340" y2="230" stroke="#334155" stroke-width="3" stroke-linecap="round"/>';
+      centerSvg += '<text x="330" y="240" text-anchor="end" font-size="14" font-weight="800" fill="#334155">Price (P)</text>';
+      centerSvg += '<text x="630" y="505" text-anchor="end" font-size="14" font-weight="800" fill="#334155">Quantity (Q)</text>';
+
+      // Supply Curve (Upward) & Demand Curve (Downward)
+      centerSvg += '<path d="M370 450 Q480 350 590 250" fill="none" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round"/>';
+      centerSvg += '<text x="600" y="255" font-size="16" font-weight="900" fill="#2563EB">S</text>';
+      centerSvg += '<path d="M370 250 Q480 350 590 450" fill="none" stroke="#DC2626" stroke-width="4.5" stroke-linecap="round"/>';
+      centerSvg += '<text x="600" y="455" font-size="16" font-weight="900" fill="#DC2626">D</text>';
+
+      // Equilibrium Intersection Point
+      centerSvg += '<line x1="340" y1="350" x2="480" y2="350" stroke="#64748B" stroke-width="2" stroke-dasharray="5 5"/>';
+      centerSvg += '<line x1="480" y1="350" x2="480" y2="480" stroke="#64748B" stroke-width="2" stroke-dasharray="5 5"/>';
+      centerSvg += '<circle cx="480" cy="350" r="12" fill="#059669" stroke="#FFFFFF" stroke-width="3"/>';
+      centerSvg += '<circle cx="480" cy="350" r="5" fill="#FFFFFF"/>';
+      centerSvg += '<text x="500" y="340" font-size="13" font-weight="800" fill="#059669">Equilibrium (E*)</text>';
+
+    } else if (/photosynthesis|chloroplast|chlorophyll|thylakoid|grana|stroma|calvin|plant bio|leaf/i.test(textForMatch)) {
+      domain = 'photosynthesis';
+      subTitle = 'PHOTOSYNTHESIS & BIOCHEMICAL PATHWAY';
+      colors = ['#10B981', '#059669', '#84CC16', '#F59E0B', '#06B6D4', '#6366F1'];
+
+      // Chloroplast double membrane cross-section
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="180" ry="160" fill="#ECFDF5" stroke="#059669" stroke-width="5"/>';
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="164" ry="145" fill="#F0FDF4" stroke="#10B981" stroke-width="3"/>';
+      
+      // Thylakoid Grana Discs Stacks (Green coin stacks)
+      function drawGranum(gx, gy) {
+        let g = '';
+        for (let k = 0; k < 4; k++) {
+          g += '<ellipse cx="' + gx + '" cy="' + (gy + k * 12) + '" rx="26" ry="8" fill="#10B981" stroke="#047857" stroke-width="2"/>';
+        }
+        return g;
+      }
+      centerSvg += drawGranum(390, 310);
+      centerSvg += drawGranum(430, 370);
+      centerSvg += drawGranum(400, 420);
+      // Stroma lamellae bridges
+      centerSvg += '<path d="M410 330 Q440 350 430 390" fill="none" stroke="#34D399" stroke-width="3"/>';
+
+      // Calvin Cycle Rotating Ring (Light Independent Reaction)
+      centerSvg += '<circle cx="550" cy="360" r="46" fill="none" stroke="#F59E0B" stroke-width="3.5" stroke-dasharray="8 5"/>';
+      centerSvg += '<polygon points="596,360 588,350 604,350" fill="#F59E0B"/>';
+      centerSvg += '<circle cx="550" cy="360" r="20" fill="#FEF3C7"/>';
+      centerSvg += '<text x="550" y="364" text-anchor="middle" font-size="10" font-weight="900" fill="#B45309">CALVIN</text>';
+
+      // Sunlight Photon Ray input
+      centerSvg += '<path d="M330 230 L370 280" fill="none" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>';
+      centerSvg += '<circle cx="330" cy="230" r="8" fill="#F59E0B"/>';
+      centerSvg += '<text x="320" y="215" font-size="12" font-weight="800" fill="#D97706">Sunlight (hv)</text>';
+
+    } else if (/dna|rna|gene|genetics|chromosome|nucleotide|adenine|thymine|guanine|cytosine|helix|replication/i.test(textForMatch)) {
+      domain = 'genetics';
+      subTitle = 'DNA MOLECULAR STRUCTURE & GENETICS';
+      colors = ['#06B6D4', '#8B5CF6', '#4F46E5', '#F43F5E', '#10B981', '#F59E0B'];
+
+      // Double Helix Structural Strands
+      centerSvg += '<rect x="300" y="190" width="360" height="340" rx="20" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="3.5"/>';
+      // Helical Backbones
+      centerSvg += '<path d="M360 220 C420 270, 420 330, 360 380 C300 430, 300 470, 360 500" fill="none" stroke="#06B6D4" stroke-width="5" stroke-linecap="round"/>';
+      centerSvg += '<path d="M600 220 C540 270, 540 330, 600 380 C660 430, 660 470, 600 500" fill="none" stroke="#8B5CF6" stroke-width="5" stroke-linecap="round"/>';
+
+      // Base pair rungs (A-T, G-C)
+      const rungs = [
+        {y: 250, c1: '#10B981', c2: '#F43F5E', t1: 'A', t2: 'T'},
+        {y: 290, c1: '#8B5CF6', c2: '#06B6D4', t1: 'G', t2: 'C'},
+        {y: 330, c1: '#F43F5E', c2: '#10B981', t1: 'T', t2: 'A'},
+        {y: 370, c1: '#06B6D4', c2: '#8B5CF6', t1: 'C', t2: 'G'},
+        {y: 410, c1: '#10B981', c2: '#F43F5E', t1: 'A', t2: 'T'},
+        {y: 450, c1: '#8B5CF6', c2: '#06B6D4', t1: 'G', t2: 'C'}
+      ];
+      rungs.forEach(function(r) {
+        centerSvg += '<line x1="390" y1="' + r.y + '" x2="475" y2="' + r.y + '" stroke="' + r.c1 + '" stroke-width="4"/>';
+        centerSvg += '<line x1="485" y1="' + r.y + '" x2="570" y2="' + r.y + '" stroke="' + r.c2 + '" stroke-width="4"/>';
+        centerSvg += '<circle cx="480" cy="' + r.y + '" r="5" fill="#FFFFFF" stroke="#4F46E5" stroke-width="2"/>';
+        centerSvg += '<text x="430" y="' + (r.y - 6) + '" text-anchor="middle" font-size="10" font-weight="900" fill="' + r.c1 + '">' + r.t1 + '</text>';
+        centerSvg += '<text x="530" y="' + (r.y - 6) + '" text-anchor="middle" font-size="10" font-weight="900" fill="' + r.c2 + '">' + r.t2 + '</text>';
+      });
+
+    } else if (/heart|cardio|blood|artery|vein|ventricle|atrium|aorta|pulmonary|circulat/i.test(textForMatch)) {
+      domain = 'cardio';
+      subTitle = 'CARDIOVASCULAR ANATOMY & BLOOD FLOW';
+      colors = ['#EF4444', '#2563EB', '#DC2626', '#1D4ED8', '#9333EA', '#D97706'];
+
+      // Heart chambers & vessels cross-section
+      centerSvg += '<path d="M480 230 C420 180, 320 220, 320 330 C320 420, 430 490, 480 520 C530 490, 640 420, 640 330 C640 220, 540 180, 480 230 Z" fill="#FEF2F2" stroke="#DC2626" stroke-width="5"/>';
+      // Septum divider
+      centerSvg += '<path d="M480 260 V490" stroke="#B91C1C" stroke-width="5" stroke-linecap="round"/>';
+      
+      // Left / Right Atria & Ventricles
+      centerSvg += '<circle cx="410" cy="300" r="32" fill="#DBEAFE" stroke="#2563EB" stroke-width="2.5"/>';
+      centerSvg += '<text x="410" y="305" text-anchor="middle" font-size="11" font-weight="800" fill="#1E40AF">R. Atrium</text>';
+      centerSvg += '<circle cx="550" cy="300" r="32" fill="#FEE2E2" stroke="#DC2626" stroke-width="2.5"/>';
+      centerSvg += '<text x="550" y="305" text-anchor="middle" font-size="11" font-weight="800" fill="#991B1B">L. Atrium</text>';
+
+      centerSvg += '<circle cx="410" cy="400" r="38" fill="#BFDBFE" stroke="#1D4ED8" stroke-width="2.5"/>';
+      centerSvg += '<text x="410" y="405" text-anchor="middle" font-size="11" font-weight="800" fill="#1E40AF">R. Ventricle</text>';
+      centerSvg += '<circle cx="550" cy="400" r="38" fill="#FECACA" stroke="#B91C1C" stroke-width="2.5"/>';
+      centerSvg += '<text x="550" y="405" text-anchor="middle" font-size="11" font-weight="800" fill="#991B1B">L. Ventricle</text>';
+
+      // Directional Flow Arrows
+      centerSvg += '<path d="M410 260 V360" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>';
+      centerSvg += '<path d="M550 260 V360" fill="none" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>';
+
+    } else if (/wave|wavelength|frequenc|amplitude|optic|light|refract|reflect|prism|spectrum|diffraction|lens|laser/i.test(textForMatch)) {
+      domain = 'physics_waves';
+      subTitle = 'WAVE DYNAMICS & OPTICAL DISPERSION';
+      colors = ['#0284C7', '#4F46E5', '#7C3AED', '#EC4899', '#F59E0B', '#10B981'];
+
+      centerSvg += '<rect x="290" y="190" width="380" height="340" rx="20" fill="#F0F9FF" stroke="#0284C7" stroke-width="3.5"/>';
+      // Harmonic Sine Wave
+      centerSvg += '<path d="M310 320 C340 230, 380 230, 410 320 C440 410, 480 410, 510 320 C540 230, 580 230, 610 320 C640 410, 660 410, 670 320" fill="none" stroke="#0284C7" stroke-width="4.5" stroke-linecap="round"/>';
+      // Center Baseline Axis
+      centerSvg += '<line x1="310" y1="320" x2="650" y2="320" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4"/>';
+      
+      // Wavelength & Amplitude Brackets
+      centerSvg += '<line x1="360" y1="215" x2="560" y2="215" stroke="#7C3AED" stroke-width="2.5"/>';
+      centerSvg += '<circle cx="360" cy="215" r="4" fill="#7C3AED"/><circle cx="560" cy="215" r="4" fill="#7C3AED"/>';
+      centerSvg += '<text x="460" y="205" text-anchor="middle" font-size="12" font-weight="900" fill="#6D28D9">Wavelength (λ)</text>';
+
+      centerSvg += '<line x1="410" y1="320" x2="410" y2="410" stroke="#EC4899" stroke-width="2.5"/>';
+      centerSvg += '<text x="420" y="370" font-size="11" font-weight="800" fill="#BE185D">Amplitude (A)</text>';
+
+      // Optical Prism refraction
+      centerSvg += '<polygon points="480,420 440,500 520,500" fill="#FFFFFF" stroke="#4F46E5" stroke-width="3"/>';
+      centerSvg += '<line x1="410" y1="470" x2="455" y2="465" stroke="#F59E0B" stroke-width="3"/>';
+      centerSvg += '<path d="M490 465 L560 445" stroke="#EF4444" stroke-width="2"/>';
+      centerSvg += '<path d="M490 465 L560 465" stroke="#10B981" stroke-width="2"/>';
+      centerSvg += '<path d="M490 465 L560 485" stroke="#6366F1" stroke-width="2"/>';
+
+    } else if (/force|gravity|friction|velocity|accelerat|newton|momentum|vector|kinematic|incline|trajectory|torque/i.test(textForMatch)) {
+      domain = 'physics_mechanics';
+      subTitle = 'PHYSICAL MECHANICS & FORCE VECTORS';
+      colors = ['#EA580C', '#2563EB', '#16A34A', '#9333EA', '#0284C7', '#D97706'];
+
+      // Inclined plane mechanics
+      centerSvg += '<rect x="290" y="190" width="380" height="340" rx="20" fill="#FFF7ED" stroke="#EA580C" stroke-width="3.5"/>';
+      // Incline triangle
+      centerSvg += '<polygon points="340,480 620,480 620,320" fill="#E2E8F0" stroke="#475569" stroke-width="3"/>';
+      
+      // Mass block
+      centerSvg += '<rect x="460" y="360" width="70" height="50" rx="6" fill="#FFFFFF" stroke="#1E293B" stroke-width="3" transform="rotate(-30 495 385)"/>';
+      centerSvg += '<text x="495" y="390" text-anchor="middle" font-size="14" font-weight="900" fill="#1E293B" transform="rotate(-30 495 385)">m</text>';
+
+      // Force Vectors (Gravity, Normal, Friction, Applied)
+      centerSvg += '<line x1="495" y1="385" x2="495" y2="475" stroke="#DC2626" stroke-width="4" stroke-linecap="round"/>';
+      centerSvg += '<polygon points="495,485 490,470 500,470" fill="#DC2626"/>';
+      centerSvg += '<text x="510" y="475" font-size="12" font-weight="800" fill="#DC2626">Fg (mg)</text>';
+
+      centerSvg += '<line x1="495" y1="385" x2="465" y2="310" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>';
+      centerSvg += '<polygon points="460,300 458,315 472,310" fill="#2563EB"/>';
+      centerSvg += '<text x="455" y="290" font-size="12" font-weight="800" fill="#2563EB">Fn</text>';
+
+      centerSvg += '<line x1="495" y1="385" x2="420" y2="430" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/>';
+      centerSvg += '<text x="400" y="445" font-size="12" font-weight="800" fill="#16A34A">Friction</text>';
+
+    } else if (/reaction|reactant|product|catalyst|enthalpy|activation energy|exothermic|endothermic|titrat|acid|base|ph /i.test(textForMatch)) {
+      domain = 'chemistry';
+      subTitle = 'CHEMICAL REACTION KINETICS & ENERGETICS';
+      colors = ['#0891B2', '#7C3AED', '#EA580C', '#16A34A', '#2563EB', '#D97706'];
+
+      // Reaction Coordinate Potential Energy Profile
+      centerSvg += '<rect x="290" y="190" width="380" height="340" rx="20" fill="#F0FDFA" stroke="#0D9488" stroke-width="3.5"/>';
+      centerSvg += '<line x1="330" y1="480" x2="630" y2="480" stroke="#334155" stroke-width="3" stroke-linecap="round"/>';
+      centerSvg += '<line x1="330" y1="480" x2="330" y2="230" stroke="#334155" stroke-width="3" stroke-linecap="round"/>';
+      centerSvg += '<text x="325" y="235" text-anchor="end" font-size="13" font-weight="800" fill="#334155">Energy (E)</text>';
+      centerSvg += '<text x="630" y="505" text-anchor="end" font-size="13" font-weight="800" fill="#334155">Progress</text>';
+
+      // Potential Energy Activation Curve
+      centerSvg += '<path d="M340 400 H400 C430 400, 450 250, 480 250 C510 250, 530 450, 560 450 H620" fill="none" stroke="#0D9488" stroke-width="4.5" stroke-linecap="round"/>';
+      
+      // Transition state peak & Ea arrow
+      centerSvg += '<circle cx="480" cy="250" r="9" fill="#EA580C" stroke="#FFFFFF" stroke-width="2"/>';
+      centerSvg += '<text x="480" y="235" text-anchor="middle" font-size="11" font-weight="900" fill="#EA580C">Transition State [‡]</text>';
+      centerSvg += '<line x1="400" y1="400" x2="480" y2="400" stroke="#64748B" stroke-dasharray="4 4"/>';
+      centerSvg += '<line x1="480" y1="250" x2="480" y2="400" stroke="#7C3AED" stroke-width="2.5"/>';
+      centerSvg += '<text x="495" y="325" font-size="12" font-weight="900" fill="#7C3AED">Ea</text>';
+
+      // Enthalpy drop
+      centerSvg += '<line x1="560" y1="400" x2="620" y2="400" stroke="#64748B" stroke-dasharray="4 4"/>';
+      centerSvg += '<line x1="590" y1="400" x2="590" y2="450" stroke="#DC2626" stroke-width="2.5"/>';
+      centerSvg += '<text x="600" y="430" font-size="12" font-weight="900" fill="#DC2626">ΔH</text>';
+
+    } else if (/cell|organelle|membrane|mitochondri|nucleus|ribosome|cytoplasm|enzyme|protein/i.test(textForMatch)) {
+      domain = 'biology_cell';
+      subTitle = 'CELLULAR ULTRASTRUCTURE & ORGANELLES';
       colors = ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B', '#14B8A6', '#6366F1'];
+      
       // Detailed biological cell cross-section
-      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="180" ry="215" fill="#ECFDF5" stroke="#10B981" stroke-width="6" stroke-dasharray="8 4"/>';
-      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="164" ry="198" fill="#F0FDF4" stroke="#059669" stroke-width="4"/>';
-      // Cytoplasm subtle organelle texture
-      centerSvg += '<path d="M370 270 Q410 240 430 280 T390 320" fill="none" stroke="#6EE7B7" stroke-width="5" stroke-linecap="round"/>';
-      centerSvg += '<path d="M530 430 Q570 400 590 440 T550 480" fill="none" stroke="#6EE7B7" stroke-width="5" stroke-linecap="round"/>';
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="180" ry="175" fill="#ECFDF5" stroke="#10B981" stroke-width="6" stroke-dasharray="8 4"/>';
+      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="164" ry="160" fill="#F0FDF4" stroke="#059669" stroke-width="4"/>';
       // Mitochondria capsules
-      centerSvg += '<rect x="360" y="380" width="70" height="36" rx="18" fill="#FDE68A" stroke="#D97706" stroke-width="3"/>';
-      centerSvg += '<path d="M375 398 Q395 385 415 398" fill="none" stroke="#B45309" stroke-width="2.5"/>';
-      centerSvg += '<rect x="530" y="270" width="65" height="32" rx="16" fill="#FDE68A" stroke="#D97706" stroke-width="3"/>';
-      centerSvg += '<path d="M545 286 Q562 276 580 286" fill="none" stroke="#B45309" stroke-width="2.5"/>';
+      centerSvg += '<rect x="360" y="360" width="70" height="36" rx="18" fill="#FDE68A" stroke="#D97706" stroke-width="3"/>';
+      centerSvg += '<path d="M375 378 Q395 365 415 378" fill="none" stroke="#B45309" stroke-width="2.5"/>';
       // Large Nucleus with double membrane & nucleolus
-      centerSvg += '<circle cx="' + (cx + 10) + '" cy="' + (cy - 10) + '" r="68" fill="#EDE9FE" stroke="#7C3AED" stroke-width="5"/>';
-      centerSvg += '<circle cx="' + (cx + 10) + '" cy="' + (cy - 10) + '" r="46" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="3"/>';
-      centerSvg += '<circle cx="' + (cx + 15) + '" cy="' + (cy - 12) + '" r="22" fill="#6D28D9"/>';
+      centerSvg += '<circle cx="' + (cx + 20) + '" cy="' + (cy - 10) + '" r="64" fill="#EDE9FE" stroke="#7C3AED" stroke-width="5"/>';
+      centerSvg += '<circle cx="' + (cx + 20) + '" cy="' + (cy - 10) + '" r="42" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="3"/>';
+      centerSvg += '<circle cx="' + (cx + 25) + '" cy="' + (cy - 12) + '" r="18" fill="#6D28D9"/>';
       // Ribosomes / micro dots
-      centerSvg += '<circle cx="450" cy="460" r="4" fill="#3B82F6"/><circle cx="465" cy="475" r="4" fill="#3B82F6"/><circle cx="485" cy="465" r="4" fill="#3B82F6"/>';
-      centerSvg += '<circle cx="400" cy="230" r="4" fill="#3B82F6"/><circle cx="420" cy="220" r="4" fill="#3B82F6"/>';
-    } else if (domain === 'history') {
+      centerSvg += '<circle cx="450" cy="440" r="4" fill="#3B82F6"/><circle cx="465" cy="455" r="4" fill="#3B82F6"/><circle cx="485" cy="445" r="4" fill="#3B82F6"/>';
+      centerSvg += '<circle cx="390" cy="260" r="4" fill="#3B82F6"/><circle cx="410" cy="250" r="4" fill="#3B82F6"/>';
+
+    } else if (/war|battle|wwii|wwi|treaty|empire|revolution|military|army|soviet|cold war|allies|axis/i.test(textForMatch)) {
+      domain = 'history';
+      subTitle = 'HISTORICAL THEATRE & STRATEGIC CHRONOLOGY';
       colors = ['#DC2626', '#D97706', '#2563EB', '#475569', '#7C3AED', '#059669'];
-      // Strategic Theatre / Conflict Map & Alliance Grid
-      centerSvg += '<rect x="300" y="180" width="360" height="360" rx="20" fill="#FEF2F2" stroke="#DC2626" stroke-width="4"/>';
-      // Map grid lines
+      
+      centerSvg += '<rect x="300" y="190" width="360" height="340" rx="20" fill="#FEF2F2" stroke="#DC2626" stroke-width="4"/>';
+      // Strategic grid lines
       centerSvg += '<line x1="300" y1="270" x2="660" y2="270" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
       centerSvg += '<line x1="300" y1="360" x2="660" y2="360" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
       centerSvg += '<line x1="300" y1="450" x2="660" y2="450" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
-      centerSvg += '<line x1="390" y1="180" x2="390" y2="540" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
-      centerSvg += '<line x1="480" y1="180" x2="480" y2="540" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
-      centerSvg += '<line x1="570" y1="180" x2="570" y2="540" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="420" y1="190" x2="420" y2="530" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
+      centerSvg += '<line x1="540" y1="190" x2="540" y2="530" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="6 4"/>';
       // Front lines & tactical arrows
       centerSvg += '<path d="M340 480 Q430 380 470 330 Q510 280 620 230" fill="none" stroke="#DC2626" stroke-width="5" stroke-linecap="round"/>';
       centerSvg += '<path d="M350 490 Q440 390 480 340 Q520 290 630 240" fill="none" stroke="#2563EB" stroke-width="3" stroke-dasharray="8 6"/>';
-      // Central Shield / Insignia
-      centerSvg += '<path d="M480 280 L530 310 V380 Q530 430 480 460 Q430 430 430 380 V310 Z" fill="#FFFFFF" stroke="#991B1B" stroke-width="4"/>';
-      centerSvg += '<path d="M480 300 L515 322 V375 Q515 412 480 438 Q445 412 445 375 V322 Z" fill="#FEE2E2"/>';
-      centerSvg += '<circle cx="480" cy="365" r="14" fill="#DC2626"/>';
-      // Compass Rose
-      centerSvg += '<g transform="translate(620, 220)">' +
-        '<circle cx="0" cy="0" r="22" fill="#FFFFFF" stroke="#475569" stroke-width="2"/>' +
-        '<polygon points="0,-18 4,-4 18,0 4,4 0,18 -4,4 -18,0 -4,-4" fill="#DC2626"/>' +
-        '<text x="0" y="-22" text-anchor="middle" font-size="10" font-weight="800" fill="#475569">N</text>' +
-      '</g>';
-    } else if (domain === 'physics') {
-      colors = ['#06B6D4', '#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EC4899'];
-      // Quantum / Atomic Planetary Orbits
-      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="200" ry="85" fill="none" stroke="#06B6D4" stroke-width="3.5" transform="rotate(30 ' + cx + ' ' + cy + ')"/>';
-      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="200" ry="85" fill="none" stroke="#3B82F6" stroke-width="3.5" transform="rotate(-30 ' + cx + ' ' + cy + ')"/>';
-      centerSvg += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="200" ry="85" fill="none" stroke="#8B5CF6" stroke-width="3.5" transform="rotate(90 ' + cx + ' ' + cy + ')"/>';
-      // Orbiting particles with glowing halos
-      centerSvg += '<circle cx="340" cy="270" r="10" fill="#06B6D4"/><circle cx="340" cy="270" r="16" fill="none" stroke="#06B6D4" stroke-width="2" stroke-opacity="0.5"/>';
-      centerSvg += '<circle cx="620" cy="270" r="10" fill="#3B82F6"/><circle cx="620" cy="270" r="16" fill="none" stroke="#3B82F6" stroke-width="2" stroke-opacity="0.5"/>';
-      centerSvg += '<circle cx="480" cy="540" r="10" fill="#8B5CF6"/><circle cx="480" cy="540" r="16" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-opacity="0.5"/>';
-      // Central Radiant Nucleus Cluster
-      centerSvg += '<circle cx="' + cx + '" cy="' + cy + '" r="52" fill="#FEF3C7" stroke="#F59E0B" stroke-width="4"/>';
-      centerSvg += '<circle cx="' + (cx - 14) + '" cy="' + (cy - 12) + '" r="20" fill="#EF4444"/>';
-      centerSvg += '<circle cx="' + (cx + 14) + '" cy="' + (cy - 10) + '" r="20" fill="#3B82F6"/>';
-      centerSvg += '<circle cx="' + (cx - 6) + '" cy="' + (cy + 14) + '" r="20" fill="#10B981"/>';
-      centerSvg += '<circle cx="' + (cx + 14) + '" cy="' + (cy + 12) + '" r="18" fill="#F59E0B"/>';
-    } else if (domain === 'tech') {
+      // Central Shield
+      centerSvg += '<path d="M480 290 L525 315 V370 Q525 410 480 435 Q435 410 435 370 V315 Z" fill="#FFFFFF" stroke="#991B1B" stroke-width="4"/>';
+      centerSvg += '<circle cx="480" cy="360" r="14" fill="#DC2626"/>';
+
+    } else if (/code|comput|algorithm|network|database|ai|neural|data|server|api|software|cpu|cloud/i.test(textForMatch)) {
+      domain = 'tech';
+      subTitle = 'DISTRIBUTED SYSTEM ARCHITECTURE';
       colors = ['#8B5CF6', '#06B6D4', '#10B981', '#3B82F6', '#F59E0B', '#6366F1'];
-      // Neural / System Architecture Pipeline Bus
-      centerSvg += '<rect x="310" y="210" width="340" height="300" rx="16" fill="#F5F3FF" stroke="#7C3AED" stroke-width="4"/>';
-      // PCB traces & connection lines
+      
+      centerSvg += '<rect x="300" y="190" width="360" height="340" rx="20" fill="#F5F3FF" stroke="#7C3AED" stroke-width="4"/>';
       centerSvg += '<path d="M340 260 H420 V340 H460" fill="none" stroke="#8B5CF6" stroke-width="3"/>';
       centerSvg += '<path d="M340 460 H420 V380 H460" fill="none" stroke="#8B5CF6" stroke-width="3"/>';
       centerSvg += '<path d="M620 260 H540 V340 H500" fill="none" stroke="#06B6D4" stroke-width="3"/>';
       centerSvg += '<path d="M620 460 H540 V380 H500" fill="none" stroke="#06B6D4" stroke-width="3"/>';
       // Central Processing Core Module
-      centerSvg += '<rect x="440" y="320" width="80" height="80" rx="12" fill="#7C3AED" stroke="#5B21B6" stroke-width="3"/>';
+      centerSvg += '<rect x="440" y="320" width="80" height="80" rx="14" fill="#7C3AED" stroke="#5B21B6" stroke-width="3"/>';
       centerSvg += '<circle cx="480" cy="360" r="18" fill="#FFFFFF"/>';
-      centerSvg += '<text x="480" y="365" text-anchor="middle" font-size="12" font-weight="900" fill="#7C3AED">CORE</text>';
-      // Stage nodes
+      centerSvg += '<text x="480" y="365" text-anchor="middle" font-size="11" font-weight="900" fill="#7C3AED">CORE</text>';
       centerSvg += '<circle cx="340" cy="260" r="12" fill="#10B981"/><circle cx="340" cy="460" r="12" fill="#10B981"/>';
       centerSvg += '<circle cx="620" cy="260" r="12" fill="#06B6D4"/><circle cx="620" cy="460" r="12" fill="#06B6D4"/>';
+
     } else {
-      // General Dynamic Conceptual System Diagram
+      // General Dynamic Multi-Node Analytic Synthesis Matrix
+      domain = 'general_framework';
+      subTitle = 'CONCEPTUAL ARCHITECTURE & SYSTEM MATRIX';
       colors = ['#4F46E5', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6'];
-      centerSvg += '<circle cx="' + cx + '" cy="' + cy + '" r="170" fill="#EEF2FF" stroke="#4F46E5" stroke-width="4" stroke-dasharray="6 4"/>';
-      centerSvg += '<circle cx="' + cx + '" cy="' + cy + '" r="120" fill="#E0E7FF" stroke="#6366F1" stroke-width="3"/>';
-      // Flow rings & connecting hubs
-      centerSvg += '<circle cx="' + (cx - 70) + '" cy="' + (cy - 60) + '" r="34" fill="#FFFFFF" stroke="#06B6D4" stroke-width="3"/>';
-      centerSvg += '<circle cx="' + (cx + 70) + '" cy="' + (cy - 60) + '" r="34" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>';
-      centerSvg += '<circle cx="' + cx + '" cy="' + (cy + 75) + '" r="34" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3"/>';
-      // Central focal icon
-      centerSvg += '<circle cx="' + cx + '" cy="' + (cy - 5) + '" r="42" fill="#4F46E5"/>';
-      centerSvg += '<circle cx="' + cx + '" cy="' + (cy - 5) + '" r="28" fill="#EEF2FF"/>';
-      centerSvg += '<circle cx="' + cx + '" cy="' + (cy - 5) + '" r="14" fill="#4F46E5"/>';
+
+      // Hexagonal multi-hub synthesis core
+      centerSvg += '<polygon points="480,210 610,285 610,435 480,510 350,435 350,285" fill="#EEF2FF" stroke="#4F46E5" stroke-width="3.5" stroke-dasharray="8 6"/>';
+      centerSvg += '<polygon points="480,250 570,300 570,420 480,470 390,420 390,300" fill="#E0E7FF" stroke="#6366F1" stroke-width="2.5"/>';
+
+      // Internal connection web
+      centerSvg += '<line x1="480" y1="250" x2="480" y2="470" stroke="#818CF8" stroke-width="2"/>';
+      centerSvg += '<line x1="390" y1="300" x2="570" y2="420" stroke="#818CF8" stroke-width="2"/>';
+      centerSvg += '<line x1="390" y1="420" x2="570" y2="300" stroke="#818CF8" stroke-width="2"/>';
+
+      // Central Hub
+      centerSvg += '<circle cx="480" cy="360" r="38" fill="#FFFFFF" stroke="#4F46E5" stroke-width="4"/>';
+      centerSvg += '<circle cx="480" cy="360" r="22" fill="#4F46E5"/>';
+      centerSvg += '<circle cx="480" cy="360" r="10" fill="#EEF2FF"/>';
+
+      // Satellite Nodes
+      centerSvg += '<circle cx="480" cy="210" r="14" fill="#06B6D4" stroke="#FFFFFF" stroke-width="2.5"/>';
+      centerSvg += '<circle cx="610" cy="285" r="14" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>';
+      centerSvg += '<circle cx="610" cy="435" r="14" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2.5"/>';
+      centerSvg += '<circle cx="480" cy="510" r="14" fill="#EC4899" stroke="#FFFFFF" stroke-width="2.5"/>';
+      centerSvg += '<circle cx="350" cy="435" r="14" fill="#8B5CF6" stroke="#FFFFFF" stroke-width="2.5"/>';
+      centerSvg += '<circle cx="350" cy="285" r="14" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2.5"/>';
     }
 
     let svg = '';
     svg += '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">';
     svg += '<rect width="100%" height="100%" fill="' + bgFill + '"/>';
     
-    // Header Title
+    // Header Title & Contextual Category Subtitle
     svg += '<text x="' + cx + '" y="56" text-anchor="middle" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="26" font-weight="800" fill="#09090B" letter-spacing="-0.02em">' + escXml(rawTitle) + '</text>';
-    svg += '<text x="' + cx + '" y="84" text-anchor="middle" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#71717A" text-transform="uppercase" letter-spacing="0.08em">Interactive Concept Breakdown</text>';
+    svg += '<text x="' + cx + '" y="84" text-anchor="middle" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="13" font-weight="700" fill="#64748B" text-transform="uppercase" letter-spacing="0.08em">' + escXml(subTitle) + '</text>';
 
     // Render central theme
     svg += centerSvg;
@@ -216,7 +426,6 @@
         
         // Label Text
         const textX = cardX + 38;
-        const maxTextW = cardW - 48;
         svg += '<text x="' + textX + '" y="' + (y + cardH / 2 + 6) + '" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="16" font-weight="700" fill="#18181B">' + escXml(String(lab).slice(0, 24)) + '</text>';
       });
     }
@@ -237,14 +446,33 @@
 
     const cacheKey = (q + '|' + labels.join(',')).toLowerCase();
     const cached = readImgCache()[cacheKey];
-    if (cached && String(cached).indexOf('data:image/svg') === 0) {
+    if (cached) {
       done(cached);
       return;
     }
 
-    const url = buildLabeledDiagramSvg(title, labels);
-    writeImgCache(cacheKey, url);
-    done(url);
+    // 1. Generate high-quality topic-tailored vector diagram immediately so reader has instant crisp visual
+    const vectorUrl = buildLabeledDiagramSvg(title, labels);
+    writeImgCache(cacheKey, vectorUrl);
+    done(vectorUrl);
+
+    // 2. Optionally attempt background AI infographic generation via NVIDIA FLUX for rich pictorial diagrams
+    try {
+      const email = localStorage.getItem('NOURA_EMAIL') || '';
+      const prompt = `Educational visual diagram of "${title}". Topic: ${q}. Components shown: ${labels.join(', ')}. Clean vector illustration, educational infographic style, high contrast, white background, textbook diagram.`;
+      fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Noura-Email': email },
+        body: JSON.stringify({ prompt: prompt, source: 'lesson' })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.image_url && data.image_url.startsWith('data:image/png')) {
+          writeImgCache(cacheKey, data.image_url);
+        }
+      })
+      .catch(function() {});
+    } catch(e) {}
   }
 
   function readImgCache() {
