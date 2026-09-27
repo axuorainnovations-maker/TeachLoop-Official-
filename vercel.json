@@ -37,6 +37,10 @@
       "dest": "/api/index.py"
     },
     {
+      "src": "/api/metrics/?$",
+      "dest": "/api/metrics.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.py"
     },
